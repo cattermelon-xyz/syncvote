@@ -1,2 +1,3 @@
 # syncvote-fe
-Front end for SyncVote project
+
+Repo for SyncVote: Front end and Edge functions.
