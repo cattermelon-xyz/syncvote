@@ -13,6 +13,9 @@ export interface ICheckPoint {
   participation?: IParticipant,
 }
 
+// TODO: add version
+// TODO: separate between data & cosmetic options
+
 export interface IParticipant {
   type?: 'token' | 'identity',
   data?: IToken | string[],

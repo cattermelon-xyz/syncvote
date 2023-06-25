@@ -28,6 +28,7 @@
     "eslint-config-prettier": "^8.6.0",
     "file-saver": "^2.0.5",
     "fuse.js": "^6.6.2",
+    "html-react-parser": "^4.0.0",
     "js-file-download": "^0.4.12",
     "moment": "^2.29.4",
     "react": "^18.2.0",

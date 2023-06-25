@@ -7,7 +7,8 @@ import { CommentOutlined, LockFilled, UnlockOutlined } from '@ant-design/icons';
 import {
   validateWorkflow, validateMission,
 } from '@middleware/logic';
-import { ICheckPoint } from '../../../types';
+import { ICheckPoint } from '@types';
+import TextEditor from '@components/Editor/TextEditor';
 import { getVoteMachine } from '../voteMachine';
 
 const ContextTab = ({
@@ -88,14 +89,15 @@ const ContextTab = ({
             disabled={!editable}
           />
         </Space>
-        <TextArea
+        <TextEditor
           value={selectedNode?.description}
-          onChange={(e) => {
+          setValue={(value:any) => {
             const newNode = structuredClone(selectedNode);
-            newNode.description = e.target.value;
+            newNode.description = value;
             onChange(newNode);
           }}
-          disabled={locked.description}
+          heightEditor={200}
+          // disabled={locked.description}
         />
       </Space>
       {!selectedNode?.isEnd && selectedNode.vote_machine_type ?

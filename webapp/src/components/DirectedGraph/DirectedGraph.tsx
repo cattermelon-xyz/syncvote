@@ -7,12 +7,13 @@ import { Button, Space } from 'antd';
 import { PlusOutlined, VerticalAlignMiddleOutlined } from '@ant-design/icons';
 import 'reactflow/dist/style.css';
 import { buildATree } from './buildATree';
-import MultipleDirectNode from './MultipleDiretionNode';
-import SelfConnectingEdge from './SelfConnectingEdge';
-import BezierCustomEdge from './BezierCustomEdge';
+import MultipleDirectNode from './CustomNodes/MultipleDiretionNode';
+import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
+import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
+import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
 
 const nodeTypes = { ...MultipleDirectNode.getType() };
-const edgeTypes = { ...SelfConnectingEdge.getType(), ...BezierCustomEdge.getType() };
+const edgeTypes = { ...SelfConnectingEdge.getType(), ...BezierCustomEdge.getType(), ...SmoothCustomEdge.getType() };
 
 interface IFlow {
   data?: any, // eslint-disable-line

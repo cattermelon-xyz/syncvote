@@ -1,10 +1,11 @@
 import { MarkerType, Position } from 'reactflow';
-import SelfConnectingEdge from './SelfConnectingEdge';
-import MultipleDiretionNode from './MultipleDiretionNode';
+import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
+import MultipleDiretionNode from './CustomNodes/MultipleDiretionNode';
 import { emptyStage } from './emptyStage';
 import { getVoteMachine } from './voteMachine';
 import { IVoteMachine } from '../../types';
-import BezierCustomEdge from './BezierCustomEdge';
+import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
+import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
 
 const widths = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.2796875,0.2765625,0.3546875,0.5546875,0.5546875,0.8890625,0.665625,0.190625,0.3328125,0.3328125,0.3890625,0.5828125,0.2765625,0.3328125,0.2765625,0.3015625,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.2765625,0.2765625,0.584375,0.5828125,0.584375,0.5546875,1.0140625,0.665625,0.665625,0.721875,0.721875,0.665625,0.609375,0.7765625,0.721875,0.2765625,0.5,0.665625,0.5546875,0.8328125,0.721875,0.7765625,0.665625,0.7765625,0.721875,0.665625,0.609375,0.721875,0.665625,0.94375,0.665625,0.665625,0.609375,0.2765625,0.3546875,0.2765625,0.4765625,0.5546875,0.3328125,0.5546875,0.5546875,0.5,0.5546875,0.5546875,0.2765625,0.5546875,0.5546875,0.221875,0.240625,0.5,0.221875,0.8328125,0.5546875,0.5546875,0.5546875,0.5546875,0.3328125,0.5,0.2765625,0.5546875,0.5,0.721875,0.5,0.5,0.5,0.3546875,0.259375,0.353125,0.5890625]; //eslint-disable-line
 const avg = 0.5279276315789471;
@@ -65,12 +66,14 @@ const buildEdge = ({
     // edgeType = 'right->left';
     sourceHandle = `s-${Position.Right}`;
     targetHandle = `t-${Position.Left}`;
-    type = BezierCustomEdge.getTypeName();
+    // type = BezierCustomEdge.getTypeName();
+    type = SmoothCustomEdge.getTypeName();
   } else if (angle > 45 && angle <= 135) {
     // edgeType = 'bottom->top';
     sourceHandle = `s-${Position.Bottom}`;
     targetHandle = `t-${Position.Top}`;
-    type = BezierCustomEdge.getTypeName();
+    // type = BezierCustomEdge.getTypeName();
+    type = SmoothCustomEdge.getTypeName();
   } else if (angle > 135 && angle <= 225) {
     // edgeType = 'top->top';
     sourceHandle = `s-${Position.Top}`;
@@ -80,7 +83,8 @@ const buildEdge = ({
     // edgeType = 'top->bottom';
     sourceHandle = `s-${Position.Top}`;
     targetHandle = `t-${Position.Bottom}`;
-    type = BezierCustomEdge.getTypeName();
+    // type = BezierCustomEdge.getTypeName();
+    type = SmoothCustomEdge.getTypeName();
   }
   // console.log(`${source.id}->${target.id}`, sourceHandle, targetHandle,'; angle: ',angle);
   return {
@@ -146,7 +150,7 @@ export const buildATree = (data:any, selectedNodeId:string | undefined) => {
 
     if (!node.edgeConstructed && node.children && node.children.length > 0) {
       node.edgeConstructed = true; // eslint-disable-line no-param-reassign
-      const sourceId = node.id;
+      const sourceId = node.id; 
       node.children.forEach((childId:string) => {
         const child = checkpoints.find((_node) => _node.id === childId);
         let edgeStyle = {};
@@ -187,6 +191,7 @@ export const buildATree = (data:any, selectedNodeId:string | undefined) => {
           label: checkpoint.title ? checkpoint.title : checkpoint.id,
           style: nodeStyle,
           isEnd: checkpoint.isEnd,
+          raw: checkpoint,
           triggers: checkpoint.triggers,
         },
         x: checkpoint.x,
