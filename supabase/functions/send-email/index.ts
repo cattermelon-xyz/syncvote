@@ -30,7 +30,7 @@ serve(async (req) => {
   }
   const { inviter, full_name, org_title, to_email  } = await req.json();
   const url = "https://api.postmarkapp.com/email/withTemplate";
-  const token = Deno.env.get('POSTMAN_KEY') ?? '',
+  const token = Deno.env.get('POSTMAN_KEY') ?? '';
   try {
     const data = await fetch(url, {
       method: "POST",
