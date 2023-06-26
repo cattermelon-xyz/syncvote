@@ -11,7 +11,7 @@ interface CustomProps extends EdgeProps {
 const Path = memo((props: CustomProps) => {
   const {
     sourceX, sourceY, targetX, targetY, markerEnd, style, label, sourcePosition, targetPosition,
-    id, isHappyPath //eslint-disable-line
+    id, isHappyPath = true //eslint-disable-line
   } = props;
   const smoothOpts = getSmoothStepPath({
     sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, borderRadius: 24,
@@ -23,7 +23,7 @@ const Path = memo((props: CustomProps) => {
     strokeWidth: 2,
     stroke: '#6F00FF',
     // 1px -1px 0px 7px rgba(0,0,0,0.48);
-    filter: 'drop-shadow(0px 0px 5px rgb(111 0 255 / 0.7)) drop-shadow( 1px  0px 5px rgb(111 0 255 / 0.7))  drop-shadow(-1px  0px 5px rgb(111 20 255 / 0.5))',
+    // filter: 'drop-shadow(0px 0px 5px rgb(111 0 255 / 0.7)) drop-shadow( 1px  0px 5px rgb(111 0 255 / 0.7))  drop-shadow(-1px  0px 5px rgb(111 20 255 / 0.5))',
   } : {};
   const finalStyle = { ...style, ...additionalStyle };
   return (

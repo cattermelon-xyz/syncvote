@@ -1,4 +1,4 @@
-import { ICheckPoint } from '../../types';
+import { ICheckPoint, IWorkflowVersion } from './interface';
 
 const rootCheckPoint: ICheckPoint = {
   id: 'root',
@@ -9,7 +9,7 @@ const rootCheckPoint: ICheckPoint = {
   isEnd: true,
   data: {},
 };
-export const emptyStage = {
+export const emptyStage:IWorkflowVersion = {
   checkpoints: [
     rootCheckPoint,
   ],

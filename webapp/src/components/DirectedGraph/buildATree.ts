@@ -3,7 +3,7 @@ import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
 import MultipleDiretionNode from './CustomNodes/MultipleDiretionNode';
 import { emptyStage } from './emptyStage';
 import { getVoteMachine } from './voteMachine';
-import { IVoteMachine } from '../../types';
+import { IVoteMachine, IWorkflowVersion, IWorkflowVersionLayout } from './interface';
 import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
 import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
 
@@ -103,9 +103,12 @@ const buildEdge = ({
   };
 };
 
-export const buildATree = (data:any, selectedNodeId:string | undefined) => {
+export const buildATree = (data:IWorkflowVersion, selectedNodeId:string | undefined) => {
   const checkpoints: Array<any> = [];
   let newData = { ...data };
+  const layouts:IWorkflowVersionLayout[] = data.cosmetic?.layouts || [];
+  const defaultLayout = data.cosmetic?.default;
+  // TODO: render based on layout
   if (data.checkpoints === undefined || data.checkpoints.length === 0) {
     newData = emptyStage;
   }

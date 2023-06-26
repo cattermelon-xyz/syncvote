@@ -76,3 +76,54 @@ export interface IVoteMachine {
     checkpoint:ICheckPoint,
   }) => { isValid: boolean, message: string[] } ;
 }
+
+export interface IWorkflowVersionLayoutMarker {
+  id: string;
+  title: string;
+  description?: string;
+  color: string;
+  icon: string;
+}
+
+export interface IWorkflowVersionLayoutNode {
+  position: {
+    x: number;
+    y: number;
+  },
+  style?: {
+    header?: any;
+    content?: any;
+  }
+}
+
+export interface IWorkflowVersionLayoutEdge {
+  style: {
+    path: any;
+    label: any;
+    markerEnd: any;
+  }
+}
+
+export interface IWorkflowVersionLayout {
+  id: string;
+  renderer: "default";
+  screen: "horizontal" | "vertical";
+  title: string;
+  descritpion?: string;
+  nodes?: [],
+  edges?: [],
+  markers?: [],
+  background?: {},
+}
+
+export interface IWorkflowVersion {
+  start: string;
+  checkpoints: ICheckPoint[];
+  cosmetic?: {
+    default: {
+      horizontal: string;
+      vertical: string;
+    };
+    layouts: IWorkflowVersionLayout[];
+  }
+}
