@@ -14,6 +14,7 @@ import SingleChoiceRaceToMax from '@votemachines/SingleChoiceRaceToMax';
 import MultipleChoiceRaceToMax from '@votemachines/MultipleChoiceRaceToMax';
 import { queryOrgs, queryPresetBanner, queryPresetIcon } from '@middleware/data';
 import { shouldUseCachedData } from '@utils/helpers';
+import { log } from 'console';
 
 function App({
   isFullHeight = false,
@@ -97,4 +98,5 @@ function App({
     </div>
   );
 }
+
 export default App;

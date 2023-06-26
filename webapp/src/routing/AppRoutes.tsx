@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
 import App from '@App';
+import PublicMission from '@PublicMission';
+
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import PageScreen from '@components/HomeScreen/PageScreen';
 import ChooseWorkflow from '@pages/Mission/ChooseWorkflow';
@@ -22,6 +24,14 @@ import EditMission from '@pages/Mission/EditMission';
 const AppRoutes = () => (
   <BrowserRouter basename="/">
     <Routes>
+      {/* <Router path></Router> */}
+
+      <Route path="/public" element={<PublicMission isFullHeight/>}>
+        <Route>
+        <Route path="mission" element={<EditVersion />} />
+        </Route>
+      </Route>
+
       <Route path="/" element={<App isFullHeight />}>
         <Route path=":orgIdString/:workflowIdString/:versionIdString" element={<EditVersion />} />
         <Route path=":orgIdString/mission/:missionIdString" element={<Mission />}>

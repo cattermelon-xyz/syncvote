@@ -153,3 +153,7 @@ html body {
 .ant-btn-primary {
   background-color: #7c3aed !important;
 }
+
+.header-public {
+  width: 480px;
+}
