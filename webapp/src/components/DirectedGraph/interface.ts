@@ -106,10 +106,10 @@ export interface IWorkflowVersionLayoutEdge {
 
 export interface IWorkflowVersionLayout {
   id: string;
-  renderer: "default";
-  screen: "horizontal" | "vertical";
+  renderer: string;
+  screen: "horizontal" | "vertical" | string;
   title: string;
-  descritpion?: string;
+  description?: string;
   nodes?: [],
   edges?: [],
   markers?: [],

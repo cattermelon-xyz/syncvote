@@ -1,7 +1,8 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Button, Space } from 'antd';
+import { Button, Drawer, Layout, Space } from 'antd';
 import { useState } from 'react';
 import { IWorkflowVersionLayout } from '../interface';
+import LayoutFrm from './LayoutFrm';
 
 const CosmeticConfigPanel = ({layouts , newLayoutHandler, deleteLayoutHandler}: {
   layouts: IWorkflowVersionLayout[],
@@ -9,8 +10,22 @@ const CosmeticConfigPanel = ({layouts , newLayoutHandler, deleteLayoutHandler}: 
   deleteLayoutHandler: (layoutId: string) => void,
 }) => {
   const [showNewLayoutModal, setShowNewLayoutModal] = useState(false);
+  const emptyLayout = {
+    id: '',
+    screen: 'horizontal',
+    title: '',
+    description: '',
+    renderer: 'default',
+  };
   return (
     <Space direction="vertical" size="large" className="w-full">
+      <Drawer
+        title="New Layout"
+        open={showNewLayoutModal}
+        onClose={() => setShowNewLayoutModal(false)}
+      >
+        <LayoutFrm layout={{...emptyLayout}} />
+      </Drawer>
       <Space direction="horizontal" className="flex justify-between w-full">
         <span>Layouts</span>
         <Button
