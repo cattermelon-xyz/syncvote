@@ -51,7 +51,8 @@ export const LANG: any = {
     'Please keep in mind that after start time, the proposal will be active and can’t be edited or deleted',
   endTime: 'End time',
   startTime: 'Start time',
-  unlockCollective: 'Unlock the collective intelligence of decentralized decision-making',
+  unlockCollective:
+    'Unlock the collective intelligence of decentralized decision-making',
   connectWallet: 'Connect wallet to create',
   copyLinkToProposal: 'Copy link to proposal',
   automateWithDiscordBot: 'Automate with Discord Bot',
@@ -75,7 +76,8 @@ export const LANG: any = {
   assetType: 'Asset type',
   action: 'Action',
   addApprovals: 'Add approvals',
-  youCanSelect: 'You can select custom options when creating a multi-linked proposal',
+  youCanSelect:
+    'You can select custom options when creating a multi-linked proposal',
   evermoon:
     'Evermoon has passed IC voting with the unanimous 100% approval rate. This vote will automatically be approved in x days unless the community reject the investment.',
   traction: '[Traction] Evermoon',
@@ -87,7 +89,8 @@ export const LANG: any = {
   publish: 'Publish',
   thisFieldIsRequiredPleaseFillIn: 'This field is required. Please fill in',
   duplicateNameTag: 'Duplicate name tag, please re-enter',
-  allOptionsName: 'All options name of all voting methods have to be different to be valid',
+  allOptionsName:
+    'All options name of all voting methods have to be different to be valid',
   maximumInputLengthIs255Characters: 'Maximum input length is 255 characters.',
   executionTime: 'Execution time',
   memberList: 'Member list',
@@ -135,11 +138,13 @@ export const LANG: any = {
   viewCheckpointSettings: 'View checkpoint settings',
   votingCondition: 'Voting condition',
   numberOfParticipants: 'Number of participants',
-  numberOfOptionsEachParticipantCanVote: 'Number of options each participant can vote',
+  numberOfOptionsEachParticipantCanVote:
+    'Number of options each participant can vote',
   thresholdCalculatedBy: 'Threshold calculated by',
   totalVotesMade: 'Total votes made',
   thresholdValueForEachResult: 'Threshold value for each result (% at least)',
-  thresholdValueForEachResultVotesAtLeast: 'Threshold value for each result (votes at least)',
+  thresholdValueForEachResultVotesAtLeast:
+    'Threshold value for each result (votes at least)',
   inputNumberOfResults: 'Input number of results',
   option: 'Option',
   editParticipants: 'Edit participants',
@@ -162,9 +167,11 @@ export const LANG: any = {
   selectNFTCol: 'Select NFT collection',
   minimumHoldingPeriod: 'Minimum holding period (optional)',
   minimumHoldingQuantity: 'Minimum holding quantity (optional)',
-  thisFieldIsRequiredMustBeAnInteger: 'This field is required. Must be an integer.',
+  thisFieldIsRequiredMustBeAnInteger:
+    'This field is required. Must be an integer.',
   thisFieldMustBeAPositiveInteger: 'This field must be a positive integer',
-  onlyAllowedToUploadAMaximumOf100Files: 'Only allowed to upload a maximum of 100 files!',
+  onlyAllowedToUploadAMaximumOf100Files:
+    'Only allowed to upload a maximum of 100 files!',
   numberOfDatascource: 'Number of datascource:',
   thereAreInvalidFiles: 'There are invalid files',
   transfer: 'Transfer',
@@ -205,7 +212,8 @@ export const LANG: any = {
   optionColumn: 'Options column',
   preview: 'Preview',
   label: 'Label',
-  selectATagToAddContentBasedOnResults: 'Select a tag to add content based on results',
+  selectATagToAddContentBasedOnResults:
+    'Select a tag to add content based on results',
   noteLongDynamicContentMayNotDisplayOnTwitterSRulesOf250Characters:
     "Note: Long dynamic content may not display on Twitter's rules of 250 characters",
   labelOfTheApprovedOptionS: 'Label of the approved option(s)',
@@ -215,7 +223,8 @@ export const LANG: any = {
   createMultipleMultiLinkedProposals: 'Create multiple',
   reviewCheckpoints: 'Review checkpoints',
   multiLinkedProposalName: 'Multi-linked proposal name',
-  addBasicInfoForANewMultiLinkedProposal: 'Add basic info for a new multi-linked proposal',
+  addBasicInfoForANewMultiLinkedProposal:
+    'Add basic info for a new multi-linked proposal',
   numberOfMultiLinkedProposals: 'Number of multi-linked proposals',
   inOrderToAddMultipleMultiLinkedProposalAtTheSameTimePleaseReferToThis:
     'In order to add multiple multi-linked proposal at the same time, please refer to this',
@@ -234,7 +243,8 @@ export const LANG: any = {
   availableOptions: 'Available options',
   delayTime: 'Delay time',
   templates: 'Templates',
-  exploreBlueprintsInTheTemplateLibrary: 'Explore workflows in the template library',
+  exploreBlueprintsInTheTemplateLibrary:
+    'Explore workflows in the template library',
   allOptionsNameOfAllVotingMethodsHaveToBeDifferent:
     'All options name have to be different to be valid.',
   viewLessOptions: 'View less options',
@@ -250,8 +260,10 @@ export const LANG: any = {
   pleaseEnterTheValue: 'Please enter the value',
   pleaseSelectTheTime: 'Please select the time',
   endTimeGreaterThanStartTime: 'Start time must be earlier than end time',
-  startGreaterThanEndTime: 'The start time must be greater than the previous end time',
-  executionTimeGreaterThanEndTime: 'The execution time must be greater than the end time',
+  startGreaterThanEndTime:
+    'The start time must be greater than the previous end time',
+  executionTimeGreaterThanEndTime:
+    'The execution time must be greater than the end time',
   cancel: 'Cancel',
   application: 'Application',
   connectToTwitter: 'Connect to Twitter',
@@ -260,7 +272,8 @@ export const LANG: any = {
   addNew: 'Add new',
   details: 'Details',
   postContent: 'Post content',
-  shapeTheFutureOfYourDaoThroughVoting: 'Shape the future of your DAO through voting',
+  shapeTheFutureOfYourDaoThroughVoting:
+    'Shape the future of your DAO through voting',
   joinToBuildYourOwnWorkflow: 'Join to build your own workflow',
   signInOrConnectWalletToVote: 'Sign in or connect wallet to vote',
   continueWidth: 'Continue with',
@@ -280,4 +293,6 @@ export const LANG: any = {
   organizationType: 'Type of organization',
   organizationSize: 'Size of organization',
   chooseIcon: 'Choose Icon',
+  welcomeToSyncvote: 'Welcome to Syncvote',
+  logInToStartCreatingYourWorkflows: 'Log in to start creating your workflows'
 };
