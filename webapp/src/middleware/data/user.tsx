@@ -1,5 +1,6 @@
 import { finishLoading, startLoading } from "@redux/reducers/ui.reducer";
 import { supabase } from "@utils/supabaseClient";
+import { addUserToOrg } from "@redux/reducers/orginfo.reducer";
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -78,10 +79,25 @@ export const addMemberToOrg = async ({
   onError?: (error: any) => void;
 }) => {
   dispatch(startLoading({}));
-  const { data, error } = await supabase.from("user_org").insert(userOrgInfo);
+  const { user_id, org_id, email, full_name, role } = userOrgInfo;
+  const infoMemberSupabase = {
+    org_id: org_id,
+    user_id: user_id,
+    role: role,
+  };
+  const { data, error } = await supabase
+    .from("user_org")
+    .insert(infoMemberSupabase);
   if (error) {
     onError(error);
   } else {
+    const infoMember = {
+      id: user_id,
+      email: email,
+      full_name: full_name,
+      avatar_url: "",
+    };
+    dispatch(addUserToOrg({ orgId: org_id, user: infoMember }));
     onSuccess();
   }
   dispatch(finishLoading({}));
@@ -124,6 +140,8 @@ export const inviteExistingMember = async ({
         org_id: org_id,
         user_id: id_user,
         role: "MEMBER",
+        email: to_email,
+        full_name: full_name,
       };
       await addMemberToOrg({ userOrgInfo, dispatch, onSuccess, onError });
     } else {
