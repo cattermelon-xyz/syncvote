@@ -1,4 +1,5 @@
-import { ICheckPoint } from '@types';
+import { ICheckPoint, IWorkflowVersionCosmetic } from '@types';
+import { generateId } from '@utils/helpers';
 
 export const changeVersion = ({
   versionData, selectedNodeId, changedCheckPointData,
@@ -48,6 +49,48 @@ export const changeVersion = ({
   }
   return newData;
 };
+
+export const changeCosmetic = (original: IWorkflowVersionCosmetic, changed: IWorkflowVersionCosmetic) => {
+  const {defaultLayout , layouts} = changed;
+  const result = original ? {...original} : {
+    defaultLayout: undefined,
+    layouts: [],
+  };
+  if (defaultLayout) {
+    const {horizontal, vertical} = defaultLayout;
+    if (!result.defaultLayout) {
+      result.defaultLayout = {...defaultLayout}
+    } else {
+      result.defaultLayout = {
+        horizontal: horizontal || result.defaultLayout.horizontal,
+        vertical: vertical || result.defaultLayout.vertical,
+      }
+    }
+  }
+  if (layouts) {
+    if (!result.layouts) {
+      result.layouts = [];
+      console.log('old layout is empty')
+      layouts.forEach((layout) => {
+        if (!layout.id) {
+          result.layouts.push({...layout, id: generateId(4)});
+        }
+      })
+    } else {
+      layouts.forEach((layout) => {
+        const index = result.layouts.findIndex((item) => item.id === layout.id);
+        if (index === -1) {
+          console.log('push new')
+          result.layouts.push({...layout, id: generateId(4)});
+        } else {
+          console.log('changed')
+          result.layouts[index] = {...layout};
+        }
+      })
+    }
+  }
+  return {...result};
+}
 
 export const validateWorkflow = ({ checkPoint }:{
   checkPoint: ICheckPoint;

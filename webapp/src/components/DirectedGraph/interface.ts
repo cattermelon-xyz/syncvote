@@ -116,14 +116,16 @@ export interface IWorkflowVersionLayout {
   background?: {},
 }
 
+export interface IWorkflowVersionCosmetic {
+  defaultLayout?: {
+    horizontal: string;
+    vertical: string;
+  };
+  layouts: IWorkflowVersionLayout[];
+}
+
 export interface IWorkflowVersion {
   start: string;
   checkpoints: ICheckPoint[];
-  cosmetic?: {
-    default: {
-      horizontal: string;
-      vertical: string;
-    };
-    layouts: IWorkflowVersionLayout[];
-  }
+  cosmetic?: IWorkflowVersionCosmetic;
 }

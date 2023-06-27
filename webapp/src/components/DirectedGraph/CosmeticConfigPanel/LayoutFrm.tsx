@@ -1,17 +1,20 @@
 import { Button, Input, Select, Space } from 'antd';
 import { useState } from 'react';
-import { IWorkflowVersionLayout } from '../interface';
+import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '../interface';
 import { SaveOutlined } from '@ant-design/icons';
 
-const LayoutFrm = ({layout}: {
-  layout: IWorkflowVersionLayout
+const LayoutFrm = ({layout, onCosmeticChanged}: {
+  layout: IWorkflowVersionLayout,
+  onCosmeticChanged: (layout: IWorkflowVersionCosmetic) => void,
 }) => {
-  const id= layout.id || -1;
+  const [id, setId] = useState(layout.id || '');
   const [title, setTitle] = useState('' || layout.title);
   const [description, setDescription] = useState('' || layout.description);
   const [screen, setScreen] = useState('' || layout.screen);
+  const [renderer, setRenderer] = useState('' || layout.renderer);
   return (
     <Space direction="vertical" size="large" className="w-full">
+      <span>id : {id}</span>
       <Space direction="vertical" size="middle" className="w-full">
         <span>Title</span>
         <Input
@@ -39,7 +42,18 @@ const LayoutFrm = ({layout}: {
         </Select>
       </Space>
       <Space direction="horizontal" className="w-full flex justify-end">
-        <Button type="primary" className="flex items-center" icon={<SaveOutlined/>}>
+        <Button type="primary" className="flex items-center" icon={<SaveOutlined/>} onClick={() => {
+          const toSave = {title, description, screen, id, renderer}
+          console.log('toSave: ',toSave);
+          onCosmeticChanged({
+            layouts: [toSave]
+          })
+          setTitle('');
+          setDescription('');
+          setRenderer('');
+          setScreen('');
+          setId('');
+        }}>
           Save
         </Button>
       </Space>

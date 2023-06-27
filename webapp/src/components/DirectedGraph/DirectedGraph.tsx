@@ -11,7 +11,7 @@ import MultipleDirectNode from './CustomNodes/MultipleDiretionNode';
 import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
 import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
 import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
-import { IWorkflowVersionLayout } from './interface';
+import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from './interface';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import CosmeticConfigPanel from './CosmeticConfigPanel';
 
@@ -21,9 +21,12 @@ const edgeTypes = { ...SelfConnectingEdge.getType(), ...BezierCustomEdge.getType
 interface IFlow {
   data?: any, // eslint-disable-line
   onNodeClick?: (event:any, data:any) => void,
+  onLayoutClick?: (data:any) => void,
   selectedNodeId?: string, // eslint-disable-line
+  selectedLayoutId?: string,
   onPaneClick? : (event:any) => void,
   onNodeChanged? : (nodes: any) => void,
+  onCosmeticChanged? : (changed: IWorkflowVersionCosmetic) => void,
   onResetPosition? : () => void,
   onAddNewNode? : () => void,
   nodes?: any, // eslint-disable-line
@@ -36,11 +39,14 @@ interface IFlow {
 // TODO: should change editable to isWorkflow to reflect the real meaning
 const Flow = ({
   onNodeClick = () => {},
+  onLayoutClick = (data:any) => {},
   onPaneClick = () => {},
   onNodeChanged = () => {},
   onResetPosition = () => {},
   onAddNewNode = () => {},
   onViewPortChange = () => {},
+  onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {},
+  selectedLayoutId,
   nodes,
   edges,
   cosmetic,
@@ -65,7 +71,7 @@ const Flow = ({
         open={showCosmeticPanel}
         onClose={() => setShowCosmeticPanel(false)}
       >
-        <CosmeticConfigPanel layouts={layouts} newLayoutHandler={() => {}} deleteLayoutHandler={(id:string) => {}} />
+        <CosmeticConfigPanel layouts={layouts} onCosmeticChanged={onCosmeticChanged} deleteLayoutHandler={(id:string) => {}} />
       </Drawer>
       <ReactFlow
         nodes={nodes}
@@ -99,9 +105,16 @@ const Flow = ({
                 </span>
               </Space>
               {layouts?.map((layout, index) => {
+                const selected = layout.id === selectedLayoutId ? 'bg-violet-100' : '';
                 return (
-                  <div key={layout.id} className="pointer-cursor p-2">
-                    {index}
+                  <div
+                    key={layout.id}
+                    className={`cursor-pointer p-2 border bg-white rounded-md hover:bg-violet-100 ${selected}`}
+                    onClick={() => {
+                      onLayoutClick(layout.id);
+                    }}
+                  >
+                    {layout.title}
                   </div>
                 )
               })}
@@ -120,23 +133,25 @@ const Flow = ({
 };
 // TODO: expose a function for manually trigger fitview
 export const DirectedGraph = ({
-  data, onNodeClick = () => {},
+  data, onNodeClick = () => {}, onLayoutClick = () => {},
   selectedNodeId,
+  selectedLayoutId,
   onPaneClick = () => {},
   onNodeChanged = () => {},
   onResetPosition = () => {},
   onAddNewNode = () => {},
   onViewPortChange = () => {},
+  onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {},
   editable = true,
   navPanel = <></>,
 }: IFlow) => {
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
   useEffect(() => {
-    const obj:any = buildATree(data, selectedNodeId);
+    const obj:any = buildATree({data, selectedNodeId, selectedLayoutId});
     setNodes(obj.nodes);
     setEdges(obj.edges);
-  }, [data, selectedNodeId]);
+  }, [data, selectedNodeId, selectedLayoutId]);
   return (
     <div
       style={{
@@ -148,15 +163,18 @@ export const DirectedGraph = ({
         <Flow
           nodes={nodes}
           edges={edges}
-          cosmetic={data?.cosmetic}
+          cosmetic={data.cosmetic}
           onNodeClick={onNodeClick}
+          onLayoutClick={onLayoutClick}
           onPaneClick={onPaneClick}
           onNodeChanged={onNodeChanged}
           onResetPosition={onResetPosition}
           onAddNewNode={onAddNewNode}
           onViewPortChange={onViewPortChange}
+          onCosmeticChanged={onCosmeticChanged}
           editable={editable}
           navPanel={navPanel}
+          selectedLayoutId={selectedLayoutId}
         />
       </ReactFlowProvider>
     </div>

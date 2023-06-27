@@ -1,11 +1,11 @@
 import { BranchesOutlined, SaveOutlined } from '@ant-design/icons';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import {
-  DirectedGraph, emptyStage, getVoteMachine, renderVoteMachineConfigPanel,
+  DirectedGraph, emptyCosmetic, emptyStage, getVoteMachine, renderVoteMachineConfigPanel,
 } from '@components/DirectedGraph';
 import Icon from '@components/Icon/Icon';
 import { queryWeb2Integration, queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
-import { changeVersion } from '@middleware/logic';
+import { changeCosmetic, changeVersion } from '@middleware/logic';
 import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import {
   Button, Drawer, Modal, Space,
@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditInfo from './fragment/EditInfo';
+import { IWorkflowVersionCosmetic } from '@types';
 
 const extractVersion = ({
   workflows, workflowId, versionId,
@@ -48,6 +49,7 @@ export const EditVersion = () => {
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [workflow, setWorkflow] = useState<any>(workflows.find((w:any) => w.id === workflowId));
   const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [selectedLayoutId, setSelectedLayoutId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const extractWorkflowFromList = (wfList:any) => {
     setVersion(extractVersion({
@@ -217,20 +219,50 @@ export const EditVersion = () => {
         editable
         data={version?.data || emptyStage}
         selectedNodeId={selectedNodeId}
+        selectedLayoutId={selectedLayoutId}
         onNodeChanged={(changedNodes) => {
           const newData = structuredClone(version?.data);
           newData?.checkpoints?.forEach((v:any, index:number) => {
             const changedNode = changedNodes.find((cN:any) => cN.id === v.id);
+            // TODO: position data should come from cosmetic
             if (changedNode && changedNode.position) {
               newData.checkpoints[index].position = changedNode.position;
+              console.log(selectedLayoutId)
+              if (selectedLayoutId) {
+                console.log(newData.cosmetic);
+                const layout = newData.cosmetic.layouts.find((l:any) => l.id === selectedLayoutId);
+                if (!layout.nodes) {
+                  layout.nodes = []
+                }
+                const nodes = layout.nodes;
+                const index = nodes.findIndex((n:any) => n.id === changedNode.id);
+                if (index === -1) {
+                  nodes.push({
+                    id: changedNode.id,
+                    position: changedNode.position,
+                  })
+                }else{
+                  nodes[index].position = changedNode.position;
+                }
+              }
             }
           });
+          console.log(newData);
           setVersion({
             ...version, data: newData,
           });
           if (selectedNodeId) {
             setDataHasChanged(true);
           }
+        }}
+        onCosmeticChanged={(changed:IWorkflowVersionCosmetic) => {
+          const cosmetic = changeCosmetic(version?.data.cosmetic, changed);
+          setVersion({
+            ...version, data: {...version.data, cosmetic} ,
+          });
+        }}
+        onLayoutClick={(selectedLayoutId) => {
+          setSelectedLayoutId(selectedLayoutId);
         }}
         onNodeClick={(event, node) => {
           setSelectedNodeId(node.id);

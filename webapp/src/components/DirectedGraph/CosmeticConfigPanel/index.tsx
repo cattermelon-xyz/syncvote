@@ -1,17 +1,18 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Drawer, Layout, Space } from 'antd';
 import { useState } from 'react';
-import { IWorkflowVersionLayout } from '../interface';
+import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '../interface';
 import LayoutFrm from './LayoutFrm';
+import EditIcon from '@assets/icons/svg-icons/EditIcon';
 
-const CosmeticConfigPanel = ({layouts , newLayoutHandler, deleteLayoutHandler}: {
+const CosmeticConfigPanel = ({layouts , onCosmeticChanged, deleteLayoutHandler}: {
   layouts: IWorkflowVersionLayout[],
-  newLayoutHandler: () => void,
+  onCosmeticChanged: (data:IWorkflowVersionCosmetic) => void,
   deleteLayoutHandler: (layoutId: string) => void,
 }) => {
   const [showNewLayoutModal, setShowNewLayoutModal] = useState(false);
   const emptyLayout = {
-    id: '',
+    id: '', 
     screen: 'horizontal',
     title: '',
     description: '',
@@ -24,7 +25,10 @@ const CosmeticConfigPanel = ({layouts , newLayoutHandler, deleteLayoutHandler}: 
         open={showNewLayoutModal}
         onClose={() => setShowNewLayoutModal(false)}
       >
-        <LayoutFrm layout={{...emptyLayout}} />
+        <LayoutFrm layout={{...emptyLayout}} onCosmeticChanged={(data) => {
+          setShowNewLayoutModal(false);
+          onCosmeticChanged(data);
+        }} />
       </Drawer>
       <Space direction="horizontal" className="flex justify-between w-full">
         <span>Layouts</span>
@@ -37,14 +41,22 @@ const CosmeticConfigPanel = ({layouts , newLayoutHandler, deleteLayoutHandler}: 
           New Layout
         </Button>
       </Space>
-      <Space direction="vertical">
-        {/* {layouts?.map((layout, index) => {
+      <Space direction="vertical" className="w-full" size="small">
+        {layouts?.map((layout, index) => {
           return (
-            <Space key={layout.id} className="pointer-cursor p-2">
-              {index}
+            <Space key={layout.id} className="pr-2 justify-between w-full flex items-center">
+              <Space direction="horizontal" className="flex items-center">
+                {layout.title}
+                <span className="px-2" onClick={() => {
+
+                }}>
+                  <EditIcon />
+                </span>
+              </Space>
+              <span>{layout.screen}</span>
             </Space>
           )
-        })} */}
+        })}
       </Space>
     </Space>
   )
