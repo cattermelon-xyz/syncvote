@@ -48,10 +48,10 @@ function Login() {
         <div className='w-full'>
           <div className='w-[50%] flex flex-col justify-start items-center float-left h-[456px]'>
             <div className='w-[374px]'>
-              <p className='text-[#252524] text-[28px] font-semibold w-full m-auto mb-[16px] mt-[103px] leading-[41px]'>
+              <p className='text-neutral-800 text-[28px] font-semibold leading-loose tracking-wide'>
                 {L('welcomeToSyncvote')}
               </p>
-              <p className='text-[15px] font-normal leading-[28px] mb-[80px]'>
+              <p className='text-neutral-600 text-[15px] font-medium mb-[28px]'>
                 {L('logInToStartCreatingYourWorkflows')}
               </p>
               <div className='flex gap-[12px] flex-col items-center'>
