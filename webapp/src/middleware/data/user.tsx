@@ -1,6 +1,6 @@
-import { finishLoading, startLoading } from "@redux/reducers/ui.reducer";
-import { supabase } from "@utils/supabaseClient";
-import { addUserToOrg } from "@redux/reducers/orginfo.reducer";
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { supabase } from '@utils/supabaseClient';
+import { addUserToOrg } from '@redux/reducers/orginfo.reducer';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -22,19 +22,23 @@ export const inviteUserByEmail = async ({
   // TODO: move this to the edge function
   try {
     const url =
-      "https://uafmqopjujmosmilsefw.supabase.co/functions/v1/invite-user-email";
+      'https://uafmqopjujmosmilsefw.supabase.co/functions/v1/invite-user-email';
     const response = await fetch(url, {
-      method: "POST",
+      method: 'POST',
       headers: {
         authorization: `Bearer ${supabaseAnonKey}`,
-        "content-type": "application/json",
+        'content-type': 'application/json',
       },
       body: JSON.stringify({
         email,
       }),
     });
     const result = await response.json();
-    onSuccess(result);
+    if (result.status === 200) {
+      onSuccess(result);
+    } else {
+      onError(new Error('Cannot invite user'));
+    }
   } catch (error) {
     onError(error);
   }
@@ -55,9 +59,9 @@ export const queryUserByEmail = async ({
 }) => {
   dispatch(startLoading({}));
   const { data, error } = await supabase
-    .from("profile")
-    .select("id, email, full_name")
-    .eq("email", email);
+    .from('profile')
+    .select('id, email, full_name')
+    .eq('email', email);
   if (error) {
     onError(error);
   } else {
@@ -86,7 +90,7 @@ export const addMemberToOrg = async ({
     role: role,
   };
   const { data, error } = await supabase
-    .from("user_org")
+    .from('user_org')
     .insert(infoMemberSupabase);
   if (error) {
     onError(error);
@@ -95,7 +99,7 @@ export const addMemberToOrg = async ({
       id: user_id,
       email: email,
       full_name: full_name,
-      avatar_url: "",
+      avatar_url: '',
     };
     dispatch(addUserToOrg({ orgId: org_id, user: infoMember }));
     onSuccess();
@@ -120,12 +124,12 @@ export const inviteExistingMember = async ({
   dispatch(startLoading({}));
   try {
     const url =
-      "https://uafmqopjujmosmilsefw.supabase.co/functions/v1/send-email";
+      'https://uafmqopjujmosmilsefw.supabase.co/functions/v1/send-email';
     const response = await fetch(url, {
-      method: "POST",
+      method: 'POST',
       headers: {
         authorization: `Bearer ${supabaseAnonKey}`,
-        "content-type": "application/json",
+        'content-type': 'application/json',
       },
       body: JSON.stringify({
         to_email,
@@ -139,13 +143,13 @@ export const inviteExistingMember = async ({
       const userOrgInfo = {
         org_id: org_id,
         user_id: id_user,
-        role: "MEMBER",
+        role: 'MEMBER',
         email: to_email,
         full_name: full_name,
       };
       await addMemberToOrg({ userOrgInfo, dispatch, onSuccess, onError });
     } else {
-      onError(new Error("Cannot invite user"));
+      onError(new Error('Cannot invite user'));
     }
   } catch (error) {
     onError(error);
