@@ -1,40 +1,46 @@
 /* eslint-disable max-len */
-import App from '@App';
-import PublicMission from '@PublicMission';
+import App from "@App";
+import PublicMission from "@PublicMission";
 
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import PageScreen from '@components/HomeScreen/PageScreen';
-import ChooseWorkflow from '@pages/Mission/ChooseWorkflow';
-import ChooseTemplate from '@pages/Workflow/BuildBlueprint/ChooseTemplate';
-import Mission from 'pages/Mission';
-import Workflow from 'pages/Workflow';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import PageScreen from "@components/HomeScreen/PageScreen";
+import ChooseWorkflow from "@pages/Mission/ChooseWorkflow";
+import ChooseTemplate from "@pages/Workflow/BuildBlueprint/ChooseTemplate";
+import Mission from "pages/Mission";
+import Workflow from "pages/Workflow";
 import {
   OrganizationHome,
   OrganizationList,
   OrganizationSetting,
-} from '@pages/Organization';
-import CreatorLogin from '@pages/Authentication/index';
-import BluePrint from '@pages/Workflow/BluePrint';
-import {
-  EditVersion, NewVersion,
-} from '@pages/Workflow/Version';
-import NewMission from '@pages/Mission/NewMission';
-import EditMission from '@pages/Mission/EditMission';
+} from "@pages/Organization";
+import CreatorLogin from "@pages/Authentication/index";
+import BluePrint from "@pages/Workflow/BluePrint";
+import { EditVersion, NewVersion } from "@pages/Workflow/Version";
+import NewMission from "@pages/Mission/NewMission";
+import EditMission from "@pages/Mission/EditMission";
+import { PublicVersion } from "@pages/Workflow/Version/PublicVersion";
 
 const AppRoutes = () => (
   <BrowserRouter basename="/">
     <Routes>
       {/* <Router path></Router> */}
 
-      <Route path="/public" element={<PublicMission isFullHeight/>}>
-        <Route>
-        <Route path="mission" element={<EditVersion />} />
-        </Route>
+      <Route path="/public" element={<PublicMission isFullHeight />}>
+      <Route
+          path=":orgIdString/:workflowIdString/:versionIdString"
+          element={<PublicVersion />}
+        />
       </Route>
 
       <Route path="/" element={<App isFullHeight />}>
-        <Route path=":orgIdString/:workflowIdString/:versionIdString" element={<EditVersion />} />
-        <Route path=":orgIdString/mission/:missionIdString" element={<Mission />}>
+        <Route
+          path=":orgIdString/:workflowIdString/:versionIdString"
+          element={<EditVersion />}
+        />
+        <Route
+          path=":orgIdString/mission/:missionIdString"
+          element={<Mission />}
+        >
           <Route index element={<EditMission />} />
         </Route>
       </Route>
@@ -54,7 +60,10 @@ const AppRoutes = () => (
           <Route path="workflow/:workflowIdString" element={<Workflow />}>
             <Route index element={<BluePrint />} />
             <Route path="new-version" element={<NewVersion />} />
-            <Route path=":versionIdString/new-mission" element={<NewMission />} />
+            <Route
+              path=":versionIdString/new-mission"
+              element={<NewMission />}
+            />
             <Route path=":versionIdString" element={<EditVersion />} />
           </Route>
         </Route>

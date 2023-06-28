@@ -155,5 +155,15 @@ html body {
 }
 
 .header-public {
-  width: 480px;
+  width: 460px;
+}
+
+.task-bar {
+  /* Các thuộc tính khác */
+  opacity: 1;
+  transition: opacity 10s ease;
+}
+
+.task-bar.hidden {
+  opacity: 0;
 }
