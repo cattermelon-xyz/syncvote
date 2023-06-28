@@ -1,15 +1,21 @@
 import { supabase } from '@utils/supabaseClient';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import {
-  finishLoading, startLoading,
-} from '@redux/reducers/ui.reducer';
-import {
-  changeOrgInfo, setOrgsInfo, setLastFetch,
+  changeOrgInfo,
+  setOrgsInfo,
+  setLastFetch,
 } from '@redux/reducers/orginfo.reducer';
 
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
 export const newOrg = async ({
-  orgInfo, onSuccess, onError = (error) => {
+  orgInfo,
+  uid,
+  onSuccess,
+  onError = (error) => {
     console.error(error); // eslint-disable-line
-  }, dispatch,
+  },
+  dispatch,
 }: {
   orgInfo: {
     title: string;
@@ -19,44 +25,78 @@ export const newOrg = async ({
     org_type: string;
     preset_banner_url: string;
   };
+  uid: string;
   onSuccess: (data: any) => void;
   onError?: (data: any) => void;
   dispatch: any;
 }) => {
-  const { data, error } = await supabase.from('org')
-    .insert(orgInfo).select();
-  if (error) {
+  try {
+    const url = 'https://uafmqopjujmosmilsefw.supabase.co/functions/v1/new-org';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${supabaseAnonKey}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        orgInfo,
+        uid,
+      }),
+    });
+    const result = await response.json();
+    if (result) {
+      const data = result[0];
+      console.log(data);
+      const info = structuredClone(orgInfo);
+      dispatch(
+        changeOrgInfo({
+          id: data.id,
+          role: 'ADMIN',
+          ...info,
+        })
+      );
+      dispatch(setLastFetch({}));
+      onSuccess(data);
+    } else {
+      onError(new Error("Can't create organization"));
+    }
+  } catch (error) {
     onError(error);
-  } else {
-    const info = structuredClone(orgInfo);
-    dispatch(changeOrgInfo({
-      id: data[0].id,
-      role: 'ADMIN',
-      ...info,
-    }));
-    dispatch(setLastFetch({}));
-    onSuccess(data);
   }
 };
 export const upsertAnOrg = async ({
-  org, onLoad, onError = (error) => {
+  org,
+  onLoad,
+  onError = (error) => {
     console.error(error); // eslint-disable-line
-  }, dispatch,
-  }:{
-    org: any;
-    onLoad: (data: any) => void;
-    onError?: (data: any) => void;
-    dispatch: any;
-  }) => {
+  },
+  dispatch,
+}: {
+  org: any;
+  onLoad: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
   const newOrg = { ...org };
   dispatch(startLoading({}));
-  const props = ['id', 'title', 'desc', 'org_size', 'org_type', 'icon_url', 'banner_url', 'preset_icon_url', 'preset_banner_url'];
+  const props = [
+    'id',
+    'title',
+    'desc',
+    'org_size',
+    'org_type',
+    'icon_url',
+    'banner_url',
+    'preset_icon_url',
+    'preset_banner_url',
+  ];
   Object.keys(newOrg).forEach((key) => {
     if (props.indexOf(key) === -1) {
       delete newOrg[key];
     }
   });
-  if (newOrg.id < 0) { // invalid id, probably a new mission
+  if (newOrg.id < 0) {
+    // invalid id, probably a new mission
     delete newOrg.id;
   }
   if (newOrg.icon_url?.indexOf('preset:') === 0) {
@@ -71,9 +111,13 @@ export const upsertAnOrg = async ({
   dispatch(finishLoading({}));
   if (data) {
     const newData = [...data];
-    data.forEach((d: any, index:number) => {
-      newData[index].icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
-      newData[index].banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
+    data.forEach((d: any, index: number) => {
+      newData[index].icon_url = d.preset_icon_url
+        ? `preset:${d.preset_icon_url}`
+        : d.icon_url;
+      newData[index].banner_url = d.preset_banner_url
+        ? `preset:${d.preset_banner_url}`
+        : d.banner_url;
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
     });
@@ -85,20 +129,26 @@ export const upsertAnOrg = async ({
   }
 };
 export const queryOrgs = async ({
-  filter, onSuccess, onError = (error) => {
+  filter,
+  onSuccess,
+  onError = (error) => {
     console.error(error);
-  }, dispatch,
-}:
-{
-  filter: any, onSuccess: (data: any) => void,
-  onError?: (data: any) => void, dispatch: any
+  },
+  dispatch,
+}: {
+  filter: any;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
 }) => {
   const { userId } = filter;
   dispatch(startLoading({}));
   // TODO: add email in table profile, use ref in profile to select user
   // TODO: query list of user
-  const { data, error } = await supabase.from('user_org')
-  .select(`
+  const { data, error } = await supabase
+    .from('user_org')
+    .select(
+      `
     role,
     org (
       id,
@@ -117,30 +167,38 @@ export const queryOrgs = async ({
         avatar_url
       )
     )
-  `).eq('user_id', userId);
+  `
+    )
+    .eq('user_id', userId);
   if (!error) {
-    const tmp:any[] = [];
-      data.forEach((d:any) => {
-        const org:any = d?.org || {
-          id: '', title: '', desc: '',
-        };
-        const presetIcon = org?.preset_icon_url ? `preset:${org.preset_icon_url}` : org.preset_icon_url;
-        const presetBanner = org?.preset_banner_url ? `preset:${org.preset_banner_url}` : org.preset_banner_url;
-        tmp.push({
-          id: org?.id,
-          role: d.role,
-          title: org?.title,
-          desc: org.desc,
-          icon_url: org.icon_url ? org.icon_url : presetIcon,
-          banner_url: org.banner_url ? org.banner_url : presetBanner,
-          org_size: org.org_size,
-          org_type: org.org_type,
-          profile: org.profile || [],
-        });
+    const tmp: any[] = [];
+    data.forEach((d: any) => {
+      const org: any = d?.org || {
+        id: '',
+        title: '',
+        desc: '',
+      };
+      const presetIcon = org?.preset_icon_url
+        ? `preset:${org.preset_icon_url}`
+        : org.preset_icon_url;
+      const presetBanner = org?.preset_banner_url
+        ? `preset:${org.preset_banner_url}`
+        : org.preset_banner_url;
+      tmp.push({
+        id: org?.id,
+        role: d.role,
+        title: org?.title,
+        desc: org.desc,
+        icon_url: org.icon_url ? org.icon_url : presetIcon,
+        banner_url: org.banner_url ? org.banner_url : presetBanner,
+        org_size: org.org_size,
+        org_type: org.org_type,
+        profile: org.profile || [],
       });
-      dispatch(setOrgsInfo(tmp));
-      dispatch(setLastFetch({}));
-      onSuccess(tmp);
+    });
+    dispatch(setOrgsInfo(tmp));
+    dispatch(setLastFetch({}));
+    onSuccess(tmp);
   } else {
     onError(error);
   }
