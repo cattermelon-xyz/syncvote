@@ -28,6 +28,7 @@ const Node = memo(({ data, isConnectable = true, id }: {
 }) => {
   const description = data.raw?.description || '';
   const duration = data.raw?.duration * 1000 || 0;
+  const selected = data.selected ? 'border-2 border-violet-500' : 'border border-slate-700 ';
   return (
     <>
       <Handle
@@ -88,7 +89,7 @@ const Node = memo(({ data, isConnectable = true, id }: {
         isConnectable={isConnectable}
       />
       <div
-        className={`rounded-md border border-solid text-base border-slate-700 ${data.isEnd ? 'bg-slate-700 text-white' : ''}`}
+        className={`rounded-md text-base border-solid ${selected} ${data.isEnd ? 'bg-slate-700 text-white' : ''}`}
         style={data.style}
       >
         {

@@ -1,8 +1,8 @@
 import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Drawer } from 'antd';
+import { Button, Drawer, Typography } from 'antd';
 import MachineConfigPanel from './MachineConfigPanel/MachineConfigPanel';
 import { getVoteMachine } from './voteMachine';
-import { IVoteMachine } from '../../types';
+import { IVoteMachine } from '@types';
 
 export const renderVoteMachineConfigPanel = ({
   // TODO: change versionData to a better name
@@ -48,9 +48,18 @@ export const renderVoteMachineConfigPanel = ({
     <Drawer
       open={selectedNodeId !== '' && selectedNodeId !== undefined}
       onClose={onClose}
-      title={`${selectedNode?.title ? selectedNode.title : selectedNodeId}`}
-      // TODO: use Paragraph instead
-      bodyStyle={{ paddingTop: '0px' }}
+      title={<Typography.Paragraph
+        className="text-2xl font-bold"
+        style={{marginBottom:"0px"}}
+        editable={editable ? { onChange: (value) => {
+          const newNode = structuredClone(selectedNode);
+          newNode.title = value;
+          onChange(newNode);
+        }} : false}
+      >
+        {selectedNode?.title ? selectedNode.title : selectedNodeId}
+      </Typography.Paragraph>}
+      bodyStyle={{ padding:'0px', backgroundColor:'#e3e3e2' }}
       extra={
         (
           <Button

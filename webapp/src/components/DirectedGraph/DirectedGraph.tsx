@@ -93,7 +93,7 @@ const Flow = ({
             <Space direction="horizontal">
               {navPanel}
             </Space>
-            <Space direction="horizontal" size="middle" className="p-2 border rounded-md flex items-center">
+            <Space direction="horizontal" size="middle" className="p-2 border rounded-md flex items-center bg-white">
               <Space direction="horizontal" size="small" className="flex items-center">
                 Layout
                 <span
@@ -105,11 +105,11 @@ const Flow = ({
                 </span>
               </Space>
               {layouts?.map((layout, index) => {
-                const selected = layout.id === selectedLayoutId ? 'bg-violet-100' : '';
+                const selected = layout.id === selectedLayoutId ? 'bg-violet-100' : 'bg-white';
                 return (
                   <div
                     key={layout.id}
-                    className={`cursor-pointer p-2 border bg-white rounded-md hover:bg-violet-100 ${selected}`}
+                    className={`cursor-pointer p-2 border rounded-md hover:bg-violet-100 ${selected}`}
                     onClick={() => {
                       onLayoutClick(layout.id);
                     }}

@@ -56,6 +56,7 @@ const MachineConfigPanel = ({
   ];
   return (
     <Tabs
+      className="w-full px-4"
       defaultActiveKey="1"
       items={items}
     />

@@ -54,7 +54,7 @@ const ContextTab = ({
   };
   return (
     <Space direction="vertical" size="large" className="w-full">
-      <Space.Compact className="w-full">
+      {/* <Space.Compact className="w-full">
         <Input
           value={selectedNode?.title ? selectedNode.title : selectedNode.id}
           onChange={(e) => {
@@ -74,9 +74,9 @@ const ContextTab = ({
           }}
           disabled={!editable}
         />
-      </Space.Compact>
-      <Space direction="vertical" size="small" className="w-full">
-        <Space direction="horizontal" className="justify-between w-full">
+      </Space.Compact> */}
+      <Space direction="vertical" size="small" className="w-full bg-white rounded-lg">
+        {/* <Space direction="horizontal" className="justify-between w-full">
           <span>Information supporting the decision</span>
           <Button
             icon={locked.description ? <LockFilled /> : <UnlockOutlined />}
@@ -88,7 +88,7 @@ const ContextTab = ({
             }}
             disabled={!editable}
           />
-        </Space>
+        </Space> */}
         <TextEditor
           value={selectedNode?.description}
           setValue={(value:any) => {
