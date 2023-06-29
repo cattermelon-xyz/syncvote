@@ -9,27 +9,26 @@ import { useSelector, useDispatch } from 'react-redux';
 import GlobalLoading from '@components/GlobalLoading/GlobalLoading';
 import { registerVoteMachine } from '@components/DirectedGraph';
 import { setUser } from '@redux/reducers/orginfo.reducer';
-
+import { useLocation } from 'react-router-dom';
 import SingleChoiceRaceToMax from '@votemachines/SingleChoiceRaceToMax';
 import MultipleChoiceRaceToMax from '@votemachines/MultipleChoiceRaceToMax';
-import { queryOrgs, queryPresetBanner, queryPresetIcon } from '@middleware/data';
+import {
+  queryOrgs,
+  queryPresetBanner,
+  queryPresetIcon,
+} from '@middleware/data';
 import { shouldUseCachedData } from '@utils/helpers';
 
-function App({
-  isFullHeight = false,
-} : {
-  isFullHeight?: boolean,
-}) {
+function App({ isFullHeight = false }: { isFullHeight?: boolean }) {
   // const [isAuth, setIsAuth] = useState(false);
   const navigate = useNavigate();
   // const token = window.localStorage.getItem('isConnectWallet');
   const [session, setSession] = useState<Session | null>(null);
-  const {
-    presetIcons, presetBanners, initialized,
-  } = useSelector((state:any) => state.ui);
-  const {
-    lastFetch,
-  } = useSelector((state:any) => state.orginfo);
+  const location = useLocation();
+  const { presetIcons, presetBanners, initialized } = useSelector(
+    (state: any) => state.ui
+  );
+  const { lastFetch } = useSelector((state: any) => state.orginfo);
   const dispatch = useDispatch();
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
@@ -39,10 +38,12 @@ function App({
     if (_session !== null) {
       // query to server to get preset icons and banners
       queryPresetBanner({
-        dispatch, presetBanners,
+        dispatch,
+        presetBanners,
       });
       queryPresetIcon({
-        dispatch, presetIcons,
+        dispatch,
+        presetIcons,
       });
     }
     if (_session !== null) {
@@ -57,11 +58,13 @@ function App({
         });
       }
       if (initialized === false) {
-        dispatch(setUser({
-          id: user.id,
-          email: user.email,
-          full_name: user.user_metadata.full_name,
-        }));
+        dispatch(
+          setUser({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata.full_name,
+          })
+        );
       }
     }
   };
@@ -79,13 +82,15 @@ function App({
   return (
     <div className={`w-full ${isFullHeight ? 'bg-slate-100 h-screen' : null}`}>
       <GlobalLoading />
-      <Header
-        // isAuth={isAuth}
-        // setIsAuth={setIsAuth}
-        session={session}
-        isMainAppFullHeight={isFullHeight}
-      />
-      <MainLayout isFullHeight={isFullHeight}>
+      {location.pathname !== '/login' && (
+        <Header
+          // isAuth={isAuth}
+          // setIsAuth={setIsAuth}
+          session={session}
+          isMainAppFullHeight={isFullHeight}
+        />
+      )}
+      <MainLayout isFullHeight={isFullHeight } isLoginPage={location.pathname === '/login'}>
         <Outlet
           context={{
             // isAuth,

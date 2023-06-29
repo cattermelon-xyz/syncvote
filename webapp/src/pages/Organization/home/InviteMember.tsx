@@ -1,33 +1,36 @@
 import {
-  inviteUserByEmail, queryUserByEmail, inviteExistingMember,
-} from '@middleware/data';
-import { extractIdFromIdString } from '@utils/helpers';
-import {
-  Button, Drawer, Input, Modal, Space,
-} from 'antd';
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+  inviteUserByEmail,
+  queryUserByEmail,
+  inviteExistingMember,
+} from "@middleware/data";
+import { extractIdFromIdString } from "@utils/helpers";
+import { Button, Drawer, Input, Modal, Space } from "antd";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const InviteMember = ({
-  visible, setVisible,
+  visible,
+  setVisible,
 }: {
   visible: boolean;
   setVisible: (visible: boolean) => void;
 }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
-  const { orgs, user } = useSelector((state:any) => state.orginfo);
-  const org = orgs.find((tmp:any) => tmp.id === orgId);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
+  const org = orgs.find((tmp: any) => tmp.id === orgId);
   const handleInvite = async () => {
     queryUserByEmail({
       email,
       dispatch,
-      onSuccess: (data:any) => {
+      onSuccess: (data: any) => {
         if (data?.length > 0) {
-          const idata:any = {
+          const idata: any = {
+            org_id: orgId,
+            id_user: data[0].id,
             to_email: email,
             full_name: data[0].full_name,
             org_title: org.title,
@@ -38,14 +41,14 @@ const InviteMember = ({
             dispatch,
             onSuccess: () => {
               Modal.success({
-                title: 'Success',
-                content: 'Invite user successfully',
+                title: "Success",
+                content: "Invite user successfully",
               });
             },
             onError: () => {
               Modal.error({
-                title: 'Error',
-                content: 'Cannot invite user',
+                title: "Error",
+                content: "Cannot invite user",
               });
             },
           });
@@ -56,14 +59,14 @@ const InviteMember = ({
             dispatch,
             onSuccess: () => {
               Modal.success({
-                title: 'Success',
-                content: 'Invite user successfully',
+                title: "Success",
+                content: "Invite user successfully",
               });
             },
             onError: () => {
               Modal.error({
-                title: 'Error',
-                content: 'Cannot invite user',
+                title: "Error",
+                content: "Cannot invite user",
               });
             },
           });
@@ -72,8 +75,8 @@ const InviteMember = ({
       },
       onError: () => {
         Modal.error({
-          title: 'Error',
-          content: 'Cannot retrieve user data',
+          title: "Error",
+          content: "Cannot retrieve user data",
         });
       },
     });
@@ -83,15 +86,13 @@ const InviteMember = ({
       open={visible}
       onClose={() => {
         setVisible(false);
-        setEmail('');
+        setEmail("");
       }}
       title="Invite a member"
     >
       <Space direction="vertical" size="large" className="w-full">
         <Space direction="vertical" size="small" className="w-full">
-          <div>
-            Input user email
-          </div>
+          <div>Input user email</div>
           <Input
             placeholder="Email"
             value={email}
@@ -101,12 +102,12 @@ const InviteMember = ({
             className="w-full"
           />
         </Space>
-        <Space direction="horizontal" size="small" className="w-full flex justify-end">
-          <Button
-            type="default"
-            className="w-full"
-            onClick={handleInvite}
-          >
+        <Space
+          direction="horizontal"
+          size="small"
+          className="w-full flex justify-end"
+        >
+          <Button type="default" className="w-full" onClick={handleInvite}>
             Invite
           </Button>
         </Space>
