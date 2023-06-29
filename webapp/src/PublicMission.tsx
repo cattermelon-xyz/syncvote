@@ -3,7 +3,6 @@ import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import PublicHeader from "@layout/fragments/PublicHeader";
-import PublicMissionLayout from "@layout/PublicMissionLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { shouldUseCachedData } from "@utils/helpers";
 import { queryOrgs, queryPresetBanner, queryPresetIcon } from "@middleware/data";
