@@ -90,7 +90,7 @@ function App({ isFullHeight = false }: { isFullHeight?: boolean }) {
           isMainAppFullHeight={isFullHeight}
         />
       )}
-      <MainLayout isFullHeight={isFullHeight } isLoginPage={location.pathname === '/login'}>
+      <MainLayout isFullHeight={isFullHeight}>
         <Outlet
           context={{
             // isAuth,
