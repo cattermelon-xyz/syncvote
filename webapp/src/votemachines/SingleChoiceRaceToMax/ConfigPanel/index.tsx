@@ -1,5 +1,5 @@
 import {
-  Tag, Space, Switch, Button,
+  Tag, Space, Switch, Button, Divider, Alert, Input,
 } from 'antd';
 import { useState } from 'react';
 import { ICheckPoint, IVoteMachineConfigProps } from '../../../types';
@@ -7,6 +7,8 @@ import { Option } from './option';
 import VotingResult from './VotingResult';
 import VotingCondition from './VotingCondition';
 import NewOptionDrawer from './NewOptionDrawer';
+import { PlusOutlined } from '@ant-design/icons';
+import '../styles.scss';
 
 /**
  *
@@ -207,45 +209,68 @@ const ConfigPanel = ({
     return rs;
   };
   return (
-    <Space direction="vertical" size="large" className="mb-4 w-full">
-      <Space direction="vertical" size="small" className="w-full">
+    <Space direction="vertical" size="large" className="w-full single-choice">
+      {/* <Space direction="vertical" size="small" className="w-full">
         <div className="bg-slate-100 p-2 w-full">
           <span className="mr-0.5">Everyone choose ONE option until one option reach</span>
           {getMaxText()}
         </div>
-      </Space>
-      <div className="text-lg">Options</div>
-      <Space direction="vertical" size="small" className="w-full">
-        <Space direction="horizontal" size="small" className="w-full flex items-center justify-between">
-          <span>Can user abstain his vote?</span>
-          <Switch checked={includedAbstain} onChange={changeAbstainHandler} />
+      </Space> */}
+      <Space direction="vertical" className="bg-white rounded-lg p-4 w-full">
+        <Space direction="horizontal" size="small" className="w-full flex items-center justify-between bg-zinc-100 px-4 py-2 rounded-lg">
+          <span>Enable abstain options</span>
+          <Space direction="horizontal" size="small">
+            Yes
+            <Switch checked={includedAbstain} onChange={changeAbstainHandler} />
+          </Space>
         </Space>
-        {options?.map((option:string, index:number) => {
-          const currentNode = allNodes.find((node) => node.id === children[index]);
-          return (
-            <Option
-              key={option}
-              index={index}
-              option={option}
-              currentNode={currentNode}
-              changeOptionHandler={changeOptionHandler}
-              deleteOptionHandler={deleteOptionHandler}
-              possibleOptions={posibleOptions}
-              editable={editable}
-              addAndDeleteOptionHandler={addAndDeleteOptionHandler}
+        <hr className="my-2"/>
+        <Alert
+          type="success"
+          message="Set up logic for your workflow"
+          description="If option X wins then workflow will navigage to Y checkpoint"
+          closable
+        />
+        <Space direction="vertical" size="small" className="w-full">
+          {options?.map((option:string, index:number) => {
+            const currentNode = allNodes.find((node) => node.id === children[index]);
+            return (
+              <Option
+                key={option}
+                index={index}
+                option={option}
+                currentNode={currentNode}
+                changeOptionHandler={changeOptionHandler}
+                deleteOptionHandler={deleteOptionHandler}
+                possibleOptions={posibleOptions}
+                editable={editable}
+                addAndDeleteOptionHandler={addAndDeleteOptionHandler}
+              />
+            );
+          },
+          )}
+          {includedAbstain ? 
+          <Space direction="vertical" className="w-full flex justify-between">
+            <span className="text-gray-400">Option {(options?.length + 1)}</span>
+            <Input
+              className="w-full"
+              value="Abstain"
+              disabled
             />
-          );
-        },
-        )}
+          </Space>
+          : null
+          }
+        </Space>
+        <Button
+          type="link"
+          icon={<PlusOutlined />}
+          className="w-full flex items-center justify-start pl-0"
+          onClick={() => setShowNewOptionDrawer(true)}
+          disabled={!editable}
+        >
+          Add a new option & navigation
+        </Button>
       </Space>
-      <Button
-        type="default"
-        className="w-full"
-        onClick={() => setShowNewOptionDrawer(true)}
-        disabled={!editable}
-      >
-        Add New Option
-      </Button>
       <NewOptionDrawer
         showAddOptionDrawer={showAddOptionDrawer}
         setShowNewOptionDrawer={setShowNewOptionDrawer}
@@ -254,17 +279,19 @@ const ConfigPanel = ({
         posibleOptions={posibleOptions}
         addNewOptionHandler={addNewOptionHandler}
       />
-      <VotingResult countedBy={countedBy} setCountedBy={setCountedBy} />
-      <VotingCondition
-        getThresholdText={getThresholdText}
-        maxStr={maxStr}
-        editable={editable}
-        setMaxStr={setMaxStr}
-        changeMaxHandler={changeMaxHandler}
-        countedBy={countedBy}
-        token={token}
-        changeTokenHandler={changeTokenHandler}
-      />
+      <Space className="p-4 rounded-lg bg-white w-full" direction="vertical">
+        <VotingResult countedBy={countedBy} setCountedBy={setCountedBy} />
+        <VotingCondition
+          getThresholdText={getThresholdText}
+          maxStr={maxStr}
+          editable={editable}
+          setMaxStr={setMaxStr}
+          changeMaxHandler={changeMaxHandler}
+          countedBy={countedBy}
+          token={token}
+          changeTokenHandler={changeTokenHandler}
+        />
+      </Space>
     </Space>
   );
 };

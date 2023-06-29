@@ -1,9 +1,9 @@
 import { MarkerType, Position } from 'reactflow';
 import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
 import MultipleDiretionNode from './CustomNodes/MultipleDiretionNode';
-import { emptyStage } from './emptyStage';
+import { emptyStage } from './empty';
 import { getVoteMachine } from './voteMachine';
-import { IVoteMachine } from '../../types';
+import { IVoteMachine, IWorkflowVersion, IWorkflowVersionCosmetic, IWorkflowVersionLayout } from './interface';
 import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
 import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
 
@@ -103,9 +103,16 @@ const buildEdge = ({
   };
 };
 
-export const buildATree = (data:any, selectedNodeId:string | undefined) => {
+export const buildATree = ({data, selectedNodeId, selectedLayoutId}: {
+  data:IWorkflowVersion, selectedNodeId:string | undefined, selectedLayoutId: string | undefined
+}) => {
   const checkpoints: Array<any> = [];
   let newData = { ...data };
+  const cosmetic = newData.cosmetic;
+  const layouts:IWorkflowVersionLayout[] = cosmetic?.layouts || [];
+  const defaultLayout = cosmetic?.defaultLayout;
+  const layout = layouts.find((l) => l.id === selectedLayoutId);
+  // TODO: render based on layout
   if (data.checkpoints === undefined || data.checkpoints.length === 0) {
     newData = emptyStage;
   }
@@ -185,20 +192,24 @@ export const buildATree = (data:any, selectedNodeId:string | undefined) => {
       } else if (checkpoint.style) {
         nodeStyle = checkpoint.style;
       }
+      const checkpointFromLayout:any = layout?.nodes?.find((n:any) => n.id === checkpoint.id);
+      const position = checkpointFromLayout?.position || checkpoint.position;
+      const style = {...nodeStyle, ...checkpointFromLayout?.style}
       nodes.push({
         id: checkpoint.id,
         data: {
           label: checkpoint.title ? checkpoint.title : checkpoint.id,
-          style: nodeStyle,
+          style,
           isEnd: checkpoint.isEnd,
           raw: checkpoint,
           triggers: checkpoint.triggers,
+          selected: checkpoint.id === selectedNodeId,
         },
         x: checkpoint.x,
         y: checkpoint.y,
         draggable: true,
         type: MultipleDiretionNode.getTypeName(),
-        position: checkpoint.position,
+        position: {...position},
       });
     });
     nodes.forEach((node) => {
@@ -212,7 +223,6 @@ export const buildATree = (data:any, selectedNodeId:string | undefined) => {
         iterEdge(node);
       }
     });
-    // console.log('buildATree ** edges: ',edges,'; nodes: ',nodes);
   }
   return { nodes, edges };
 };

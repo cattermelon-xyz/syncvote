@@ -1,5 +1,5 @@
 import { ICheckPoint, IToken } from '@types';
-import { Select, Space } from 'antd';
+import { Divider, Select, Space } from 'antd';
 import AllowedByIdentity from './fragment/AllowedByIdentity';
 import AllowedByToken from './fragment/AllowedByToken';
 
@@ -16,9 +16,9 @@ const VotingPartipation = ({
   const identity = type === 'identity' && data ? data as string[] : [];
   const tokenData = type === 'token' && data ? data as IToken : {};
   return (
-    <Space direction="vertical" size="large" className="w-full">
+    <Space direction="vertical" size="large" className="w-full rounded-lg bg-white p-4">
       <Space direction="vertical" size="small" className="w-full">
-        <div className="text-sm">Allowed by</div>
+        <div className="text-sm">Voter allowed by</div>
         <Select
           disabled={!editable}
           value={type}
@@ -44,6 +44,9 @@ const VotingPartipation = ({
             },
           ]}
         />
+        <div className="py-2">
+          <hr/>
+        </div>
         {
           type === 'identity' ?
           (

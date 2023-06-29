@@ -29,16 +29,14 @@ export const Option = ({
             icon={<DeleteOutlined />}
             disabled={!editable}
             onClick={() => deleteOptionHandler(index)}
-          >
-            Remove
-          </Button>
+          />
         </div>
         <Space direction="horizontal" className="w-6/12 flex pt-1 justify-between items-center">
-          <span className="text-gray-400">Navigate to</span>
-          <span className="text-violet-400 flex items-center gap-1">
+          <span className="text-gray-400 pl-6">Navigate to</span>
+          {/* <span className="text-violet-400 flex items-center gap-1">
             <ClockCircleOutlined />
             <span>Deplay 7h</span>
-          </span>
+          </span> */}
         </Space>
       </div>
       <div className="w-full flex justify-between">
