@@ -1,20 +1,23 @@
 import {
   Tabs,
 } from 'antd';
-import { ICheckPoint } from '../../../types';
+import { ICheckPoint, IWorkflowVersionLayout, IWorkflowVersionLayoutMarker } from '../../../types';
 import ContextTab from './ContextTab';
 import RulesTab from './RulesTab';
 import TriggerTab from './TriggerTab';
+import '../styles.scss';
 
 const MachineConfigPanel = ({
-  selectedNode, onChange, web2Integrations, allNodes, editable = false, vmConfigPanel,
+  selectedNode, onChange, web2Integrations, allNodes, editable = false, vmConfigPanel, selectedLayout, onChangeLayout,
 }:{
   selectedNode: any,
   onChange: (changedData:ICheckPoint) => void;
+  onChangeLayout: (changedData:IWorkflowVersionLayout) => void;
   web2Integrations: any[];
   allNodes: any[];
   editable?: boolean;
   vmConfigPanel:JSX.Element;
+  selectedLayout: IWorkflowVersionLayout;
 }) => {
   const items = [
     {
@@ -23,7 +26,9 @@ const MachineConfigPanel = ({
       children: (
         <ContextTab
           selectedNode={selectedNode}
+          selectedLayout={selectedLayout}
           onChange={onChange}
+          onChangeLayout={onChangeLayout}
           editable={editable}
         />
       ),
@@ -56,7 +61,7 @@ const MachineConfigPanel = ({
   ];
   return (
     <Tabs
-      className="w-full px-4"
+      className="w-full machine-config-panel-tabs"
       defaultActiveKey="1"
       items={items}
     />

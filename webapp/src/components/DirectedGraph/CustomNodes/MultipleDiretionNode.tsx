@@ -29,6 +29,7 @@ const Node = memo(({ data, isConnectable = true, id }: {
   const description = data.raw?.description || '';
   const duration = data.raw?.duration * 1000 || 0;
   const selected = data.selected ? 'border-2 border-violet-500' : 'border border-slate-700 ';
+  const style = data.style;
   return (
     <>
       <Handle
@@ -90,7 +91,6 @@ const Node = memo(({ data, isConnectable = true, id }: {
       />
       <div
         className={`rounded-md text-base border-solid ${selected} ${data.isEnd ? 'bg-slate-700 text-white' : ''}`}
-        style={data.style}
       >
         {
           duration > 0 ?
@@ -103,6 +103,7 @@ const Node = memo(({ data, isConnectable = true, id }: {
         }
         <div
           className={description ? 'bg-zinc-100 p-2 rounded-t-md':'p-2'}
+          style={style.title ? style.title : {}}
         >{ data.label ? parse(data.label) : id }</div>
           {
           data.triggers && data.triggers.length > 0 ?
@@ -126,7 +127,10 @@ const Node = memo(({ data, isConnectable = true, id }: {
           }
         {description ? 
         (
-          <div className="text-xs justify-left gap-0.5 py-2 px-3 bg-white rounded-b-md">
+          <div
+            className="text-xs justify-left gap-0.5 py-2 px-3 bg-white rounded-b-md"
+            style={style.content ? style.content : {}}
+          >
             {parse(description)}
           </div>
         ):null

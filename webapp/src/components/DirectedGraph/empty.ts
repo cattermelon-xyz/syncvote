@@ -1,4 +1,4 @@
-import { ICheckPoint, IWorkflowVersion, IWorkflowVersionCosmetic } from './interface';
+import { ICheckPoint, IWorkflowVersion, IWorkflowVersionCosmetic, IWorkflowVersionLayout } from './interface';
 
 const rootCheckPoint: ICheckPoint = {
   id: 'root',
@@ -16,6 +16,16 @@ export const emptyCosmetic: IWorkflowVersionCosmetic = {
     vertical: '',
   },
   layouts: [],
+};
+
+export const emptyLayout: IWorkflowVersionLayout = {
+  id: '',
+  title: '',
+  screen: '',
+  renderer: '',
+  nodes: [],
+  edges: [],
+  markers: [],
 };
 
 export const emptyStage:IWorkflowVersion = {

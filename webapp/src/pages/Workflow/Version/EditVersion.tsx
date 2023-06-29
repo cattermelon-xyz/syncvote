@@ -5,7 +5,7 @@ import {
 } from '@components/DirectedGraph';
 import Icon from '@components/Icon/Icon';
 import { queryWeb2Integration, queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
-import { changeCosmetic, changeVersion } from '@middleware/logic';
+import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import {
   Button, Drawer, Modal, Space,
@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditInfo from './fragment/EditInfo';
-import { IWorkflowVersionCosmetic } from '@types';
+import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '@types';
 
 const extractVersion = ({
   workflows, workflowId, versionId,
@@ -133,6 +133,7 @@ export const EditVersion = () => {
         web2Integrations: web2IntegrationsState,
         versionData: version?.data || emptyStage,
         selectedNodeId,
+        selectedLayoutId,
         onChange: (changedData:any) => {
           const newData = changeVersion({
             versionData: version?.data || emptyStage,
@@ -178,6 +179,21 @@ export const EditVersion = () => {
           }
         },
         onClose: () => { setSelectedNodeId(''); },
+        onChangeLayout: (changedData:IWorkflowVersionLayout) => {
+          if (selectedLayoutId !== '') {
+            // TODO: version.data.cosmetic might not existed before this call
+            const selectedLayout = version.data.cosmetic.layouts.find((l:any) => l.id === selectedLayoutId);
+            const selectedLayoutIndex = version.data.cosmetic.layouts.findIndex((l:any) => l.id === selectedLayoutId);
+            const newLayout = changeLayout(selectedLayout, changedData)
+            if (newLayout != undefined) {
+              const tmp = structuredClone(version);
+              tmp.data.cosmetic.layouts[selectedLayoutIndex] = newLayout;
+              setVersion({
+                ...tmp,
+              });
+            }
+          }
+        },
       },
       )}
       <DirectedGraph
@@ -227,9 +243,7 @@ export const EditVersion = () => {
             // TODO: position data should come from cosmetic
             if (changedNode && changedNode.position) {
               newData.checkpoints[index].position = changedNode.position;
-              console.log(selectedLayoutId)
               if (selectedLayoutId) {
-                console.log(newData.cosmetic);
                 const layout = newData.cosmetic.layouts.find((l:any) => l.id === selectedLayoutId);
                 if (!layout.nodes) {
                   layout.nodes = []
@@ -247,7 +261,6 @@ export const EditVersion = () => {
               }
             }
           });
-          console.log(newData);
           setVersion({
             ...version, data: newData,
           });

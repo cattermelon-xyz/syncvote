@@ -194,11 +194,12 @@ export const buildATree = ({data, selectedNodeId, selectedLayoutId}: {
       }
       const checkpointFromLayout:any = layout?.nodes?.find((n:any) => n.id === checkpoint.id);
       const position = checkpointFromLayout?.position || checkpoint.position;
+      const style = {...nodeStyle, ...checkpointFromLayout?.style}
       nodes.push({
         id: checkpoint.id,
         data: {
           label: checkpoint.title ? checkpoint.title : checkpoint.id,
-          style: nodeStyle,
+          style,
           isEnd: checkpoint.isEnd,
           raw: checkpoint,
           triggers: checkpoint.triggers,

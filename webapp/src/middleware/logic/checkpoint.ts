@@ -1,4 +1,4 @@
-import { ICheckPoint, IWorkflowVersionCosmetic } from '@types';
+import { ICheckPoint, IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '@types';
 import { generateId } from '@utils/helpers';
 
 export const changeVersion = ({
@@ -91,6 +91,41 @@ export const changeCosmetic = (original: IWorkflowVersionCosmetic, changed: IWor
   }
   return {...result};
 }
+
+export const changeLayout = (original: IWorkflowVersionLayout, changed: IWorkflowVersionLayout) => {
+  if(original.id === changed.id) {
+    const {nodes, edges, markers} = changed;
+    const {nodes: originalNodes, edges: originalEdges, markers: originalMarkers} = original;
+    const result = structuredClone(original);
+    if (!originalNodes || result.nodes === undefined) {
+      result.nodes = []
+    }
+    if (!originalEdges || result.edges === undefined) {
+      result.edges = []
+    }
+    if (!originalMarkers || result.markers === undefined) {
+      result.markers = []
+    }
+    if (nodes && nodes.length > 0) {
+      nodes.forEach((node) => {
+        if(!originalNodes) {
+          result.nodes?.push(node)
+        } else {
+          const index = result.nodes?.findIndex((orginalNode:any) => orginalNode.id === node.id);
+          if (index === -1) {
+            result.nodes?.push(node)
+          }else if(index !== undefined){
+            result.nodes? result.nodes[index] = {
+              ...result.nodes[index],
+              ...node
+            }: null;
+          }
+        }
+      })
+    }
+    return result;
+  }
+};
 
 export const validateWorkflow = ({ checkPoint }:{
   checkPoint: ICheckPoint;

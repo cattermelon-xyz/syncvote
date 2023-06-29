@@ -19,7 +19,7 @@ const VotingCondition = (props: VotingConditionProps) => {
   } = props;
   return (
     <Space direction="vertical" size="small" className="w-full">
-      <Space className="text-md" direction="horizontal" size="small">
+      {/* <Space className="text-md" direction="horizontal" size="small">
         <span className="text-lg">
           Voting condition
         </span>
@@ -28,8 +28,8 @@ const VotingCondition = (props: VotingConditionProps) => {
             <QuestionCircleOutlined />
           </Tooltip>
         </div>
-      </Space>
-      <Space direction="vertical" size="small" className="w-full">
+      </Space> */}
+      {/* <Space direction="vertical" size="small" className="w-full">
         <div className="text-sm text-slate-600">
           Threshold calculated by
         </div>
@@ -39,7 +39,7 @@ const VotingCondition = (props: VotingConditionProps) => {
           disabled
           value={getThresholdText()}
         />
-      </Space>
+      </Space> */}
       <Space direction="vertical" size="small" className="w-full">
         <div className="text-sm text-slate-600">
           Threshold value for each result (at least)

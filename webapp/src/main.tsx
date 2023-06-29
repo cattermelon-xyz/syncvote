@@ -13,6 +13,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
      theme={{
         token: {
           colorPrimary: '#5D23BB',
+          colorLink: '#5D23BB',
+          colorSuccessBg: '#EAF6EE',
+          colorSuccessText: '#29A259',
         },
       }}
     >

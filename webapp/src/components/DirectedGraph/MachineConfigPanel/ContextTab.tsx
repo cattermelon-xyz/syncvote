@@ -1,23 +1,34 @@
 import {
   Alert,
-  Button, Input, Space,
+  Button, Input, Popover, Space,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { CommentOutlined, LockFilled, UnlockOutlined } from '@ant-design/icons';
 import {
   validateWorkflow, validateMission,
 } from '@middleware/logic';
-import { ICheckPoint } from '@types';
+import { ICheckPoint, IWorkflowVersionLayout, IWorkflowVersionLayoutMarker } from '@types';
 import TextEditor from '@components/Editor/TextEditor';
 import { getVoteMachine } from '../voteMachine';
+import { emptyLayout } from '../empty';
+import { Markers } from './markers';
 
 const ContextTab = ({
-  selectedNode = {}, onChange, editable,
+  selectedNode = {}, onChange, editable, selectedLayout = {...emptyLayout}, markers = [], onChangeLayout,
 } : {
   selectedNode?: any;
   onChange: (changedData:ICheckPoint) => void;
   editable?: boolean;
+  selectedLayout?: IWorkflowVersionLayout;
+  markers?: IWorkflowVersionLayoutMarker[];
+  onChangeLayout?: (changedData:IWorkflowVersionLayout) => void;
 }) => {
+  const layoutNode = selectedLayout?.nodes?.find((node:any) => node.id === selectedNode?.id) || {style: {
+    title: {
+      backgroundColor: '#fff',
+    }
+  }};
+  const style = layoutNode?.style;
   const summary = getVoteMachine(selectedNode.vote_machine_type)?.explain({
     checkpoint: selectedNode,
     data: selectedNode.data,
@@ -103,7 +114,7 @@ const ContextTab = ({
       {!selectedNode?.isEnd && selectedNode.vote_machine_type ?
       (
         <>
-          <Space direction="vertical" className="p-4 rounded-md bg-slate-100 border-1 w-full">
+          <Space direction="vertical" className="p-4 rounded-lg bg-white border-1 w-full">
             <div className="flex items-center text-lg font-bold">
               <CommentOutlined className="mr-2" />
               Summary
@@ -117,6 +128,67 @@ const ContextTab = ({
       :
         <></>
       }
+      <Space direction="vertical" className="w-full">
+        <div className="text-gray-400">Checkpoint color & label</div>
+          <Input
+            prefix={(
+            <Popover
+              content={(
+                <Space direction="horizontal">
+                  {
+                    Markers.map((marker:any) => {
+                      return <div
+                        className="w-[16px] h-[16px] border-2 cursor-pointer"
+                        style={{backgroundColor: marker.title.backgroundColor}}
+                        onClick={() => {
+                          const tmp = structuredClone(selectedLayout);
+                          const nodes = tmp?.nodes;
+                          const style = {
+                            title: {...marker.title},  
+                            content: {...marker.content},
+                          };
+                          if (!nodes) {
+                            tmp.nodes = [];
+                            tmp.nodes.push({
+                              id: selectedNode?.id,
+                              style,
+                            })
+                          } else {
+                            const idx = nodes.findIndex((node:any) => node.id === selectedNode?.id);
+                            if (idx === -1) {
+                              nodes.push({
+                                id: selectedNode?.id,
+                                style,
+                              })
+                            } else {
+                              nodes[idx].style = {
+                                ...nodes[idx].style,
+                                ...style,
+                              };
+                            }
+                          }
+                          onChangeLayout ? 
+                          onChangeLayout({
+                            ...tmp,
+                          }) : null;
+                        }}
+                      ></div>
+                    })
+                  }
+                </Space>
+              )}
+            >
+              <div className="w-[24px] h-[24px] rounded-md border cursor-pointer mr-2" style={{
+                backgroundColor: style?.title.backgroundColor,
+              }}></div>
+            </Popover>
+            )}
+            className="w-full"
+            value={markers.find((marker:any) => marker.color === style?.title?.backgroundColor)?.title || ''}
+            placeholder="Write a label"
+            disabled={style?.title?.backgroundColor === '#fff'}
+          />
+      </Space>
       <Space direction="vertical" size="middle" className="w-full">
         {renderValidation(validation)}
         {renderValidation(vmValidation)}

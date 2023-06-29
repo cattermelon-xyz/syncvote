@@ -1,6 +1,6 @@
 import {
   CloseCircleOutlined,
-  CopyOutlined, DatabaseOutlined, DeleteOutlined, MoreOutlined, PlusOutlined,
+  CopyOutlined, DatabaseOutlined, DeleteOutlined, EllipsisOutlined, MoreOutlined, PlusOutlined,
 } from '@ant-design/icons';
 import {
   Button, Drawer, Input, Modal, Popover, Space,
@@ -50,9 +50,7 @@ const MoreButton = ({
         )
       }
     >
-      <Button
-        icon={<MoreOutlined />}
-      />
+      <EllipsisOutlined className="mx-2 font-bold" />
     </Popover>
   );
 };
@@ -109,12 +107,12 @@ const AllowedByIdentity = (props: AllowedByIdentityProps) => {
   const [addNewDrawerVisibility, setAddNewDrawerVisibility] = useState(false);
   return (
     <Space direction="vertical" size="middle" className="w-full">
-      <div className="text-sm">Allowed identity (email, twitter or wallet address)</div>
+      <div className="text-sm">List of identity</div>
       <Space direction="vertical" size="small" className="w-full">
         {identity.map((id, index) => (
-          <Space.Compact className="w-full" key={id}>
+          <Space direction="horizontal" className="w-full flex justify-between" key={id}>
             <Input
-              className="w-full"
+              className="w-full grow"
               value={id}
               onChange={(e) => {
                 const newIdentity = [...identity];
@@ -139,22 +137,22 @@ const AllowedByIdentity = (props: AllowedByIdentityProps) => {
               setIdentity(newIdentity);
             }}
             />
-          </Space.Compact>
+          </Space>
         ))}
       </Space>
       <Space direction="horizontal" size="small" className="w-full flex justify-between">
-        <Button
+        {/* <Button
           type="link"
           icon={<DatabaseOutlined />}
-          className="flex items-center"
+          className="flex items-center pl-0"
           disabled
         >
           Link to a datasource
-        </Button>
+        </Button> */}
         <Button
           type="link"
           icon={<PlusOutlined />}
-          className="flex items-center"
+          className="flex items-center pr-0 pl-0"
           onClick={() => {
             setAddNewDrawerVisibility(true);
           }}

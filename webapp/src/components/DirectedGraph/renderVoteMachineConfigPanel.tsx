@@ -2,19 +2,23 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Drawer, Typography } from 'antd';
 import MachineConfigPanel from './MachineConfigPanel/MachineConfigPanel';
 import { getVoteMachine } from './voteMachine';
-import { IVoteMachine } from '@types';
+import { IVoteMachine, IWorkflowVersionLayout } from '@types';
 
 export const renderVoteMachineConfigPanel = ({
   // TODO: change versionData to a better name
   versionData, selectedNodeId, onChange, onDelete, onClose, web2Integrations,
-  editable = false,
+  editable = false, selectedLayoutId,
+  onChangeLayout,
 }: {
   versionData: any, selectedNodeId:string, onChange: (data:any) => void,
   onDelete: (data:any) => void, onClose: () => void,
   web2Integrations: any[],
   editable?: boolean,
+  selectedLayoutId?: string,
+  onChangeLayout: (data:IWorkflowVersionLayout) => void,
 }) => {
   const selectedNode = versionData.checkpoints?.find((chk:any) => chk.id === selectedNodeId);
+  const layout = versionData.cosmetic?.layouts?.find((l:any) => l?.id === selectedLayoutId);
   let configPanel = (<></>);
   if (selectedNode !== undefined) {
     const machine:IVoteMachine = getVoteMachine(selectedNode.vote_machine_type) || {
@@ -25,6 +29,8 @@ export const renderVoteMachineConfigPanel = ({
     configPanel = (
       <MachineConfigPanel
         selectedNode={selectedNode}
+        onChangeLayout={onChangeLayout}
+        selectedLayout={layout}
         onChange={onChange}
         web2Integrations={web2Integrations}
         allNodes={versionData.checkpoints}
@@ -46,6 +52,8 @@ export const renderVoteMachineConfigPanel = ({
   }
   return (
     <Drawer
+      closeIcon={<></>}
+      className="directed-graph-config-panel"
       open={selectedNodeId !== '' && selectedNodeId !== undefined}
       onClose={onClose}
       title={<Typography.Paragraph
@@ -59,13 +67,13 @@ export const renderVoteMachineConfigPanel = ({
       >
         {selectedNode?.title ? selectedNode.title : selectedNodeId}
       </Typography.Paragraph>}
-      bodyStyle={{ padding:'0px', backgroundColor:'#e3e3e2' }}
+      bodyStyle={{ padding:'0px', backgroundColor:'#f6f6f6' }}
       extra={
         (
           <Button
             type="link"
             icon={<DeleteOutlined />}
-            className="text-red-500 flex items-center"
+            className="flex items-center"
             onClick={() => {
               let data = structuredClone(selectedNode.data);
               const newVersionData = structuredClone(versionData);
@@ -80,6 +88,7 @@ export const renderVoteMachineConfigPanel = ({
               onDelete(selectedNodeId);
             }}
             disabled={!editable}
+            danger
           >
             Delete
           </Button>

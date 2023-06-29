@@ -78,11 +78,8 @@ export interface IVoteMachine {
 }
 
 export interface IWorkflowVersionLayoutMarker {
-  id: string;
   title: string;
-  description?: string;
   color: string;
-  icon: string;
 }
 
 export interface IWorkflowVersionLayoutNode {
@@ -110,9 +107,9 @@ export interface IWorkflowVersionLayout {
   screen: "horizontal" | "vertical" | string;
   title: string;
   description?: string;
-  nodes?: [],
-  edges?: [],
-  markers?: [],
+  nodes?: any[],
+  edges?: any[],
+  markers?: IWorkflowVersionLayoutMarker[],
   background?: {},
 }
 

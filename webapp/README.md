@@ -37,6 +37,7 @@ $ npm run preview
 │   ├── middleware         -> Hold data & logic
 │   │   ├── data           -> Connect & fetch data from backend & interact with redux
 │   │   ├── logic          -> Logic for transforming checkpoints
+│   ├── pages              -> Most page has its own URL
 │   ├── redux              -> State redux for app
 │   ├── routing            -> App routing
 │   ├── types              -> Types and interfaces, hold almost no code but export from other places

@@ -105,16 +105,16 @@ const Flow = ({
                 </span>
               </Space>
               {layouts?.map((layout, index) => {
-                const selected = layout.id === selectedLayoutId ? 'bg-violet-100' : 'bg-white';
+                const selected = layout?.id === selectedLayoutId ? 'bg-violet-100' : 'bg-white';
                 return (
                   <div
-                    key={layout.id}
+                    key={layout?.id}
                     className={`cursor-pointer p-2 border rounded-md hover:bg-violet-100 ${selected}`}
                     onClick={() => {
                       onLayoutClick(layout.id);
                     }}
                   >
-                    {layout.title}
+                    {layout?.title}
                   </div>
                 )
               })}
