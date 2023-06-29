@@ -53,7 +53,9 @@ const RulesTab = ({
           currentType={selectedNode?.vote_machine_type}
         />
       </Drawer>
-      <Space direction="vertical" size="large" className="w-full">
+      <div className="w-full">
+        <div className="pt-4 px-4 bg-white rounded-t-lg">
+        <div className="mb-2">Voting method</div>
         {editable && !selectedNode?.isEnd ? (
           <div
             className="w-full flex justify-between items-center text-lg p-2 cursor-pointer rounded-lg border-2 hover:border-violet-500 hover:text-violet-500"
@@ -72,47 +74,33 @@ const RulesTab = ({
           <></>
         }
         {editable && selectedNode?.isEnd ? (
-          <ChooseVoteMachine
-            changeVoteMachineType={setVoteMachine}
-            currentType={undefined}
+        <ChooseVoteMachine
+          changeVoteMachineType={setVoteMachine}
+          currentType={undefined}
           />
         )
         :
           <></>
         }
+        </div>
         {!selectedNode?.isEnd ? (
-          <Tabs
-            defaultActiveKey="1"
-            items={[
-              {
-                key: '1',
-                label: 'Options & Results',
-                children: vmConfigPanel,
-              },
-              {
-                key: '2',
-                label: 'Voting participants',
-                children: <VotingPartipation
-                  onChange={onChange}
-                  editable={editable}
-                  selectedNode={selectedNode}
-                />,
-              },
-              {
-                key: '3',
-                label: 'Voting Duration',
-                children: <VotingDuration
-                  onChange={onChange}
-                  editable={editable}
-                  selectedNode={selectedNode}
-                />,
-              },
-            ]}
-          />
+          <Space direction="vertical" size="middle" className="w-full mb-4">
+            {vmConfigPanel}
+            <VotingPartipation
+              onChange={onChange}
+              editable={editable}
+              selectedNode={selectedNode}
+            />
+            <VotingDuration
+              onChange={onChange}
+              editable={editable}
+              selectedNode={selectedNode}
+            />
+          </Space>
         )
         : null
         }
-      </Space>
+      </div>
     </>
   );
 };

@@ -3,6 +3,6 @@ import { ICheckPoint as icp } from '../../types';
 export * from './DirectedGraph';
 export * from './voteMachine';
 export * from './renderVoteMachineConfigPanel';
-export * from './emptyStage';
+export * from './empty';
 
 export type { icp as ICheckPoint };
