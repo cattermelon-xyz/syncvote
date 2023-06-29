@@ -75,10 +75,8 @@ export const PublicVersion = () => {
   const navigate = useNavigate();
   const { web2Integrations } = useSelector((state: any) => state.integration);
   const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
-  const { orgs, users } = useSelector((state: any) => state.orginfo)
-  
-  const [org, setOrg] = useState<any>(orgs.find((o: any) => o.id === orgId));
-  
+  const { orgs, users } = useSelector((state: any) => state.orginfo);
+
   const [version, setVersion] = useState<any>(
     extractVersion({
       workflows,
@@ -89,6 +87,9 @@ export const PublicVersion = () => {
 
   const [web2IntegrationsState, setWeb2IntegrationsState] =
     useState(web2Integrations);
+
+  const [org, setOrg] = useState<any>(orgs.find((o: any) => o.id === orgId));
+
   const [workflow, setWorkflow] = useState<any>(
     workflows.find((w: any) => w.id === workflowId)
   );
@@ -106,7 +107,7 @@ export const PublicVersion = () => {
     );
     setDataHasChanged(false);
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
-  };  
+  };
 
   const uniswapGovernaceProcess = {
     workflow: workflow?.title,
@@ -224,6 +225,7 @@ export const PublicVersion = () => {
                 config={disqusConfig}
               />
             </div>
+            
           </Sider>
 
           <Layout className="relative">
