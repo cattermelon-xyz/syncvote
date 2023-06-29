@@ -1,14 +1,7 @@
 import {
-  BranchesOutlined,
-  DesktopOutlined,
   DownloadOutlined,
-  FileOutlined,
   FileTextOutlined,
   LeftOutlined,
-  PieChartOutlined,
-  SaveOutlined,
-  TeamOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import Disqus from "disqus-react";
 import {
@@ -19,28 +12,17 @@ import {
 } from "@components/DirectedGraph";
 import Icon from "@components/Icon/Icon";
 import {
+  queryOrgs,
   queryWeb2Integration,
   queryWorkflow,
   upsertWorkflowVersion,
 } from "@middleware/data";
 import { changeVersion } from "@middleware/logic";
 import { extractIdFromIdString, shouldUseCachedData } from "@utils/helpers";
-import {
-  Button,
-  Drawer,
-  Layout,
-  Modal,
-  Space,
-  Image,
-  Avatar,
-  MenuProps,
-  theme,
-  Menu,
-} from "antd";
+import { Button, Layout, Space, Image, Avatar } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import EditInfo from "./fragment/EditInfo";
 import { FiCalendar, FiHome, FiLink, FiUser } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
 import { LuPaintbrush } from "react-icons/lu";
@@ -48,7 +30,7 @@ import { log } from "console";
 import Sider from "antd/es/layout/Sider";
 import { TbH1 } from "react-icons/tb";
 import { Content } from "antd/es/layout/layout";
-
+import Comment from "./fragment/Comment";
 const extractVersion = ({
   workflows,
   workflowId,
@@ -59,42 +41,46 @@ const extractVersion = ({
   versionId: number;
 }) => {
   const wf = workflows.find((workflow: any) => workflow.id === workflowId);
+
   if (wf) {
     return wf.workflow_version.find((wv: any) => wv.id === versionId);
   }
   return {};
 };
 
+const extractOrg = ({ orgList, orgId }: { orgList: any; orgId: number }) => {
+  const org = orgList.find((org: any) => org.id === orgId);
+  return org;
+};
+
 export const PublicVersion = () => {
-  const { orgIdString, workflowIdString, versionIdString } = useParams();
+  const { orgIdString, workflowIdString, versionIdString, userId } =
+    useParams();
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
   const versionId = extractIdFromIdString(versionIdString);
+
   const dispatch = useDispatch();
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
-  const { web2Integrations } = useSelector((state: any) => state.integration);
-  const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
-  const { orgs, users } = useSelector((state: any) => state.orginfo);
 
-  const [version, setVersion] = useState<any>(
-    extractVersion({
-      workflows,
-      workflowId,
-      versionId,
-    })
-  );
+  // const { web2Integrations } = useSelector((state: any) => state.integration);
+  // const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
+  // const { orgs, users } = useSelector((state: any) => state.orginfo);
 
-  const [web2IntegrationsState, setWeb2IntegrationsState] =
-    useState(web2Integrations);
+  // const [web2IntegrationsState, setWeb2IntegrationsState] =
+  //   useState(web2Integrations);
 
-  const [org, setOrg] = useState<any>(orgs.find((o: any) => o.id === orgId));
+  // const [org, setOrg] = useState<any>(orgs.find((o: any) => o.id === orgId));
 
-  const [workflow, setWorkflow] = useState<any>(
-    workflows.find((w: any) => w.id === workflowId)
-  );
+  // const [workflow, setWorkflow] = useState<any>(
+  //   workflows.find((w: any) => w.id === workflowId)
+  // );
+  const [version, setVersion] = useState<any>();
+  const [workflow, setWorkflow] = useState<any>();
+  const [org, setOrg] = useState<any>();
 
-  const [selectedNodeId, setSelectedNodeId] = useState("");
+  // const [selectedNodeId, setSelectedNodeId] = useState("");
   const [dataHasChanged, setDataHasChanged] = useState(false);
 
   const extractWorkflowFromList = (wfList: any) => {
@@ -105,8 +91,13 @@ export const PublicVersion = () => {
         versionId,
       })
     );
+
     setDataHasChanged(false);
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
+  };
+
+  const extractOrgList = (orgList: any) => {
+    setOrg(extractOrg({ orgList, orgId }));
   };
 
   const uniswapGovernaceProcess = {
@@ -117,32 +108,35 @@ export const PublicVersion = () => {
     desc: workflow?.desc,
   };
 
-  const disqusShortname = "comment-vudsovdn2x";
-  const disqusConfig = {
-    url: `http://localhost:3001/${orgIdString}$/${workflowIdString}$/${versionIdString}$`,
-    identifier: `${orgIdString}$/${workflowIdString}$/${versionIdString}$`,
-    title: "Title of Your Article",
-    laziness: 1,
-  };
+  console.log(uniswapGovernaceProcess);
 
   useEffect(() => {
-    if (!shouldUseCachedData(lastFetch)) {
-      queryWeb2Integration({
-        orgId,
-        dispatch,
-        onLoad: (data: any) => {
-          setWeb2IntegrationsState(data);
-        },
-      });
-      queryWorkflow({
-        orgId,
-        dispatch,
-        onLoad: (wfList: any) => {
-          extractWorkflowFromList(wfList);
-        },
-      });
-    }
-  }, [workflows, web2Integrations, lastFetch]);
+    // if (!shouldUseCachedData(lastFetch)) {
+    // queryWeb2Integration({
+    //   orgId,
+    //   dispatch,
+    //   onLoad: (data: any) => {
+    //     setWeb2IntegrationsState(data);
+    //   },
+    // });
+    queryWorkflow({
+      orgId,
+      dispatch,
+      onLoad: (wfList: any) => {
+        extractWorkflowFromList(wfList);
+      },
+    });
+
+    queryOrgs({
+      filter: { userId },
+      onSuccess: (orgList: any) => {
+        extractOrgList(orgList);
+      },
+      dispatch,
+    });
+    // }
+  }, []);
+  // }, [workflows, web2Integrations, lastFetch]);
 
   const [collapsed, setCollapsed] = useState(false);
   const [comment, setComment] = useState(false);
@@ -214,18 +208,19 @@ export const PublicVersion = () => {
           <Sider
             collapsed={!comment}
             collapsedWidth={0}
-            width="40%"
+            width="26%"
             theme="light"
-            style={{ backgroundColor: "#EEEEEE" }}
+            style={{ backgroundColor: "#EEEEEE", borderRadius: "12px" }}
             className="comment-collapsedh"
           >
             <div className="p-5">
-              <Disqus.DiscussionEmbed
-                shortname={disqusShortname}
-                config={disqusConfig}
+              <Comment
+                orgId={orgId}
+                workflowId={workflowId}
+                versionId={versionId}
+                profile={null}
               />
             </div>
-            
           </Sider>
 
           <Layout className="relative">
@@ -296,7 +291,7 @@ export const PublicVersion = () => {
                 </Button>
               </Space>
             </div>
-
+            {/* 
             {renderVoteMachineConfigPanel({
               editable: false,
               web2Integrations: web2IntegrationsState,
@@ -344,7 +339,7 @@ export const PublicVersion = () => {
                   y: (-viewport.y + 250) / viewport.zoom,
                 });
               }}
-            />
+            /> */}
           </Layout>
         </Layout>
       ) : (

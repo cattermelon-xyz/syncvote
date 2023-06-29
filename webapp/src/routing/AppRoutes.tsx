@@ -27,7 +27,7 @@ const AppRoutes = () => (
 
       <Route path="/public" element={<PublicMission isFullHeight />}>
       <Route
-          path=":orgIdString/:workflowIdString/:versionIdString"
+          path=":orgIdString/:workflowIdString/:versionIdString/:userId"
           element={<PublicVersion />}
         />
       </Route>
