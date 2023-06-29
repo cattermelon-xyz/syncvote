@@ -295,4 +295,5 @@ export const LANG: any = {
   chooseIcon: 'Choose Icon',
   welcomeToSyncvote: 'Welcome to Syncvote',
   logInToStartCreatingYourWorkflows: 'Log in to start creating your workflows'
+  
 };
