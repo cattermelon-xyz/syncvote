@@ -20,10 +20,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
     const { orgInfo, uid } = await req.json();
-    const { data, error } = await supabaseClient.from('org').insert(orgInfo).select();
+    const { data, error } = await supabaseClient.from('org').insert(orgInfo).select('*');
     const rs = !error ? JSON.stringify(data) : JSON.stringify(error);
     if (data) {
-      const org = {...data};
+      const org = {...data[0]};
       await supabaseClient.from('user_org').insert({
         org_id: org.id,
         user_id: uid,
