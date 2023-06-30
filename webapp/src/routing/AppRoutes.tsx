@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import App from "@App";
-import PublicMission from "@PublicMission";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import PageScreen from "@components/HomeScreen/PageScreen";
@@ -12,19 +11,31 @@ import {
   OrganizationHome,
   OrganizationList,
   OrganizationSetting,
-} from '@pages/Organization';
-import CreatorLogin from '@pages/Authentication/index';
-import BluePrint from '@pages/Workflow/BluePrint';
-import { EditVersion, NewVersion } from '@pages/Workflow/Version';
-import NewMission from '@pages/Mission/NewMission';
-import EditMission from '@pages/Mission/EditMission';
-import AppLayout from '@layout/AppLayout';
-import NoHeaderLayout from '@layout/NoHeader';
-import WebLayout from '@layout/WebLayout';
+} from "@pages/Organization";
+import CreatorLogin from "@pages/Authentication/index";
+import BluePrint from "@pages/Workflow/BluePrint";
+import { EditVersion, NewVersion } from "@pages/Workflow/Version";
+import NewMission from "@pages/Mission/NewMission";
+import EditMission from "@pages/Mission/EditMission";
+import AppLayout from "@layout/AppLayout";
+import NoHeaderLayout from "@layout/NoHeader";
+import WebLayout from "@layout/WebLayout";
+import PublicAppLayout from "@layout/PublicAppLayout";
+import { PublicVersion } from "@pages/Workflow/Version/PublicVersion";
 
 const AppRoutes = () => (
   <BrowserRouter basename="/">
     <Routes>
+      <Route
+        path="/public"
+        element={<App layout={PublicAppLayout} requiredLogin={false} />}
+      >
+        <Route
+          path=":orgIdString/:workflowIdString/:versionIdString/:userId"
+          element={<PublicVersion />}
+        ></Route>
+      </Route>
+
       <Route path="/" element={<App layout={AppLayout} requiredLogin={true} />}>
         <Route
           path=":orgIdString/:workflowIdString/:versionIdString"

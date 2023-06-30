@@ -90,7 +90,7 @@ export const PublicVersion = () => {
     setOrg(extractOrg({ orgList, orgId }));
   };
 
-  const uniswapGovernaceProcess = {
+  const worflowInfo = {
     workflow: workflow?.title,
     org: org?.title,
     authority: org?.profile[0].full_name,
@@ -140,7 +140,7 @@ export const PublicVersion = () => {
             <Sider
               collapsed={!collapsed}
               collapsedWidth={0}
-              width="30%"
+              width="33%"
               theme="light"
               style={{ backgroundColor: "#EEEEEE" }}
               className="information-collapsed"
@@ -158,20 +158,20 @@ export const PublicVersion = () => {
                 </Space>
                 <Space className="flex-col">
                   <p className="text-[17px] font-normal">
-                    {uniswapGovernaceProcess.workflow}
+                    {worflowInfo.workflow}
                   </p>
                   <Space direction="horizontal">
                     <div className="flex items-center text-[13px]">
                       <FiHome className="mr-1" size={16} />
-                      {uniswapGovernaceProcess.org}
+                      {worflowInfo.org}
                     </div>
                     <div className="flex items-center text-[13px]">
                       <FiUser className="mr-1" size={16} />
-                      {uniswapGovernaceProcess.authority}
+                      {worflowInfo.authority}
                     </div>
                     <div className="flex items-center text-[13px]">
                       <FiCalendar className="mr-1" size={16} />
-                      {uniswapGovernaceProcess.date}
+                      {worflowInfo.date}
                     </div>
                   </Space>
                 </Space>
@@ -215,7 +215,7 @@ export const PublicVersion = () => {
 
             <Layout className="relative">
               {!collapsed && (
-                <Space className="absolute m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit">
+                <Space className="absolute m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit mt-16">
                   <Space>
                     <Avatar
                       shape="circle"
@@ -226,20 +226,20 @@ export const PublicVersion = () => {
                   </Space>
                   <Space className="flex-col">
                     <p className="text-[17px] font-normal">
-                      {uniswapGovernaceProcess?.workflow}
+                      {worflowInfo?.workflow}
                     </p>
                     <Space direction="horizontal">
                       <div className="flex items-center text-[13px]">
                         <FiHome className="mr-1" size={16} />
-                        {uniswapGovernaceProcess?.org}
+                        {worflowInfo?.org}
                       </div>
                       <div className="flex items-center text-[13px]">
                         <FiUser className="mr-1" size={16} />
-                        {uniswapGovernaceProcess?.authority}
+                        {worflowInfo?.authority}
                       </div>
                       <div className="flex items-center text-[13px]">
                         <FiCalendar className="mr-1" size={16} />
-                        {uniswapGovernaceProcess?.date}
+                        {worflowInfo?.date}
                       </div>
                     </Space>
                   </Space>
@@ -291,7 +291,9 @@ export const PublicVersion = () => {
                 onClose: () => {
                   setSelectedNodeId("");
                 },
+                onChangeLayout: () => {},
               })}
+
               <DirectedGraph
                 editable
                 data={version?.data || emptyStage}

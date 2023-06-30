@@ -32,22 +32,9 @@ function getItem(
     style,
   } as MenuItem;
 }
-type HeaderProps = {
-  // isAuth: boolean;
-  // setIsAuth: (value: boolean) => void;
-  session: any;
-  isMainAppFullHeight: boolean;
-};
 
-function PublicHeader({
-  // isAuth = false,
-  // setIsAuth = () => {},
-  session,
-  isMainAppFullHeight = false,
-}: HeaderProps) {
+function PublicHeader(session: any) {
   const navigate = useNavigate();
-  const { orgIdString } = useParams();
-  const orgId = extractIdFromIdString(orgIdString);
 
   const items: MenuProps["items"] = [
     getItem("About us", "1"),
