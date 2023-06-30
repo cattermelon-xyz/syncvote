@@ -1,4 +1,5 @@
-import { ICheckPoint } from '@types';
+import { ICheckPoint, IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '@types';
+import { generateId } from '@utils/helpers';
 
 export const changeVersion = ({
   versionData, selectedNodeId, changedCheckPointData,
@@ -47,6 +48,83 @@ export const changeVersion = ({
     newData.checkpoints[index].participation = changedCheckPointData.participation;
   }
   return newData;
+};
+
+export const changeCosmetic = (original: IWorkflowVersionCosmetic, changed: IWorkflowVersionCosmetic) => {
+  const {defaultLayout , layouts} = changed;
+  const result = original ? {...original} : {
+    defaultLayout: undefined,
+    layouts: [],
+  };
+  if (defaultLayout) {
+    const {horizontal, vertical} = defaultLayout;
+    if (!result.defaultLayout) {
+      result.defaultLayout = {...defaultLayout}
+    } else {
+      result.defaultLayout = {
+        horizontal: horizontal || result.defaultLayout.horizontal,
+        vertical: vertical || result.defaultLayout.vertical,
+      }
+    }
+  }
+  if (layouts) {
+    if (!result.layouts) {
+      result.layouts = [];
+      console.log('old layout is empty')
+      layouts.forEach((layout) => {
+        if (!layout.id) {
+          result.layouts.push({...layout, id: generateId(4)});
+        }
+      })
+    } else {
+      layouts.forEach((layout) => {
+        const index = result.layouts.findIndex((item) => item.id === layout.id);
+        if (index === -1) {
+          console.log('push new')
+          result.layouts.push({...layout, id: generateId(4)});
+        } else {
+          console.log('changed')
+          result.layouts[index] = {...layout};
+        }
+      })
+    }
+  }
+  return {...result};
+}
+
+export const changeLayout = (original: IWorkflowVersionLayout, changed: IWorkflowVersionLayout) => {
+  if(original.id === changed.id) {
+    const {nodes, edges, markers} = changed;
+    const {nodes: originalNodes, edges: originalEdges, markers: originalMarkers} = original;
+    const result = structuredClone(original);
+    if (!originalNodes || result.nodes === undefined) {
+      result.nodes = []
+    }
+    if (!originalEdges || result.edges === undefined) {
+      result.edges = []
+    }
+    if (!originalMarkers || result.markers === undefined) {
+      result.markers = []
+    }
+    if (nodes && nodes.length > 0) {
+      nodes.forEach((node) => {
+        if(!originalNodes) {
+          result.nodes?.push(node)
+        } else {
+          const index = result.nodes?.findIndex((orginalNode:any) => orginalNode.id === node.id);
+          if (index === -1) {
+            result.nodes?.push(node)
+          }else if(index !== undefined){
+            result.nodes? result.nodes[index] = {
+              ...result.nodes[index],
+              ...node
+            }: null;
+          }
+        }
+      })
+    }
+    return result;
+  }
 };
 
 export const validateWorkflow = ({ checkPoint }:{

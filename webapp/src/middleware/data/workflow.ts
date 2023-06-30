@@ -1,11 +1,11 @@
-import { finishLoading, startLoading } from "@redux/reducers/ui.reducer";
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import {
   setWorkflows,
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
-} from "@redux/reducers/workflow.reducer";
-import { supabase } from "@utils/supabaseClient";
+} from '@redux/reducers/workflow.reducer';
+import { supabase } from '@utils/supabaseClient';
 
 export const upsertWorkflowVersion = async ({
   dispatch,
@@ -27,7 +27,7 @@ export const upsertWorkflowVersion = async ({
   dispatch: any;
   onSuccess: (data: any) => void;
   onError?: (data: any) => void;
-  mode?: "data" | "info" | undefined;
+  mode?: 'data' | 'info' | undefined;
 }) => {
   dispatch(startLoading({}));
   const { versionId, workflowId, version, status, versionData, recommended } =
@@ -45,7 +45,7 @@ export const upsertWorkflowVersion = async ({
     toUpsert.recommended = recommended;
   }
   const { data, error } = await supabase
-    .from("workflow_version")
+    .from('workflow_version')
     .upsert(toUpsert)
     .select();
   dispatch(finishLoading({}));
@@ -74,10 +74,10 @@ export const queryWorkflow = async ({
   dispatch(startLoading({}));
   // TODO: should we stuff workflow_version into workflow?
   const { data, error } = await supabase
-    .from("workflow")
-    .select("*, workflow_version ( * )")
-    .eq("owner_org_id", orgId)
-    .order("created_at", { ascending: false });
+    .from('workflow')
+    .select('*, workflow_version ( * )')
+    .eq('owner_org_id', orgId)
+    .order('created_at', { ascending: false });
   dispatch(finishLoading({}));
   if (data) {
     const wfList = Array.isArray(data) ? data : [data];
@@ -130,10 +130,10 @@ export const updateAWorkflowInfo = async ({
   if (icon_url) toUpdate.icon_url = icon_url;
   if (preset_icon_url) toUpdate.preset_icon_url = preset_icon_url;
   const { data, error } = await supabase
-    .from("workflow")
+    .from('workflow')
     .update(toUpdate)
-    .eq("id", id)
-    .select("*");
+    .eq('id', id)
+    .select('*');
   dispatch(finishLoading({}));
   if (data) {
     const newData = structuredClone(data);
@@ -152,6 +152,34 @@ export const updateAWorkflowInfo = async ({
     dispatch(changeWorkflow(data[0]));
     onSuccess(data);
   } else {
+    onError(error);
+  }
+};
+
+export const deleteAWorkflow = async ({
+  workflowId,
+  dispatch,
+  onSuccess,
+  onError = () => {},
+}: {
+  workflowId: number;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+}) => {
+  dispatch(startLoading({}));
+
+  const { data, error } = await supabase
+    .from('workflow_version')
+    .delete()
+    .eq('id', workflowId);
+
+  dispatch(finishLoading({}));
+
+  if (!error) {
+    // dispatch(removeWorkflow(workflowId));
+    onSuccess(data);
+  } else if (error) {
     onError(error);
   }
 };

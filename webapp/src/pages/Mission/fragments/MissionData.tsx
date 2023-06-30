@@ -8,6 +8,7 @@ import {
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import MissionMeta from './MissionMeta';
+import { IWorkflowVersionLayout } from '@types';
 
 const Data = ({
   currentMission, onPublish, onUnPublish, onDelete,
@@ -126,6 +127,7 @@ const Data = ({
               }
             },
             onClose: () => { setSelectedNodeId(''); },
+            onChangeLayout: (changedData:IWorkflowVersionLayout) => {},
           },
         )}
         <DirectedGraph

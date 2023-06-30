@@ -8,7 +8,7 @@ const TriggerEmptyStage = ({
   editable: boolean;
 }) => {
   return (
-    <Space direction="vertical" size="large" className="mx-16 p-4 border-1 rounded-lg border-2">
+    <Space direction="vertical" size="large" className="mx-16 p-4 border-1 rounded-lg border-2 bg-white">
       <div>
         {`Streamline your tasks with Syncvote. 
           From updating records and tweeting to sending emails and initiating transfers - set actions to trigger at voting checkpoints. 
