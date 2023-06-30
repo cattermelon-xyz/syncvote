@@ -1,73 +1,83 @@
 export const Markers = [
   {
-    markerTitle: 'Black',
+    markerTitle: 'Grey',
     title: {
-      backgroundColor: '#0E0E0E',
-      color: '#fff',
+      backgroundColor: 'rgba(0,0,8,0.5)',
+      color: '#252422',
     },
     content: {
-      backgroundColor: '#E3E3E2',
-    }
-  },
-  {
-    markerTitle: 'Gray',
-    title: {
-      backgroundColor: '#626262',
-      color: '#fff',
+      backgroundColor: '#E0E0E0',
+      color: '#252422',
     },
-    content: {
-      backgroundColor: '#E3E3E2',
-    }
   },
   {
     markerTitle: 'Red',
     title: {
-      backgroundColor: '#D52716',
-      color: '#fff',
+      backgroundColor: '#FAB9B5',
+      color: '#252422',
     },
     content: {
-      backgroundColor: '#DC6357',
-    }
+      backgroundColor: '#FAB9B5',
+    },
   },
   {
     markerTitle: 'Orange',
     title: {
-      backgroundColor: '#F3841B',
-      color: '#eee',
+      backgroundColor: '#FAC78B',
+      color: '#252422',
     },
     content: {
-      backgroundColor: '#F2A155',
-    }
+      backgroundColor: '#FAC78B',
+    },
+  },
+  {
+    markerTitle: 'Yellow',
+    title: {
+      backgroundColor: '#FCE493',
+      color: '#252422',
+    },
+    content: {
+      backgroundColor: '#FCE493',
+    },
   },
   {
     markerTitle: 'Green',
-    color: '#1F7F40',
     title: {
-      backgroundColor: '#1F7F40',
-      color: '#eee',
+      backgroundColor: '#A2F4BA',
+      color: '#252422',
     },
     content: {
-      backgroundColor: '#428358',
-    }
+      backgroundColor: '#A2F4BA',
+    },
   },
   {
     markerTitle: 'Blue',
     title: {
-      backgroundColor: '#2275E3',
-      color: '#eee',
+      backgroundColor: '#B0DCFF',
+      color: '#252422',
     },
     content: {
-      backgroundColor: '#699EE4',
-    }
+      backgroundColor: '#B0DCFF',
+    },
   },
   {
     markerTitle: 'Purple',
     title: {
-      backgroundColor: '#750EF2',
-      color: '#fff',
+      backgroundColor: '#DDBDFF',
+      color: '#252422',
     },
     content: {
-      backgroundColor: '#9F5AF2',
-    }
-  }
+      backgroundColor: '#DDBDFF',
+    },
+  },
+  {
+    markerTitle: 'Pink',
+    title: {
+      backgroundColor: '#F0B5FA',
+      color: '#252422',
+    },
+    content: {
+      backgroundColor: '#F0B5FA',
+    },
+  },
 ];
