@@ -117,10 +117,6 @@ export const EditVersion = () => {
           },
           dispatch,
         });
-        Modal.success({
-          maskClosable: true,
-          content: 'Data saved successfully',
-        });
       },
       onError: (error) => {
         Modal.error({

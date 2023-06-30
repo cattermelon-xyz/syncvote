@@ -32,6 +32,10 @@ export const changeVersion = ({
   if (changedCheckPointData.description) {
     newData.checkpoints[index].description = changedCheckPointData.description;
   }
+  if (changedCheckPointData.votingLocation) {
+    newData.checkpoints[index].votingLocation =
+      changedCheckPointData.votingLocation;
+  }
   if (changedCheckPointData.locked) {
     newData.checkpoints[index].locked = changedCheckPointData.locked;
   }

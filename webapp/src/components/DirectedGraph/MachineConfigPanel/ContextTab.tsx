@@ -122,22 +122,19 @@ const ContextTab = ({
           // disabled={locked.description}
         />
       </Space>
-      {!selectedNode?.isEnd && selectedNode.vote_machine_type ? (
-        <>
-          <Space
-            direction="vertical"
-            className="p-4 rounded-lg bg-white border-1 w-full"
-          >
-            <div className="flex items-center text-lg font-bold">
-              <CommentOutlined className="mr-2" />
-              Summary
-            </div>
-            {summary}
-          </Space>
-        </>
-      ) : (
-        <></>
-      )}
+      <Space direction="vertical" className="w-full p-4 bg-white rounded-lg">
+        <div className="text-gray-400">Voting location</div>
+        <Input
+          value={selectedNode?.votingLocation}
+          onChange={(e) => {
+            const val = e.target.value || ' ';
+            const newNode = structuredClone(selectedNode);
+            newNode.votingLocation = val;
+            onChange(newNode);
+          }}
+          placeholder="Discourse Forum"
+        />
+      </Space>
       <Space direction="vertical" className="w-full p-4 bg-white rounded-lg">
         <div className="text-gray-400">Checkpoint color & label</div>
         <Input
@@ -245,6 +242,22 @@ const ContextTab = ({
           disabled={style?.title?.backgroundColor === '#fff'}
         />
       </Space>
+      {!selectedNode?.isEnd && selectedNode.vote_machine_type ? (
+        <>
+          <Space
+            direction="vertical"
+            className="p-4 rounded-lg bg-white border-1 w-full"
+          >
+            <div className="flex items-center text-lg font-bold">
+              <CommentOutlined className="mr-2" />
+              Summary
+            </div>
+            {summary}
+          </Space>
+        </>
+      ) : (
+        <></>
+      )}
       <Space direction="vertical" size="middle" className="w-full">
         {renderValidation(validation)}
         {renderValidation(vmValidation)}
