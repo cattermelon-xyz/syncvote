@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import './index.css';
 import { Outlet, useNavigate } from 'react-router-dom';
-import Header from '@layout/fragments/Header';
-import MainLayout from '@layout/MainLayout';
 import { supabase } from '@utils/supabaseClient';
 import { Session } from '@supabase/gotrue-js';
 import { useSelector, useDispatch } from 'react-redux';
@@ -18,8 +16,15 @@ import {
   queryPresetIcon,
 } from '@middleware/data';
 import { shouldUseCachedData } from '@utils/helpers';
+import { AuthContext } from '@layout/context/AuthContext';
 
-function App({ isFullHeight = false }: { isFullHeight?: boolean }) {
+function App({
+  requiredLogin = false,
+  layout,
+}: {
+  requiredLogin?: boolean;
+  layout: any;
+}) {
   // const [isAuth, setIsAuth] = useState(false);
   const navigate = useNavigate();
   // const token = window.localStorage.getItem('isConnectWallet');
@@ -31,10 +36,10 @@ function App({ isFullHeight = false }: { isFullHeight?: boolean }) {
   const { lastFetch } = useSelector((state: any) => state.orginfo);
   const dispatch = useDispatch();
   const handleSession = async (_session: Session | null) => {
-    setSession(_session);
-    if (_session === null) {
+    if (requiredLogin === true && _session === null) {
       navigate('/login');
     }
+    setSession(_session);
     if (_session !== null) {
       // query to server to get preset icons and banners
       queryPresetBanner({
@@ -68,38 +73,21 @@ function App({ isFullHeight = false }: { isFullHeight?: boolean }) {
       }
     }
   };
-  // query from redux user info
   useEffect(() => {
-    // if (!token) {
-    //   navigate(PAGE_ROUTES.CONNECT_WALLET);
-    // }
     supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
       await handleSession(_session);
     });
     registerVoteMachine(SingleChoiceRaceToMax);
     registerVoteMachine(MultipleChoiceRaceToMax);
   }, []);
+  const Layout: any = layout;
   return (
-    <div className={`w-full ${isFullHeight ? 'bg-slate-100 h-screen' : null}`}>
-      <GlobalLoading />
-      {location.pathname !== '/login' && (
-        <Header
-          // isAuth={isAuth}
-          // setIsAuth={setIsAuth}
-          session={session}
-          isMainAppFullHeight={isFullHeight}
-        />
-      )}
-      <MainLayout isFullHeight={isFullHeight}>
-        <Outlet
-          context={{
-            // isAuth,
-            // setIsAuth,
-            session,
-          }}
-        />
-      </MainLayout>
-    </div>
+    <AuthContext.Provider value={{ session }}>
+      <Layout>
+        <GlobalLoading />
+        <Outlet />
+      </Layout>
+    </AuthContext.Provider>
   );
 }
 export default App;

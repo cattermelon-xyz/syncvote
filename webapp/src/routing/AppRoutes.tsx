@@ -16,11 +16,14 @@ import BluePrint from '@pages/Workflow/BluePrint';
 import { EditVersion, NewVersion } from '@pages/Workflow/Version';
 import NewMission from '@pages/Mission/NewMission';
 import EditMission from '@pages/Mission/EditMission';
+import AppLayout from '@layout/AppLayout';
+import NoHeaderLayout from '@layout/NoHeader';
+import WebLayout from '@layout/WebLayout';
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
     <Routes>
-      <Route path='/' element={<App isFullHeight />}>
+      <Route path='/' element={<App layout={AppLayout} requiredLogin={true} />}>
         <Route
           path=':orgIdString/:workflowIdString/:versionIdString'
           element={<EditVersion />}
@@ -33,17 +36,21 @@ const AppRoutes = () => (
         </Route>
       </Route>
       {/* TODO: login should use different layout */}
-      <Route path='/' element={<App isFullHeight />}>
+      <Route
+        path='/'
+        element={<App layout={NoHeaderLayout} requiredLogin={false} />}
+      >
         <Route path='login' element={<CreatorLogin />} />
       </Route>
-
-      <Route path='/' element={<App isFullHeight />}>
+      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
+        {/* TODO: this screen should only once for each new org */}
+        <Route path='onboard' element={<PageScreen />} />
         <Route index element={<OrganizationList />} />
         <Route path='my-spaces' element={<OrganizationList />} />
         <Route path='shared-spaces' element={<OrganizationList />} />
       </Route>
 
-      <Route path='/' element={<App />}>
+      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
         {/* TODO: this screen should only once for each new org */}
         <Route path='onboard' element={<PageScreen />} />
         <Route path=':orgIdString'>
