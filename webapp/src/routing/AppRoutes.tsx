@@ -13,26 +13,36 @@ import {
 } from '@pages/Organization';
 import CreatorLogin from '@pages/Authentication/index';
 import BluePrint from '@pages/Workflow/BluePrint';
-import {
-  EditVersion, NewVersion,
-} from '@pages/Workflow/Version';
+import { EditVersion, NewVersion } from '@pages/Workflow/Version';
 import NewMission from '@pages/Mission/NewMission';
 import EditMission from '@pages/Mission/EditMission';
+import AppLayout from '@layout/AppLayout';
+import NoHeaderLayout from '@layout/NoHeader';
+import WebLayout from '@layout/WebLayout';
 
 const AppRoutes = () => (
   <BrowserRouter basename="/">
     <Routes>
-      <Route path="/" element={<App isFullHeight />}>
-        <Route path=":orgIdString/:workflowIdString/:versionIdString" element={<EditVersion />} />
-        <Route path=":orgIdString/mission/:missionIdString" element={<Mission />}>
+      <Route path="/" element={<App layout={AppLayout} requiredLogin={true} />}>
+        <Route
+          path=":orgIdString/:workflowIdString/:versionIdString"
+          element={<EditVersion />}
+        />
+        <Route
+          path=":orgIdString/mission/:missionIdString"
+          element={<Mission />}
+        >
           <Route index element={<EditMission />} />
         </Route>
       </Route>
       {/* TODO: login should use different layout */}
-      <Route path="/" element={<App />}>
+      <Route
+        path="/"
+        element={<App layout={NoHeaderLayout} requiredLogin={false} />}
+      >
         <Route path="login" element={<CreatorLogin />} />
       </Route>
-      <Route path="/" element={<App />}>
+      <Route path="/" element={<App layout={WebLayout} requiredLogin={true} />}>
         {/* TODO: this screen should only once for each new org */}
         <Route path="onboard" element={<PageScreen />} />
         <Route index element={<OrganizationList />} />
@@ -44,7 +54,10 @@ const AppRoutes = () => (
           <Route path="workflow/:workflowIdString" element={<Workflow />}>
             <Route index element={<BluePrint />} />
             <Route path="new-version" element={<NewVersion />} />
-            <Route path=":versionIdString/new-mission" element={<NewMission />} />
+            <Route
+              path=":versionIdString/new-mission"
+              element={<NewMission />}
+            />
             <Route path=":versionIdString" element={<EditVersion />} />
           </Route>
         </Route>
