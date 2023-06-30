@@ -42,9 +42,8 @@ const AppRoutes = () => (
       >
         <Route path='login' element={<CreatorLogin />} />
       </Route>
+
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        {/* TODO: this screen should only once for each new org */}
-        <Route path='onboard' element={<PageScreen />} />
         <Route index element={<OrganizationList />} />
         <Route path='my-spaces' element={<OrganizationList />} />
         <Route path='shared-spaces' element={<OrganizationList />} />

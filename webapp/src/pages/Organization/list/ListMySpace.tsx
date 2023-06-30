@@ -3,6 +3,7 @@ import SpaceCard from '@components/Card/SpaceCard';
 import { useSelector } from 'react-redux';
 import { queryOrgsAndWorkflowForHome } from '@middleware/data';
 import { useDispatch } from 'react-redux';
+import { L } from '@utils/locales/L';
 
 const ListMySpace = () => {
   const { user } = useSelector((state: any) => state.orginfo);
@@ -17,26 +18,37 @@ const ListMySpace = () => {
         dispatch,
       });
       if (orgs) {
-        const adminOrgs = orgs.filter((org: any) => org.role === 'ADMIN');
-        setAdminOrgs(adminOrgs);
-        console.log(adminOrgs);
+        const data = orgs.filter((org: any) => org.role === 'ADMIN');
+        setAdminOrgs(data);
       }
     };
 
-    fetchData();
+    if (user) {
+      fetchData();
+    }
   }, [user]);
 
   return (
-    <div>
-      {adminOrgs &&
-        adminOrgs.map((org) => (
-          <SpaceCard
-            key={org.id}
-            title={org.title}
-            imageUrl={org.icon_url}
-            amountWorkflow={org.workflows.length}
-          />
-        ))}
+    <div className='flex flex-col'>
+      <div>
+        <div className="text-3xl font-['General_Sans'] font-semibold text-[#252422] mb-10">
+          My spaces
+        </div>
+        <div className="font-['General_Sans'] font-medium text-[#252422] mb-4">
+          Spaces
+        </div>
+      </div>
+      <div className='grid grid-cols-5 gap-4 xl:grid-cols-4'>
+        {adminOrgs &&
+          adminOrgs.map((adminOrg, index) => (
+            <SpaceCard
+              key={index}
+              title={adminOrg.org.title}
+              imageUrl={adminOrg.org.icon_url}
+              amountWorkflow={adminOrg.org.workflows?.length}
+            />
+          ))}
+      </div>
     </div>
   );
 };

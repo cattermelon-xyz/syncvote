@@ -23,7 +23,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({
       </div>
       <div className='justify-start items-center gap-2'>
         <div className='flex-col justify-start items-start gap-1'>
-          <div className='text-neutral-800 text-[16px] font-medium'>
+          <div className='text-neutral-800 text-[16px] font-medium truncate'>
             {title}
           </div>
           <div className='text-zinc-500 text-[13px] font-medium'>

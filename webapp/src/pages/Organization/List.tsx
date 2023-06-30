@@ -78,22 +78,18 @@ const Organization = () => {
           </HomeButton>
         </div>
       </Sider>
-      <div className='w-4/5 flex-grow'>
-        {currentStatus === 'listHome' && (
-          <div className='w-full'>
+      <div className='w-4/5 flex-grow my-8'>
+        <div className='w-3/4 mx-auto'>
+          {currentStatus === 'listHome' ? (
             <ListHome />
-          </div>
-        )}
-        {currentStatus === 'listMySpace' && (
-          <div className='w-full'>
+          ) : currentStatus === 'listMySpace' ? (
             <ListMySpace />
-          </div>
-        )}
-        {currentStatus === 'listSharedSpaces' && (
-          <div className='w-full'>
+          ) : currentStatus === 'listSharedSpaces' ? (
             <ListSharedSpaces />
-          </div>
-        )}
+          ) : (
+            <></>
+          )}
+        </div>
       </div>
     </div>
   );

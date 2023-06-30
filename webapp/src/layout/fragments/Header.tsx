@@ -57,19 +57,19 @@ function Header({ session }: HeaderProps) {
     <div
       className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
     >
-      <div className=" w-full flex justify-between">
-        <div className="flex p-0 gap-2 items-center">
-          <div className="flex items-center gap-2">
-            <span className="cursor-pointer flex">
+      <div className=' w-full flex justify-between'>
+        <div className='flex p-0 gap-2 items-center'>
+          <div className='flex items-center gap-2'>
+            <span className='cursor-pointer flex'>
               {orgId !== -1 ? (
-                <span className="text-xl flex flex-row items-center">
+                <span className='text-xl flex flex-row items-center'>
                   <HomeOutlined
                     style={{ fontSize: '24px' }}
                     onClick={() => {
                       navigate('/');
                     }}
                   />
-                  <span className="ml-2 mr-2">/</span>
+                  <span className='ml-2 mr-2'>/</span>
                   <span
                     onClick={() => {
                       navigate(`/${orgIdString}`);
@@ -86,14 +86,14 @@ function Header({ session }: HeaderProps) {
                             currentOrg?.icon_url?.indexOf('preset:') === 0,
                           type: 'icon',
                         })}
-                        className="mx-2"
+                        className='mx-2'
                       />
                     ) : (
                       <Avatar>{currentOrg?.title[0]}</Avatar>
                     )}
                   </span>
                   <span
-                    className="mr-4"
+                    className='mr-4'
                     onClick={() => {
                       navigate(`/${orgIdString}`);
                     }}
@@ -101,7 +101,7 @@ function Header({ session }: HeaderProps) {
                     {currentOrg?.title}
                   </span>
                   <Button
-                    type="text"
+                    type='text'
                     disabled={currentPage === Pages.ORG_HOME}
                     onClick={() => {
                       navigate(`/${orgIdString}`);
@@ -110,8 +110,8 @@ function Header({ session }: HeaderProps) {
                     Governance
                   </Button>
                   <Button
-                    type="text"
-                    className="ml-2"
+                    type='text'
+                    className='ml-2'
                     disabled={currentPage === Pages.ORG_SETTING}
                     onClick={() => {
                       navigate(`/${orgIdString}/setting`);
@@ -122,21 +122,26 @@ function Header({ session }: HeaderProps) {
                 </span>
               ) : (
                 <span
-                  className="mr-2"
+                  className='mr-2'
                   onClick={() => {
                     handleClearStore();
                     navigate('/');
                   }}
                 >
-                  <Logo width="128" height="24" />
+                  <div className='flex top-[2%] left-[1.3%] gap-1'>
+                    <LogoSyncVote />
+                    <div className='text-violet-700 text-[20px] font-bold '>
+                      Syncvote
+                    </div>
+                  </div>
                 </span>
               )}
             </span>
           </div>
         </div>
-        <div className="flex w-w_3 items-center justify-end">
+        <div className='flex w-w_3 items-center justify-end'>
           <div
-            className="border-b_2 py-3 px-4 my-3 mr-0 rounded-lg border-gray-normal  cursor-pointer"
+            className='border-b_2 py-3 px-4 my-3 mr-0 rounded-lg border-gray-normal  cursor-pointer'
             onClick={async () => {
               dispatch(startLoading({}));
               await supabase.auth.signOut();
@@ -145,12 +150,12 @@ function Header({ session }: HeaderProps) {
             }}
             title={L('clickToLogout')}
           >
-            <p className="text-text_2 text-[#252422]">
+            <p className='text-text_2 text-[#252422]'>
               {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
               <img
                 src={session?.user?.user_metadata?.avatar_url}
-                alt="user_avatar"
-                className="w-8 h-8 rounded-full inline-block mr-2"
+                alt='user_avatar'
+                className='w-8 h-8 rounded-full inline-block mr-2'
               />
               {session?.user?.user_metadata?.full_name}
             </p>
