@@ -204,3 +204,49 @@ export const queryOrgs = async ({
   }
   dispatch(finishLoading({}));
 };
+
+export const queryOrgsAndWorkflowForHome = async ({
+  userId,
+  onSuccess,
+  onError = (error) => {
+    console.error(error);
+  },
+  dispatch,
+}: {
+  userId: number;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('user_org')
+    .select(
+      `
+      role,
+      org (
+        id,
+        title,
+        desc,
+        icon_url,
+        banner_url,
+        preset_icon_url,
+        preset_banner_url,
+        org_size,
+        org_type,
+        workflows:workflow (
+          id,
+          title
+        )
+      )
+    `
+    )
+    .eq('user_id', userId);
+  if (!error) {
+    onSuccess(data);
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
+  return data;
+};

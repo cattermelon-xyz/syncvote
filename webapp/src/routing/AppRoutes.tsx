@@ -36,10 +36,16 @@ const AppRoutes = () => (
       <Route path='/' element={<App isFullHeight />}>
         <Route path='login' element={<CreatorLogin />} />
       </Route>
+
+      <Route path='/' element={<App isFullHeight />}>
+        <Route index element={<OrganizationList />} />
+        <Route path='my-spaces' element={<OrganizationList />} />
+        <Route path='shared-spaces' element={<OrganizationList />} />
+      </Route>
+
       <Route path='/' element={<App />}>
         {/* TODO: this screen should only once for each new org */}
         <Route path='onboard' element={<PageScreen />} />
-        <Route index element={<OrganizationList />} />
         <Route path=':orgIdString'>
           <Route index element={<OrganizationHome />} />
           <Route path='setting' element={<OrganizationSetting />} />
