@@ -1,4 +1,4 @@
-.directed-graph-config-panel{
+.directed-graph-config-panel {
   .machine-config-panel-tabs {
     .ant-tabs-nav-wrap {
       /* px-4 */
@@ -11,7 +11,33 @@
       padding-right: 1rem; /* 16px */
     }
   }
-  .ant-btn-dangerous{
+  .ant-btn-dangerous {
     color: #aaa;
+  }
+}
+
+.directed-graph {
+  .react-flow__panel.bottom.right {
+    padding: 16px;
+    margin-bottom: 48px;
+    margin-right: 48px;
+    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    background-color: white;
+    border-radius: 16px;
+  }
+  .react-flow__panel.bottom.center {
+    background-color: white;
+    padding: 16px;
+    border-radius: 16px 16px 0px 0px;
+    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    margin-bottom: 0px;
+  }
+  .react-flow__panel.react-flow__controls.bottom.left {
+    margin-bottom: 48px;
+    margin-left: 48px;
+    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    background-color: white;
+    padding: 16px;
+    border-radius: 16px;
   }
 }
