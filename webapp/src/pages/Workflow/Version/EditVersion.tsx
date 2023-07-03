@@ -1,4 +1,8 @@
-import { BranchesOutlined, SaveOutlined } from '@ant-design/icons';
+import {
+  BranchesOutlined,
+  DownloadOutlined,
+  SaveOutlined,
+} from '@ant-design/icons';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import {
   DirectedGraph,
@@ -21,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditInfo from './fragment/EditInfo';
 import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '@types';
+import SaveGraphImage from '@components/SaveGraphImage/SaveGraphImage';
 
 const extractVersion = ({
   workflows,
@@ -254,6 +259,7 @@ export const EditVersion = () => {
                 <EditIcon />
               </span>
             </Space>
+            <SaveGraphImage />
             <Button
               type="link"
               className="flex items-center text-violet-500"
