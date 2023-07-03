@@ -72,7 +72,7 @@
 //     registerVoteMachine(SingleChoiceRaceToMax);
 //     registerVoteMachine(MultipleChoiceRaceToMax);
 //   }, []);
-  
+
 //   return (
 //     <div className={`w-full ${isFullHeight ? "bg-slate-100 h-screen" : null}`}>
 //       <GlobalLoading />

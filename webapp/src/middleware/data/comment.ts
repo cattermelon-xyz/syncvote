@@ -1,25 +1,36 @@
-import { finishLoading, startLoading } from "@redux/reducers/ui.reducer";
-import { supabase } from "@utils/supabaseClient";
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { supabase } from '@utils/supabaseClient';
+
+interface Profile {
+  id: any;
+  email: any;
+  full_name: any;
+  avatar_url: any;
+}
 
 interface CommentType {
-  id: Number;
+  id: any;
   text: String;
-  by_who: any;
   where: any;
-  parent_id: Number | null;
-  children_count: Number | null;
+  comment_id: Number | null;
+  comment: any;
+  profile: Profile | null;
+  created_at: any;
+  by_who: any;
 }
 
 export const addComment = async ({
-  commentInfo,
+  commentInsert,
   dispatch,
   onLoad,
 }: {
-  commentInfo: any;
+  commentInsert: any;
   dispatch: any;
   onLoad: (data: any) => void;
 }) => {
-  const { data, error } = await supabase.from("comment").insert(commentInfo);
+  dispatch(startLoading({}));
+  const { data, error } = await supabase.from('comment').insert(commentInsert);
+  dispatch(finishLoading({}));
   onLoad(data);
 };
 
@@ -28,24 +39,28 @@ export const loadCommentParent = async ({
   onLoad,
   offset,
   limit,
+  dispatch,
 }: {
+  dispatch: any;
   offset: any;
   limit: any;
   where: any;
   onLoad: (data: any) => void;
 }) => {
+  dispatch(startLoading({}));
   const start = offset;
   const end = offset + limit - 1;
   const { data, error } = await supabase
-    .from("comment")
+    .from('comment')
     .select(
       `
       id,
       created_at,
       text,
-      parent_id,
-      children_count,
+      comment_id,
       where,
+      by_who,
+      comment(count),
     profile (
       id,
       email,
@@ -54,11 +69,14 @@ export const loadCommentParent = async ({
     )`
     )
     .range(start, end)
-    .eq("where", where)
-    .order("created_at", { ascending: false });
+    .eq('where', where)
+    .is('comment_id', null)
+    .order('created_at', { ascending: false });
   onLoad(data);
+  dispatch(finishLoading({}));
+  console.log('Data', data);
 
-  return data;
+  return data as unknown as CommentType[];
 };
 
 export const loadCommentChildren = async ({
@@ -71,17 +89,15 @@ export const loadCommentChildren = async ({
   onLoad: (data: any) => void;
 }) => {
   dispatch(startLoading({}));
-  console.log(comment);
 
   const { data, error } = await supabase
-    .from("comment")
+    .from('comment')
     .select(
       `
       id,
       created_at,
       text,
-      parent_id,
-      children_count,
+      comment_id,
     profile (
       id,
       email,
@@ -89,11 +105,12 @@ export const loadCommentChildren = async ({
       avatar_url
     )`
     )
-    .eq("where", comment.where)
-    .eq("parent_id", comment.id)
-    .order("created_at", { ascending: false });
+    .eq('where', comment.where)
+    .eq('comment_id', comment.id)
+    .order('created_at', { ascending: false });
   dispatch(finishLoading({}));
-  console.log("Reply", data);
 
   onLoad(data);
+
+  return data as unknown as CommentType[];
 };
