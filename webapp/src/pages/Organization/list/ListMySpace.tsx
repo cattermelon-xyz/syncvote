@@ -4,10 +4,13 @@ import { useSelector } from 'react-redux';
 import { queryOrgsAndWorkflowForHome } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import { L } from '@utils/locales/L';
+import WorkflowCard from '@components/Card/WorkflowCard';
 
 const ListMySpace = () => {
   const { user } = useSelector((state: any) => state.orginfo);
   const [adminOrgs, setAdminOrgs] = useState<any[]>([]);
+  const [workflows, setWorkflows] = useState<any[]>([]);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -18,8 +21,14 @@ const ListMySpace = () => {
         dispatch,
       });
       if (orgs) {
-        const data = orgs.filter((org: any) => org.role === 'ADMIN');
-        setAdminOrgs(data);
+        const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+        setAdminOrgs(adminOrgsData);
+
+        // Get all workflows from the admin orgs
+        const allWorkflows = adminOrgsData.flatMap(
+          (adminOrg: any) => adminOrg.org.workflows
+        );
+        setWorkflows(allWorkflows);
       }
     };
 
@@ -28,28 +37,45 @@ const ListMySpace = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    console.log(workflows);
+  });
+
   return (
-    <div className='flex flex-col'>
+    <>
+      <div className='flex flex-col mb-10'>
+        <div>
+          <div className="text-3xl font-['General_Sans'] font-semibold text-[#252422] mb-10">
+            {L('mySpace')}
+          </div>
+          <div className="font-['General_Sans'] font-medium text-[#252422] mb-4">
+            {L('Spaces')}
+          </div>
+        </div>
+        <div className='grid 2xl:grid-cols-4 gap-4 xl:grid-cols-4 gap-y-6'>
+          {adminOrgs &&
+            adminOrgs.map((adminOrg, index) => (
+              <SpaceCard
+                key={index}
+                title={adminOrg.org.title}
+                imageUrl={adminOrg.org.icon_url}
+                amountWorkflow={adminOrg.org.workflows?.length}
+              />
+            ))}
+        </div>
+      </div>
       <div>
-        <div className="text-3xl font-['General_Sans'] font-semibold text-[#252422] mb-10">
-          My spaces
-        </div>
         <div className="font-['General_Sans'] font-medium text-[#252422] mb-4">
-          Spaces
+          {L('workflows')}
+        </div>
+        <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-4 gap-y-6'>
+          {workflows &&
+            workflows.map((workflow, index) => (
+              <WorkflowCard key={index} title={workflow.title} />
+            ))}
         </div>
       </div>
-      <div className='grid grid-cols-5 gap-4 xl:grid-cols-4'>
-        {adminOrgs &&
-          adminOrgs.map((adminOrg, index) => (
-            <SpaceCard
-              key={index}
-              title={adminOrg.org.title}
-              imageUrl={adminOrg.org.icon_url}
-              amountWorkflow={adminOrg.org.workflows?.length}
-            />
-          ))}
-      </div>
-    </div>
+    </>
   );
 };
 

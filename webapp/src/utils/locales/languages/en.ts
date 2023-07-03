@@ -301,4 +301,5 @@ export const LANG: any = {
   sharedSpaces: 'Shared spaces',
   syncvoteForEarlyAdopters: 'Syncvote for early adopters',
   exploreTopTierWorkflows: 'Explore top-tier workflows',
+  workflows: "Workflows"
 };
