@@ -52,7 +52,7 @@ const ListMySpace = () => {
             {L('Spaces')}
           </div>
         </div>
-        <div className='grid 2xl:grid-cols-4 gap-4 xl:grid-cols-4 gap-y-6'>
+        <div className='grid 2xl:grid-cols-4 xl:grid-cols-4 gap-4 gap-y-6'>
           {adminOrgs &&
             adminOrgs.map((adminOrg, index) => (
               <SpaceCard

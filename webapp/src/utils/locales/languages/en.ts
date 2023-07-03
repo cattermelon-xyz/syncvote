@@ -296,10 +296,12 @@ export const LANG: any = {
   welcomeToSyncvote: 'Welcome to Syncvote',
   logInToStartCreatingYourWorkflows: 'Log in to start creating your workflows',
   home: 'Home',
-  spaces: "Spaces",
+  spaces: 'Spaces',
   mySpace: 'My Spaces',
   sharedSpaces: 'Shared spaces',
   syncvoteForEarlyAdopters: 'Syncvote for early adopters',
   exploreTopTierWorkflows: 'Explore top-tier workflows',
-  workflows: "Workflows"
+  workflows: 'Workflows',
+  logOut: 'Log out',
+  createANewSpace: 'Create a new space',
 };
