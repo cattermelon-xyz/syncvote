@@ -55,12 +55,7 @@ const ListMySpace = () => {
         <div className='grid 2xl:grid-cols-4 xl:grid-cols-4 gap-4 gap-y-6'>
           {adminOrgs &&
             adminOrgs.map((adminOrg, index) => (
-              <SpaceCard
-                key={index}
-                title={adminOrg.org.title}
-                imageUrl={adminOrg.org.icon_url}
-                amountWorkflow={adminOrg.org.workflows?.length}
-              />
+              <SpaceCard key={index} dataSpace={adminOrg} isMySpace={true} />
             ))}
         </div>
       </div>
@@ -71,7 +66,7 @@ const ListMySpace = () => {
         <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-4 gap-y-6'>
           {workflows &&
             workflows.map((workflow, index) => (
-              <WorkflowCard key={index} title={workflow.title} />
+              <WorkflowCard key={index} dataWorkflow={workflow} />
             ))}
         </div>
       </div>

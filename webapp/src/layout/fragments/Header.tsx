@@ -143,10 +143,10 @@ function Header({ session }: HeaderProps) {
                     </div>
                   </span>
                   <Search
-                    placeholder='input search text'
+                    placeholder={`${L('searchAWorkflow')}...`}
                     allowClear
                     onSearch={onSearch}
-                    style={{ width: 200 }}
+                    style={{ width: 220 }}
                   />
                 </div>
               )}

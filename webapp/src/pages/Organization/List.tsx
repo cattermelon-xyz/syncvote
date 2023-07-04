@@ -13,8 +13,10 @@ import {
 import HomeButton from '@components/HomeScreen/HomeButton';
 import ListHome from './list/ListHome';
 import ListMySpace from './list/ListMySpace';
+import WorkflowOfAMySpace from './list/WorkflowOfAMySpace';
 import ListSharedSpaces from './list/ListSharedSpaces';
 import CreateSpaceModal from './list/CreateSpaceModal';
+import WorkflowOfASharedSpace from './list/WorkflowOfASharedSpace';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { supabase } from '@utils/supabaseClient';
@@ -30,15 +32,20 @@ const Organization = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    switch (location.pathname) {
-      case '/my-spaces':
+    if (location.pathname.startsWith('/my-spaces')) {
+      if (location.pathname === '/my-spaces') {
         setCurrentStatus('listMySpace');
-        break;
-      case '/shared-spaces':
+      } else {
+        setCurrentStatus('WorkflowOfAMySpace');
+      }
+    } else if (location.pathname.startsWith('/shared-spaces')) {
+      if (location.pathname === '/shared-spaces') {
         setCurrentStatus('listSharedSpaces');
-        break;
-      default:
-        setCurrentStatus('listHome');
+      } else {
+        setCurrentStatus('WorkflowOfASharedSpace'); // Trạng thái mới cho trường hợp URL chứa spaceId
+      }
+    } else {
+      setCurrentStatus('listHome');
     }
   }, [location.pathname]);
 
@@ -117,6 +124,10 @@ const Organization = () => {
             <ListMySpace />
           ) : currentStatus === 'listSharedSpaces' ? (
             <ListSharedSpaces />
+          ) : currentStatus === 'WorkflowOfAMySpace' ? (
+            <WorkflowOfAMySpace />
+          ) : currentStatus === 'WorkflowOfASharedSpace' ? (
+            <WorkflowOfASharedSpace />
           ) : (
             <></>
           )}

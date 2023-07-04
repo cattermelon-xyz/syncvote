@@ -304,4 +304,7 @@ export const LANG: any = {
   workflows: 'Workflows',
   logOut: 'Log out',
   createANewSpace: 'Create a new space',
+  searchAWorkflow: 'Search a workflow',
+  backToSharedSpaces: 'Back to shared spaces',
+  backToMySpaces: 'Back to my spaces',
 };

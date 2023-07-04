@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SpaceCard from '@components/Card/SpaceCard';
 import { useSelector } from 'react-redux';
 import { queryOrgsAndWorkflowForHome } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@components/Card/WorkflowCard';
+import { useParams } from 'react-router-dom';
 
 const ListSharedSpaces = () => {
   const { user } = useSelector((state: any) => state.orginfo);
@@ -45,7 +46,7 @@ const ListSharedSpaces = () => {
     <>
       <div className='flex flex-col mb-10'>
         <div>
-          <div className="text-3xl font-['General_Sans'] font-semibold text-[#252422] mb-10">
+          <div className="text-3xl font-semibold text-[#252422] mb-10">
             {L('mySpace')}
           </div>
           <div className="font-['General_Sans'] font-medium text-[#252422] mb-4">
@@ -55,12 +56,7 @@ const ListSharedSpaces = () => {
         <div className='grid 2xl:grid-cols-4 gap-4 xl:grid-cols-4 gap-y-6'>
           {adminOrgs &&
             adminOrgs.map((adminOrg, index) => (
-              <SpaceCard
-                key={index}
-                title={adminOrg.org.title}
-                imageUrl={adminOrg.org.icon_url}
-                amountWorkflow={adminOrg.org.workflows?.length}
-              />
+              <SpaceCard key={index} dataSpace={adminOrg} />
             ))}
         </div>
       </div>
@@ -71,7 +67,7 @@ const ListSharedSpaces = () => {
         <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-4 gap-y-6'>
           {workflows &&
             workflows.map((workflow, index) => (
-              <WorkflowCard key={index} title={workflow.title} />
+              <WorkflowCard key={index} dataWorkflow={workflow} />
             ))}
         </div>
       </div>

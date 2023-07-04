@@ -3,10 +3,10 @@ import { Avatar, Card } from 'antd';
 import './AntCard.css';
 
 interface WorkflowCardProps {
-  title: string;
+  dataWorkflow: any;
 }
 
-const WorkflowCard: React.FC<WorkflowCardProps> = ({ title }) => (
+const WorkflowCard: React.FC<WorkflowCardProps> = ({ dataWorkflow }) => (
   <Card
     style={{ position: 'relative' }}
     className='w-64 h-[176px] relative rounded-xl '
@@ -20,7 +20,9 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({ title }) => (
       src='https://xsgames.co/randomusers/avatar.php?g=pixel'
       style={{ position: 'absolute', top: '78px', left: '24px', zIndex: 10 }}
     />
-    <p className='text-xs text-[#252422] mt-[18px] mb-2 truncate'>{title}</p>
+    <p className='text-xs text-[#252422] mt-[18px] mb-2 truncate'>
+      {dataWorkflow.title}
+    </p>
     <div className='flex'>
       <Avatar
         src='https://xsgames.co/randomusers/avatar.php?g=pixel'

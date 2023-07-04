@@ -46,7 +46,9 @@ const AppRoutes = () => (
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
         <Route index element={<OrganizationList />} />
         <Route path='my-spaces' element={<OrganizationList />} />
+        <Route path='my-spaces/:spaceId' element={<OrganizationList />} />
         <Route path='shared-spaces' element={<OrganizationList />} />
+        <Route path='shared-spaces/:spaceId' element={<OrganizationList />} />
       </Route>
 
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
