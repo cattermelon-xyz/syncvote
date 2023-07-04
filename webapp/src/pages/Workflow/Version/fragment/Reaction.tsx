@@ -3,6 +3,7 @@ import {
   getDataReactionCount,
   insertReaction,
   deleteReaction,
+  getDataReactionByUser,
 } from '@middleware/data/reaction';
 import {
   NotificationInstance,
@@ -28,8 +29,29 @@ const ReactionBox = ({
     const data = await getDataReactionCount({ where, dispatch });
     setDataReaction(data);
   };
+  const setBeginReaction = async () => {
+    const reaction_by_user = await getDataReactionByUser({
+      who: by_who,
+      where: where,
+      dispatch: dispatch,
+    });
+
+    if (reaction_by_user.length !== 0) {
+      for (const element of reaction_by_user) {
+        setSelectedReactions((prevSelectedReactions) => [
+          ...prevSelectedReactions,
+          element.reaction_type,
+        ]);
+      }
+    }
+  };
+
   useEffect(() => {
     fetchData();
+
+    if (by_who !== undefined) {
+      setBeginReaction();
+    }
   }, []);
 
   const handleReactionClick = async (reactionId: string) => {
@@ -117,15 +139,6 @@ const ReactionBox = ({
             <div></div>
             {reaction?.reaction[0]?.count}
           </Button>
-          // <div
-          //   key={reaction.id}
-          //   className={`reaction ${
-          //     selectedReactions.includes(reaction.id) ? 'selected' : ''
-          //   }`}
-          //   onClick={() => handleReactionClick(reaction.id)}
-          // >
-          //   {parse(reaction?.icon)} {reaction?.reaction[0]?.count}
-          // </div>
         ))}
       </div>
     </div>

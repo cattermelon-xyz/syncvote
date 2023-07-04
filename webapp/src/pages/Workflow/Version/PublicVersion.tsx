@@ -1,8 +1,5 @@
-import {
-  DownloadOutlined,
-  FileTextOutlined,
-  LeftOutlined,
-} from '@ant-design/icons';
+import { LeftOutlined } from '@ant-design/icons';
+import { GrDocumentText } from 'react-icons/gr';
 import parse from 'html-react-parser';
 import {
   DirectedGraph,
@@ -19,15 +16,18 @@ import { Button, Layout, Space, Image, Avatar, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiCalendar, FiHome, FiLink, FiUser } from 'react-icons/fi';
+import { FiCalendar, FiHome, FiLink, FiUser, FiDownload } from 'react-icons/fi';
 import { MdChatBubbleOutline } from 'react-icons/md';
 import { LuPaintbrush } from 'react-icons/lu';
 import Sider from 'antd/es/layout/Sider';
-import { Content } from 'antd/es/layout/layout';
 import Comment from './fragment/Comment';
 import { supabase } from '@utils/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
+import { getDataReactionCount } from '@middleware/data/reaction';
+import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
+import { HiMiniFire } from 'react-icons/hi2';
+import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 const extractVersion = ({
   workflows,
   workflowId,
@@ -69,6 +69,8 @@ export const PublicVersion = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [comment, setComment] = useState(false);
   const [api, contextHolder] = notification.useNotification();
+  const where = `${orgId}$/${workflowId}$/${versionId}$`;
+  const [dataReaction, setDataReaction] = useState<any[]>([]);
 
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
@@ -99,6 +101,11 @@ export const PublicVersion = () => {
     desc: workflow?.desc,
   };
 
+  const fetchData = async () => {
+    const data = await getDataReactionCount({ where, dispatch });
+    setDataReaction(data);
+  };
+
   useEffect(() => {
     queryWeb2Integration({
       orgId,
@@ -127,6 +134,8 @@ export const PublicVersion = () => {
     supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
       await handleSession(_session);
     });
+
+    fetchData();
   }, []);
 
   return (
@@ -190,9 +199,7 @@ export const PublicVersion = () => {
                     }}
                   />
                 </Space>
-                <div className='p-5'>
-                  {parse(worflowInfo.desc)}
-                </div>
+                <div className='p-5'>{parse(worflowInfo.desc)}</div>
               </Sider>
 
               <Sider
@@ -207,13 +214,7 @@ export const PublicVersion = () => {
                 }}
                 className='comment-collapsedh'
               >
-                <Comment
-                  orgId={orgId}
-                  workflowId={workflowId}
-                  versionId={versionId}
-                  session={session}
-                  api={api}
-                />
+                <Comment where={where} session={session} api={api} />
               </Sider>
 
               <Layout className='relative'>
@@ -249,41 +250,74 @@ export const PublicVersion = () => {
                   </Space>
                 )}
                 <div className=' absolute top-0 right-10 z-50'>
-                  <Space direction='horizontal' className='flex gap-[12px] p-2'>
+                  <Space direction='horizontal' className='flex p-2'>
                     <Button
                       className='w-11 h-9 flex justify-center items-center'
-                      icon={<FileTextOutlined />}
                       onClick={() => {
                         if (comment) {
                           setComment(!comment);
                         }
                         setCollapsed(!collapsed);
                       }}
+                      icon={<GrDocumentText className='w-5 h-5' />}
                     />
                     <Button
-                      className='w-11 h-9 primary flex items-center justify-center'
+                      className='w-11 h-9 flex items-center justify-center'
                       onClick={() => {
                         if (collapsed) {
                           setCollapsed(!collapsed);
                         }
                         setComment(!comment);
                       }}
-                      icon={<MdChatBubbleOutline />}
+                      icon={<MdChatBubbleOutline className='w-5 h-5' />}
                     />
                     <Button
                       className='w-11 h-9 flex items-center justify-center'
-                      icon={<FiLink />}
+                      icon={<FiLink className='w-5 h-5' />}
                     />
                     <Button
                       className='w-11 h-9 flex items-center justify-center'
-                      icon={<DownloadOutlined />}
+                      icon={<FiDownload className='w-5 h-5' />}
                     />
 
                     <Button
                       className='w-11 h-9 flex items-center justify-center'
-                      icon={<LuPaintbrush />}
+                      icon={<LuPaintbrush className='w-5 h-5' />}
                     />
                   </Space>
+                </div>
+                {/* import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
+import { HiMiniFire } from 'react-icons/hi2';
+import { AiFillLike, AiFillDislike } from 'react-icons/ai'; */}
+                <div
+                  className='cursor-pointer flex rounded-3xl absolute left-1/2 bottom-16 w-52 h-14 z-50'
+                  style={{
+                    border: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
+                  }}
+                  onClick={() => {
+                    if (collapsed) {
+                      setCollapsed(!collapsed);
+                    }
+                    setComment(!comment);
+                  }}
+                >
+                  <div className='p-4 flex'>
+                    <div className='pr-3'>
+                      <FaRegFaceGrinHearts size={24} />
+                    </div>
+                    <div className='pr-3'>
+                      <FaRegFaceSurprise size={24} />
+                    </div>
+                    <div className='pr-3'>
+                      <HiMiniFire size={24} />
+                    </div>
+                    <div className='pr-3'>
+                      <AiFillLike size={24} />
+                    </div>
+                    <div className='pr-3'>
+                      <AiFillDislike size={24} />
+                    </div>
+                  </div>
                 </div>
                 {renderVoteMachineConfigPanel({
                   editable: false,

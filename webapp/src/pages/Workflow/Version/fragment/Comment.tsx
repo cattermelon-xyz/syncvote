@@ -19,17 +19,14 @@ import moment from 'moment';
 import { LeftOutlined } from '@ant-design/icons';
 import ReactionBox from './Reaction';
 import { Content } from 'antd/es/layout/layout';
+import { getDataReactionCount } from '@middleware/data/reaction';
 
 const Comment = ({
-  orgId,
-  workflowId,
-  versionId,
+  where,
   session,
   api,
 }: {
-  orgId: number | undefined;
-  workflowId: number | undefined;
-  versionId: number | undefined;
+  where: any;
   session: Session | null;
   api: NotificationInstance;
 }) => {
@@ -42,46 +39,14 @@ const Comment = ({
   const [commentStatus, setCommentStatus] = useState(true);
   const [replyStatus, setReplyStatus] = useState(false);
   const [currentComment, setCurrentComment] = useState<CommentType>();
-  const where = `${orgId}$/${workflowId}$/${versionId}$`;
   const [dataComment, setDataComment] = useState<CommentType[]>([]);
   const [dataReply, setDataReply] = useState<CommentType[]>([]);
   const [offset, setOffset] = useState(0);
   const [offsetReply, setOffsetReply] = useState(0);
-  const [selectedEmoji, setSelectedEmoji] = useState<any>();
+  const [dataReaction, setDataReaction] = useState<any[]>([]);
 
   const limit = 5;
-  const ReactionItems = [
-    {
-      id: 0,
-      emoji: '😇',
-      title: 'like',
-    },
-    {
-      id: 1,
-      emoji: '🥰',
-      title: 'love',
-    },
-    {
-      id: 2,
-      emoji: '🤗',
-      title: 'care',
-    },
-    {
-      id: 3,
-      emoji: '😘',
-      title: 'kiss',
-    },
-    {
-      id: 4,
-      emoji: '😂',
-      title: 'laugh',
-    },
-    {
-      id: 5,
-      emoji: '😎',
-      title: 'cool',
-    },
-  ];
+
   useEffect(() => {
     loadCommentData(offset, limit);
   }, []);
@@ -200,7 +165,7 @@ const Comment = ({
                 <List>
                   <VirtualList
                     data={dataComment}
-                    height={340}
+                    height={330}
                     itemHeight={47}
                     itemKey='email'
                     onScroll={onScroll}

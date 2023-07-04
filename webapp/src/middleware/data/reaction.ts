@@ -23,6 +23,30 @@ export const getDataReactionCount = async ({
   }
 };
 
+export const getDataReactionByUser = async ({
+  who,
+  where,
+  dispatch,
+}: {
+  who: any;
+  where: any;
+  dispatch: any;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('reaction')
+    .select(`reaction_type`)
+    .eq('where', where)
+    .eq('by_who', who);
+  dispatch(finishLoading({}));
+  if (error) {
+    console.log(error);
+    return [];
+  } else {
+    return data as any[];
+  }
+};
+
 export const insertReaction = async (reaction: any, dispatch: any) => {
   dispatch(startLoading({}));
   const { error } = await supabase.from('reaction').insert(reaction);
