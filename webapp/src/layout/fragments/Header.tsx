@@ -11,6 +11,10 @@ import { Avatar, Button } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { Input } from 'antd';
+import './SearchBox.css';
+
+const { Search } = Input;
 
 type HeaderProps = {
   session: any;
@@ -53,6 +57,8 @@ function Header({ session }: HeaderProps) {
       currentPage = Pages.UNKNOWN;
       break;
   }
+
+  const onSearch = (value: string) => console.log(value);
   return (
     <div
       className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
@@ -121,27 +127,35 @@ function Header({ session }: HeaderProps) {
                   </Button>
                 </span>
               ) : (
-                <span
-                  className='mr-2'
-                  onClick={() => {
-                    handleClearStore();
-                    navigate('/');
-                  }}
-                >
-                  <div className='flex top-[2%] left-[1.3%] gap-1'>
-                    <LogoSyncVote />
-                    <div className='text-violet-700 text-[20px] font-bold '>
-                      Syncvote
+                <div className='flex gap-9'>
+                  <span
+                    className='mr-2'
+                    onClick={() => {
+                      handleClearStore();
+                      navigate('/');
+                    }}
+                  >
+                    <div className='flex top-[2%] left-[1.3%] gap-1'>
+                      <LogoSyncVote />
+                      <div className='text-violet-700 text-[20px] font-bold '>
+                        Syncvote
+                      </div>
                     </div>
-                  </div>
-                </span>
+                  </span>
+                  <Search
+                    placeholder='input search text'
+                    allowClear
+                    onSearch={onSearch}
+                    style={{ width: 200 }}
+                  />
+                </div>
               )}
             </span>
           </div>
         </div>
         <div className='flex w-w_3 items-center justify-end'>
           <div
-            className='border-b_2 py-3 px-4 my-3 mr-0 rounded-lg border-gray-normal  cursor-pointer'
+            className='border-b_2 py-3 px-4 my-3 mr-0 rounded-full border-gray-normal bg-[#f6f6f6] cursor-pointer'
             onClick={async () => {
               dispatch(startLoading({}));
               await supabase.auth.signOut();

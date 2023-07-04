@@ -3,7 +3,8 @@ import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
 import Icon from '@components/Icon/Icon';
 import Input from '@components/Input/Input';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { newOrg } from '@middleware/data';
 
 interface CreateSpaceModalProps {
   open: boolean;
@@ -18,13 +19,38 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   const [title, setTitle] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [icon_url, setIconUrl] = useState(''); //eslint-disable-line
+  const dispatch = useDispatch();
 
-  const handleOk = async() => {
-    setConfirmLoading(true);
-    setTimeout(() => {
-      onClose();
-      setConfirmLoading(false);
-    }, 2000);
+  const handleOk = async () => {
+    await newOrg({
+      orgInfo: {
+        title,
+        icon_url,
+      },
+      uid: user.id,
+      onSuccess: () => {
+        setTitle('');
+        setIconUrl('');
+        Modal.success({
+          title: 'Success',
+          content: 'Create organization successfully',
+        });
+      },
+      dispatch,
+      onError: () => {
+        Modal.error({
+          title: 'Error',
+          content: 'Create organization failed',
+        });
+      },
+    });
+
+    onClose();
+    // setConfirmLoading(true);
+    // setTimeout(() => {
+    //   onClose();
+    //   setConfirmLoading(false);
+    // }, 2000);
   };
 
   const handleCancel = () => {

@@ -19,11 +19,11 @@ export const newOrg = async ({
 }: {
   orgInfo: {
     title: string;
-    desc: string;
+    desc ?: string;
     icon_url: string;
-    org_size: string;
-    org_type: string;
-    preset_banner_url: string;
+    org_size ?: string;
+    org_type ?: string;
+    preset_banner_url ?: string;
   };
   uid: string;
   onSuccess: (data: any) => void;
