@@ -8,7 +8,7 @@ interface Profile {
   avatar_url: any;
 }
 
-interface CommentType {
+export interface CommentType {
   id: any;
   text: String;
   where: any;
@@ -22,21 +22,17 @@ interface CommentType {
 export const addComment = async ({
   commentInsert,
   dispatch,
-  onLoad,
 }: {
   commentInsert: any;
   dispatch: any;
-  onLoad: (data: any) => void;
 }) => {
   dispatch(startLoading({}));
-  const { data, error } = await supabase.from('comment').insert(commentInsert);
+  const { error } = await supabase.from('comment').insert(commentInsert);
   dispatch(finishLoading({}));
-  onLoad(data);
 };
 
-export const loadCommentParent = async ({
+export const getDataComment = async ({
   where,
-  onLoad,
   offset,
   limit,
   dispatch,
@@ -45,11 +41,11 @@ export const loadCommentParent = async ({
   offset: any;
   limit: any;
   where: any;
-  onLoad: (data: any) => void;
 }) => {
   dispatch(startLoading({}));
   const start = offset;
   const end = offset + limit - 1;
+
   const { data, error } = await supabase
     .from('comment')
     .select(
@@ -72,23 +68,29 @@ export const loadCommentParent = async ({
     .eq('where', where)
     .is('comment_id', null)
     .order('created_at', { ascending: false });
-  onLoad(data);
   dispatch(finishLoading({}));
-  console.log('Data', data);
+
+  if (error) {
+    console.log(error);
+  }
 
   return data as unknown as CommentType[];
 };
 
-export const loadCommentChildren = async ({
+export const getDataReply = async ({
   comment,
   dispatch,
-  onLoad,
+  offset,
+  limit,
 }: {
-  comment: CommentType;
+  offset: number;
+  limit: number;
+  comment: CommentType | undefined;
   dispatch: any;
-  onLoad: (data: any) => void;
 }) => {
   dispatch(startLoading({}));
+  const start = offset;
+  const end = offset + limit - 1;
 
   const { data, error } = await supabase
     .from('comment')
@@ -105,12 +107,15 @@ export const loadCommentChildren = async ({
       avatar_url
     )`
     )
-    .eq('where', comment.where)
-    .eq('comment_id', comment.id)
+    .range(start, end)
+    .eq('where', comment?.where)
+    .eq('comment_id', comment?.id)
     .order('created_at', { ascending: false });
   dispatch(finishLoading({}));
 
-  onLoad(data);
+  if (error) {
+    console.log(error);
+  }
 
   return data as unknown as CommentType[];
 };

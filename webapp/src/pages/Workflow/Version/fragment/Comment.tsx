@@ -5,8 +5,9 @@ import VirtualList from 'rc-virtual-list';
 
 import {
   addComment,
-  loadCommentChildren,
-  loadCommentParent,
+  getDataReply,
+  getDataComment,
+  CommentType,
 } from '@middleware/data/comment';
 import { useDispatch } from 'react-redux';
 import type {
@@ -16,24 +17,9 @@ import type {
 import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
 import { LeftOutlined } from '@ant-design/icons';
+import ReactionBox from './Reaction';
+import { Content } from 'antd/es/layout/layout';
 
-interface Profile {
-  id: any;
-  email: any;
-  full_name: any;
-  avatar_url: any;
-}
-
-interface CommentType {
-  id: any;
-  text: String;
-  where: any;
-  comment_id: Number | null;
-  comment: any;
-  profile: Profile | null;
-  created_at: any;
-  by_who: any;
-}
 const Comment = ({
   orgId,
   workflowId,
@@ -55,21 +41,49 @@ const Comment = ({
   };
   const [commentStatus, setCommentStatus] = useState(true);
   const [replyStatus, setReplyStatus] = useState(false);
-  const [commentParent, setCommentParent] = useState<CommentType[]>();
-  const [commentChildren, setCommentChildren] = useState<CommentType[]>();
   const [currentComment, setCurrentComment] = useState<CommentType>();
   const where = `${orgId}$/${workflowId}$/${versionId}$`;
-
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<CommentType[]>([]);
+  const [dataComment, setDataComment] = useState<CommentType[]>([]);
   const [dataReply, setDataReply] = useState<CommentType[]>([]);
+  const [offset, setOffset] = useState(0);
+  const [offsetReply, setOffsetReply] = useState(0);
+  const [selectedEmoji, setSelectedEmoji] = useState<any>();
 
-  const currentPage = Math.floor(data.length / 10) + 1;
-  const pageSize = 10;
-  const offset = (currentPage - 1) * pageSize;
-
+  const limit = 5;
+  const ReactionItems = [
+    {
+      id: 0,
+      emoji: '😇',
+      title: 'like',
+    },
+    {
+      id: 1,
+      emoji: '🥰',
+      title: 'love',
+    },
+    {
+      id: 2,
+      emoji: '🤗',
+      title: 'care',
+    },
+    {
+      id: 3,
+      emoji: '😘',
+      title: 'kiss',
+    },
+    {
+      id: 4,
+      emoji: '😂',
+      title: 'laugh',
+    },
+    {
+      id: 5,
+      emoji: '😎',
+      title: 'cool',
+    },
+  ];
   useEffect(() => {
-    loadMoreData();
+    loadCommentData(offset, limit);
   }, []);
 
   const backToComment = () => {
@@ -77,61 +91,46 @@ const Comment = ({
     setReplyStatus(!replyStatus);
     setDataReply([]);
     setCurrentComment(undefined);
+    setOffsetReply(0);
+    setDataReply([]);
+    loadCommentData(offset, limit);
   };
 
   const toReply = (item: CommentType) => {
     setCommentStatus(false);
     setReplyStatus(true);
     setCurrentComment(item);
-    loadReplyData(item);
+    setOffset(0);
+    setOffsetReply(0);
+    setDataComment([]);
+    loadReplyData(item, 0, limit);
   };
 
-  const loadMoreData = async () => {
-    if (loading) {
-      return;
-    }
-    setLoading(true);
-
-    try {
-      const commentList = await loadCommentParent({
-        limit: pageSize,
-        offset: offset,
-        where: where,
-        dispatch: dispatch,
-        onLoad: (data: any) => {
-          setCommentParent(data);
-        },
-      });
-
-      setData(data.concat(commentList));
-    } catch (error) {
-      console.error('Failed to load more comments:', error);
-    }
-
-    setLoading(false);
+  const loadCommentData = async (offset: number, limit: number) => {
+    const newComments = await getDataComment({
+      limit: limit,
+      offset: offset,
+      where: where,
+      dispatch: dispatch,
+    });
+    setDataComment((prevData) => [...prevData, ...newComments]);
+    setOffset(offset);
   };
 
-  const loadReplyData = async (comment: CommentType) => {
-    if (loading) {
-      return;
-    }
-    setLoading(true);
+  const loadReplyData = async (
+    comment: CommentType | undefined,
+    offset: number,
+    limit: number
+  ) => {
+    const newComments = await getDataReply({
+      comment: comment,
+      dispatch: dispatch,
+      offset: offset,
+      limit: limit,
+    });
 
-    try {
-      const commentList = await loadCommentChildren({
-        comment: comment,
-        dispatch: dispatch,
-        onLoad: (data: any) => {
-          setCommentChildren(data);
-        },
-      });
-
-      setDataReply(dataReply.concat(commentList));
-    } catch (error) {
-      console.error('Failed to load more comments:', error);
-    }
-
-    setLoading(false);
+    setDataReply((prevData) => [...prevData, ...newComments]);
+    setOffsetReply(offset);
   };
 
   const handleSubmit = async (item: any) => {
@@ -142,28 +141,16 @@ const Comment = ({
       comment_id: item?.id,
     };
 
-    const commentInfo: CommentType = {
-      id: data.length,
-      text: commentInsert.text,
-      where: commentInsert.where,
-      comment_id: item?.id,
-      profile: {
-        id: session?.user?.id,
-        email: session?.user?.email,
-        full_name: session?.user?.user_metadata?.full_name,
-        avatar_url: session?.user?.user_metadata?.avatar_url,
-      },
-      created_at: moment.now(),
-      by_who: session?.user?.id,
-      comment: undefined,
-    };
-
     if (commentInsert.text !== '') {
-      await addComment({ commentInsert, dispatch, onLoad: (data: any) => {} });
+      await addComment({ commentInsert, dispatch });
       if (item) {
-        setDataReply((prevData) => [commentInfo, ...prevData]);
+        setOffsetReply(0);
+        setDataReply([]);
+        loadReplyData(item, offsetReply, limit);
       } else {
-        setData((prevData) => [commentInfo, ...prevData]);
+        setOffset(0);
+        setDataComment([]);
+        loadCommentData(offset, limit);
       }
     } else {
       openNotification('top', 'Cannot comment null');
@@ -174,7 +161,13 @@ const Comment = ({
 
   const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
     if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === 400) {
-      loadMoreData();
+      loadCommentData(offset + limit, limit);
+    }
+  };
+
+  const onScrollReply = (e: React.UIEvent<HTMLElement, UIEvent>) => {
+    if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === 400) {
+      loadReplyData(currentComment, offsetReply + limit, limit);
     }
   };
 
@@ -197,10 +190,17 @@ const Comment = ({
             <div className=''>
               <Space direction='vertical' className='w-full p-4 cursor-pointer'>
                 <div className='text-lg	font-semibold'>Comments</div>
+                <ReactionBox
+                  where={where}
+                  by_who={session?.user?.id}
+                  dispatch={dispatch}
+                  api={api}
+                />
+
                 <List>
                   <VirtualList
-                    data={data}
-                    height={400}
+                    data={dataComment}
+                    height={340}
                     itemHeight={47}
                     itemKey='email'
                     onScroll={onScroll}
@@ -312,7 +312,7 @@ const Comment = ({
                 <Input
                   value={inputValue}
                   onChange={handleInputChange}
-                  className='w-full h-12 m-2.5'
+                  className='w-full h-12'
                   placeholder='Please login to comment'
                   suffix={
                     <FiSend
@@ -327,7 +327,7 @@ const Comment = ({
                 <Input
                   value={inputValue}
                   onChange={handleInputChange}
-                  className='h-12'
+                  className='w-fullh-12'
                   placeholder='Comment'
                   suffix={
                     <FiSend
@@ -363,7 +363,7 @@ const Comment = ({
                     height={400}
                     itemHeight={47}
                     itemKey='email'
-                    onScroll={onScroll}
+                    onScroll={onScrollReply}
                   >
                     {(item: CommentType) => (
                       <div className='rounded-xl	m-1.5'>
