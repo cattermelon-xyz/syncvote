@@ -6,27 +6,20 @@ import ReactFlow, {
   ReactFlowProvider,
   useOnViewportChange,
 } from 'reactflow';
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useContext } from 'react';
 import { Button, Drawer, Modal, Space } from 'antd';
-import {
-  BulbOutlined,
-  EditOutlined,
-  FolderOpenOutlined,
-  FormOutlined,
-  PlusOutlined,
-  SyncOutlined,
-  VerticalAlignMiddleOutlined,
-} from '@ant-design/icons';
+import { BulbOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons';
 import 'reactflow/dist/style.css';
 import { buildATree } from './buildATree';
 import MultipleDirectNode from './CustomNodes/MultipleDiretionNode';
 import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
 import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
 import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
-import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from './interface';
+import { IGraph, IWorkflowVersionLayout } from './interface';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import CosmeticConfigPanel from './CosmeticConfigPanel';
 import QuickStartDialog from './QuickStartDialog';
+import { GraphContext } from './context';
 
 const nodeTypes = { ...MultipleDirectNode.getType() };
 const edgeTypes = {
@@ -35,51 +28,40 @@ const edgeTypes = {
   ...SmoothCustomEdge.getType(),
 };
 
-interface IFlow {
-  data?: any; // eslint-disable-line
-  onNodeClick?: (event: any, data: any) => void;
-  onLayoutClick?: (data: any) => void;
-  selectedNodeId?: string; // eslint-disable-line
-  selectedLayoutId?: string;
-  onPaneClick?: (event: any) => void;
-  onNodeChanged?: (nodes: any) => void;
-  onCosmeticChanged?: (changed: IWorkflowVersionCosmetic) => void;
-  onResetPosition?: () => void;
-  onAddNewNode?: () => void;
-  nodes?: any; // eslint-disable-line
-  edges?: any; // eslint-disable-line
-  cosmetic?: any; // eslint-disable-line
-  onViewPortChange?: (viewport: any) => void;
-  editable?: boolean; // eslint-disable-line
-  navPanel?: JSX.Element; // eslint-disable-line
-}
 // TODO: should change editable to isWorkflow to reflect the real meaning
-const Flow = ({
-  onNodeClick = () => {},
-  onLayoutClick = (data: any) => {},
-  onPaneClick = () => {},
-  onNodeChanged = () => {},
-  onResetPosition = () => {},
-  onAddNewNode = () => {},
-  onViewPortChange = () => {},
-  onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {},
-  selectedLayoutId,
-  nodes,
-  edges,
-  cosmetic,
-  editable = true,
-  navPanel = <></>,
-}: IFlow) => {
+const Flow = () => {
+  const {
+    data,
+    selectedNodeId,
+    onNodeClick,
+    onLayoutClick,
+    onPaneClick,
+    onNodeChanged,
+    onResetPosition,
+    onAddNewNode,
+    onViewPortChange,
+    onCosmeticChanged,
+    selectedLayoutId,
+    editable = true,
+    navPanel,
+  } = useContext(GraphContext);
+  const [nodes, setNodes] = React.useState([]);
+  const [edges, setEdges] = React.useState([]);
   useOnViewportChange({
     onChange: useCallback((viewport: any) => {
-      onViewPortChange(viewport);
+      onViewPortChange ? onViewPortChange(viewport) : null;
     }, []),
   });
+  useEffect(() => {
+    const obj: any = buildATree({ data, selectedNodeId, selectedLayoutId });
+    setNodes(obj.nodes);
+    setEdges(obj.edges);
+  }, [data, selectedNodeId, selectedLayoutId]);
   const proOptions = {
     hideAttribution: true,
   };
-  const layouts: IWorkflowVersionLayout[] = cosmetic?.layouts;
-  const defaultLayout = cosmetic?.default;
+  const layouts: IWorkflowVersionLayout[] = data?.cosmetic?.layouts || [];
+  // const defaultLayout = data?.cosmetic?.default;
   const [showCosmeticPanel, setShowCosmeticPanel] = useState(false);
   const [showQuickStartDialog, setShowQuickStartDialog] = useState(false);
   return (
@@ -91,7 +73,7 @@ const Flow = ({
       >
         <CosmeticConfigPanel
           layouts={layouts}
-          onCosmeticChanged={onCosmeticChanged}
+          onCosmeticChanged={onCosmeticChanged ? onCosmeticChanged : () => {}}
           deleteLayoutHandler={(id: string) => {}}
         />
       </Drawer>
@@ -141,7 +123,7 @@ const Flow = ({
                     key={layout?.id}
                     className={`cursor-pointer p-2 border rounded-md hover:bg-violet-100 ${selected}`}
                     onClick={() => {
-                      onLayoutClick(layout.id);
+                      onLayoutClick ? onLayoutClick(layout.id) : null;
                     }}
                   >
                     {layout?.title}
@@ -166,7 +148,7 @@ const Flow = ({
               }`}
               style={{ backgroundColor: editable ? '#F4F0FA' : '#aaa' }}
               onClick={() => {
-                editable ? onAddNewNode() : null;
+                editable && onAddNewNode ? onAddNewNode() : null;
               }}
             >
               <PlusOutlined />
@@ -198,28 +180,7 @@ const Flow = ({
   );
 };
 // TODO: expose a function for manually trigger fitview
-export const DirectedGraph = ({
-  data,
-  onNodeClick = () => {},
-  onLayoutClick = () => {},
-  selectedNodeId,
-  selectedLayoutId,
-  onPaneClick = () => {},
-  onNodeChanged = () => {},
-  onResetPosition = () => {},
-  onAddNewNode = () => {},
-  onViewPortChange = () => {},
-  onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {},
-  editable = true,
-  navPanel = <></>,
-}: IFlow) => {
-  const [nodes, setNodes] = React.useState([]);
-  const [edges, setEdges] = React.useState([]);
-  useEffect(() => {
-    const obj: any = buildATree({ data, selectedNodeId, selectedLayoutId });
-    setNodes(obj.nodes);
-    setEdges(obj.edges);
-  }, [data, selectedNodeId, selectedLayoutId]);
+export const DirectedGraph = (props: IGraph) => {
   return (
     <div
       style={{
@@ -229,24 +190,11 @@ export const DirectedGraph = ({
       }}
       className="h-full directed-graph"
     >
-      <ReactFlowProvider>
-        <Flow
-          nodes={nodes}
-          edges={edges}
-          cosmetic={data.cosmetic}
-          onNodeClick={onNodeClick}
-          onLayoutClick={onLayoutClick}
-          onPaneClick={onPaneClick}
-          onNodeChanged={onNodeChanged}
-          onResetPosition={onResetPosition}
-          onAddNewNode={onAddNewNode}
-          onViewPortChange={onViewPortChange}
-          onCosmeticChanged={onCosmeticChanged}
-          editable={editable}
-          navPanel={navPanel}
-          selectedLayoutId={selectedLayoutId}
-        />
-      </ReactFlowProvider>
+      <GraphContext.Provider value={props}>
+        <ReactFlowProvider>
+          <Flow />
+        </ReactFlowProvider>
+      </GraphContext.Provider>
     </div>
   );
 };

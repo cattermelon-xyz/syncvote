@@ -1,72 +1,78 @@
 import { LockFilled, UnlockOutlined } from '@ant-design/icons';
-import {
-  Space, Input, Button, Modal,
-} from 'antd';
+import { GraphPanelContext } from '@components/DirectedGraph/context';
+import { Space, Input, Button, Modal } from 'antd';
 import moment from 'moment';
+import { useContext } from 'react';
 
-const VotingDuration = ({
-  selectedNode,
-  onChange, editable,
-}:{
-  selectedNode: any;
-  onChange: (data:any) => void;
-  editable: boolean;
-}) => {
+const VotingDuration = () => {
+  const { data, onChange, editable, selectedNodeId } =
+    useContext(GraphPanelContext);
+  const selectedNode = data.checkpoints?.find(
+    (chk: any) => chk.id === selectedNodeId
+  );
   const duration = selectedNode?.duration || 0;
   const days = duration ? Math.floor(duration / 86400) : 0;
-  const hours = duration ? Math.floor((duration - days * 86400)/3600) : 0;
-  const mins = duration ? Math.floor((duration - days * 86400 - hours * 3600) / 60) : 0;
-  const dateChange = (durationChanged:number) => {
+  const hours = duration ? Math.floor((duration - days * 86400) / 3600) : 0;
+  const mins = duration
+    ? Math.floor((duration - days * 86400 - hours * 3600) / 60)
+    : 0;
+  const dateChange = (durationChanged: number) => {
     const node = structuredClone(selectedNode);
-    node.duration = durationChanged;
-    onChange(node);
+    if (node) {
+      node.duration = durationChanged;
+      onChange(node);
+    }
   };
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
   return (
-    <Space direction="vertical" size="small" className="bg-white p-4 rounded-lg w-full">
-      <span>Duration: {moment.duration(duration, "seconds").humanize()}</span>
+    <Space
+      direction="vertical"
+      size="small"
+      className="bg-white p-4 rounded-lg w-full"
+    >
+      <span>Duration: {moment.duration(duration, 'seconds').humanize()}</span>
       {/* <Space direction="horizontal" className="w-full flex justify-between"> */}
-        {/* {`Voting duration (${duration ? moment.duration(duration,
+      {/* {`Voting duration (${duration ? moment.duration(duration,
           'seconds').humanize() : 'missing'})`} */}
-        <Space direction="horizontal" className="w-full flex justify-between">
-          <Input
-            addonAfter="Days"
-            value={days}
-            placeholder='Day'
-            className="text-center"
-            onChange={(e) => {
-              dateChange(
-                parseInt(e.target.value, 10) * 86400 + hours * 3600 + mins * 60,
-              );
-            }}
-            disabled={locked.duration}
-          />
-          <Input
-            value={hours}
-            addonAfter="Hour"
-            placeholder='Hour'
-            className="text-center"
-            onChange={(e) => {
-              dateChange(
-                days * 86400 + parseInt(e.target.value, 10) * 3600 + mins * 60,
-              );
-            }}
-            disabled={locked.duration}
-          />
-          <Input
-            value={mins}
-            addonAfter="Minute"
-            placeholder='Minute'
-            className="text-center"
-            onChange={(e) => {
-              dateChange(
-                days * 86400 + hours * 3600 + parseInt(e.target.value, 10) * 60,
-              );
-            }}
-            disabled={locked.duration}
-          />
-        </Space>
-        {/* <Button
+      <Space direction="horizontal" className="w-full flex justify-between">
+        <Input
+          addonAfter="Days"
+          value={days}
+          placeholder="Day"
+          className="text-center"
+          onChange={(e) => {
+            dateChange(
+              parseInt(e.target.value, 10) * 86400 + hours * 3600 + mins * 60
+            );
+          }}
+          disabled={locked.duration}
+        />
+        <Input
+          value={hours}
+          addonAfter="Hour"
+          placeholder="Hour"
+          className="text-center"
+          onChange={(e) => {
+            dateChange(
+              days * 86400 + parseInt(e.target.value, 10) * 3600 + mins * 60
+            );
+          }}
+          disabled={locked.duration}
+        />
+        <Input
+          value={mins}
+          addonAfter="Minute"
+          placeholder="Minute"
+          className="text-center"
+          onChange={(e) => {
+            dateChange(
+              days * 86400 + hours * 3600 + parseInt(e.target.value, 10) * 60
+            );
+          }}
+          disabled={locked.duration}
+        />
+      </Space>
+      {/* <Button
           icon={locked.duration ? <LockFilled /> : <UnlockOutlined />}
           onClick={() => {
             if (duration === undefined || Number.isNaN(duration) || duration === 0) {
@@ -83,7 +89,7 @@ const VotingDuration = ({
           }}
           disabled={!editable}
         /> */}
-      </Space>
+    </Space>
     // </Space>
   );
 };

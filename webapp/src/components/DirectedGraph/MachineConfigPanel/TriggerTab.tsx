@@ -1,70 +1,71 @@
 import { IWeb2Integration } from '@types';
-import {
-  Button, Space,
-} from 'antd';
+import { Button, Space } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Twitter from '../Enforcer/Twitter';
 import Fake from '../Enforcer/Fake';
 import TriggerEmptyStage from './triggers/TriggerEmptyStage';
 import NewTriggerDrawer from './triggers/NewTriggerDrawer';
+import { GraphPanelContext } from '../context';
 
 interface ITrigger {
-  id: string,
-  name: string,
-  provider: string,
-  integrationId: string,
-  params: any,
+  id: string;
+  name: string;
+  provider: string;
+  integrationId: string;
+  params: any;
 }
 
-const getProvider = (provider:string) => {
+const getProvider = (provider: string) => {
   switch (provider) {
     case Twitter.getName():
       return {
         Add: Twitter.Add,
         Display: Twitter.Display,
       };
-      case Fake.getName():
-        return {
-          Add: Fake.Add,
-          Display: Fake.Display,
-        };
+    case Fake.getName():
+      return {
+        Add: Fake.Add,
+        Display: Fake.Display,
+      };
     default:
       return {
-        Add: () => (<></>),
-        Display: () => (<></>),
+        Add: () => <></>,
+        Display: () => <></>,
       };
   }
 };
 
-const TriggerTab = ({
-  web2Integrations, triggers, onChange, children, selectedNode, allNodes, editable = false,
-}:{
-  web2Integrations: IWeb2Integration[],
-  triggers: ITrigger[],
-  onChange: (data:any) => void,
-  children: any[],
-  selectedNode: any,
-  allNodes: any[],
-  editable?: boolean,
-}) => {
+const TriggerTab = () => {
+  const { data, selectedNodeId, web2Integrations, editable, onChange } =
+    useContext(GraphPanelContext);
+  const selectedNode = data.checkpoints?.find(
+    (chk: any) => chk.id === selectedNodeId
+  );
+  const children = selectedNode?.children || [];
+  const triggers = selectedNode?.triggers || [];
+  const allNodes = data.checkpoints || [];
   const [showAddTriggerDrawer, setShowAddTriggerDrawer] = useState(false);
   const [selectedIntegrationId, setSelectedIntegrationId] = useState<string>();
   const [selectedTriggerAt, setSelectedTriggerAt] = useState<string>();
-  const options = web2Integrations?.map((integration:IWeb2Integration) => {
+  const options = web2Integrations?.map((integration: IWeb2Integration) => {
     return {
       id: integration.id,
-      label: integration.username !== ' ' ? `${integration.provider} (${integration.username})` : integration.provider,
+      label:
+        integration.username !== ' '
+          ? `${integration.provider} (${integration.username})`
+          : integration.provider,
       value: integration.id,
     };
   });
   const selectedIntegration = web2Integrations?.find(
-    (integration) => integration.id === selectedIntegrationId);
+    (integration) => integration.id === selectedIntegrationId
+  );
   const AddElement = getProvider(selectedIntegration?.provider || '').Add;
-  const triggerAtOptions:any = [];
+  const triggerAtOptions: any = [];
   children?.forEach((childId) => {
-    let title = allNodes.find((n) => n.id === childId).title || childId;
+    let title = allNodes.find((n) => n.id === childId)?.title || childId;
     if (title.length > 20) {
       title = `${title.slice(0, 20)}...`;
     }
@@ -81,73 +82,72 @@ const TriggerTab = ({
           onClick={() => {
             setShowAddTriggerDrawer(true);
           }}
-          editable={editable}
+          editable={editable || false}
         />
-      )
-      :
-      (
+      ) : (
         <>
           <Space direction="vertical" size="middle" className="w-full">
-            {
-              triggers.map(
-                (trigger:ITrigger, index: number) => {
-                  const display = getProvider(trigger.provider).Display;
-                  return (
-                    <Space
-                      direction="vertical"
-                      size="small"
-                      className="rounded-md border-2 p-4 w-full"
-                      key={trigger.id || Math.random()}
-                    >
-                      <Space direction="horizontal" className="w-full flex justify-between">
-                        <Paragraph
-                          style={{ marginBottom: '0px' }}
-                          className="text-lg font-semibold flex items-center"
-                          editable={{
-                            onChange: (name) => {
-                              const newTriggers = [...triggers];
-                              newTriggers[index].name = name;
-                              onChange({
-                                ...selectedNode,
-                                triggers: newTriggers,
-                              });
-                            },
-                          }}
-                        >
-                          {trigger.name}
-                        </Paragraph>
-                        <Button
-                          icon={<DeleteOutlined />}
-                          className="text-red-500"
-                          onClick={() => {
-                            const tmpSelectedNode = structuredClone(selectedNode);
-                            const tmpTriggers = [...triggers];
-                            tmpTriggers.splice(index, 1);
-                            onChange({
-                              ...tmpSelectedNode,
-                              triggers: tmpTriggers,
-                            });
-                          }}
-                          disabled={!editable}
-                        />
-                      </Space>
-                      {display({
-                        data: {
-                          ...trigger, allNodes,
-                        },
-                        onChange: (data) => {
+            {triggers.map((trigger: ITrigger, index: number) => {
+              const display = getProvider(trigger.provider).Display;
+              return (
+                <Space
+                  direction="vertical"
+                  size="small"
+                  className="rounded-md border-2 p-4 w-full"
+                  key={trigger.id || Math.random()}
+                >
+                  <Space
+                    direction="horizontal"
+                    className="w-full flex justify-between"
+                  >
+                    <Paragraph
+                      style={{ marginBottom: '0px' }}
+                      className="text-lg font-semibold flex items-center"
+                      editable={{
+                        onChange: (name) => {
                           const newTriggers = [...triggers];
-                          newTriggers[index] = data;
+                          newTriggers[index].name = name;
                           onChange({
                             ...selectedNode,
                             triggers: newTriggers,
                           });
                         },
-                      })}
-                    </Space>
-                  );
-                },
-            )}
+                      }}
+                    >
+                      {trigger.name}
+                    </Paragraph>
+                    <Button
+                      icon={<DeleteOutlined />}
+                      className="text-red-500"
+                      onClick={() => {
+                        const tmpSelectedNode = structuredClone(selectedNode);
+                        const tmpTriggers = [...triggers];
+                        tmpTriggers.splice(index, 1);
+                        onChange({
+                          ...tmpSelectedNode,
+                          triggers: tmpTriggers,
+                        });
+                      }}
+                      disabled={!editable}
+                    />
+                  </Space>
+                  {display({
+                    data: {
+                      ...trigger,
+                      allNodes,
+                    },
+                    onChange: (data) => {
+                      const newTriggers = [...triggers];
+                      newTriggers[index] = data;
+                      onChange({
+                        ...selectedNode,
+                        triggers: newTriggers,
+                      });
+                    },
+                  })}
+                </Space>
+              );
+            })}
           </Space>
           <Button
             type="default"
@@ -160,13 +160,12 @@ const TriggerTab = ({
             Add Trigger
           </Button>
         </>
-      )
-      }
+      )}
       <NewTriggerDrawer
         selectedNode={selectedNode}
         triggers={triggers}
         onChange={onChange}
-        options={options}
+        options={options || []}
         AddElement={AddElement}
         selectedIntegrationId={selectedIntegrationId}
         setSelectedIntegrationId={setSelectedIntegrationId}
