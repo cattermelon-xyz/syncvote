@@ -125,7 +125,7 @@ const Comment = ({
   };
 
   const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
-    if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === 400) {
+    if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === 330) {
       loadCommentData(offset + limit, limit);
     }
   };
@@ -292,7 +292,7 @@ const Comment = ({
                 <Input
                   value={inputValue}
                   onChange={handleInputChange}
-                  className='w-fullh-12'
+                  className='w-full h-12'
                   placeholder='Comment'
                   suffix={
                     <FiSend
