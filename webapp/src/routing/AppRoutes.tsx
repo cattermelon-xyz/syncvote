@@ -21,15 +21,15 @@ import NoHeaderLayout from '@layout/NoHeader';
 import WebLayout from '@layout/WebLayout';
 
 const AppRoutes = () => (
-  <BrowserRouter basename="/">
+  <BrowserRouter basename='/'>
     <Routes>
-      <Route path="/" element={<App layout={AppLayout} requiredLogin={true} />}>
+      <Route path='/' element={<App layout={AppLayout} requiredLogin={true} />}>
         <Route
-          path=":orgIdString/:workflowIdString/:versionIdString"
+          path=':orgIdString/:workflowIdString/:versionIdString'
           element={<EditVersion />}
         />
         <Route
-          path=":orgIdString/mission/:missionIdString"
+          path=':orgIdString/mission/:missionIdString'
           element={<Mission />}
         >
           <Route index element={<EditMission />} />
@@ -37,28 +37,36 @@ const AppRoutes = () => (
       </Route>
       {/* TODO: login should use different layout */}
       <Route
-        path="/"
+        path='/'
         element={<App layout={NoHeaderLayout} requiredLogin={false} />}
       >
-        <Route path="login" element={<CreatorLogin />} />
+        <Route path='login' element={<CreatorLogin />} />
       </Route>
-      <Route path="/" element={<App layout={WebLayout} requiredLogin={true} />}>
-        {/* TODO: this screen should only once for each new org */}
-        <Route path="onboard" element={<PageScreen />} />
+
+      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
         <Route index element={<OrganizationList />} />
-        <Route path=":orgIdString">
+        <Route path='my-spaces' element={<OrganizationList />} />
+        <Route path='my-spaces/:spaceId' element={<OrganizationList />} />
+        <Route path='shared-spaces' element={<OrganizationList />} />
+        <Route path='shared-spaces/:spaceId' element={<OrganizationList />} />
+      </Route>
+
+      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
+        {/* TODO: this screen should only once for each new org */}
+        <Route path='onboard' element={<PageScreen />} />
+        <Route path=':orgIdString'>
           <Route index element={<OrganizationHome />} />
-          <Route path="setting" element={<OrganizationSetting />} />
-          <Route path="new-workflow" element={<ChooseTemplate />} />
-          <Route path="new-mission" element={<ChooseWorkflow />} />
-          <Route path="workflow/:workflowIdString" element={<Workflow />}>
+          <Route path='setting' element={<OrganizationSetting />} />
+          <Route path='new-workflow' element={<ChooseTemplate />} />
+          <Route path='new-mission' element={<ChooseWorkflow />} />
+          <Route path='workflow/:workflowIdString' element={<Workflow />}>
             <Route index element={<BluePrint />} />
-            <Route path="new-version" element={<NewVersion />} />
+            <Route path='new-version' element={<NewVersion />} />
             <Route
-              path=":versionIdString/new-mission"
+              path=':versionIdString/new-mission'
               element={<NewMission />}
             />
-            <Route path=":versionIdString" element={<EditVersion />} />
+            <Route path=':versionIdString' element={<EditVersion />} />
           </Route>
         </Route>
       </Route>
