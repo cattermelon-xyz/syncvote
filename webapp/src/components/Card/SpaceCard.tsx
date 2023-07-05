@@ -1,6 +1,7 @@
 import React from 'react';
 import { Avatar } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { createIdString } from '@utils/helpers';
 
 interface SpaceCardProps {
   dataSpace: any;
@@ -15,13 +16,25 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
       className='w-[200px] h-[111px] px-4 py-3 bg-white rounded-xl border border-neutral-200 flex-col justify-start items-start gap-2'
       onClick={() => {
         if (isMySpace) {
-          navigate(`/my-spaces/${dataSpace.org.id}`, {
-            state: { dataSpace },
-          });
+          navigate(
+            `/my-spaces/${createIdString(
+              dataSpace.org.title,
+              dataSpace.org.id.toString()
+            )}`,
+            {
+              state: { dataSpace },
+            }
+          );
         } else {
-          navigate(`/shared-spaces/${dataSpace.org.id}`, {
-            state: { dataSpace },
-          });
+          navigate(
+            `/shared-spaces/${createIdString(
+              dataSpace.org.title,
+              dataSpace.org.id.toString()
+            )}`,
+            {
+              state: { dataSpace },
+            }
+          );
         }
       }}
     >

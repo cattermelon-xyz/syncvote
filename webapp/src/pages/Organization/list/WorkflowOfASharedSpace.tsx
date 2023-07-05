@@ -12,8 +12,12 @@ const WorkflowOfASharedSpace = () => {
 
   useEffect(() => {
     if (data) {
-      setWorkflows(data?.org.workflows);
-      console.log(data)
+      const workflowsData = data?.org.workflows.map((workflow: any) => ({
+        ...workflow,
+        org_title: data.org.title,
+      }));
+
+      setWorkflows(workflowsData);
     }
   }, [data]);
 

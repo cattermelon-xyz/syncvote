@@ -237,7 +237,11 @@ export const queryOrgsAndWorkflowForHome = async ({
         workflows:workflow (
           id,
           title,
-          owner_org_id
+          owner_org_id,
+          versions: workflow_version(
+            id, 
+            status
+          )
         )
       )
     `

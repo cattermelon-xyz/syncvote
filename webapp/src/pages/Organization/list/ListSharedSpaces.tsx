@@ -25,10 +25,14 @@ const ListSharedSpaces = () => {
         const adminOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
         setAdminOrgs(adminOrgsData);
 
-        // Get all workflows from the admin orgs
-        const allWorkflows = adminOrgsData.flatMap(
-          (adminOrg: any) => adminOrg.org.workflows
-        );
+         // Get all workflows from the admin orgs and include org title
+         const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
+         adminOrg.org.workflows.map((workflow: any) => ({
+           ...workflow,
+           org_title: adminOrg.org.title,
+         }))
+       );
+
         setWorkflows(allWorkflows);
       }
     };
@@ -37,10 +41,6 @@ const ListSharedSpaces = () => {
       fetchData();
     }
   }, [user]);
-
-  useEffect(() => {
-    console.log(workflows);
-  });
 
   return (
     <>
