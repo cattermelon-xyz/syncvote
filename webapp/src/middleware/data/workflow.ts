@@ -36,10 +36,10 @@ export const upsertWorkflowVersion = async ({
     id: versionId !== -1 ? versionId : undefined,
     workflow_id: workflowId,
   };
-  if (!mode || mode === 'data') {
+  if (!mode || mode === "data") {
     toUpsert.data = versionData;
   }
-  if (!mode || mode === 'info') {
+  if (!mode || mode === "info") {
     toUpsert.version = version;
     toUpsert.status = status;
     toUpsert.recommended = recommended;
@@ -119,8 +119,8 @@ export const updateAWorkflowInfo = async ({
   dispatch(startLoading({}));
   const { id, title, desc, iconUrl } = info;
   let icon_url, preset_icon_url; // eslint-disable-line
-  if (iconUrl?.startsWith('preset:')) {
-    preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
+  if (iconUrl?.startsWith("preset:")) {
+    preset_icon_url = iconUrl.replace("preset:", ""); // eslint-disable-line
   } else {
     icon_url = iconUrl; // eslint-disable-line
   }
