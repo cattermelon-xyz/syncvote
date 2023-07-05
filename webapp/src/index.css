@@ -93,7 +93,7 @@ h6 {
   }
 
   .primary-button {
-    @apply bg-violet-version-5 hover:bg-violet-version-7 text-white;
+    @apply bg-violet-700 hover:bg-violet-version-7 text-white;
   }
 
   .secondary-button {
@@ -137,7 +137,7 @@ h6 {
 }
 /* hot fix for antd, TODO: what went wrong? */
 .ant-avatar .anticon {
-   display: inline-flex;
+  display: inline-flex;
 }
 
 html body {

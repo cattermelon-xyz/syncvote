@@ -1,96 +1,139 @@
-import { useState } from 'react';
-import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
+import { useState, useEffect } from 'react';
 import Button from '@components/Button/Button';
 import { L } from '@utils/locales/L';
-import Icon from '@components/Icon/Icon';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { createIdString, getImageUrl } from '@utils/helpers';
-import { Drawer, Space } from 'antd';
-import NewOrgFrm from './list/NewOrgFrm';
+import { Layout } from 'antd';
+import {
+  PlusOutlined,
+  DownOutlined,
+  HomeOutlined,
+  FolderOutlined,
+  ShareAltOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons';
+import HomeButton from '@components/HomeScreen/HomeButton';
+import ListHome from './list/ListHome';
+import ListMySpace from './list/ListMySpace';
+import WorkflowOfAMySpace from './list/WorkflowOfAMySpace';
+import ListSharedSpaces from './list/ListSharedSpaces';
+import CreateSpaceModal from './list/CreateSpaceModal';
+import WorkflowOfASharedSpace from './list/WorkflowOfASharedSpace';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { supabase } from '@utils/supabaseClient';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+
+const { Sider } = Layout;
 
 const Organization = () => {
-  const { presetBanners } = useSelector((state: any) => state.ui);
-  const { orgs } = useSelector((state: any) => state.orginfo);
-  const [shouldShowForm, setShouldShowForm] = useState(false);
-  const presetBanner = presetBanners[15] ? getImageUrl({ filePath: presetBanners[15], isPreset: true, type: 'banner' }) : null;
+  const [openModal, setOpenModal] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState('listHome');
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/my-spaces')) {
+      if (location.pathname === '/my-spaces') {
+        setCurrentStatus('listMySpace');
+      } else {
+        setCurrentStatus('WorkflowOfAMySpace');
+      }
+    } else if (location.pathname.startsWith('/shared-spaces')) {
+      if (location.pathname === '/shared-spaces') {
+        setCurrentStatus('listSharedSpaces');
+      } else {
+        setCurrentStatus('WorkflowOfASharedSpace'); // Trạng thái mới cho trường hợp URL chứa spaceId
+      }
+    } else {
+      setCurrentStatus('listHome');
+    }
+  }, [location.pathname]);
+
+  const showModal = () => {
+    setOpenModal(true);
+  };
+
+  const closeModal = () => {
+    setOpenModal(false);
+  };
+
   return (
-    <div className="mt-8 container mx-auto relative">
-      <div className="flex items-center mb-10 container justify-between">
-        <div className="flex text-lg font-bold">{L('yourOrganization')}</div>
-        <Space direction="horizontal">
-          <Button
-            variant="outline"
-            startIcon={<PlusIcon />}
-            onClick={
-              () => setShouldShowForm(true)
-            }
-          >
-            {L('createANewOrganization')}
-          </Button>
-        </Space>
-      </div>
-      <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-center">
-        {orgs.map((org:any) => {
-          let bannerUrl = presetBanner;
-          if (org.banner_url) {
-            const filePath = org.banner_url.indexOf('preset:') === 0 ? org.banner_url.replace('preset:', '') : org.banner_url;
-            bannerUrl = getImageUrl({ filePath, isPreset: org.banner_url.indexOf('preset:') === 0, type: 'banner' });
-          }
-          const path = `/${createIdString(org.title, org.id)}`;
-          return (
-            <div
-              key={org.id}
-              className="w-[290px] border-b_1 cursor-pointer hover:drop-shadow-lg"
-              onClick={() => {
-                navigate(path);
-              }}
-              title={path}
-            >
-              {org.background_url ?
-                <div className="w-[290px] h-[142px]" />
-              :
-                (
-                  <div
-                    className="w-[290px] h-[142px] bg-cover"
-                    // className="w-[290px] h-[142px] bg-gradient-to-tr from-gray-500 to-gray-700"
-                    style={{ backgroundImage: `url(${bannerUrl})` }}
-                  />
-                )
-              }
-              <div className="flex flex-col items-left pl-4 pr-4 pb-4 bg-card-bg">
-                <div className="-mt-8">
-                  {org.icon_url ?
-                    // <Avatar size={64} src={org.icon_url} className="outline outline-2" />
-                    <Icon size="large" iconUrl={org.icon_url} />
-                    :
-                    (
-                      <Icon size="large">
-                        {org?.title?.charAt(0)}
-                      </Icon>
-                    )
-                  }
-                </div>
-                <div className="mt-2 text-lg text-ellipsis">{org.title}</div>
-                <div className="mt-2 text-xs text-ellipsis">{org.desc}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <Drawer
-        open={shouldShowForm}
-        title={L('createANewOrganization')}
-        footer={null}
-        onClose={() => setShouldShowForm(false)}
-        size="large"
+    <div className='flex w-full'>
+      <Sider
+        theme='light'
+        className='overflow-auto min-h-screen border-r w-1/5 flex flex-col relative'
       >
-        <NewOrgFrm onSubmit={() => {
-          setShouldShowForm(false);
-        }}
-        />
-      </Drawer>
+        <Button
+          startIcon={<PlusOutlined />}
+          endIcon={<DownOutlined />}
+          className='my-6 ml-8 mr-4'
+          onClick={showModal}
+        >
+          {L('createNew')}
+        </Button>
+        <div className='flex flex-col pl-4'>
+          <HomeButton
+            startIcon={<HomeOutlined />}
+            onClick={() => {
+              setCurrentStatus('listHome');
+              navigate('/');
+            }}
+            isFocused={currentStatus === 'listHome'}
+          >
+            {L('home')}
+          </HomeButton>
+          <HomeButton
+            startIcon={<FolderOutlined />}
+            onClick={() => {
+              setCurrentStatus('listMySpace');
+              navigate('/my-spaces');
+            }}
+            isFocused={currentStatus === 'listMySpace'}
+          >
+            {L('mySpace')}
+          </HomeButton>
+          <HomeButton
+            startIcon={<ShareAltOutlined />}
+            onClick={() => {
+              setCurrentStatus('listSharedSpaces');
+              navigate('/shared-spaces');
+            }}
+            isFocused={currentStatus === 'listSharedSpaces'}
+          >
+            {L('sharedSpaces')}
+          </HomeButton>
+        </div>
+        <div
+          className='flex gap-3 pl-8 absolute bottom-4 cursor-pointer'
+          onClick={async () => {
+            dispatch(startLoading({}));
+            await supabase.auth.signOut();
+            dispatch(finishLoading({}));
+            navigate('/login');
+          }}
+        >
+          <LogoutOutlined />
+          <p> {L('logOut')}</p>
+        </div>
+      </Sider>
+      <div className='w-4/5 flex-grow my-8'>
+        <div className='w-3/4 mx-auto'>
+          {currentStatus === 'listHome' ? (
+            <ListHome />
+          ) : currentStatus === 'listMySpace' ? (
+            <ListMySpace />
+          ) : currentStatus === 'listSharedSpaces' ? (
+            <ListSharedSpaces />
+          ) : currentStatus === 'WorkflowOfAMySpace' ? (
+            <WorkflowOfAMySpace />
+          ) : currentStatus === 'WorkflowOfASharedSpace' ? (
+            <WorkflowOfASharedSpace />
+          ) : (
+            <></>
+          )}
+        </div>
+      </div>
+      <CreateSpaceModal open={openModal} onClose={closeModal} />
     </div>
   );
 };

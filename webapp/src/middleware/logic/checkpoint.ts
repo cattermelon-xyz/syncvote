@@ -1,15 +1,23 @@
-import { ICheckPoint, IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '@types';
+import {
+  ICheckPoint,
+  IWorkflowVersionCosmetic,
+  IWorkflowVersionLayout,
+} from '@types';
 import { generateId } from '@utils/helpers';
 
 export const changeVersion = ({
-  versionData, selectedNodeId, changedCheckPointData,
+  versionData,
+  selectedNodeId,
+  changedCheckPointData,
 }: {
   versionData: any;
   selectedNodeId: string;
   changedCheckPointData: ICheckPoint;
 }) => {
   const newData = structuredClone(versionData);
-  const index = newData.checkpoints.findIndex((item: any) => item.id === selectedNodeId);
+  const index = newData.checkpoints.findIndex(
+    (item: any) => item.id === selectedNodeId
+  );
   if (changedCheckPointData.data) {
     newData.checkpoints[index].data = {
       ...changedCheckPointData.data,
@@ -23,6 +31,10 @@ export const changeVersion = ({
   }
   if (changedCheckPointData.description) {
     newData.checkpoints[index].description = changedCheckPointData.description;
+  }
+  if (changedCheckPointData.votingLocation) {
+    newData.checkpoints[index].votingLocation =
+      changedCheckPointData.votingLocation;
   }
   if (changedCheckPointData.locked) {
     newData.checkpoints[index].locked = changedCheckPointData.locked;
@@ -40,94 +52,113 @@ export const changeVersion = ({
     delete newData.checkpoints[index].data;
   }
   if (changedCheckPointData.vote_machine_type) {
-    newData.checkpoints[index].vote_machine_type
-    = changedCheckPointData.vote_machine_type;
+    newData.checkpoints[index].vote_machine_type =
+      changedCheckPointData.vote_machine_type;
     newData.checkpoints[index].data = changedCheckPointData.data;
   }
   if (changedCheckPointData.participation) {
-    newData.checkpoints[index].participation = changedCheckPointData.participation;
+    newData.checkpoints[index].participation =
+      changedCheckPointData.participation;
   }
   return newData;
 };
 
-export const changeCosmetic = (original: IWorkflowVersionCosmetic, changed: IWorkflowVersionCosmetic) => {
-  const {defaultLayout , layouts} = changed;
-  const result = original ? {...original} : {
-    defaultLayout: undefined,
-    layouts: [],
-  };
+export const changeCosmetic = (
+  original: IWorkflowVersionCosmetic,
+  changed: IWorkflowVersionCosmetic
+) => {
+  const { defaultLayout, layouts } = changed;
+  const result = original
+    ? { ...original }
+    : {
+        defaultLayout: undefined,
+        layouts: [],
+      };
   if (defaultLayout) {
-    const {horizontal, vertical} = defaultLayout;
+    const { horizontal, vertical } = defaultLayout;
     if (!result.defaultLayout) {
-      result.defaultLayout = {...defaultLayout}
+      result.defaultLayout = { ...defaultLayout };
     } else {
       result.defaultLayout = {
         horizontal: horizontal || result.defaultLayout.horizontal,
         vertical: vertical || result.defaultLayout.vertical,
-      }
+      };
     }
   }
   if (layouts) {
     if (!result.layouts) {
       result.layouts = [];
-      console.log('old layout is empty')
       layouts.forEach((layout) => {
         if (!layout.id) {
-          result.layouts.push({...layout, id: generateId(4)});
+          result.layouts.push({ ...layout, id: generateId(4) });
         }
-      })
+      });
     } else {
       layouts.forEach((layout) => {
         const index = result.layouts.findIndex((item) => item.id === layout.id);
         if (index === -1) {
-          console.log('push new')
-          result.layouts.push({...layout, id: generateId(4)});
+          result.layouts.push({ ...layout, id: generateId(4) });
         } else {
-          console.log('changed')
-          result.layouts[index] = {...layout};
+          result.layouts[index] = { ...layout };
         }
-      })
+      });
     }
   }
-  return {...result};
-}
+  return { ...result };
+};
 
-export const changeLayout = (original: IWorkflowVersionLayout, changed: IWorkflowVersionLayout) => {
-  if(original.id === changed.id) {
-    const {nodes, edges, markers} = changed;
-    const {nodes: originalNodes, edges: originalEdges, markers: originalMarkers} = original;
+export const changeLayout = (
+  original: IWorkflowVersionLayout,
+  changed: IWorkflowVersionLayout
+) => {
+  if (original.id === changed.id) {
+    const { nodes, edges, markers } = changed;
+    const {
+      nodes: originalNodes,
+      edges: originalEdges,
+      markers: originalMarkers,
+    } = original;
     const result = structuredClone(original);
     if (!originalNodes || result.nodes === undefined) {
-      result.nodes = []
+      result.nodes = [];
     }
     if (!originalEdges || result.edges === undefined) {
-      result.edges = []
+      result.edges = [];
     }
     if (!originalMarkers || result.markers === undefined) {
-      result.markers = []
+      result.markers = [];
     }
     if (nodes && nodes.length > 0) {
       nodes.forEach((node) => {
-        if(!originalNodes) {
-          result.nodes?.push(node)
+        if (!originalNodes) {
+          result.nodes?.push(node);
         } else {
-          const index = result.nodes?.findIndex((orginalNode:any) => orginalNode.id === node.id);
+          const index = result.nodes?.findIndex(
+            (orginalNode: any) => orginalNode.id === node.id
+          );
           if (index === -1) {
-            result.nodes?.push(node)
-          }else if(index !== undefined){
-            result.nodes? result.nodes[index] = {
-              ...result.nodes[index],
-              ...node
-            }: null;
+            result.nodes?.push(node);
+          } else if (index !== undefined) {
+            result.nodes
+              ? (result.nodes[index] = {
+                  ...result.nodes[index],
+                  ...node,
+                })
+              : null;
           }
         }
-      })
+      });
+    }
+    if (markers && markers.length > 0) {
+      result.markers = [...markers];
     }
     return result;
   }
 };
 
-export const validateWorkflow = ({ checkPoint }:{
+export const validateWorkflow = ({
+  checkPoint,
+}: {
   checkPoint: ICheckPoint;
 }) => {
   const message = [];
@@ -136,7 +167,10 @@ export const validateWorkflow = ({ checkPoint }:{
     // End checkPoint require no condition
     isValid = true;
   } else {
-    if (checkPoint.participation === undefined || checkPoint.participation?.data === undefined) {
+    if (
+      checkPoint.participation === undefined ||
+      checkPoint.participation?.data === undefined
+    ) {
       isValid = false;
       message.push('Missing voting participation condition');
     }
@@ -154,11 +188,14 @@ export const validateWorkflow = ({ checkPoint }:{
     }
   }
   return {
-    isValid, message,
+    isValid,
+    message,
   };
 };
 
-export const validateMission = ({ checkPoint }:{
+export const validateMission = ({
+  checkPoint,
+}: {
   checkPoint: ICheckPoint;
 }) => {
   let message = '';
@@ -171,6 +208,7 @@ export const validateMission = ({ checkPoint }:{
     message = 'nothing has been done';
   }
   return {
-    isValid, message,
+    isValid,
+    message,
   };
 };

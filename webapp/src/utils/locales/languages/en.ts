@@ -294,5 +294,17 @@ export const LANG: any = {
   organizationSize: 'Size of organization',
   chooseIcon: 'Choose Icon',
   welcomeToSyncvote: 'Welcome to Syncvote',
-  logInToStartCreatingYourWorkflows: 'Log in to start creating your workflows'
+  logInToStartCreatingYourWorkflows: 'Log in to start creating your workflows',
+  home: 'Home',
+  spaces: 'Spaces',
+  mySpace: 'My Spaces',
+  sharedSpaces: 'Shared spaces',
+  syncvoteForEarlyAdopters: 'Syncvote for early adopters',
+  exploreTopTierWorkflows: 'Explore top-tier workflows',
+  workflows: 'Workflows',
+  logOut: 'Log out',
+  createANewSpace: 'Create a new space',
+  searchAWorkflow: 'Search a workflow',
+  backToSharedSpaces: 'Back to shared spaces',
+  backToMySpaces: 'Back to my spaces',
 };
