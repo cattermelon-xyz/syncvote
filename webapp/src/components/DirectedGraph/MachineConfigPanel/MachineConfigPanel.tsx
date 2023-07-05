@@ -1,62 +1,29 @@
-import {
-  Tabs,
-} from 'antd';
-import { ICheckPoint, IWorkflowVersionLayout, IWorkflowVersionLayoutMarker } from '../../../types';
+import { Tabs } from 'antd';
 import ContextTab from './ContextTab';
 import RulesTab from './RulesTab';
 import TriggerTab from './TriggerTab';
 import '../styles.scss';
 
 const MachineConfigPanel = ({
-  selectedNode, onChange, web2Integrations, allNodes, editable = false, vmConfigPanel, selectedLayout, onChangeLayout,
-}:{
-  selectedNode: any,
-  onChange: (changedData:ICheckPoint) => void;
-  onChangeLayout: (changedData:IWorkflowVersionLayout) => void;
-  web2Integrations: any[];
-  allNodes: any[];
-  editable?: boolean;
-  vmConfigPanel:JSX.Element;
-  selectedLayout: IWorkflowVersionLayout;
+  vmConfigPanel,
+}: {
+  vmConfigPanel: JSX.Element;
 }) => {
   const items = [
     {
       key: '1',
       label: 'Content',
-      children: (
-        <ContextTab
-          selectedNode={selectedNode}
-          selectedLayout={selectedLayout}
-          onChange={onChange}
-          onChangeLayout={onChangeLayout}
-          editable={editable}
-        />
-      ),
+      children: <ContextTab />,
     },
     {
       key: '2',
       label: 'Rules and conditions',
-      children: (
-        <RulesTab
-          selectedNode={selectedNode}
-          onChange={onChange}
-          editable={editable}
-          vmConfigPanel={vmConfigPanel}
-        />
-      ),
+      children: <RulesTab vmConfigPanel={vmConfigPanel} />,
     },
     {
       key: '3',
       label: 'Automated actions',
-      children: <TriggerTab
-        web2Integrations={web2Integrations}
-        triggers={selectedNode?.triggers || []}
-        onChange={onChange}
-        children={selectedNode?.children}
-        selectedNode={selectedNode}
-        allNodes={allNodes}
-        editable={editable}
-      />,
+      children: <TriggerTab />,
     },
   ];
   return (

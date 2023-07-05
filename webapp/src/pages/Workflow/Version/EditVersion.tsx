@@ -155,7 +155,7 @@ export const EditVersion = () => {
       {renderVoteMachineConfigPanel({
         editable: true,
         web2Integrations: web2IntegrationsState,
-        versionData: version?.data || emptyStage,
+        data: version?.data || emptyStage,
         selectedNodeId,
         selectedLayoutId,
         onChange: (changedData: any) => {
@@ -259,7 +259,9 @@ export const EditVersion = () => {
                 <EditIcon />
               </span>
             </Space>
-            <SaveGraphImage />
+            <SaveGraphImage>
+              <Button>Download</Button>
+            </SaveGraphImage>
             <Button
               type="link"
               className="flex items-center text-violet-500"

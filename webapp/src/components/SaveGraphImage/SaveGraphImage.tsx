@@ -1,11 +1,6 @@
-import {
-  Panel,
-  useReactFlow,
-  getRectOfNodes,
-  getTransformForBounds,
-} from 'reactflow';
+import { useReactFlow, getRectOfNodes, getTransformForBounds } from 'reactflow';
 import { toPng } from 'html-to-image';
-import { Button } from 'antd';
+import { ReactNode } from 'react';
 
 function downloadImage(dataUrl: any) {
   const a = document.createElement('a');
@@ -18,7 +13,13 @@ function downloadImage(dataUrl: any) {
 const imageWidth = 1340;
 const imageHeight = 768;
 
-function SaveGraphImage() {
+function SaveGraphImage({
+  className = '',
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
   const { getNodes } = useReactFlow();
   const onClick = () => {
     // we calculate a transform for the nodes so that all nodes are visible
@@ -29,14 +30,15 @@ function SaveGraphImage() {
       nodesBounds,
       imageWidth,
       imageHeight,
-      0.5,
-      2
+      0.4,
+      10
     );
 
     toPng(document.querySelector('.react-flow__viewport') as HTMLElement, {
       backgroundColor: '#fff',
       width: imageWidth,
       height: imageHeight,
+      skipAutoScale: true,
       style: {
         width: imageWidth + 'px',
         height: imageHeight + 'px',
@@ -46,9 +48,9 @@ function SaveGraphImage() {
   };
 
   return (
-    <Button className="download-btn" onClick={onClick}>
-      Download Image
-    </Button>
+    <div className={`download-btn ${className}`} onClick={onClick}>
+      {children}
+    </div>
   );
 }
 

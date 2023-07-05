@@ -69,10 +69,10 @@ export interface IVoteMachine {
     checkpoint,
     data,
   }: {
-    checkpoint: ICheckPoint;
+    checkpoint: ICheckPoint | undefined;
     data: any;
   }) => JSX.Element;
-  validate: ({ checkpoint }: { checkpoint: ICheckPoint }) => {
+  validate: ({ checkpoint }: { checkpoint: ICheckPoint | undefined }) => {
     isValid: boolean;
     message: string[];
   };
@@ -126,4 +126,38 @@ export interface IWorkflowVersion {
   start: string;
   checkpoints: ICheckPoint[];
   cosmetic?: IWorkflowVersionCosmetic;
+}
+
+export interface IGraph {
+  data: IWorkflowVersion;
+  selectedNodeId?: string;
+  selectedLayoutId?: string;
+  cosmetic?: IWorkflowVersionCosmetic;
+  editable?: boolean;
+  navPanel?: JSX.Element;
+  onNodeClick?: (event: any, data: any) => void;
+  onLayoutClick?: (data: any) => void;
+  onPaneClick?: (event: any) => void;
+  onNodeChanged?: (data: any) => void; // new name: onReactFlowNodeChanged
+  onCosmeticChanged?: (changed: IWorkflowVersionCosmetic) => void;
+  onResetPosition?: () => void;
+  onAddNewNode?: () => void;
+  onViewPortChange?: (viewport: any) => void;
+  // web2Integrations?: any[];
+  // onChange: (data: ICheckPoint) => void;
+  // onDeleteNode: (ckpId: string) => void;
+  // onConfigPanelClose: () => void;
+  // onChangeLayout: (data: IWorkflowVersionLayout) => void;
+}
+
+export interface IConfigPanel {
+  data: IWorkflowVersion;
+  selectedNodeId?: string;
+  selectedLayoutId?: string;
+  web2Integrations?: any[];
+  editable?: boolean;
+  onChange: (data: ICheckPoint) => void;
+  onDelete: (ckpId: string) => void;
+  onClose: () => void;
+  onChangeLayout: (data: IWorkflowVersionLayout) => void;
 }

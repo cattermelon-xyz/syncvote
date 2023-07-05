@@ -159,30 +159,30 @@ export const changeLayout = (
 export const validateWorkflow = ({
   checkPoint,
 }: {
-  checkPoint: ICheckPoint;
+  checkPoint: ICheckPoint | undefined;
 }) => {
   const message = [];
   let isValid = true;
-  if (checkPoint.isEnd) {
+  if (checkPoint?.isEnd) {
     // End checkPoint require no condition
     isValid = true;
   } else {
     if (
-      checkPoint.participation === undefined ||
-      checkPoint.participation?.data === undefined
+      checkPoint?.participation === undefined ||
+      checkPoint?.participation?.data === undefined
     ) {
       isValid = false;
       message.push('Missing voting participation condition');
     }
-    if (checkPoint.vote_machine_type === undefined) {
+    if (checkPoint?.vote_machine_type === undefined) {
       isValid = false;
       message.push('Missing voting machine type');
     }
-    if (!checkPoint.duration) {
+    if (!checkPoint?.duration) {
       isValid = false;
       message.push('Missing duration');
     }
-    if (!checkPoint.data) {
+    if (!checkPoint?.data) {
       isValid = false;
       message.push('Vote configuration is missing');
     }
@@ -196,11 +196,11 @@ export const validateWorkflow = ({
 export const validateMission = ({
   checkPoint,
 }: {
-  checkPoint: ICheckPoint;
+  checkPoint: ICheckPoint | undefined;
 }) => {
   let message = '';
   let isValid = true;
-  if (checkPoint.isEnd) {
+  if (checkPoint?.isEnd) {
     // End checkPoint require no condition
     isValid = true;
   } else {

@@ -11,20 +11,24 @@ import TextEditor from '@components/Editor/TextEditor';
 import { getVoteMachine } from '../voteMachine';
 import { emptyLayout } from '../empty';
 import { Markers } from './markers';
+import { useContext } from 'react';
+import { GraphPanelContext } from '../context';
 
-const ContextTab = ({
-  selectedNode = {},
-  onChange,
-  editable,
-  selectedLayout = { ...emptyLayout },
-  onChangeLayout,
-}: {
-  selectedNode?: any;
-  onChange: (changedData: ICheckPoint) => void;
-  editable?: boolean;
-  selectedLayout?: IWorkflowVersionLayout;
-  onChangeLayout?: (changedData: IWorkflowVersionLayout) => void;
-}) => {
+const ContextTab = () => {
+  const {
+    data,
+    selectedNodeId,
+    selectedLayoutId,
+    onChange,
+    editable,
+    onChangeLayout,
+  } = useContext(GraphPanelContext);
+  const selectedNode = data.checkpoints?.find(
+    (chk: any) => chk.id === selectedNodeId
+  );
+  const selectedLayout = data.cosmetic?.layouts?.find(
+    (l: any) => l?.id === selectedLayoutId
+  );
   const layoutNode = selectedLayout?.nodes?.find(
     (node: any) => node.id === selectedNode?.id
   ) || {
@@ -36,15 +40,15 @@ const ContextTab = ({
   };
   const style = layoutNode?.style;
   const markers = selectedLayout?.markers || [];
-  const summary = getVoteMachine(selectedNode.vote_machine_type)?.explain({
+  const summary = getVoteMachine(selectedNode?.vote_machine_type)?.explain({
     checkpoint: selectedNode,
-    data: selectedNode.data,
+    data: selectedNode?.data,
   });
-  const vmValidation = getVoteMachine(selectedNode.vote_machine_type)?.validate(
-    {
-      checkpoint: selectedNode,
-    }
-  ) || {
+  const vmValidation = getVoteMachine(
+    selectedNode?.vote_machine_type
+  )?.validate({
+    checkpoint: selectedNode,
+  }) || {
     isValid: true,
   };
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
@@ -115,8 +119,10 @@ const ContextTab = ({
           value={selectedNode?.description}
           setValue={(value: any) => {
             const newNode = structuredClone(selectedNode);
-            newNode.description = value;
-            onChange(newNode);
+            if (newNode) {
+              newNode.description = value;
+              onChange(newNode);
+            }
           }}
           heightEditor={200}
           // disabled={locked.description}
@@ -129,8 +135,10 @@ const ContextTab = ({
           onChange={(e) => {
             const val = e.target.value || ' ';
             const newNode = structuredClone(selectedNode);
-            newNode.votingLocation = val;
-            onChange(newNode);
+            if (newNode) {
+              newNode.votingLocation = val;
+              onChange(newNode);
+            }
           }}
           placeholder="Discourse Forum"
         />
@@ -152,55 +160,58 @@ const ContextTab = ({
                         }}
                         onClick={() => {
                           const tmp = structuredClone(selectedLayout);
-                          const nodes = tmp?.nodes;
-                          const markers = tmp?.markers;
-                          const style = {
-                            title: { ...marker.title },
-                            content: { ...marker.content },
-                          };
-                          const newMarker = {
-                            color: marker.title.backgroundColor,
-                            title: marker.markerTitle,
-                          };
-                          if (!markers) {
-                            tmp.markers = [];
-                            tmp.markers.push(newMarker);
-                          } else {
-                            const idx = markers.findIndex(
-                              (marker: any) =>
-                                marker.title.backgroundColor === newMarker.color
-                            );
-                            if (idx === -1) {
-                              markers.push(newMarker);
+                          if (tmp) {
+                            const nodes = tmp?.nodes;
+                            const markers = tmp?.markers;
+                            const style = {
+                              title: { ...marker.title },
+                              content: { ...marker.content },
+                            };
+                            const newMarker = {
+                              color: marker.title.backgroundColor,
+                              title: marker.markerTitle,
+                            };
+                            if (!markers) {
+                              tmp.markers = [];
+                              tmp.markers.push(newMarker);
+                            } else {
+                              const idx = markers.findIndex(
+                                (marker: any) =>
+                                  marker.title.backgroundColor ===
+                                  newMarker.color
+                              );
+                              if (idx === -1) {
+                                markers.push(newMarker);
+                              }
                             }
-                          }
-                          if (!nodes) {
-                            tmp.nodes = [];
-                            tmp.nodes.push({
-                              id: selectedNode?.id,
-                              style,
-                            });
-                          } else {
-                            const idx = nodes.findIndex(
-                              (node: any) => node.id === selectedNode?.id
-                            );
-                            if (idx === -1) {
-                              nodes.push({
+                            if (!nodes) {
+                              tmp.nodes = [];
+                              tmp.nodes.push({
                                 id: selectedNode?.id,
                                 style,
                               });
                             } else {
-                              nodes[idx].style = {
-                                ...nodes[idx].style,
-                                ...style,
-                              };
+                              const idx = nodes.findIndex(
+                                (node: any) => node.id === selectedNode?.id
+                              );
+                              if (idx === -1) {
+                                nodes.push({
+                                  id: selectedNode?.id,
+                                  style,
+                                });
+                              } else {
+                                nodes[idx].style = {
+                                  ...nodes[idx].style,
+                                  ...style,
+                                };
+                              }
                             }
+                            onChangeLayout
+                              ? onChangeLayout({
+                                  ...tmp,
+                                })
+                              : null;
                           }
-                          onChangeLayout
-                            ? onChangeLayout({
-                                ...tmp,
-                              })
-                            : null;
                         }}
                       ></div>
                     );
@@ -226,23 +237,25 @@ const ContextTab = ({
           onChange={(e) => {
             const label = e.target.value;
             const tmp = structuredClone(selectedLayout);
-            const idx = markers?.findIndex(
-              (marker: any) => marker.color === style?.title?.backgroundColor
-            );
-            if (idx !== -1) {
-              markers[idx].title = label;
+            if (tmp) {
+              const idx = markers?.findIndex(
+                (marker: any) => marker.color === style?.title?.backgroundColor
+              );
+              if (idx !== -1) {
+                markers[idx].title = label;
+              }
+              onChangeLayout
+                ? onChangeLayout({
+                    ...tmp,
+                    markers: [...markers],
+                  })
+                : null;
             }
-            onChangeLayout
-              ? onChangeLayout({
-                  ...tmp,
-                  markers: [...markers],
-                })
-              : null;
           }}
           disabled={style?.title?.backgroundColor === '#fff'}
         />
       </Space>
-      {!selectedNode?.isEnd && selectedNode.vote_machine_type ? (
+      {!selectedNode?.isEnd && selectedNode?.vote_machine_type ? (
         <>
           <Space
             direction="vertical"

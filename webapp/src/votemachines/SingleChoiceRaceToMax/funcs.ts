@@ -17,7 +17,11 @@ export const getType = () => {
   return 'SingleChoiceRaceToMax';
 };
 
-export const deleteChildNode = (data: IData, children:string[], childId:string) => {
+export const deleteChildNode = (
+  data: IData,
+  children: string[],
+  childId: string
+) => {
   const index = children ? children.indexOf(childId) : -1;
   const result = data.options ? [...data.options] : [];
   if (index === -1) {
@@ -28,7 +32,7 @@ export const deleteChildNode = (data: IData, children:string[], childId:string) 
 };
 
 export const getInitialData = () => {
-  const data : IData = {
+  const data: IData = {
     options: [],
     max: 0,
     includedAbstain: true,
@@ -38,21 +42,22 @@ export const getInitialData = () => {
 };
 
 export const validate = ({
-  checkpoint //eslint-disable-line
+  checkpoint, //eslint-disable-line
 }: {
-  checkpoint: ICheckPoint,
+  checkpoint: ICheckPoint | undefined;
 }) => {
   let isValid = true;
   const message = [];
-  if (!checkpoint.children || checkpoint.children.length === 0) {
+  if (!checkpoint?.children || checkpoint.children.length === 0) {
     isValid = false;
     message.push('Missing options');
   }
-  if (!checkpoint.data || !checkpoint.data.max) {
+  if (!checkpoint?.data || !checkpoint.data.max) {
     isValid = false;
     message.push('Missing number of vote need to win');
   }
   return {
-    isValid, message,
+    isValid,
+    message,
   };
 };

@@ -1,6 +1,4 @@
-import {
-  ShareAltOutlined, TwitterOutlined,
-} from '@ant-design/icons';
+import { ShareAltOutlined, TwitterOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { Tag } from 'antd';
 import { getVoteMachine } from '@components/DirectedGraph';
@@ -8,11 +6,16 @@ import {
   ICheckPoint,
   IParticipant,
   IToken,
-  IVoteMachine, IVoteMachineGetLabelProps,
+  IVoteMachine,
+  IVoteMachineGetLabelProps,
 } from '../../types';
 import {
-  getProgramAddress as gpa, getName as gn, deleteChildNode as dcn, getType as gt,
-  getInitialData as gid, validate as v,
+  getProgramAddress as gpa,
+  getName as gn,
+  deleteChildNode as dcn,
+  getType as gt,
+  getInitialData as gid,
+  validate as v,
 } from './funcs';
 import cf from './ConfigPanel';
 import { IData } from './interface';
@@ -21,50 +24,66 @@ export const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
   const data = source.data || {};
   const { triggers } = source;
-  const filteredTriggers = triggers?.filter((trg:any) => (trg.triggerAt === target.id));
+  const filteredTriggers = triggers?.filter(
+    (trg: any) => trg.triggerAt === target.id
+  );
   const children = source.children || [];
   const idx = children.indexOf(target.id);
-  return data.options ?
-    (
+  return data.options ? (
+    <div>
+      <div>{data.options[idx]}</div>
       <div>
-        <div>{data.options[idx]}</div>
-        <div>{filteredTriggers?.map((trg:any) => (trg.provider === 'twitter' ? <TwitterOutlined key={trg.id || Math.random()} className="pr-2" /> : <span key={trg.id || Math.random()}>{trg.provider}</span>))}</div>
+        {filteredTriggers?.map((trg: any) =>
+          trg.provider === 'twitter' ? (
+            <TwitterOutlined key={trg.id || Math.random()} className="pr-2" />
+          ) : (
+            <span key={trg.id || Math.random()}>{trg.provider}</span>
+          )
+        )}
       </div>
-    )
-    :
-    (
-      <div>{filteredTriggers?.map((trg:any) => (trg.provider === 'twitter' ? <TwitterOutlined key={trg.id || Math.random()} className="pr-2" /> : <span key={trg.id || Math.random()}>{trg.provider}</span>))}</div>
-    );
+    </div>
+  ) : (
+    <div>
+      {filteredTriggers?.map((trg: any) =>
+        trg.provider === 'twitter' ? (
+          <TwitterOutlined key={trg.id || Math.random()} className="pr-2" />
+        ) : (
+          <span key={trg.id || Math.random()}>{trg.provider}</span>
+        )
+      )}
+    </div>
+  );
 };
 // label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
 
 export const getIcon = () => {
-  return (
-    <ShareAltOutlined />
-  );
+  return <ShareAltOutlined />;
 };
 
 export const explain = ({
-  checkpoint, data,
-}:{
-  checkpoint:ICheckPoint, data:IData
+  checkpoint,
+  data,
+}: {
+  checkpoint: ICheckPoint | undefined;
+  data: IData;
 }) => {
+  if (!checkpoint) {
+    return <></>;
+  }
   const noOfOptions = checkpoint.children ? checkpoint.children.length : 0;
   const { participation } = checkpoint;
-  const renderParticipation = (participation : IParticipant | undefined) => {
+  const renderParticipation = (participation: IParticipant | undefined) => {
     let rs = null;
     if (!participation || (participation.type && !participation.data)) {
-      rs = (
-        <div className="text-red-500">
-          Missing participation setup
-        </div>
-      );
+      rs = <div className="text-red-500">Missing participation setup</div>;
     } else {
       const { type, data: pdata } = participation;
       if (type === 'identity') {
         rs = (
           <div>
-            <Tag className="text-violet-500 mx-2">{(pdata as string[] || []).length}</Tag>
+            <Tag className="text-violet-500 mx-2">
+              {((pdata as string[]) || []).length}
+            </Tag>
             users can participate
           </div>
         );
@@ -73,7 +92,9 @@ export const explain = ({
           <div>
             User with
             <Tag className="text-violet-500 mx-2">{(pdata as IToken)?.min}</Tag>
-            <Tag className="text-violet-500 mx-2">{(pdata as IToken)?.address}</Tag>
+            <Tag className="text-violet-500 mx-2">
+              {(pdata as IToken)?.address}
+            </Tag>
             can participate
           </div>
         );
@@ -95,11 +116,11 @@ export const explain = ({
         {moment.duration((checkpoint?.duration || 0) * 1000).humanize()}
       </Tag>
       and the user would have to choose ONE of
-      <Tag className="text-violet-500 mx-2">
-        {noOfOptions}
-      </Tag>
+      <Tag className="text-violet-500 mx-2">{noOfOptions}</Tag>
       options.
-      {data.includedAbstain ? ' User can also choose to abstain from voting.' : ''}
+      {data.includedAbstain
+        ? ' User can also choose to abstain from voting.'
+        : ''}
       {/* Only user with ... can vote. */}
       <br />
       The winning option must reach
@@ -111,12 +132,10 @@ export const explain = ({
       {renderParticipation(participation)}
     </div>
   );
-  return (
-    p1
-  );
+  return p1;
 };
 
-const VoteMachine : IVoteMachine = {
+const VoteMachine: IVoteMachine = {
   ConfigPanel: cf,
   getProgramAddress: gpa,
   getName: gn,
