@@ -49,10 +49,9 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           })}
         />
       ) : (
-        <img
-          className='w-full h-[86px] rounded-lg m-0'
-          alt='example'
-          src='https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png'
+        <div
+          className='w-full h-[86px] rounded-lg m-0 border border-gray-200'
+          style={{ backgroundColor: '#FFFFFF' }}
         />
       )}
       {dataWorkflow.icon_url ? (
@@ -89,8 +88,13 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           {dataWorkflow?.owner_workflow_icon_url ? (
             <Avatar
               src={getImageUrl({
-                filePath: dataWorkflow?.owner_workflow_icon_url?.replace('preset:', ''),
-                isPreset: dataWorkflow?.owner_workflow_icon_url?.indexOf('preset:') === 0,
+                filePath: dataWorkflow?.owner_workflow_icon_url?.replace(
+                  'preset:',
+                  ''
+                ),
+                isPreset:
+                  dataWorkflow?.owner_workflow_icon_url?.indexOf('preset:') ===
+                  0,
                 type: 'icon',
               })}
               className='w-[16px] h-[16px]'
