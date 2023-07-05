@@ -216,10 +216,9 @@ export const PublicVersion = () => {
               >
                 <Comment where={where} session={session} api={api} />
               </Sider>
-
-              <Layout className='relative'>
+              <Layout className='relative flex items-center'>
                 {!collapsed && (
-                  <Space className='absolute m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit mt-16'>
+                  <Space className='absolute left-0 m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit mt-16'>
                     <Space>
                       <Avatar
                         shape='circle'
@@ -286,11 +285,9 @@ export const PublicVersion = () => {
                     />
                   </Space>
                 </div>
-                {/* import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
-import { HiMiniFire } from 'react-icons/hi2';
-import { AiFillLike, AiFillDislike } from 'react-icons/ai'; */}
+
                 <div
-                  className='cursor-pointer flex rounded-3xl absolute left-1/2 bottom-16 w-52 h-14 z-50'
+                  className='cursor-pointer flex rounded-3xl absolute bottom-20 w-52 h-14 z-50'
                   style={{
                     border: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
                   }}
@@ -319,6 +316,7 @@ import { AiFillLike, AiFillDislike } from 'react-icons/ai'; */}
                     </div>
                   </div>
                 </div>
+
                 {renderVoteMachineConfigPanel({
                   editable: false,
                   web2Integrations: web2IntegrationsState,

@@ -18,8 +18,6 @@ import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
 import { LeftOutlined } from '@ant-design/icons';
 import ReactionBox from './Reaction';
-import { Content } from 'antd/es/layout/layout';
-import { getDataReactionCount } from '@middleware/data/reaction';
 
 const Comment = ({
   where,
@@ -43,7 +41,6 @@ const Comment = ({
   const [dataReply, setDataReply] = useState<CommentType[]>([]);
   const [offset, setOffset] = useState(0);
   const [offsetReply, setOffsetReply] = useState(0);
-  const [dataReaction, setDataReaction] = useState<any[]>([]);
 
   const limit = 5;
 
