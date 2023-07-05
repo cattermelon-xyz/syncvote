@@ -12,7 +12,7 @@ const WebLayout = ({ children }: Props) => {
       <AuthContext.Consumer>
         {({ session }) => (
           <div className="w-full">
-            <div className="fixed top-0 left-0 w-full">
+            <div className="fixed top-0 left-0 w-full z-50 bg-white">
               <Header session={session} />
             </div>
             <div className={`w-full flex justify-center mt-20`}>{children}</div>
