@@ -31,7 +31,7 @@ const AppRoutes = () => (
         element={<App layout={PublicAppLayout} requiredLogin={false} />}
       >
         <Route
-          path=":orgIdString/:workflowIdString/:versionIdString/:userId"
+          path=":orgIdString/:workflowIdString/:versionIdString"
           element={<PublicVersion />}
         ></Route>
       </Route>
