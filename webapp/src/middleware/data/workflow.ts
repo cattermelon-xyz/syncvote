@@ -36,10 +36,10 @@ export const upsertWorkflowVersion = async ({
     id: versionId !== -1 ? versionId : undefined,
     workflow_id: workflowId,
   };
-  if (!mode || mode === "data") {
+  if (!mode || mode === 'data') {
     toUpsert.data = versionData;
   }
-  if (!mode || mode === "info") {
+  if (!mode || mode === 'info') {
     toUpsert.version = version;
     toUpsert.status = status;
     toUpsert.recommended = recommended;
@@ -105,6 +105,62 @@ export const queryWorkflow = async ({
     onError(error);
   }
 };
+
+export const queryWorkflowVersion = async ({
+  orgId,
+  onLoad,
+  onError = (error) => {
+    console.error(error); // eslint-disable-line
+  },
+  dispatch,
+  filter = {}, // eslint-disable-line
+  versionId,
+  workflowId,
+}: {
+  orgId: number;
+  workflowId: any;
+  versionId: any;
+  onLoad: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+  filter?: any;
+}) => {
+  dispatch(startLoading({}));
+  // TODO: should we stuff workflow_version into workflow?
+  const { data, error } = await supabase
+    .from('workflow')
+    .select('*, workflow_version ( * )')
+    .eq('owner_org_id', orgId)
+    .eq('id', workflowId)
+    .eq('workflow_version.id', versionId)
+    .order('created_at', { ascending: false });
+  dispatch(finishLoading({}));
+  if (data) {
+    const wfList = Array.isArray(data) ? data : [data];
+    const newData: any[] = [];
+    wfList.forEach((d: any, index: number) => {
+      newData[index] = { ...structuredClone(d) };
+      const presetIcon = d.preset_icon_url
+        ? `preset:${d.preset_icon_url}`
+        : d.icon_url;
+      const presetBanner = d.preset_banner_url
+        ? `preset:${d.preset_banner_url}`
+        : d.bann_url;
+      newData[index].icon_url = d.icon_url ? d.icon_url : presetIcon;
+      newData[index].banner_url = d.banner_url ? d.banner_url : presetBanner;
+      delete newData[index].preset_icon_url;
+      delete newData[index].preset_banner_url;
+      newData[index].workflow_version =
+        [...newData[index].workflow_version] || [];
+    });
+    // TODO: is the data match the interface?
+    dispatch(setWorkflows(newData));
+    dispatch(setLastFetch({}));
+    onLoad(newData);
+  } else if (error) {
+    onError(error);
+  }
+};
 export const updateAWorkflowInfo = async ({
   info,
   dispatch,
@@ -119,8 +175,8 @@ export const updateAWorkflowInfo = async ({
   dispatch(startLoading({}));
   const { id, title, desc, iconUrl } = info;
   let icon_url, preset_icon_url; // eslint-disable-line
-  if (iconUrl?.startsWith("preset:")) {
-    preset_icon_url = iconUrl.replace("preset:", ""); // eslint-disable-line
+  if (iconUrl?.startsWith('preset:')) {
+    preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
   } else {
     icon_url = iconUrl; // eslint-disable-line
   }

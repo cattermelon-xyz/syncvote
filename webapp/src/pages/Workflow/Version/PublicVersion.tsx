@@ -7,9 +7,9 @@ import {
   renderVoteMachineConfigPanel,
 } from '@components/DirectedGraph';
 import {
-  queryOrgs,
+  queryOrgAndUser,
   queryWeb2Integration,
-  queryWorkflow,
+  queryWorkflowVersion,
 } from '@middleware/data';
 import { extractIdFromIdString } from '@utils/helpers';
 import { Button, Layout, Space, Image, Avatar, notification } from 'antd';
@@ -28,22 +28,6 @@ import { getDataReactionCount } from '@middleware/data/reaction';
 import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
 import { HiMiniFire } from 'react-icons/hi2';
 import { AiFillLike, AiFillDislike } from 'react-icons/ai';
-const extractVersion = ({
-  workflows,
-  workflowId,
-  versionId,
-}: {
-  workflows: any;
-  workflowId: number;
-  versionId: number;
-}) => {
-  const wf = workflows.find((workflow: any) => workflow.id === workflowId);
-
-  if (wf) {
-    return wf.workflow_version.find((wv: any) => wv.id === versionId);
-  }
-  return {};
-};
 
 const extractOrg = ({ orgList, orgId }: { orgList: any; orgId: number }) => {
   const org = orgList.find((org: any) => org.id === orgId);
@@ -51,7 +35,7 @@ const extractOrg = ({ orgList, orgId }: { orgList: any; orgId: number }) => {
 };
 
 export const PublicVersion = () => {
-  const { orgIdString, workflowIdString, versionIdString, userId } =
+  const { orgIdString, workflowIdString, versionIdString } =
     useParams();
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
@@ -63,6 +47,7 @@ export const PublicVersion = () => {
   const [version, setVersion] = useState<any>();
   const [workflow, setWorkflow] = useState<any>();
   const [org, setOrg] = useState<any>();
+  const [profile, setProfile] = useState<any>();
   const [session, setSession] = useState<Session | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
@@ -76,27 +61,10 @@ export const PublicVersion = () => {
     setSession(_session);
   };
 
-  const extractWorkflowFromList = (wfList: any) => {
-    setVersion(
-      extractVersion({
-        workflows: wfList,
-        workflowId,
-        versionId,
-      })
-    );
-
-    setDataHasChanged(false);
-    setWorkflow(wfList.find((w: any) => w.id === workflowId));
-  };
-
-  const extractOrgList = (orgList: any) => {
-    setOrg(extractOrg({ orgList, orgId }));
-  };
-
   const worflowInfo = {
     workflow: workflow?.title,
     org: org?.title,
-    authority: org?.profile[0].full_name,
+    authority: profile?.full_name,
     date: moment(workflow?.created_at).fromNow(),
     desc: workflow?.desc,
   };
@@ -115,18 +83,22 @@ export const PublicVersion = () => {
       },
     });
 
-    queryWorkflow({
+    queryWorkflowVersion({
       orgId,
+      versionId,
+      workflowId,
       dispatch,
-      onLoad: (wfList: any) => {
-        extractWorkflowFromList(wfList);
+      onLoad: (worflow: any) => {
+        setWorkflow(worflow[0]);
+        setVersion(worflow[0]?.workflow_version[0]);
       },
     });
 
-    queryOrgs({
-      filter: { userId },
-      onSuccess: (orgList: any) => {
-        extractOrgList(orgList);
+    queryOrgAndUser({
+      orgId,
+      onSuccess: (data: any) => {        
+        setOrg(data[0]?.org);
+        setProfile(data[0]?.profile);
       },
       dispatch,
     });
@@ -320,7 +292,7 @@ export const PublicVersion = () => {
                 {renderVoteMachineConfigPanel({
                   editable: false,
                   web2Integrations: web2IntegrationsState,
-                  versionData: version?.data || emptyStage,
+                  data: version?.data || emptyStage,
                   selectedNodeId,
                   onChange: () => {},
                   onDelete: () => {},
