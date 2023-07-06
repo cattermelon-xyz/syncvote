@@ -8,13 +8,9 @@ import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
 import { Avatar, Button } from 'antd';
-import { HomeOutlined } from '@ant-design/icons';
+import { HomeOutlined, BellOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
-import { Input } from 'antd';
-import './SearchBox.css';
-
-const { Search } = Input;
 
 type HeaderProps = {
   session: any;
@@ -127,35 +123,30 @@ function Header({ session }: HeaderProps) {
                   </Button>
                 </span>
               ) : (
-                <div className='flex gap-9'>
-                  <span
-                    className='mr-2'
-                    onClick={() => {
-                      handleClearStore();
-                      navigate('/');
-                    }}
-                  >
-                    <div className='flex top-[2%] left-[1.3%] gap-1'>
-                      <LogoSyncVote />
-                      <div className='text-violet-700 text-[20px] font-bold '>
-                        Syncvote
-                      </div>
+                <span
+                  className='mr-2'
+                  onClick={() => {
+                    handleClearStore();
+                    navigate('/');
+                  }}
+                >
+                  <div className='flex top-[2%] left-[1.3%] gap-1'>
+                    <LogoSyncVote />
+                    <div className='text-violet-700 text-[20px] font-bold '>
+                      Syncvote
                     </div>
-                  </span>
-                  <Search
-                    placeholder={`${L('searchAWorkflow')}...`}
-                    allowClear
-                    onSearch={onSearch}
-                    style={{ width: 220 }}
-                  />
-                </div>
+                  </div>
+                </span>
               )}
             </span>
           </div>
         </div>
-        <div className='flex w-w_3 items-center justify-end'>
+        <div className='flex w-w_3 items-center justify-end gap-3'>
+          <div className='flex rounded-full h-11 w-11 bg-gray-100 justify-center cursor-pointer'>
+            <BellOutlined style={{ fontSize: '24px' }} />
+          </div>
           <div
-            className='border-b_2 py-3 px-4 my-3 mr-0 rounded-full border-gray-normal bg-[#f6f6f6] cursor-pointer'
+            className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'
             onClick={async () => {
               dispatch(startLoading({}));
               await supabase.auth.signOut();

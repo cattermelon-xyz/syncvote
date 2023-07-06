@@ -35,8 +35,7 @@ const extractOrg = ({ orgList, orgId }: { orgList: any; orgId: number }) => {
 };
 
 export const PublicVersion = () => {
-  const { orgIdString, workflowIdString, versionIdString } =
-    useParams();
+  const { orgIdString, workflowIdString, versionIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
   const versionId = extractIdFromIdString(versionIdString);
@@ -96,7 +95,7 @@ export const PublicVersion = () => {
 
     queryOrgAndUser({
       orgId,
-      onSuccess: (data: any) => {        
+      onSuccess: (data: any) => {
         setOrg(data[0]?.org);
         setProfile(data[0]?.profile);
       },
@@ -114,7 +113,8 @@ export const PublicVersion = () => {
     <>
       {contextHolder}
       <Layout>
-        {version?.status === 'PUBLISHED' ? (
+        {version?.status === 'PUBLISHED' ||
+        version?.status === 'PUBLIC_COMMUNITY' ? (
           <>
             <Image
               height={134}
