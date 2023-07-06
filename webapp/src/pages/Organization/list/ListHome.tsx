@@ -1,5 +1,6 @@
 import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
 import Icon from '@components/Icon/Icon';
+import SortButton from '@components/SortButton/SortButton';
 import { createIdString, getImageUrl } from '@utils/helpers';
 import NewOrgFrm from './NewOrgFrm';
 import { useSelector, useDispatch } from 'react-redux';
@@ -47,9 +48,7 @@ const ListHome = () => {
   useEffect(() => {
     const fetchDataWorkflow = async () => {
       dispatch(startLoading({}));
-      const { data, error } = await supabase
-        .from('workflow')
-        .select(`*,
+      const { data, error } = await supabase.from('workflow').select(`*,
          versions: workflow_version(id, status),
          infoOrg: org(title)
          `);
@@ -107,16 +106,7 @@ const ListHome = () => {
             </CheckableTag>
           ))}
         </Space>
-        {/* <Popover title='Title' trigger='click'> */}
-        <Button
-          style={{ border: 'None', padding: '5px' }}
-          className='w-[44px] bg-[#F6F6F6]'
-        >
-          <SortAscendingOutlined
-            style={{ fontSize: '20px', color: '#6200EE' }}
-          />
-        </Button>
-        {/* </Popover> */}
+        <SortButton />
       </div>
       <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-y-6 w-full justify-items-center'>
         {workflows &&

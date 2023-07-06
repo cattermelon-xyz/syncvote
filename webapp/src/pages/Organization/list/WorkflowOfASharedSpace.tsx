@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { LeftOutlined } from '@ant-design/icons';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { L } from '@utils/locales/L';
+import SortButton from '@components/SortButton/SortButton';
 
 const WorkflowOfASharedSpace = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
@@ -32,8 +33,11 @@ const WorkflowOfASharedSpace = () => {
           {L('backToSharedSpaces')}
         </p>
       </div>
-      <div className='text-3xl font-semibold text-[#252422] mb-10'>
-        {data?.org.title}
+      <div className='mb-10 flex justify-between'>
+        <div className='text-3xl font-semibold text-[#252422] mb-10'>
+          {data?.org.title}
+        </div>
+        <SortButton />
       </div>
       <div>
         <div className="font-['General_Sans'] font-medium text-[#252422] mb-4">

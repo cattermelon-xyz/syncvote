@@ -5,6 +5,7 @@ import { queryOrgsAndWorkflowForHome } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@components/Card/WorkflowCard';
+import SortButton from '@components/SortButton/SortButton';
 
 const ListMySpace = () => {
   const { user } = useSelector((state: any) => state.orginfo);
@@ -44,12 +45,13 @@ const ListMySpace = () => {
     <>
       <div className='flex flex-col mb-10'>
         <div>
-          <div className="text-3xl font-semibold text-[#252422] mb-10">
-            {L('mySpace')}
+          <div className='mb-10 flex justify-between'>
+            <div className='text-3xl font-semibold text-[#252422]'>
+              {L('mySpace')}
+            </div>
+            <SortButton />
           </div>
-          <div className="font-medium text-[#252422] mb-4">
-            {L('Spaces')}
-          </div>
+          <div className='font-medium text-[#252422] mb-4'>{L('Spaces')}</div>
         </div>
         <div className='grid 2xl:grid-cols-4 xl:grid-cols-4 gap-4 gap-y-6'>
           {adminOrgs &&

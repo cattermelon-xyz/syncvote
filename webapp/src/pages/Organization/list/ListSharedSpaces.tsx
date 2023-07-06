@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { useParams } from 'react-router-dom';
+import SortButton from '@components/SortButton/SortButton';
 
 const ListSharedSpaces = () => {
   const { user } = useSelector((state: any) => state.orginfo);
@@ -46,8 +47,11 @@ const ListSharedSpaces = () => {
     <>
       <div className='flex flex-col mb-10'>
         <div>
-          <div className='text-3xl font-semibold text-[#252422] mb-10'>
-            {L('mySpace')}
+          <div className='mb-10 flex justify-between'>
+            <div className='text-3xl font-semibold text-[#252422]'>
+              {L('sharedSpaces')}
+            </div>
+            <SortButton />
           </div>
           <div className="font-['General_Sans'] font-medium text-[#252422] mb-4">
             {L('Spaces')}
