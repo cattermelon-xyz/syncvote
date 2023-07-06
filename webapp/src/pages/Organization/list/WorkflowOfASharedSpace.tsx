@@ -23,7 +23,10 @@ const WorkflowOfASharedSpace = () => {
 
   return (
     <div>
-      <div className='flex mb-8 gap-1' onClick={() => navigate(-1)}>
+      <div
+        className='flex mb-8 gap-1 cursor-pointer'
+        onClick={() => navigate(-1)}
+      >
         <LeftOutlined style={{ color: '#6200ee' }} />
         <p className='font-medium text-[#6200ee] self-center'>
           {L('backToSharedSpaces')}

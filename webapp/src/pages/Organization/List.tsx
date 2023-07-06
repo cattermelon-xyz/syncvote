@@ -104,7 +104,7 @@ const Organization = () => {
           </HomeButton>
         </div>
         <div
-          className='flex gap-3 pl-8 absolute bottom-4 cursor-pointer'
+          className='flex gap-3 pl-8 absolute bottom-12 cursor-pointer'
           onClick={async () => {
             dispatch(startLoading({}));
             await supabase.auth.signOut();

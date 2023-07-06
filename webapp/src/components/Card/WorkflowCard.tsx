@@ -15,6 +15,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   dataWorkflow,
   isListHome,
 }) => {
+  console.log(dataWorkflow);
   const navigate = useNavigate();
   return (
     <Card
@@ -23,6 +24,15 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       className='w-64 h-[176px] relative rounded-xl '
       onClick={() => {
         if (isListHome) {
+          navigate(
+            `/public/${createIdString(
+              dataWorkflow?.infoOrg.title,
+              dataWorkflow?.owner_org_id.toString()
+            )}/${createIdString(
+              dataWorkflow?.title,
+              dataWorkflow?.id
+            )}/${dataWorkflow?.versions[0].id.toString()}`
+          );
         } else {
           navigate(
             `/${createIdString(

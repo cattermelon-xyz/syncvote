@@ -49,7 +49,10 @@ const ListHome = () => {
       dispatch(startLoading({}));
       const { data, error } = await supabase
         .from('workflow')
-        .select(`*, versions: workflow_version(id, status)`);
+        .select(`*,
+         versions: workflow_version(id, status),
+         infoOrg: org(title)
+         `);
 
       dispatch(finishLoading({}));
       if (data) {
@@ -91,7 +94,7 @@ const ListHome = () => {
         className='mb-4 w-full'
       />
       <div className='flex flex-col w-full mb-4 items-end'>
-        <Space size={[16, 8]} wrap className='mb-10 '>
+        <Space size={[16, 16]} wrap className='mb-10 '>
           {listTag.map((tag) => (
             <CheckableTag
               className='border border-gray-300'
@@ -118,7 +121,11 @@ const ListHome = () => {
       <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-y-6 w-full justify-items-center'>
         {workflows &&
           workflows.map((workflow, index) => (
-            <WorkflowCard key={index} dataWorkflow={workflow} />
+            <WorkflowCard
+              key={index}
+              dataWorkflow={workflow}
+              isListHome={true}
+            />
           ))}
       </div>
     </div>
