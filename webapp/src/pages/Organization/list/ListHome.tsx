@@ -1,9 +1,7 @@
 import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
 import Icon from '@components/Icon/Icon';
 import { createIdString, getImageUrl } from '@utils/helpers';
-import { Drawer, Space, Layout } from 'antd';
 import NewOrgFrm from './NewOrgFrm';
-import Button from '@components/Button/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { L } from '@utils/locales/L';
@@ -11,11 +9,30 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@utils/supabaseClient';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { SearchOutlined, SortAscendingOutlined } from '@ant-design/icons';
+import { Input, Tag, Space, Button, Popover } from 'antd';
+
+const { Search } = Input;
+const { CheckableTag } = Tag;
+
+const listTag = [
+  'Finance',
+  'Governance',
+  'Human Resources',
+  'Project Management',
+  'Customer Service',
+  'Operations',
+  'Community & Social',
+  'Legal',
+  'Sales & Marketing',
+  'Strategic Planning',
+];
 
 const ListHome = () => {
   const [shouldShowForm, setShouldShowForm] = useState(false);
   const { orgs } = useSelector((state: any) => state.orginfo);
   const { presetBanners } = useSelector((state: any) => state.ui);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const dispatch = useDispatch();
   const presetBanner = presetBanners[15]
@@ -48,89 +65,62 @@ const ListHome = () => {
     fetchDataWorkflow();
   }, []);
 
+  const onSearch = (value: string) => console.log(value);
+
+  const handleChange = (tag: string, checked: boolean) => {
+    const nextSelectedTags = checked
+      ? [...selectedTags, tag]
+      : selectedTags.filter((t) => t !== tag);
+    console.log('You are interested in: ', nextSelectedTags);
+    setSelectedTags(nextSelectedTags);
+  };
+
   return (
-    <div className='mt-8 container mx-auto relative '>
-      <div className='flex items-center mb-10 container justify-between'>
-        <div className='flex text-lg font-bold'>{L('workflows')}</div>
-        {/* <Space direction='horizontal'>
-          <Button
-            variant='outline'
-            startIcon={<PlusIcon />}
-            onClick={() => setShouldShowForm(true)}
-          >
-            {L('createANewOrganization')}
-          </Button>
-        </Space> */}
+    <div className='container flex flex-col items-center'>
+      <div className='flex justify-center text-3xl font-semibold text-[#252422] mb-10'>
+        {L('syncvoteForEarlyAdopters')}
       </div>
-      <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-4 gap-y-6'>
+      <div className='w-[422px] h-[241px] bg-[#D9D9D9] mb-16'></div>
+      <div className='flex justify-center text-3xl font-semibold text-[#252422] mb-10'>
+        {L('exploreTopTierWorkflows')}
+      </div>
+      <Search
+        placeholder={`${L('searchAWorkflow')}...`}
+        allowClear
+        onSearch={onSearch}
+        className='mb-4 w-full'
+      />
+      <div className='flex flex-col w-full mb-4 items-end'>
+        <Space size={[16, 8]} wrap className='mb-10 '>
+          {listTag.map((tag) => (
+            <CheckableTag
+              className='border border-gray-300'
+              key={tag}
+              checked={selectedTags.includes(tag)}
+              onChange={(checked) => handleChange(tag, checked)}
+              style={{ borderRadius: '15px', fontSize: '16px' }}
+            >
+              {tag}
+            </CheckableTag>
+          ))}
+        </Space>
+        {/* <Popover title='Title' trigger='click'> */}
+        <Button
+          style={{ border: 'None', padding: '5px' }}
+          className='w-[44px] bg-[#F6F6F6]'
+        >
+          <SortAscendingOutlined
+            style={{ fontSize: '20px', color: '#6200EE' }}
+          />
+        </Button>
+        {/* </Popover> */}
+      </div>
+      <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-y-6 w-full justify-items-center'>
         {workflows &&
           workflows.map((workflow, index) => (
             <WorkflowCard key={index} dataWorkflow={workflow} />
           ))}
       </div>
-
-      {/* <div className='grid grid-flow-row grid-cols-3 gap-4 justify-items-center'>
-        {orgs.map((org: any) => {
-          let bannerUrl = presetBanner;
-          if (org.banner_url) {
-            const filePath =
-              org.banner_url.indexOf('preset:') === 0
-                ? org.banner_url.replace('preset:', '')
-                : org.banner_url;
-            bannerUrl = getImageUrl({
-              filePath,
-              isPreset: org.banner_url.indexOf('preset:') === 0,
-              type: 'banner',
-            });
-          }
-          const path = `/${createIdString(org.title, org.id)}`;
-          return (
-            <div
-              key={org.id}
-              className='w-[290px] border-b_1 cursor-pointer hover:drop-shadow-lg'
-              onClick={() => {
-                navigate(path);
-              }}
-              title={path}
-            >
-              {org.background_url ? (
-                <div className='w-[290px] h-[142px]' />
-              ) : (
-                <div
-                  className='w-[290px] h-[142px] bg-cover'
-                  // className="w-[290px] h-[142px] bg-gradient-to-tr from-gray-500 to-gray-700"
-                  style={{ backgroundImage: `url(${bannerUrl})` }}
-                />
-              )}
-              <div className='flex flex-col items-left pl-4 pr-4 pb-4 bg-card-bg'>
-                <div className='-mt-8'>
-                  {org.icon_url ? (
-                    // <Avatar size={64} src={org.icon_url} className="outline outline-2" />
-                    <Icon size='large' iconUrl={org.icon_url} />
-                  ) : (
-                    <Icon size='large'>{org?.title?.charAt(0)}</Icon>
-                  )}
-                </div>
-                <div className='mt-2 text-lg text-ellipsis'>{org.title}</div>
-                <div className='mt-2 text-xs text-ellipsis'>{org.desc}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div> */}
-      <Drawer
-        open={shouldShowForm}
-        title={L('createANewOrganization')}
-        footer={null}
-        onClose={() => setShouldShowForm(false)}
-        size='large'
-      >
-        <NewOrgFrm
-          onSubmit={() => {
-            setShouldShowForm(false);
-          }}
-        />
-      </Drawer>
     </div>
   );
 };
