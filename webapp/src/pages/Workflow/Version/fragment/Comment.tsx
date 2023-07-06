@@ -169,6 +169,7 @@ const Comment = ({
                   >
                     {(item: CommentType) => (
                       <div
+                        key={item.id.toString()}
                         className='rounded-xl	m-1.5'
                         style={{
                           border:
