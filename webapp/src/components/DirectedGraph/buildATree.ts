@@ -206,9 +206,6 @@ export const buildATree = ({
         );
         console.log(layout);
         let edgeStyle = { ...edgeFromLayout?.style };
-        Object.keys(edgeStyle).length > 0
-          ? console.log('edgeStyle: ', edgeStyle)
-          : null;
 
         if (selectedNodeId && sourceId === selectedNodeId) {
           edgeStyle = SELECTED_EDGE_STYLE;

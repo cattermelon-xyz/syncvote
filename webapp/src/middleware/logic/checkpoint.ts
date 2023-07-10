@@ -119,7 +119,6 @@ export const changeLayout = (
   } = original;
   const result = structuredClone(original);
   if (original.id === changed.id) {
-    console.log('originalEdges: ', edges);
     if (!originalNodes || result.nodes === undefined) {
       result.nodes = [];
     }
@@ -153,17 +152,14 @@ export const changeLayout = (
     if (edges && edges.length > 0) {
       edges.forEach((edge) => {
         if (originalEdges === undefined || originalEdges.length === 0) {
-          console.log('replace ALL edges');
           result.edges?.push(edge);
         } else {
           const index = result.edges?.findIndex(
             (orginalEdge: any) => orginalEdge.id === edge.id
           );
           if (index === -1) {
-            console.log('push new edge');
             result.edges?.push(edge);
           } else if (index !== undefined) {
-            console.log('replace edge');
             result.edges
               ? (result.edges[index] = {
                   ...result.edges[index],

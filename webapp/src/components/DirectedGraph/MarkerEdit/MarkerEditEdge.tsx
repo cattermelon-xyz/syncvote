@@ -17,7 +17,6 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
   };
   const style = layoutEdge?.style;
   const markers = selectedLayout?.markers || [];
-  console.log('style form MarkerEditEdge: ', style.stroke);
   return (
     <Input
       prefix={

@@ -73,30 +73,30 @@ const ListHome = () => {
     const nextSelectedTags = checked
       ? [...selectedTags, tag]
       : selectedTags.filter((t) => t !== tag);
-    console.log('You are interested in: ', nextSelectedTags);
+    // console.log('You are interested in: ', nextSelectedTags);
     setSelectedTags(nextSelectedTags);
   };
 
   return (
-    <div className='container flex flex-col items-center'>
-      <div className='flex justify-center text-3xl font-semibold text-[#252422] mb-10'>
+    <div className="container flex flex-col items-center">
+      <div className="flex justify-center text-3xl font-semibold text-[#252422] mb-10">
         {L('syncvoteForEarlyAdopters')}
       </div>
-      <div className='w-[422px] h-[241px] bg-[#D9D9D9] mb-16'></div>
-      <div className='flex justify-center text-3xl font-semibold text-[#252422] mb-10'>
+      <div className="w-[422px] h-[241px] bg-[#D9D9D9] mb-16"></div>
+      <div className="flex justify-center text-3xl font-semibold text-[#252422] mb-10">
         {L('exploreTopTierWorkflows')}
       </div>
       <Search
         placeholder={`${L('searchAWorkflow')}...`}
         allowClear
         onSearch={onSearch}
-        className='mb-4 w-full'
+        className="mb-4 w-full"
       />
-      <div className='flex flex-col w-full mb-4 items-end'>
-        <Space size={[16, 16]} wrap className='mb-10 '>
+      <div className="flex flex-col w-full mb-4 items-end">
+        <Space size={[16, 16]} wrap className="mb-10 ">
           {listTag.map((tag) => (
             <CheckableTag
-              className='border border-gray-300'
+              className="border border-gray-300"
               key={tag}
               checked={selectedTags.includes(tag)}
               onChange={(checked) => handleChange(tag, checked)}
@@ -108,7 +108,7 @@ const ListHome = () => {
         </Space>
         <SortButton />
       </div>
-      <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-y-6 w-full justify-items-center'>
+      <div className="grid 2xl:grid-cols-3 xl:grid-cols-3 gap-y-6 w-full justify-items-center">
         {workflows &&
           workflows.map((workflow, index) => (
             <WorkflowCard
