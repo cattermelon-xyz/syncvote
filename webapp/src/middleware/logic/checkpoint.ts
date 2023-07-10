@@ -111,14 +111,14 @@ export const changeLayout = (
   original: IWorkflowVersionLayout,
   changed: IWorkflowVersionLayout
 ) => {
+  const { nodes, edges, markers } = changed;
+  const {
+    nodes: originalNodes,
+    edges: originalEdges,
+    markers: originalMarkers,
+  } = original;
+  const result = structuredClone(original);
   if (original.id === changed.id) {
-    const { nodes, edges, markers } = changed;
-    const {
-      nodes: originalNodes,
-      edges: originalEdges,
-      markers: originalMarkers,
-    } = original;
-    const result = structuredClone(original);
     if (!originalNodes || result.nodes === undefined) {
       result.nodes = [];
     }
@@ -143,6 +143,27 @@ export const changeLayout = (
               ? (result.nodes[index] = {
                   ...result.nodes[index],
                   ...node,
+                })
+              : null;
+          }
+        }
+      });
+    }
+    if (edges && edges.length > 0) {
+      edges.forEach((edge) => {
+        if (originalEdges === undefined || originalEdges.length === 0) {
+          result.edges?.push(edge);
+        } else {
+          const index = result.edges?.findIndex(
+            (orginalEdge: any) => orginalEdge.id === edge.id
+          );
+          if (index === -1) {
+            result.edges?.push(edge);
+          } else if (index !== undefined) {
+            result.edges
+              ? (result.edges[index] = {
+                  ...result.edges[index],
+                  ...edge,
                 })
               : null;
           }

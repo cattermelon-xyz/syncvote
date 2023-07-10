@@ -35,11 +35,16 @@ export interface OutletContext {
   };
 }
 
-export const sliceAddressToken = (addressToken: string, tokenLength: number = 4) => {
+export const sliceAddressToken = (
+  addressToken: string,
+  tokenLength: number = 4
+) => {
   if (addressToken.length <= 8) {
     return addressToken;
   }
-  return `${addressToken.slice(0, tokenLength)}...${addressToken.slice(-tokenLength)}`;
+  return `${addressToken.slice(0, tokenLength)}...${addressToken.slice(
+    -tokenLength
+  )}`;
 };
 
 export function getRouteId({
@@ -62,7 +67,8 @@ export function unsecuredCopyToClipboard(text: string) {
 
 export const generateId = (length: number): string => {
   let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < length; i++) {
@@ -85,25 +91,29 @@ export const renderValidateStatus = (condition: AlertMessage | null) => {
   return '';
 };
 
-export const createIdString = (title:String, id:String) => {
+export const createIdString = (title: String, id: String) => {
   let result = '';
   result = title.toLocaleLowerCase().replace(/([^\w ]|_)/g, '');
   result = result.split(' ').join('-');
   return `${result}-${id}`;
 };
 
-export const extractIdFromIdString = (idString:String | undefined) => {
+export const extractIdFromIdString = (idString: String | undefined) => {
   if (!idString) return -1;
   const id = idString?.split('-').pop();
   if (id === undefined) return -1;
   return parseInt(id, 10);
 };
 
-export const getImageUrl = ({ filePath = '', isPreset, type }: {
-  filePath?: string,
-  isPreset: boolean,
-  type: string
-}):string => {
+export const getImageUrl = ({
+  filePath = '',
+  isPreset,
+  type,
+}: {
+  filePath?: string;
+  isPreset: boolean;
+  type: string;
+}): string => {
   if (filePath === null || filePath === 'null') {
     return '';
   }
@@ -125,6 +135,5 @@ export const shouldUseCachedData = (lastFetch: number) => {
   if (now - lastFetch < cacheTime) {
     return true;
   }
-  console.log('should reload');
   return false;
 };

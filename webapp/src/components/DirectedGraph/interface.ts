@@ -131,11 +131,14 @@ export interface IWorkflowVersion {
 export interface IGraph {
   data: IWorkflowVersion;
   selectedNodeId?: string;
+  selectedEdgeId?: string;
   selectedLayoutId?: string;
   cosmetic?: IWorkflowVersionCosmetic;
   editable?: boolean;
   navPanel?: JSX.Element;
+  web2Integrations?: any[];
   onNodeClick?: (event: any, data: any) => void;
+  onEdgeClick?: (event: any, data: any) => void;
   onLayoutClick?: (data: any) => void;
   onPaneClick?: (event: any) => void;
   onNodeChanged?: (data: any) => void; // new name: onReactFlowNodeChanged
@@ -143,11 +146,11 @@ export interface IGraph {
   onResetPosition?: () => void;
   onAddNewNode?: () => void;
   onViewPortChange?: (viewport: any) => void;
-  // web2Integrations?: any[];
-  // onChange: (data: ICheckPoint) => void;
-  // onDeleteNode: (ckpId: string) => void;
-  // onConfigPanelClose: () => void;
-  // onChangeLayout: (data: IWorkflowVersionLayout) => void;
+  onChange: (data: ICheckPoint) => void;
+  onDeleteNode: (ckpId: string) => void;
+  onConfigPanelClose: () => void;
+  onConfigEdgePanelClose: () => void;
+  onChangeLayout: (data: IWorkflowVersionLayout) => void;
 }
 
 export interface IConfigPanel {

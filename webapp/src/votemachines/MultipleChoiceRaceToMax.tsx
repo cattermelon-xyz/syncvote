@@ -1,30 +1,35 @@
 import {
   ArrowRightOutlined,
-  DeleteOutlined, NodeExpandOutlined, PlusOutlined,
+  DeleteOutlined,
+  NodeExpandOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
-import {
-  Button, Drawer, Input, Select, Space, Tag,
-} from 'antd';
+import { Button, Drawer, Input, Select, Space, Tag } from 'antd';
 import { useState } from 'react';
 
 import {
-  IVoteMachine, IVoteMachineGetLabelProps, IVoteMachineConfigProps, ICheckPoint,
+  IVoteMachine,
+  IVoteMachineGetLabelProps,
+  IVoteMachineConfigProps,
+  ICheckPoint,
 } from '../types';
 
 interface Option {
-  title: string,
-  description: string,
+  title: string;
+  description: string;
 }
 
-interface IData { //eslint-disable-line
-  options?: Option[],
-  max?: number,
-  next?: string,
-  fallback?: string,
-  upTo?: number,
+interface IData {
+  //eslint-disable-line
+  options?: Option[];
+  max?: number;
+  next?: string;
+  fallback?: string;
+  upTo?: number;
 }
 
-const deleteChildNode = (data: IData, children:string[], childId:string) => { //eslint-disable-line
+const deleteChildNode = (data: IData, children: string[], childId: string) => {
+  //eslint-disable-line
   const result = structuredClone(data);
   if (childId === data.next) {
     delete result.next;
@@ -35,26 +40,29 @@ const deleteChildNode = (data: IData, children:string[], childId:string) => { //
 };
 
 const ConfigPanel = ({
-  currentNodeId, votingPowerProvider = '', whitelist = [], onChange = (data) => {}, children = [], //eslint-disable-line
+  currentNodeId,
+  votingPowerProvider = '',
+  whitelist = [],
+  onChange = (data) => {},
+  children = [], //eslint-disable-line
   data = {
     max: 0,
     upTo: 1,
     options: [],
     next: '',
     fallback: '',
-  }, allNodes,
+  },
+  allNodes,
   editable = false,
 }: IVoteMachineConfigProps) => {
   // TODO: config `upTo`
-  const {
-    max, options, next, fallback, upTo,
-  } = data;
+  const { max, options, next, fallback, upTo } = data;
   const [newOption, setNewOption] = useState({
     title: '',
     description: '',
   });
   const [showNewOptionDrawer, setShowNewOptionDrawer] = useState(false);
-  const possibleOptions:any[] = [];
+  const possibleOptions: any[] = [];
   let maxStr = '0';
   if (max) {
     maxStr = max < 1 ? `${max * 100}%` : `${max}`;
@@ -73,62 +81,71 @@ const ConfigPanel = ({
       nextTitle = node.title ? node.title : node.id;
     }
   });
-  const renderChildren = (type:any, val:any) => {
-    return (
-      !val ?
-        (
-          <Space direction="horizontal" className="flex items-center justify-between" size="small">
-            <div>
-              {type === 'next' ? 'If we found winner then ' : 'If voting is over and we can not find winners, then ' }
-            </div>
-            <ArrowRightOutlined />
-            <Select
-              style={{ width: '200px' }}
-              options={possibleOptions}
-              onChange={(value) => {
-                const newData:any = structuredClone(data);
-                newData[type] = value; //eslint-disable-line
-                onChange({
-                  data: newData,
-                  children: [...children, value],
-                });
-              }}
-              disabled={!editable}
-            />
-          </Space>
-        )
-        :
-        (
-          <Space direction="horizontal" size="small" className="flex items-center justify-between">
-            <Button
-              type="link"
-              className="flex items-center text-red-500 justify-between"
-              icon={<DeleteOutlined />}
-              onClick={() => {
-                const newData:any = structuredClone(data);
-                delete newData[type];
-                const newChildren = [...children];
-                const idx = children.indexOf(val);
-                newChildren.splice(idx, 1);
-                onChange({
-                  data: newData,
-                  children: newChildren,
-                });
-              }}
-              disabled={!editable}
-            />
-            {type === 'next' ? 'Winner found' : 'No winner found'}
-            <ArrowRightOutlined />
-            {type === 'next' ? <Tag>{nextTitle}</Tag> : <Tag>{fallbackTitle}</Tag>}
-          </Space>
-        )
+  const renderChildren = (type: any, val: any) => {
+    return !val ? (
+      <Space
+        direction="horizontal"
+        className="flex items-center justify-between"
+        size="small"
+      >
+        <div>
+          {type === 'next'
+            ? 'If we found winner then '
+            : 'If voting is over and we can not find winners, then '}
+        </div>
+        <ArrowRightOutlined />
+        <Select
+          style={{ width: '200px' }}
+          options={possibleOptions}
+          onChange={(value) => {
+            const newData: any = structuredClone(data);
+            newData[type] = value; //eslint-disable-line
+            onChange({
+              data: newData,
+              children: [...children, value],
+            });
+          }}
+          disabled={!editable}
+        />
+      </Space>
+    ) : (
+      <Space
+        direction="horizontal"
+        size="small"
+        className="flex items-center justify-between"
+      >
+        <Button
+          type="link"
+          className="flex items-center text-red-500 justify-between"
+          icon={<DeleteOutlined />}
+          onClick={() => {
+            const newData: any = structuredClone(data);
+            delete newData[type];
+            const newChildren = [...children];
+            const idx = children.indexOf(val);
+            newChildren.splice(idx, 1);
+            onChange({
+              data: newData,
+              children: newChildren,
+            });
+          }}
+          disabled={!editable}
+        />
+        {type === 'next' ? 'Winner found' : 'No winner found'}
+        <ArrowRightOutlined />
+        {type === 'next' ? <Tag>{nextTitle}</Tag> : <Tag>{fallbackTitle}</Tag>}
+      </Space>
     );
   };
   // const lOptions = options ? options.length : 0;
   return (
     <Space direction="vertical" size="large" className="mb-4 w-full">
       <Space direction="vertical" size="small" className="w-full">
-        <div className="bg-slate-100 p-2 w-full">{`Everyone choose up to ${upTo || 'X'} options until ${upTo || 'X'} options reach ${maxStr || 'condition to pass'}`}</div>
+        <div className="bg-slate-100 p-2 w-full">{`Everyone choose up to ${
+          upTo || 'X'
+        } options until ${upTo || 'X'} options reach ${
+          maxStr || 'condition to pass'
+        }`}</div>
       </Space>
       <Space direction="vertical" size="small" className="w-full">
         <div className="text-md">Min no of vote to pass (e.g: 3, 10%)</div>
@@ -136,17 +153,20 @@ const ConfigPanel = ({
           <Input
             type="text"
             className="w-full"
-            prefix={(
+            prefix={
               <div className="text-slate-300">
                 <ArrowRightOutlined className="inline-flex items-center pr-2" />
               </div>
-            )}
+            }
             value={maxStr}
             onChange={(e) => {
               const str = e.target.value;
               let tMax = 0;
               if (str !== '') {
-                tMax = str.indexOf('%') > 0 ? parseFloat(str) / 100 : parseInt(str, 10);
+                tMax =
+                  str.indexOf('%') > 0
+                    ? parseFloat(str) / 100
+                    : parseInt(str, 10);
               }
               onChange({
                 data: {
@@ -170,11 +190,11 @@ const ConfigPanel = ({
           <Input
             type="number"
             className="w-full"
-            prefix={(
+            prefix={
               <div className="text-slate-300">
                 <ArrowRightOutlined className="inline-flex items-center pr-2" />
               </div>
-            )}
+            }
             value={upTo}
             disabled={!editable}
             onChange={(e) => {
@@ -209,48 +229,54 @@ const ConfigPanel = ({
           />
         </Space.Compact>
       </Space>
-      {
-        options && options.length > 0 ?
-        (
-          <Space direction="vertical" size="small" className="w-full">
-            <div>List of options</div>
-            {options?.map((option:any, index:any) => (
-              <Space direction="horizontal" key={option.title} className="flex items-center">
-                <Button
-                  className="mr-2 flex-inline items-center text-center text-red-500"
-                  icon={<DeleteOutlined />}
-                  onClick={() => {
-                    onChange({
-                      data: {
-                        ...structuredClone(data),
-                        options: [
-                          ...options.slice(0, index),
-                          ...options.slice(index + 1),
-                        ],
-                      },
-                    });
-                  }}
-                />
-                <Space direction="vertical" size="small">
-                  <div className="text-slate-700">{option.title}</div>
-                  <div className="text-xs">{option.description}</div>
-                </Space>
+      {options && options.length > 0 ? (
+        <Space direction="vertical" size="small" className="w-full">
+          <div>List of options</div>
+          {options?.map((option: any, index: any) => (
+            <Space
+              direction="horizontal"
+              key={option.title}
+              className="flex items-center"
+            >
+              <Button
+                className="mr-2 flex-inline items-center text-center text-red-500"
+                icon={<DeleteOutlined />}
+                onClick={() => {
+                  onChange({
+                    data: {
+                      ...structuredClone(data),
+                      options: [
+                        ...options.slice(0, index),
+                        ...options.slice(index + 1),
+                      ],
+                    },
+                  });
+                }}
+              />
+              <Space direction="vertical" size="small">
+                <div className="text-slate-700">{option.title}</div>
+                <div className="text-xs">{option.description}</div>
               </Space>
-            ))}
-          </Space>
-        )
-        : <></>
-      }
+            </Space>
+          ))}
+        </Space>
+      ) : (
+        <></>
+      )}
       <Button
         icon={<PlusOutlined />}
         className="w-full"
-        onClick={() => { setShowNewOptionDrawer(true); }}
+        onClick={() => {
+          setShowNewOptionDrawer(true);
+        }}
       >
         New Option
       </Button>
       <Drawer
         open={showNewOptionDrawer}
-        onClose={() => { setShowNewOptionDrawer(false); }}
+        onClose={() => {
+          setShowNewOptionDrawer(false);
+        }}
         title="New Option"
       >
         <Space direction="vertical" size="small" className="w-full">
@@ -285,7 +311,10 @@ const ConfigPanel = ({
               setNewOption({ title: '', description: '' });
               setShowNewOptionDrawer(false);
               onChange({
-                data: { ...data, options: options ? [...options, newOption] : [newOption] },
+                data: {
+                  ...data,
+                  options: options ? [...options, newOption] : [newOption],
+                },
               });
             }}
           >
@@ -315,20 +344,22 @@ const getName = () => {
   return 'Poll Vote';
 };
 
-const getLabel = (props : IVoteMachineGetLabelProps) => {
+const getLabel = (props: IVoteMachineGetLabelProps) => {
   // label = source?.data.next === target?.id ? 'Next' : 'Fallback';
   const { source, target } = props;
-  return source?.data.next === target?.id ? (<span>Next</span>) : (<span>Fallback</span>);
-};
-
-const getIcon = () => {
-  return (
-    <NodeExpandOutlined />
+  return source?.data.next === target?.id ? (
+    <span>Next</span>
+  ) : (
+    <span>Fallback</span>
   );
 };
 
+const getIcon = () => {
+  return <NodeExpandOutlined />;
+};
+
 const getInitialData = () => {
-  const data : IData = {
+  const data: IData = {
     options: [],
     max: undefined,
     next: '',
@@ -339,23 +370,20 @@ const getInitialData = () => {
 };
 
 const explain = ({
-  checkpoint, data //eslint-disable-line
+  checkpoint,
+  data, //eslint-disable-line
 }: {
-  checkpoint: ICheckPoint,
-  data: IData,
+  checkpoint: ICheckPoint;
+  data: IData;
 }) => {
-  console.log(checkpoint, data);
-  return (
-    <div>
-      Comming soon
-    </div>
-  );
+  // console.log(checkpoint, data);
+  return <div>Comming soon</div>;
 };
 
 const validate = ({
-  checkpoint //eslint-disable-line
+  checkpoint, //eslint-disable-line
 }: {
-  checkpoint: ICheckPoint,
+  checkpoint: ICheckPoint;
 }) => {
   let isValid = true;
   const message = [];
@@ -373,14 +401,17 @@ const validate = ({
     message.push('Missing CheckPoint to redirect if this vote is passed');
   }
   if (!checkpoint.data.fallback) {
-    message.push('Missing CheckPoint to redirect if this vote can not be decided');
+    message.push(
+      'Missing CheckPoint to redirect if this vote can not be decided'
+    );
   }
   return {
-    isValid, message,
+    isValid,
+    message,
   };
 };
 
-const VoteMachine : IVoteMachine = {
+const VoteMachine: IVoteMachine = {
   ConfigPanel,
   getProgramAddress,
   getName,

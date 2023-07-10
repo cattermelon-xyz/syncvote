@@ -9,17 +9,27 @@ export const Markers = [
       backgroundColor: '#E0E0E0',
       color: '#252422',
     },
+    path: {
+      stroke: '#E0E0E0',
+      strokeWidth: 2,
+    },
   },
   {
     markerTitle: 'Red',
     title: {
       backgroundColor: '#F0B2AE',
       color: '#252422',
+      strokeWidth: 2,
     },
     content: {
       backgroundColor: '#FAB9B5',
       color: '#252422',
     },
+    path: {
+      stroke: '#FAB9B5',
+      strokeWidth: 2,
+    },
+    labelPath: {},
   },
   {
     markerTitle: 'Orange',
@@ -30,6 +40,10 @@ export const Markers = [
     content: {
       backgroundColor: '#FAC78B',
       color: '#252422',
+    },
+    path: {
+      stroke: '#FAC78B',
+      strokeWidth: 2,
     },
   },
   {
@@ -42,6 +56,10 @@ export const Markers = [
       backgroundColor: '#FCE493',
       color: '#252422',
     },
+    path: {
+      stroke: '#FCE493',
+      strokeWidth: 2,
+    },
   },
   {
     markerTitle: 'Green',
@@ -52,6 +70,10 @@ export const Markers = [
     content: {
       backgroundColor: '#A2F4BA',
       color: '#252422',
+    },
+    path: {
+      stroke: '#9CEAB3',
+      strokeWidth: 2,
     },
   },
   {
@@ -64,6 +86,10 @@ export const Markers = [
       backgroundColor: '#B0DCFF',
       color: '#252422',
     },
+    path: {
+      stroke: '#A9D3F5',
+      strokeWidth: 2,
+    },
   },
   {
     markerTitle: 'Purple',
@@ -75,6 +101,10 @@ export const Markers = [
       backgroundColor: '#DDBDFF',
       color: '#252422',
     },
+    path: {
+      stroke: '#D4B6F5',
+      strokeWidth: 2,
+    },
   },
   {
     markerTitle: 'Pink',
@@ -85,6 +115,10 @@ export const Markers = [
     content: {
       backgroundColor: '#F0B5FA',
       color: '#252422',
+    },
+    path: {
+      stroke: '#E7AEF0',
+      strokeWidth: 2,
     },
   },
 ];

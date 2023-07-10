@@ -3,9 +3,12 @@ import { useState } from 'react';
 import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '../interface';
 import { SaveOutlined } from '@ant-design/icons';
 
-const LayoutFrm = ({layout, onCosmeticChanged}: {
-  layout: IWorkflowVersionLayout,
-  onCosmeticChanged: (layout: IWorkflowVersionCosmetic) => void,
+const LayoutFrm = ({
+  layout,
+  onCosmeticChanged,
+}: {
+  layout: IWorkflowVersionLayout;
+  onCosmeticChanged: (layout: IWorkflowVersionCosmetic) => void;
 }) => {
   const [id, setId] = useState(layout.id || '');
   const [title, setTitle] = useState('' || layout.title);
@@ -31,34 +34,46 @@ const LayoutFrm = ({layout, onCosmeticChanged}: {
           onChange={(e) => setDescription(e.target.value)}
         />
       </Space>
-      <Space direction="horizontal" size="middle" className="w-full flex justify-between">
+      <Space
+        direction="horizontal"
+        size="middle"
+        className="w-full flex justify-between"
+      >
         <span>Screen</span>
-        <Select value={screen} onChange={(val) => {
-          setScreen(val);
-          setTitle(val === 'horizontal' ? 'Desktop' : 'Mobile')
-        }} className="w-[200px]">
+        <Select
+          value={screen}
+          onChange={(val) => {
+            setScreen(val);
+            setTitle(val === 'horizontal' ? 'Desktop' : 'Mobile');
+          }}
+          className="w-[200px]"
+        >
           <Select.Option value="horizontal">Horizontal | Desktop</Select.Option>
           <Select.Option value="vertical">Vertical | Mobile</Select.Option>
         </Select>
       </Space>
       <Space direction="horizontal" className="w-full flex justify-end">
-        <Button type="primary" className="flex items-center" icon={<SaveOutlined/>} onClick={() => {
-          const toSave = {title, description, screen, id, renderer}
-          console.log('toSave: ',toSave);
-          onCosmeticChanged({
-            layouts: [toSave]
-          })
-          setTitle('');
-          setDescription('');
-          setRenderer('');
-          setScreen('');
-          setId('');
-        }}>
+        <Button
+          type="primary"
+          className="flex items-center"
+          icon={<SaveOutlined />}
+          onClick={() => {
+            const toSave = { title, description, screen, id, renderer };
+            onCosmeticChanged({
+              layouts: [toSave],
+            });
+            setTitle('');
+            setDescription('');
+            setRenderer('');
+            setScreen('');
+            setId('');
+          }}
+        >
           Save
         </Button>
       </Space>
     </Space>
-  )
-}
+  );
+};
 
 export default LayoutFrm;

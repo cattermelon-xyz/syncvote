@@ -2,17 +2,12 @@ import { Alert, Button, Input, Popover, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { CommentOutlined, LockFilled, UnlockOutlined } from '@ant-design/icons';
 import { validateWorkflow, validateMission } from '@middleware/logic';
-import {
-  ICheckPoint,
-  IWorkflowVersionLayout,
-  IWorkflowVersionLayoutMarker,
-} from '@types';
 import TextEditor from '@components/Editor/TextEditor';
 import { getVoteMachine } from '../voteMachine';
-import { emptyLayout } from '../empty';
-import { Markers } from './markers';
+import { Markers } from '../markers';
 import { useContext } from 'react';
 import { GraphPanelContext } from '../context';
+import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
 
 const ContextTab = () => {
   const {
@@ -145,115 +140,7 @@ const ContextTab = () => {
       </Space>
       <Space direction="vertical" className="w-full p-4 bg-white rounded-lg">
         <div className="text-gray-400">Checkpoint color & label</div>
-        <Input
-          prefix={
-            <Popover
-              content={
-                <Space direction="horizontal">
-                  {Markers.map((marker: any) => {
-                    return (
-                      <div
-                        key={marker.title.backgroundColor}
-                        className="w-[16px] h-[16px] border-2 cursor-pointer"
-                        style={{
-                          backgroundColor: marker.title.backgroundColor,
-                        }}
-                        onClick={() => {
-                          const tmp = structuredClone(selectedLayout);
-                          if (tmp) {
-                            const nodes = tmp?.nodes;
-                            const markers = tmp?.markers;
-                            const style = {
-                              title: { ...marker.title },
-                              content: { ...marker.content },
-                            };
-                            const newMarker = {
-                              color: marker.title.backgroundColor,
-                              title: marker.markerTitle,
-                            };
-                            if (!markers) {
-                              tmp.markers = [];
-                              tmp.markers.push(newMarker);
-                            } else {
-                              const idx = markers.findIndex(
-                                (marker: any) =>
-                                  marker.title.backgroundColor ===
-                                  newMarker.color
-                              );
-                              if (idx === -1) {
-                                markers.push(newMarker);
-                              }
-                            }
-                            if (!nodes) {
-                              tmp.nodes = [];
-                              tmp.nodes.push({
-                                id: selectedNode?.id,
-                                style,
-                              });
-                            } else {
-                              const idx = nodes.findIndex(
-                                (node: any) => node.id === selectedNode?.id
-                              );
-                              if (idx === -1) {
-                                nodes.push({
-                                  id: selectedNode?.id,
-                                  style,
-                                });
-                              } else {
-                                nodes[idx].style = {
-                                  ...nodes[idx].style,
-                                  ...style,
-                                };
-                              }
-                            }
-                            onChangeLayout
-                              ? onChangeLayout({
-                                  ...tmp,
-                                })
-                              : null;
-                          }
-                        }}
-                      ></div>
-                    );
-                  })}
-                </Space>
-              }
-            >
-              <div
-                className="w-[24px] h-[24px] rounded-md border cursor-pointer mr-2"
-                style={{
-                  backgroundColor: style?.title.backgroundColor,
-                }}
-              ></div>
-            </Popover>
-          }
-          className="w-full"
-          value={
-            markers.find(
-              (marker: any) => marker.color === style?.title?.backgroundColor
-            )?.title || ''
-          }
-          placeholder="Write a label"
-          onChange={(e) => {
-            const label = e.target.value;
-            const tmp = structuredClone(selectedLayout);
-            if (tmp) {
-              const idx = markers?.findIndex(
-                (marker: any) => marker.color === style?.title?.backgroundColor
-              );
-              if (idx !== -1) {
-                markers[idx].title = label;
-              }
-              onChangeLayout
-                ? onChangeLayout({
-                    ...tmp,
-                    markers: [...markers],
-                  })
-                : null;
-            }
-          }}
-          disabled={style?.title?.backgroundColor === '#fff'}
-        />
+        <MarkerEditNode />
       </Space>
       {!selectedNode?.isEnd && selectedNode?.vote_machine_type ? (
         <>

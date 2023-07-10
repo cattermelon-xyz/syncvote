@@ -46,7 +46,6 @@ export const newOrg = async ({
     const result = await response.json();
     if (result) {
       const data = result[0];
-      console.log(data);
       const info = structuredClone(orgInfo);
       dispatch(
         changeOrgInfo({
