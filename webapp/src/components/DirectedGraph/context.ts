@@ -11,20 +11,26 @@ import { emptyStage } from './empty';
 
 export const GraphContext = React.createContext<IGraph>({
   data: emptyStage,
-  onNodeClick: () => {},
-  onLayoutClick: () => {},
   selectedNodeId: '',
   selectedLayoutId: '',
+  selectedEdgeId: '',
+  editable: true,
+  navPanel: undefined,
+  onNodeClick: () => {},
+  onLayoutClick: () => {},
   onPaneClick: () => {},
   onNodeChanged: () => {},
   onResetPosition: () => {},
   onAddNewNode: () => {},
   onViewPortChange: () => {},
   onCosmeticChanged: (changed: IWorkflowVersionCosmetic) => {},
-  editable: true,
-  navPanel: undefined,
+  onChange: (data: ICheckPoint) => {},
+  onDeleteNode: (ckpId: string) => {},
+  onConfigPanelClose: () => {},
+  onChangeLayout: (data: IWorkflowVersionLayout) => {},
+  onConfigEdgePanelClose: () => {},
 });
-
+// TODO: delete this
 export const GraphPanelContext = React.createContext<IConfigPanel>({
   data: emptyStage,
   selectedNodeId: '',

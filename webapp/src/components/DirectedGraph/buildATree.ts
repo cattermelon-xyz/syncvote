@@ -3,22 +3,44 @@ import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
 import MultipleDiretionNode from './CustomNodes/MultipleDiretionNode';
 import { emptyStage } from './empty';
 import { getVoteMachine } from './voteMachine';
-import { IVoteMachine, IWorkflowVersion, IWorkflowVersionCosmetic, IWorkflowVersionLayout } from './interface';
+import {
+  IVoteMachine,
+  IWorkflowVersion,
+  IWorkflowVersionCosmetic,
+  IWorkflowVersionLayout,
+} from './interface';
 import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
 import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
 
-const widths = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.2796875,0.2765625,0.3546875,0.5546875,0.5546875,0.8890625,0.665625,0.190625,0.3328125,0.3328125,0.3890625,0.5828125,0.2765625,0.3328125,0.2765625,0.3015625,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.5546875,0.2765625,0.2765625,0.584375,0.5828125,0.584375,0.5546875,1.0140625,0.665625,0.665625,0.721875,0.721875,0.665625,0.609375,0.7765625,0.721875,0.2765625,0.5,0.665625,0.5546875,0.8328125,0.721875,0.7765625,0.665625,0.7765625,0.721875,0.665625,0.609375,0.721875,0.665625,0.94375,0.665625,0.665625,0.609375,0.2765625,0.3546875,0.2765625,0.4765625,0.5546875,0.3328125,0.5546875,0.5546875,0.5,0.5546875,0.5546875,0.2765625,0.5546875,0.5546875,0.221875,0.240625,0.5,0.221875,0.8328125,0.5546875,0.5546875,0.5546875,0.5546875,0.3328125,0.5,0.2765625,0.5546875,0.5,0.721875,0.5,0.5,0.5,0.3546875,0.259375,0.353125,0.5890625]; //eslint-disable-line
+const widths = [
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0.2796875, 0.2765625, 0.3546875, 0.5546875, 0.5546875,
+  0.8890625, 0.665625, 0.190625, 0.3328125, 0.3328125, 0.3890625, 0.5828125,
+  0.2765625, 0.3328125, 0.2765625, 0.3015625, 0.5546875, 0.5546875, 0.5546875,
+  0.5546875, 0.5546875, 0.5546875, 0.5546875, 0.5546875, 0.5546875, 0.5546875,
+  0.2765625, 0.2765625, 0.584375, 0.5828125, 0.584375, 0.5546875, 1.0140625,
+  0.665625, 0.665625, 0.721875, 0.721875, 0.665625, 0.609375, 0.7765625,
+  0.721875, 0.2765625, 0.5, 0.665625, 0.5546875, 0.8328125, 0.721875, 0.7765625,
+  0.665625, 0.7765625, 0.721875, 0.665625, 0.609375, 0.721875, 0.665625,
+  0.94375, 0.665625, 0.665625, 0.609375, 0.2765625, 0.3546875, 0.2765625,
+  0.4765625, 0.5546875, 0.3328125, 0.5546875, 0.5546875, 0.5, 0.5546875,
+  0.5546875, 0.2765625, 0.5546875, 0.5546875, 0.221875, 0.240625, 0.5, 0.221875,
+  0.8328125, 0.5546875, 0.5546875, 0.5546875, 0.5546875, 0.3328125, 0.5,
+  0.2765625, 0.5546875, 0.5, 0.721875, 0.5, 0.5, 0.5, 0.3546875, 0.259375,
+  0.353125, 0.5890625,
+]; //eslint-disable-line
 const avg = 0.5279276315789471;
 
-function measureText(str:string, fontSize:number) {
-  return Array.from(str).reduce(
-    (acc, cur) => acc + (widths[cur.charCodeAt(0)] ?? avg), 0) * fontSize;
+function measureText(str: string, fontSize: number) {
+  return (
+    Array.from(str).reduce(
+      (acc, cur) => acc + (widths[cur.charCodeAt(0)] ?? avg),
+      0
+    ) * fontSize
+  );
 }
 
-function getCenterPos({ node, label = '' }:{
-  node: any,
-  label?: string,
-}) {
+function getCenterPos({ node, label = '' }: { node: any; label?: string }) {
   // root font size is 16px; 1 rem = 16px
   // p-2: 0.5 rem; line-height: 1.5 rem = 24px
   return {
@@ -27,10 +49,10 @@ function getCenterPos({ node, label = '' }:{
   };
 }
 
-function calcAngle(cx:number, cy:number, ex:number, ey:number) {
-  const dy:number = ey - cy;
-  const dx:number = ex - cx;
-  let theta:number = Math.atan2(dy, dx); // range (-PI, PI]
+function calcAngle(cx: number, cy: number, ex: number, ey: number) {
+  const dy: number = ey - cy;
+  const dx: number = ex - cx;
+  let theta: number = Math.atan2(dy, dx); // range (-PI, PI]
   theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
   if (theta < 0) theta = 360 + theta; // range [0, 360)
   return theta;
@@ -48,15 +70,24 @@ const SELECTED_EDGE_STYLE = {
 };
 
 const buildEdge = ({
-  source, target, label, style = {},
+  source,
+  target,
+  label,
+  style = {},
 }: {
-  source: any,
-  target: any,
-  label: JSX.Element,
-  style?: any,
+  source: any;
+  target: any;
+  label: JSX.Element;
+  style?: any;
 }) => {
-  const sourcePos = getCenterPos({ node: source, label: source.label ? source.label : source.id });
-  const targetPos = getCenterPos({ node: target, label: target.label ? target.label : target.id });
+  const sourcePos = getCenterPos({
+    node: source,
+    label: source.label ? source.label : source.id,
+  });
+  const targetPos = getCenterPos({
+    node: target,
+    label: target.label ? target.label : target.id,
+  });
   const angle = calcAngle(sourcePos.x, sourcePos.y, targetPos.x, targetPos.y);
   let type = 'default';
   let sourceHandle = '';
@@ -98,27 +129,34 @@ const buildEdge = ({
     type,
     markerEnd: {
       type: MarkerType.Arrow,
-      // TODO: how to highligh color of arrow?
+      color: style.stroke || '#000',
     },
   };
 };
 
-export const buildATree = ({data, selectedNodeId, selectedLayoutId}: {
-  data:IWorkflowVersion, selectedNodeId:string | undefined, selectedLayoutId: string | undefined
+export const buildATree = ({
+  data,
+  selectedNodeId,
+  selectedLayoutId,
+}: {
+  data: IWorkflowVersion;
+  selectedNodeId: string | undefined;
+  selectedLayoutId: string | undefined;
 }) => {
   const checkpoints: Array<any> = [];
   let newData = { ...data };
   const cosmetic = newData.cosmetic;
-  const layouts:IWorkflowVersionLayout[] = cosmetic?.layouts || [];
+  const layouts: IWorkflowVersionLayout[] = cosmetic?.layouts || [];
   const defaultLayout = cosmetic?.defaultLayout;
   const layout = layouts.find((l) => l.id === selectedLayoutId);
   // TODO: render based on layout
   if (data.checkpoints === undefined || data.checkpoints.length === 0) {
     newData = emptyStage;
   }
-  newData.checkpoints.forEach((checkpoint:any) => {
+  newData.checkpoints.forEach((checkpoint: any) => {
     checkpoints.push({
-      ...checkpoint, edgeConstructed: false,
+      ...checkpoint,
+      edgeConstructed: false,
     });
   });
   const startNodeId = newData.start;
@@ -126,41 +164,52 @@ export const buildATree = ({data, selectedNodeId, selectedLayoutId}: {
   // each node is 100px away from other vertically
   const nodes: any[] = [];
   const edges: any[] = [];
-  const depth:{
-    [key: number]: number
+  const depth: {
+    [key: number]: number;
   } = {};
-  const iterNode = (node:any, x:number, y:number) => {
+  const iterNode = (node: any, x: number, y: number) => {
     if (node.x === undefined) {
       node.x = x; // eslint-disable-line no-param-reassign
       node.y = y; // eslint-disable-line no-param-reassign
       if (!node.children || node.children.length === 0) {
         return;
       }
-      node.children?.forEach((childId:any) => {
+      node.children?.forEach((childId: any) => {
         const child = checkpoints.find((_node) => _node.id === childId);
-        depth[node.x + 1] = depth[node.x + 1] === undefined ? 1 : depth[node.x + 1] + 1;
+        depth[node.x + 1] =
+          depth[node.x + 1] === undefined ? 1 : depth[node.x + 1] + 1;
         iterNode(child, node.x + 1, depth[node.x + 1]);
       });
     }
   };
-  const iterEdge = (node:any) => {
+  const iterEdge = (node: any) => {
     const buildLabel = ({
-      voteMachine, source, target,
-    } : {
-      voteMachine: string,
-      source: any,
-      target: any,
+      voteMachine,
+      source,
+      target,
+    }: {
+      voteMachine: string;
+      source: any;
+      target: any;
     }) => {
-      const vm:IVoteMachine = getVoteMachine(voteMachine);
+      const vm: any = getVoteMachine(voteMachine);
       return vm.getLabel({ source, target });
     };
 
     if (!node.edgeConstructed && node.children && node.children.length > 0) {
       node.edgeConstructed = true; // eslint-disable-line no-param-reassign
-      const sourceId = node.id; 
-      node.children.forEach((childId:string) => {
+      const sourceId = node.id;
+      node.children.forEach((childId: string) => {
         const child = checkpoints.find((_node) => _node.id === childId);
-        let edgeStyle = {};
+        const edgeFromLayout: any = layout?.edges?.find(
+          (n: any) => n.id === sourceId + '-' + childId
+        );
+        console.log(layout);
+        let edgeStyle = { ...edgeFromLayout?.style };
+        Object.keys(edgeStyle).length > 0
+          ? console.log('edgeStyle: ', edgeStyle)
+          : null;
+
         if (selectedNodeId && sourceId === selectedNodeId) {
           edgeStyle = SELECTED_EDGE_STYLE;
         } else if (node.edgeStyle) {
@@ -192,9 +241,11 @@ export const buildATree = ({data, selectedNodeId, selectedLayoutId}: {
       } else if (checkpoint.style) {
         nodeStyle = checkpoint.style;
       }
-      const checkpointFromLayout:any = layout?.nodes?.find((n:any) => n.id === checkpoint.id);
+      const checkpointFromLayout: any = layout?.nodes?.find(
+        (n: any) => n.id === checkpoint.id
+      );
       const position = checkpointFromLayout?.position || checkpoint.position;
-      const style = {...nodeStyle, ...checkpointFromLayout?.style}
+      const style = { ...nodeStyle, ...checkpointFromLayout?.style };
       nodes.push({
         id: checkpoint.id,
         data: {
@@ -209,14 +260,17 @@ export const buildATree = ({data, selectedNodeId, selectedLayoutId}: {
         y: checkpoint.y,
         draggable: true,
         type: MultipleDiretionNode.getTypeName(),
-        position: {...position},
+        position: { ...position },
       });
     });
     nodes.forEach((node) => {
-      node.position = node.position ? node.position : { // eslint-disable-line no-param-reassign
-        x: node.x ? node.x * 300 : 0,
-        y: node.y ? node.y * 100 : 0,
-      };
+      node.position = node.position
+        ? node.position
+        : {
+            // eslint-disable-line no-param-reassign
+            x: node.x ? node.x * 300 : 0,
+            y: node.y ? node.y * 100 : 0,
+          };
     });
     checkpoints.forEach((node) => {
       if (!node.edgeConstructed) {

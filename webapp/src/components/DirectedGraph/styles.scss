@@ -1,18 +1,21 @@
 .directed-graph-config-panel {
-  .machine-config-panel-tabs {
-    .ant-tabs-nav-wrap {
-      /* px-4 */
-      padding-left: 1rem; /* 16px */
-      padding-right: 1rem; /* 16px */
-      background-color: white;
-    }
-    .ant-tabs-tabpane {
-      padding-left: 1rem; /* 16px */
-      padding-right: 1rem; /* 16px */
-    }
+  .ant-tabs-nav-wrap {
+    /* px-4 */
+    padding-left: 1rem; /* 16px */
+    padding-right: 1rem; /* 16px */
+    background-color: white;
+  }
+  .ant-tabs-tabpane {
+    padding-left: 1rem; /* 16px */
+    padding-right: 1rem; /* 16px */
   }
   .ant-btn-dangerous {
     color: #aaa;
+  }
+}
+.edge-config-panel {
+  .ant-drawer-body {
+    background-color: #f6f6f6;
   }
 }
 

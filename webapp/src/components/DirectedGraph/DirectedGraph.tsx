@@ -20,6 +20,8 @@ import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import CosmeticConfigPanel from './CosmeticConfigPanel';
 import QuickStartDialog from './QuickStartDialog';
 import { GraphContext } from './context';
+import EdgeConfigPanel from './EdgeConfigPanel';
+import { renderVoteMachineConfigPanel } from './renderVoteMachineConfigPanel';
 
 const nodeTypes = { ...MultipleDirectNode.getType() };
 const edgeTypes = {
@@ -33,7 +35,9 @@ const Flow = () => {
   const {
     data,
     selectedNodeId,
+    selectedEdgeId,
     onNodeClick,
+    onEdgeClick,
     onLayoutClick,
     onPaneClick,
     onNodeChanged,
@@ -44,6 +48,12 @@ const Flow = () => {
     selectedLayoutId,
     editable = true,
     navPanel,
+    web2Integrations,
+    onDeleteNode,
+    onChange,
+    onConfigPanelClose,
+    onChangeLayout,
+    onConfigEdgePanelClose,
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -64,8 +74,20 @@ const Flow = () => {
   // const defaultLayout = data?.cosmetic?.default;
   const [showCosmeticPanel, setShowCosmeticPanel] = useState(false);
   const [showQuickStartDialog, setShowQuickStartDialog] = useState(false);
+  const selectedEdge = edges?.find((edge: any) => edge.id === selectedEdgeId);
   return (
     <>
+      {renderVoteMachineConfigPanel({
+        editable,
+        web2Integrations,
+        data,
+        selectedNodeId,
+        selectedLayoutId,
+        onChange,
+        onDelete: onDeleteNode,
+        onClose: onConfigPanelClose,
+        onChangeLayout,
+      })}
       <Drawer
         title="Layout Config"
         open={showCosmeticPanel}
@@ -77,6 +99,17 @@ const Flow = () => {
           deleteLayoutHandler={(id: string) => {}}
         />
       </Drawer>
+      <Drawer
+        title="Navigation Path"
+        open={selectedEdgeId !== '' && selectedEdgeId !== undefined}
+        onClose={onConfigEdgePanelClose}
+        className="edge-config-panel"
+        closeIcon={<></>}
+      >
+        {selectedEdgeId !== '' && selectedEdgeId !== undefined ? (
+          <EdgeConfigPanel selectedEdge={selectedEdge} nodes={nodes} />
+        ) : null}
+      </Drawer>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -86,6 +119,7 @@ const Flow = () => {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         proOptions={proOptions}
+        onEdgeClick={onEdgeClick}
         fitView
       >
         <Controls position="bottom-left" />

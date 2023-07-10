@@ -1,34 +1,47 @@
 import React, { memo } from 'react';
 import {
-  BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath,
+  BaseEdge,
+  EdgeLabelRenderer,
+  EdgeProps,
+  getSmoothStepPath,
 } from 'reactflow';
 
-interface CustomProps extends EdgeProps {
-  isHappyPath?: boolean;
-}
+interface CustomProps extends EdgeProps {}
+
+// strokeWidth: 2,
+// stroke: '#6F00FF',
 
 // TODO: think of a better name
 const Path = memo((props: CustomProps) => {
   const {
-    sourceX, sourceY, targetX, targetY, markerEnd, style, label, sourcePosition, targetPosition,
-    id, isHappyPath = true //eslint-disable-line
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    markerEnd,
+    style,
+    labelStyle,
+    label,
+    sourcePosition,
+    targetPosition,
+    id,
   } = props;
   const smoothOpts = getSmoothStepPath({
-    sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, borderRadius: 24,
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    sourcePosition,
+    targetPosition,
+    borderRadius: 24,
   });
   const path = smoothOpts[0];
   const labelX = smoothOpts[1];
   const labelY = smoothOpts[2];
-  const additionalStyle = isHappyPath ? {
-    strokeWidth: 2,
-    stroke: '#6F00FF',
-    // 1px -1px 0px 7px rgba(0,0,0,0.48);
-    // filter: 'drop-shadow(0px 0px 5px rgb(111 0 255 / 0.7)) drop-shadow( 1px  0px 5px rgb(111 0 255 / 0.7))  drop-shadow(-1px  0px 5px rgb(111 20 255 / 0.5))',
-  } : {};
-  const finalStyle = { ...style, ...additionalStyle };
+
   return (
     <>
-      <BaseEdge path={path} markerEnd={markerEnd} style={finalStyle} />
+      <BaseEdge path={path} markerEnd={markerEnd} style={style} />
       <EdgeLabelRenderer>
         <div
           style={{
@@ -38,8 +51,7 @@ const Path = memo((props: CustomProps) => {
             // everything inside EdgeLabelRenderer has no pointer events by default
             // if you have an interactive element, set pointer-events: all
             pointerEvents: 'all',
-            backgroundColor: isHappyPath? 'rgba(212, 183, 255)' : 'white',
-            color: isHappyPath ? '#6F00FF' : 'zinc',
+            ...labelStyle,
           }}
           className="nodrag nopan text-center rounded-md p-2"
         >

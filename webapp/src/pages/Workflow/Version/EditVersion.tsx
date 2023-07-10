@@ -68,6 +68,7 @@ export const EditVersion = () => {
     workflows.find((w: any) => w.id === workflowId)
   );
   const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [selectedLayoutId, setSelectedLayoutId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const extractWorkflowFromList = (wfList: any) => {
@@ -133,6 +134,78 @@ export const EditVersion = () => {
     });
     // clearSelectedVersion();
   };
+  const onChange = (changedData: any) => {
+    const newData = changeVersion({
+      versionData: version?.data || emptyStage,
+      selectedNodeId,
+      changedCheckPointData: changedData,
+    });
+    setVersion({
+      ...version,
+      data: newData,
+    });
+    if (selectedNodeId) {
+      setDataHasChanged(true);
+    }
+  };
+  const onDeleteNode = (id: any) => {
+    if (id === version?.data.start) {
+      Modal.error({
+        title: 'Error',
+        content: 'Cannot delete start node',
+      });
+    } else {
+      const newData = structuredClone(version?.data);
+      const index = newData.checkpoints.findIndex((v: any) => v.id === id);
+      newData.checkpoints?.forEach((_node: any, cindex: number) => {
+        if (_node.children?.includes(id)) {
+          const newChkpData =
+            getVoteMachine(_node.vote_machine_type)?.deleteChildNode(
+              _node.data,
+              _node.children,
+              id
+            ) || _node.data;
+          newData.checkpoints[cindex].data = newChkpData;
+          if (_node.children) {
+            _node.children.splice(_node.children.indexOf(id));
+          }
+        }
+      });
+      newData.checkpoints.splice(index, 1);
+      setVersion({
+        ...version,
+        data: newData,
+      });
+      if (selectedNodeId) {
+        setDataHasChanged(true);
+      }
+      setSelectedNodeId('');
+    }
+  };
+  const onChangeLayout = (changedData: IWorkflowVersionLayout) => {
+    if (selectedLayoutId !== '') {
+      // TODO: version.data.cosmetic might not existed before this call
+      const selectedLayout = version.data.cosmetic.layouts.find(
+        (l: any) => l.id === selectedLayoutId
+      );
+      const selectedLayoutIndex = version.data.cosmetic.layouts.findIndex(
+        (l: any) => l.id === selectedLayoutId
+      );
+      const newLayout = changeLayout(selectedLayout, changedData);
+      if (newLayout != undefined) {
+        const tmp = structuredClone(version);
+        tmp.data.cosmetic.layouts[selectedLayoutIndex] = newLayout;
+        console.log(tmp);
+        setVersion({
+          ...tmp,
+        });
+      }
+    }
+  };
+  const onEdgeClick = (e: any, edge: any) => {
+    // TODO: move this to IGraph interface to drill selectedEdge into children components
+    setSelectedEdgeId(edge.id);
+  };
   return (
     <div className="w-full h-full">
       <Drawer
@@ -152,85 +225,6 @@ export const EditVersion = () => {
           shouldResetDisplay={showInfoPanel}
         />
       </Drawer>
-      {renderVoteMachineConfigPanel({
-        editable: true,
-        web2Integrations: web2IntegrationsState,
-        data: version?.data || emptyStage,
-        selectedNodeId,
-        selectedLayoutId,
-        onChange: (changedData: any) => {
-          const newData = changeVersion({
-            versionData: version?.data || emptyStage,
-            selectedNodeId,
-            changedCheckPointData: changedData,
-          });
-          setVersion({
-            ...version,
-            data: newData,
-          });
-          if (selectedNodeId) {
-            setDataHasChanged(true);
-          }
-        },
-        onDelete: (id) => {
-          if (id === version?.data.start) {
-            Modal.error({
-              title: 'Error',
-              content: 'Cannot delete start node',
-            });
-          } else {
-            const newData = structuredClone(version?.data);
-            const index = newData.checkpoints.findIndex(
-              (v: any) => v.id === id
-            );
-            newData.checkpoints?.forEach((_node: any, cindex: number) => {
-              if (_node.children?.includes(id)) {
-                const newChkpData =
-                  getVoteMachine(_node.vote_machine_type)?.deleteChildNode(
-                    _node.data,
-                    _node.children,
-                    id
-                  ) || _node.data;
-                newData.checkpoints[cindex].data = newChkpData;
-                if (_node.children) {
-                  _node.children.splice(_node.children.indexOf(id));
-                }
-              }
-            });
-            newData.checkpoints.splice(index, 1);
-            setVersion({
-              ...version,
-              data: newData,
-            });
-            if (selectedNodeId) {
-              setDataHasChanged(true);
-            }
-            setSelectedNodeId('');
-          }
-        },
-        onClose: () => {
-          setSelectedNodeId('');
-        },
-        onChangeLayout: (changedData: IWorkflowVersionLayout) => {
-          if (selectedLayoutId !== '') {
-            // TODO: version.data.cosmetic might not existed before this call
-            const selectedLayout = version.data.cosmetic.layouts.find(
-              (l: any) => l.id === selectedLayoutId
-            );
-            const selectedLayoutIndex = version.data.cosmetic.layouts.findIndex(
-              (l: any) => l.id === selectedLayoutId
-            );
-            const newLayout = changeLayout(selectedLayout, changedData);
-            if (newLayout != undefined) {
-              const tmp = structuredClone(version);
-              tmp.data.cosmetic.layouts[selectedLayoutIndex] = newLayout;
-              setVersion({
-                ...tmp,
-              });
-            }
-          }
-        },
-      })}
       <DirectedGraph
         navPanel={
           <Space
@@ -278,7 +272,15 @@ export const EditVersion = () => {
         editable
         data={version?.data || emptyStage}
         selectedNodeId={selectedNodeId}
+        selectedEdgeId={selectedEdgeId}
         selectedLayoutId={selectedLayoutId}
+        web2Integrations={web2IntegrationsState}
+        onChange={onChange}
+        onDeleteNode={onDeleteNode}
+        onConfigPanelClose={() => setSelectedNodeId('')}
+        onChangeLayout={onChangeLayout}
+        onEdgeClick={onEdgeClick}
+        onConfigEdgePanelClose={() => setSelectedEdgeId('')}
         onNodeChanged={(changedNodes) => {
           const newData = structuredClone(version?.data);
           newData?.checkpoints?.forEach((v: any, index: number) => {
