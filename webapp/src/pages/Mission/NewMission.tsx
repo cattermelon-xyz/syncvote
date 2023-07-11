@@ -1,7 +1,9 @@
+import { queryWorkflow, upsertAMission } from '@middleware/data';
 import {
-  queryWorkflow, upsertAMission,
-} from '@middleware/data';
-import { createIdString, extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
+  createIdString,
+  extractIdFromIdString,
+  shouldUseCachedData,
+} from '@utils/helpers';
 import { Modal, Space, Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,21 +16,20 @@ import MissionMeta from './fragments/MissionMeta';
 // review, metadata, edit
 // data: workflow_version + mission
 const NewMission = () => {
-  const {
-    orgIdString, workflowIdString, versionIdString,
-  } = useParams();
+  const { orgIdString, workflowIdString, versionIdString } = useParams();
   const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
   const workflowId = extractIdFromIdString(workflowIdString);
   const orgId = extractIdFromIdString(orgIdString);
   const [currentScreen, setCurrentScreen] = useState('review');
-  const [currentWorkflowVersion, setCurrentWorkflowVersion] = useState<IWorkflowVersion>({
-    id: -1,
-    title: '',
-    version: '',
-    created_at: '',
-    workflow_id: workflowId,
-    data: '',
-  });
+  const [currentWorkflowVersion, setCurrentWorkflowVersion] =
+    useState<IWorkflowVersion>({
+      id: -1,
+      title: '',
+      version: '',
+      created_at: '',
+      workflow_id: workflowId,
+      data: '',
+    });
   const [currentMission, setCurrentMission] = useState<IMission>({
     id: -1,
     title: '',
@@ -45,8 +46,7 @@ const NewMission = () => {
     if (workflowIdString && !shouldUseCachedData(lastFetch)) {
       queryWorkflow({
         orgId,
-        onLoad: () => {
-        },
+        onLoad: () => {},
         dispatch,
       });
     }
@@ -76,7 +76,9 @@ const NewMission = () => {
       mission: currentMission,
       onLoad: (data) => {
         setCurrentMission(data[0]);
-        navigate(`/${orgIdString}/mission/${createIdString(data[0].title, data[0].id)}`);
+        navigate(
+          `/${orgIdString}/mission/${createIdString(data[0].title, data[0].id)}`
+        );
         Modal.success({
           title: 'Success',
           content: 'Mission saved successfully',
@@ -94,68 +96,71 @@ const NewMission = () => {
   return (
     <div className="container flex justify-center mt-12">
       <div className="flex flex-col gap-4 w-full">
-        {currentScreen === 'review' ?
-          (
-            <>
-              <ReviewWorkflow
-                currentWorkflowVersion={currentWorkflowVersion}
-              />
-              <Space direction="horizontal" size="large" className="flex justify-between">
-                <Button
-                  type="default"
-                  onClick={() => {
-                    if (navigate.length === 0) {
-                      navigate(`/${orgIdString}`);
-                    } else {
-                      navigate(-1);
-                    }
-                  }}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="default"
-                  onClick={() => {
-                    setCurrentScreen('metadata');
-                  }}
-                >
-                  Next
-                </Button>
-              </Space>
-            </>
-          )
-          :
-          null
-        }
-        {currentScreen === 'metadata' ?
-          (
-            <Space direction="vertical" size="large" className="lg:w-1/2 md:w-full self-center">
-              <MissionMeta
-                currentMission={currentMission}
-                setCurrentMission={setCurrentMission}
-              />
-              <Space direction="horizontal" size="large" className="w-full flex justify-between">
-                <Button
-                  type="default"
-                  onClick={() => {
-                    setCurrentScreen('review');
-                  }}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="default"
-                  onClick={() => {
-                    onSave();
-                  }}
-                >
-                  Create Mission
-                </Button>
-              </Space>
+        {currentScreen === 'review' ? (
+          <>
+            <ReviewWorkflow currentWorkflowVersion={currentWorkflowVersion} />
+            <Space
+              direction="horizontal"
+              size="large"
+              className="flex justify-between"
+            >
+              <Button
+                type="default"
+                onClick={() => {
+                  if (navigate.length === 0) {
+                    navigate(`/${orgIdString}`);
+                  } else {
+                    navigate(-1);
+                  }
+                }}
+              >
+                Back
+              </Button>
+              <Button
+                type="default"
+                onClick={() => {
+                  setCurrentScreen('metadata');
+                }}
+              >
+                Next
+              </Button>
             </Space>
-          )
-         : null
-        }
+          </>
+        ) : null}
+        {currentScreen === 'metadata' ? (
+          <Space
+            direction="vertical"
+            size="large"
+            className="lg:w-1/2 md:w-full self-center"
+          >
+            <MissionMeta
+              currentMission={currentMission}
+              setCurrentMission={setCurrentMission}
+            />
+            <Space
+              direction="horizontal"
+              size="large"
+              className="w-full flex justify-between"
+            >
+              <Button
+                type="default"
+                onClick={() => {
+                  setCurrentScreen('review');
+                }}
+              >
+                Back
+              </Button>
+              <Button
+                type="default"
+                onClick={() => {
+                  onSave();
+                }}
+              >
+                Create Mission
+              </Button>
+            </Space>
+          </Space>
+        ) : null}
       </div>
     </div>
   );

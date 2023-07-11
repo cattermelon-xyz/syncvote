@@ -1,3 +1,3 @@
-const Banner = () => {
-    
-}
+const Banner = () => {};
+
+export default Banner;

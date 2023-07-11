@@ -30,7 +30,7 @@ export const GraphContext = React.createContext<IGraph>({
   onChangeLayout: (data: IWorkflowVersionLayout) => {},
   onConfigEdgePanelClose: () => {},
 });
-// TODO: delete this
+
 export const GraphPanelContext = React.createContext<IConfigPanel>({
   data: emptyStage,
   selectedNodeId: '',

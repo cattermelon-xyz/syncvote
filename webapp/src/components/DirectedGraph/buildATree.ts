@@ -5,7 +5,7 @@ import { emptyStage } from './empty';
 import { getVoteMachine } from './voteMachine';
 import {
   IVoteMachine,
-  IWorkflowVersion,
+  IWorkflowVersionData,
   IWorkflowVersionCosmetic,
   IWorkflowVersionLayout,
 } from './interface';
@@ -139,7 +139,7 @@ export const buildATree = ({
   selectedNodeId,
   selectedLayoutId,
 }: {
-  data: IWorkflowVersion;
+  data: IWorkflowVersionData;
   selectedNodeId: string | undefined;
   selectedLayoutId: string | undefined;
 }) => {
@@ -204,7 +204,6 @@ export const buildATree = ({
         const edgeFromLayout: any = layout?.edges?.find(
           (n: any) => n.id === sourceId + '-' + childId
         );
-        console.log(layout);
         let edgeStyle = { ...edgeFromLayout?.style };
 
         if (selectedNodeId && sourceId === selectedNodeId) {

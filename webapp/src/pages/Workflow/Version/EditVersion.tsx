@@ -6,10 +6,10 @@ import {
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import {
   DirectedGraph,
+  defaultLayout,
   emptyCosmetic,
   emptyStage,
   getVoteMachine,
-  renderVoteMachineConfigPanel,
 } from '@components/DirectedGraph';
 import Icon from '@components/Icon/Icon';
 import {
@@ -36,11 +36,34 @@ const extractVersion = ({
   workflowId: number;
   versionId: number;
 }) => {
-  const wf = workflows.find((workflow: any) => workflow.id === workflowId);
+  const wf = workflows?.find((workflow: any) => workflow.id === workflowId);
+  let extractedVersion: any = {};
   if (wf) {
-    return wf.workflow_version.find((wv: any) => wv.id === versionId);
+    extractedVersion = structuredClone(
+      wf.workflow_version.find((wv: any) => wv.id === versionId)
+    );
+  } else {
+    return {};
   }
-  return {};
+  const cosmetic = extractedVersion.data.cosmetic;
+  if (!cosmetic) {
+    extractedVersion.data.cosmetic = emptyCosmetic;
+  } else if (cosmetic.layouts.length === 0) {
+    extractedVersion.data.cosmetic.layouts = [defaultLayout];
+    extractedVersion.data.cosmetic.defaultLayout = {
+      horizontal: 'default',
+      vertical: 'default',
+    };
+  } else if (
+    !extractedVersion.data.cosmetic.defaultLayout ||
+    extractedVersion.data.cosmetic.defaultLayout?.horizontal === ''
+  ) {
+    extractedVersion.data.cosmetic.defaultLayout = {
+      horizontal: cosmetic.layouts[0].id,
+      vertical: cosmetic.layouts[0].id,
+    };
+  }
+  return extractedVersion;
 };
 
 export const EditVersion = () => {
@@ -51,16 +74,14 @@ export const EditVersion = () => {
   const dispatch = useDispatch();
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
-
-  const { web2Integrations } = useSelector((state: any) => state.integration);
   const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
-  const [version, setVersion] = useState<any>(
-    extractVersion({
-      workflows,
-      workflowId,
-      versionId,
-    })
-  );
+  const extractedVersion = extractVersion({
+    workflows,
+    workflowId,
+    versionId,
+  });
+  const { web2Integrations } = useSelector((state: any) => state.integration);
+  const [version, setVersion] = useState<any>(extractedVersion);
   const [web2IntegrationsState, setWeb2IntegrationsState] =
     useState(web2Integrations);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
@@ -69,15 +90,27 @@ export const EditVersion = () => {
   );
   const [selectedNodeId, setSelectedNodeId] = useState('');
   const [selectedEdgeId, setSelectedEdgeId] = useState('');
-  const [selectedLayoutId, setSelectedLayoutId] = useState('');
+  console.log(
+    'selected layout: ',
+    extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
+  );
+  const [selectedLayoutId, setSelectedLayoutId] = useState(
+    extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
+  );
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const extractWorkflowFromList = (wfList: any) => {
-    setVersion(
-      extractVersion({
-        workflows: wfList,
-        workflowId,
-        versionId,
-      })
+    let extractedVersion = extractVersion({
+      workflows: wfList,
+      workflowId,
+      versionId,
+    });
+    setVersion(extractedVersion);
+    console.log(
+      'set selectedLayoutId: ',
+      extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
+    );
+    setSelectedLayoutId(
+      extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal || 'default'
     );
     setDataHasChanged(false);
     setWorkflow(wfList.find((w: any) => w.id === workflowId));

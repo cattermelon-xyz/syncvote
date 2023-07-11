@@ -1,4 +1,9 @@
-import { ICheckPoint, IWorkflowVersion, IWorkflowVersionCosmetic, IWorkflowVersionLayout } from './interface';
+import {
+  ICheckPoint,
+  IWorkflowVersionData,
+  IWorkflowVersionCosmetic,
+  IWorkflowVersionLayout,
+} from './interface';
 
 const rootCheckPoint: ICheckPoint = {
   id: 'root',
@@ -10,12 +15,22 @@ const rootCheckPoint: ICheckPoint = {
   data: {},
 };
 
+export const defaultLayout: IWorkflowVersionLayout = {
+  id: 'default',
+  title: 'Default',
+  screen: 'Horizontal',
+  renderer: '',
+  nodes: [],
+  edges: [],
+  markers: [],
+};
+
 export const emptyCosmetic: IWorkflowVersionCosmetic = {
   defaultLayout: {
-    horizontal: '',
-    vertical: '',
+    horizontal: 'default',
+    vertical: 'default',
   },
-  layouts: [],
+  layouts: [defaultLayout],
 };
 
 export const emptyLayout: IWorkflowVersionLayout = {
@@ -28,11 +43,8 @@ export const emptyLayout: IWorkflowVersionLayout = {
   markers: [],
 };
 
-export const emptyStage:IWorkflowVersion = {
-  checkpoints: [
-    rootCheckPoint,
-  ],
+export const emptyStage: IWorkflowVersionData = {
+  checkpoints: [rootCheckPoint],
   cosmetic: emptyCosmetic,
   start: 'root',
 };
-

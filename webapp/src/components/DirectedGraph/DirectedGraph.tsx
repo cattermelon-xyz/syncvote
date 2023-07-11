@@ -127,7 +127,7 @@ const Flow = () => {
         <Panel position="top-left">
           <Space direction="vertical">
             <Space direction="horizontal">{navPanel}</Space>
-            <Space
+            {/* <Space
               direction="horizontal"
               size="middle"
               className="p-2 border rounded-md flex items-center bg-white"
@@ -164,7 +164,7 @@ const Flow = () => {
                   </div>
                 );
               })}
-            </Space>
+            </Space> */}
           </Space>
         </Panel>
         <Panel position="bottom-center">
