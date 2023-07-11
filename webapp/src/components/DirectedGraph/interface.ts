@@ -121,15 +121,15 @@ export interface IWorkflowVersionCosmetic {
   };
   layouts: IWorkflowVersionLayout[];
 }
-
-export interface IWorkflowVersion {
+// TODO: rename to IWorkflowVersionData
+export interface IWorkflowVersionData {
   start: string;
   checkpoints: ICheckPoint[];
   cosmetic?: IWorkflowVersionCosmetic;
 }
 
 export interface IGraph {
-  data: IWorkflowVersion;
+  data: IWorkflowVersionData;
   selectedNodeId?: string;
   selectedEdgeId?: string;
   selectedLayoutId?: string;
@@ -154,7 +154,7 @@ export interface IGraph {
 }
 
 export interface IConfigPanel {
-  data: IWorkflowVersion;
+  data: IWorkflowVersionData;
   selectedNodeId?: string;
   selectedLayoutId?: string;
   web2Integrations?: any[];

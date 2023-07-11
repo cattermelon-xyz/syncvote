@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import {
-  Button, Input, Select, Space, Modal,
-} from 'antd';
+import { Button, Input, Select, Space, Modal } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createIdString, extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
+import {
+  createIdString,
+  extractIdFromIdString,
+  shouldUseCachedData,
+} from '@utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import { queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
 import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
@@ -15,7 +17,7 @@ export const NewVersion = () => {
   const { orgIdString, workflowIdString } = useParams();
   const workflowId = extractIdFromIdString(workflowIdString);
   const orgId = extractIdFromIdString(orgIdString);
-  const { lastFetch, workflows } = useSelector((state:any) => state.workflow);
+  const { lastFetch, workflows } = useSelector((state: any) => state.workflow);
   const dispatch = useDispatch();
   const [screen, setScreen] = useState('chooseVersion');
   const [versionTitle, setVersionTitle] = useState('');
@@ -26,14 +28,14 @@ export const NewVersion = () => {
         orgId,
         dispatch,
         onLoad: (data) => {
-          setWorkflow(data.find((w:any) => w.id === workflowId));
+          setWorkflow(data.find((w: any) => w.id === workflowId));
         },
       });
     } else {
-      setWorkflow(workflows.find((w:any) => w.id === workflowId));
+      setWorkflow(workflows.find((w: any) => w.id === workflowId));
     }
   }, []);
-  let options = workflow?.workflow_version?.map((w:any) => ({
+  let options = workflow?.workflow_version?.map((w: any) => ({
     label: w.version,
     value: w.id,
   }));
@@ -45,7 +47,8 @@ export const NewVersion = () => {
     value: -1,
   });
   const currentVersion =
-    workflow?.workflow_version?.find((w:any) => w.id === versionToCopy)?.data || emptyStage;
+    workflow?.workflow_version?.find((w: any) => w.id === versionToCopy)
+      ?.data || emptyStage;
   const handleCreateNew = async () => {
     if (versionTitle === '') {
       Modal.error({
@@ -65,7 +68,7 @@ export const NewVersion = () => {
     await upsertWorkflowVersion({
       dispatch,
       workflowVersion: versionToSave,
-      onSuccess: (data:any) => {
+      onSuccess: (data: any) => {
         const versionIdString = createIdString(data[0].version, data[0].id);
         navigate(`/${orgIdString}/${workflowIdString}/${versionIdString}`);
         Modal.success({
@@ -95,34 +98,59 @@ export const NewVersion = () => {
           disabled={screen !== 'chooseVersion'}
         />
       </Space>
-      {screen === 'chooseVersion' ?
-      (
+      {screen === 'chooseVersion' ? (
         <>
-          <div className={`w-full border-2  ${versionToCopy === -1 ? 'hidden' : ''}`} style={{ height: '300px' }}>
+          <div
+            className={`w-full border-2  ${
+              versionToCopy === -1 ? 'hidden' : ''
+            }`}
+            style={{ height: '300px' }}
+          >
             <DirectedGraph
               data={currentVersion}
               editable={false}
+              onChange={() => {}}
+              onConfigPanelClose={() => {}}
+              onConfigEdgePanelClose={() => {}}
+              onDeleteNode={() => {}}
+              onChangeLayout={() => {}}
             />
           </div>
           <Space direction="horizontal" className="w-full flex justify-between">
             <Button type="default" disabled>
               Back
             </Button>
-            <Button type="default" onClick={() => { setScreen('metadata'); }}>
+            <Button
+              type="default"
+              onClick={() => {
+                setScreen('metadata');
+              }}
+            >
               Next
             </Button>
           </Space>
         </>
-      )
-      :
-      (
+      ) : (
         <>
           <Space direction="vertical" size="small" className="w-full">
             <span>Version title</span>
-            <Input placeholder="Version title" className="w-full" value={versionTitle} onChange={(e) => setVersionTitle(e.target.value)} />
+            <Input
+              placeholder="Version title"
+              className="w-full"
+              value={versionTitle}
+              onChange={(e) => setVersionTitle(e.target.value)}
+            />
           </Space>
-          <Space direction="horizontal" className="w-full flex justify-between mt-4">
-            <Button type="default" onClick={() => { setScreen('chooseVersion'); }}>
+          <Space
+            direction="horizontal"
+            className="w-full flex justify-between mt-4"
+          >
+            <Button
+              type="default"
+              onClick={() => {
+                setScreen('chooseVersion');
+              }}
+            >
               Back
             </Button>
             <Button
@@ -134,8 +162,7 @@ export const NewVersion = () => {
             </Button>
           </Space>
         </>
-      )
-      }
+      )}
     </Space>
   );
 };
