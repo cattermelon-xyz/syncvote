@@ -89,7 +89,7 @@ const Flow = () => {
         onChangeLayout,
       })}
       <Drawer
-        title="Layout Config"
+        title='Layout Config'
         open={showCosmeticPanel}
         onClose={() => setShowCosmeticPanel(false)}
       >
@@ -100,10 +100,10 @@ const Flow = () => {
         />
       </Drawer>
       <Drawer
-        title="Navigation Path"
+        title='Navigation Path'
         open={selectedEdgeId !== '' && selectedEdgeId !== undefined}
         onClose={onConfigEdgePanelClose}
-        className="edge-config-panel"
+        className='edge-config-panel'
         closeIcon={<></>}
       >
         {selectedEdgeId !== '' && selectedEdgeId !== undefined ? (
@@ -120,13 +120,18 @@ const Flow = () => {
         edgeTypes={edgeTypes}
         proOptions={proOptions}
         onEdgeClick={onEdgeClick}
-        fitView
+        fitView={true}
+        fitViewOptions={{
+          padding: 20,
+          maxZoom: 4,
+          minZoom: 1,
+        }}
       >
-        <Controls position="bottom-left" />
-        <Background color="#aaa" variant={BackgroundVariant.Dots} />
-        <Panel position="top-left">
-          <Space direction="vertical">
-            <Space direction="horizontal">{navPanel}</Space>
+        <Controls position='bottom-left' />
+        <Background color='#aaa' variant={BackgroundVariant.Dots} />
+        <Panel position='top-left'>
+          <Space direction='vertical'>
+            <Space direction='horizontal'>{navPanel}</Space>
             {/* <Space
               direction="horizontal"
               size="middle"
@@ -167,10 +172,10 @@ const Flow = () => {
             </Space> */}
           </Space>
         </Panel>
-        <Panel position="bottom-center">
-          <Space direction="horizontal">
+        <Panel position='bottom-center'>
+          <Space direction='horizontal'>
             <div
-              className="flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer"
+              className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer'
               style={{ backgroundColor: '#F4F0FA' }}
               onClick={onResetPosition}
             >
@@ -189,20 +194,20 @@ const Flow = () => {
             </div>
           </Space>
         </Panel>
-        <Panel position="bottom-right">
+        <Panel position='bottom-right'>
           <>
             <Modal
               open={showQuickStartDialog}
               onCancel={() => setShowQuickStartDialog(false)}
-              title="🔥 Guide to master Syncvote"
+              title='🔥 Guide to master Syncvote'
               footer={null}
             >
               <QuickStartDialog />
             </Modal>
             <Button
               icon={<BulbOutlined />}
-              type="link"
-              className="flex items-center"
+              type='link'
+              className='flex items-center'
               onClick={() => setShowQuickStartDialog(true)}
             >
               Quick Start
@@ -222,7 +227,7 @@ export const DirectedGraph = (props: IGraph) => {
         minWidth: '800px',
         backgroundColor: 'white',
       }}
-      className="h-full directed-graph"
+      className='h-full directed-graph'
     >
       <GraphContext.Provider value={props}>
         <ReactFlowProvider>
