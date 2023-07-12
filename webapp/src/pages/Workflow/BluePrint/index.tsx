@@ -205,23 +205,6 @@ const BluePrint = () => {
 
   return (
     <div className="container mx-auto relative">
-      <EditWorkflow
-        open={openWorkflowEdit}
-        setOpen={(toOpen: boolean) => {
-          setOpenWorkflowEdit(toOpen);
-        }}
-        workflowIcon={workflow?.icon_url}
-        workflowTitle={workflow?.title}
-        workflowDesc={workflow?.desc}
-        onSave={(title: string, desc: string, iconUrl: string) => {
-          handleSaveWorkflowInfo({
-            title,
-            desc,
-            iconUrl,
-          });
-          setOpenWorkflowEdit(false);
-        }}
-      />
       <NewVersion
         open={openDupplicate}
         setOpen={(toOpen: boolean) => {

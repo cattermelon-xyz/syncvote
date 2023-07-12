@@ -26,6 +26,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import EditInfo from './fragment/EditInfo';
 import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '@types';
 import SaveGraphImage from '@components/SaveGraphImage/SaveGraphImage';
+import { AuthContext } from '@layout/context/AuthContext';
+import Header from './fragment/Header';
+import EditWorkflow from '../BluePrint/fragment/EditWorkflow';
 
 const extractVersion = ({
   workflows,
@@ -84,16 +87,11 @@ export const EditVersion = () => {
   const [version, setVersion] = useState<any>(extractedVersion);
   const [web2IntegrationsState, setWeb2IntegrationsState] =
     useState(web2Integrations);
-  const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [workflow, setWorkflow] = useState<any>(
     workflows.find((w: any) => w.id === workflowId)
   );
   const [selectedNodeId, setSelectedNodeId] = useState('');
   const [selectedEdgeId, setSelectedEdgeId] = useState('');
-  console.log(
-    'selected layout: ',
-    extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
-  );
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
   );
@@ -105,10 +103,6 @@ export const EditVersion = () => {
       versionId,
     });
     setVersion(extractedVersion);
-    console.log(
-      'set selectedLayoutId: ',
-      extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
-    );
     setSelectedLayoutId(
       extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal || 'default'
     );
@@ -239,169 +233,164 @@ export const EditVersion = () => {
     // TODO: move this to IGraph interface to drill selectedEdge into children components
     setSelectedEdgeId(edge.id);
   };
-  return (
-    <div className="w-full h-full">
-      <Drawer
-        open={showInfoPanel}
-        onClose={() => {
-          setShowInfoPanel(false);
-        }}
-        title="Edit Version Info"
-      >
-        <EditInfo
-          info={version}
-          onSave={(data: any) => {
-            setVersion(data);
-            handleSave('info', data);
-            setShowInfoPanel(false);
-          }}
-          shouldResetDisplay={showInfoPanel}
-        />
-      </Drawer>
-      <DirectedGraph
-        navPanel={
-          <Space
-            direction="horizontal"
-            size="middle"
-            className="flex items-center border-2 bg-white p-2 rounded-md"
-          >
-            <Space direction="horizontal" size="small">
-              <Icon iconUrl={workflow?.icon_url} size="small" />
-              <div
-                className="hover:text-violet-500 cursor-pointer"
-                onClick={() => {
-                  navigate(`/${orgIdString}/workflow/${workflowIdString}`);
-                }}
-              >
-                {workflow?.title}
-              </div>
-            </Space>
-            <BranchesOutlined />
-            <Space direction="horizontal" size="small">
-              <div className="font-bold">{version?.version}</div>
-              <span
-                onClick={() => setShowInfoPanel(true)}
-                className="cursor-pointer"
-              >
-                <EditIcon />
-              </span>
-            </Space>
-            <SaveGraphImage>
-              <Button>Download</Button>
-            </SaveGraphImage>
-            <Button
-              type="link"
-              className="flex items-center text-violet-500"
-              icon={<SaveOutlined />}
-              disabled={!dataHasChanged}
-              onClick={() => {
-                handleSave('data');
-              }}
-            >
-              Save
-            </Button>
-          </Space>
+  const onNodeChanged = (changedNodes: any) => {
+    const newData = structuredClone(version?.data);
+    newData?.checkpoints?.forEach((v: any, index: number) => {
+      const changedNode = changedNodes.find((cN: any) => cN.id === v.id);
+      // TODO: position data should come from cosmetic
+      if (changedNode && changedNode.position) {
+        newData.checkpoints[index].position = changedNode.position;
+        if (selectedLayoutId) {
+          const layout = newData.cosmetic.layouts.find(
+            (l: any) => l.id === selectedLayoutId
+          );
+          if (!layout.nodes) {
+            layout.nodes = [];
+          }
+          const nodes = layout.nodes;
+          const index = nodes.findIndex((n: any) => n.id === changedNode.id);
+          if (index === -1) {
+            nodes.push({
+              id: changedNode.id,
+              position: changedNode.position,
+            });
+          } else {
+            nodes[index].position = changedNode.position;
+          }
         }
-        editable
-        data={version?.data || emptyStage}
-        selectedNodeId={selectedNodeId}
-        selectedEdgeId={selectedEdgeId}
-        selectedLayoutId={selectedLayoutId}
-        web2Integrations={web2IntegrationsState}
-        onChange={onChange}
-        onDeleteNode={onDeleteNode}
-        onConfigPanelClose={() => setSelectedNodeId('')}
-        onChangeLayout={onChangeLayout}
-        onEdgeClick={onEdgeClick}
-        onConfigEdgePanelClose={() => setSelectedEdgeId('')}
-        onNodeChanged={(changedNodes) => {
-          const newData = structuredClone(version?.data);
-          newData?.checkpoints?.forEach((v: any, index: number) => {
-            const changedNode = changedNodes.find((cN: any) => cN.id === v.id);
-            // TODO: position data should come from cosmetic
-            if (changedNode && changedNode.position) {
-              newData.checkpoints[index].position = changedNode.position;
-              if (selectedLayoutId) {
-                const layout = newData.cosmetic.layouts.find(
-                  (l: any) => l.id === selectedLayoutId
-                );
-                if (!layout.nodes) {
-                  layout.nodes = [];
-                }
-                const nodes = layout.nodes;
-                const index = nodes.findIndex(
-                  (n: any) => n.id === changedNode.id
-                );
-                if (index === -1) {
-                  nodes.push({
-                    id: changedNode.id,
-                    position: changedNode.position,
-                  });
-                } else {
-                  nodes[index].position = changedNode.position;
-                }
-              }
-            }
-          });
-          setVersion({
-            ...version,
-            data: newData,
-          });
-          if (selectedNodeId) {
-            setDataHasChanged(true);
-          }
-        }}
-        onCosmeticChanged={(changed: IWorkflowVersionCosmetic) => {
-          const cosmetic = changeCosmetic(version?.data.cosmetic, changed);
-          setVersion({
-            ...version,
-            data: { ...version.data, cosmetic },
-          });
-        }}
-        onLayoutClick={(selectedLayoutId) => {
-          setSelectedLayoutId(selectedLayoutId);
-        }}
-        onNodeClick={(event, node) => {
-          setSelectedNodeId(node.id);
-        }}
-        onPaneClick={() => {
-          setSelectedNodeId('');
-        }}
-        onResetPosition={() => {
-          const newData = structuredClone(version?.data);
-          newData.checkpoints.forEach((v: any, index: number) => {
-            delete newData.checkpoints[index].position;
-          });
-          setVersion({
-            ...version,
-            data: newData,
-          });
-          setDataHasChanged(true);
-        }}
-        onAddNewNode={() => {
-          const newData = structuredClone(version?.data);
-          const newId = `node-${new Date().getTime()}`;
-          newData.checkpoints.push({
-            id: newId,
-            position: centerPos,
-            isEnd: true,
-          });
-          setVersion({
-            ...version,
-            data: newData,
-          });
-          setSelectedNodeId(newId);
-          if (selectedNodeId) {
-            setDataHasChanged(true);
-          }
-        }}
-        onViewPortChange={(viewport) => {
-          setCenterPos({
-            x: (-viewport.x + 600) / viewport.zoom,
-            y: (-viewport.y + 250) / viewport.zoom,
-          });
-        }}
-      />
-    </div>
+      }
+    });
+    setVersion({
+      ...version,
+      data: newData,
+    });
+    if (selectedNodeId) {
+      setDataHasChanged(true);
+    }
+  };
+  const onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {
+    const cosmetic = changeCosmetic(version?.data.cosmetic, changed);
+    setVersion({
+      ...version,
+      data: { ...version.data, cosmetic },
+    });
+  };
+  const onResetPosition = () => {
+    const newData = structuredClone(version?.data);
+    newData.checkpoints.forEach((v: any, index: number) => {
+      delete newData.checkpoints[index].position;
+    });
+    setVersion({
+      ...version,
+      data: newData,
+    });
+    setDataHasChanged(true);
+  };
+  const onAddNewNode = () => {
+    const newData = structuredClone(version?.data);
+    const newId = `node-${new Date().getTime()}`;
+    newData.checkpoints.push({
+      id: newId,
+      position: centerPos,
+      isEnd: true,
+    });
+    setVersion({
+      ...version,
+      data: newData,
+    });
+    setSelectedNodeId(newId);
+    if (selectedNodeId) {
+      setDataHasChanged(true);
+    }
+  };
+  const onViewPortChange = (viewport: any) => {
+    setCenterPos({
+      x: (-viewport.x + 600) / viewport.zoom,
+      y: (-viewport.y + 250) / viewport.zoom,
+    });
+  };
+  return (
+    <>
+      <AuthContext.Consumer>
+        {({ session }) => (
+          <div className="w-full bg-slate-100 h-screen">
+            <Header session={session} workflow={workflow} />
+
+            <div
+              className={`w-full flex justify-center`}
+              style={{ height: 'calc(100% - 80px)' }}
+            >
+              <div className="w-full h-full">
+                <DirectedGraph
+                  navPanel={<></>}
+                  editable
+                  data={version?.data || emptyStage}
+                  selectedNodeId={selectedNodeId}
+                  selectedEdgeId={selectedEdgeId}
+                  selectedLayoutId={selectedLayoutId}
+                  web2Integrations={web2IntegrationsState}
+                  onChange={onChange}
+                  onDeleteNode={onDeleteNode}
+                  onConfigPanelClose={() => setSelectedNodeId('')}
+                  onChangeLayout={onChangeLayout}
+                  onEdgeClick={onEdgeClick}
+                  onConfigEdgePanelClose={() => setSelectedEdgeId('')}
+                  onNodeChanged={onNodeChanged}
+                  onCosmeticChanged={onCosmeticChanged}
+                  onLayoutClick={(selectedLayoutId) => {
+                    setSelectedLayoutId(selectedLayoutId);
+                  }}
+                  onNodeClick={(event, node) => {
+                    setSelectedNodeId(node.id);
+                  }}
+                  onPaneClick={() => {
+                    setSelectedNodeId('');
+                  }}
+                  onResetPosition={onResetPosition}
+                  onAddNewNode={onAddNewNode}
+                  onViewPortChange={onViewPortChange}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </AuthContext.Consumer>
+    </>
   );
 };
+
+{
+  /* <Space
+  direction="horizontal"
+  size="middle"
+  className="flex items-center border-2 bg-white p-2 rounded-md"
+>
+  <Space direction="horizontal" size="small">
+    
+  </Space>
+  <BranchesOutlined />
+  <Space direction="horizontal" size="small">
+    <div className="font-bold">{version?.version}</div>
+    <span
+      onClick={() => setShowInfoPanel(true)}
+      className="cursor-pointer"
+    >
+      <EditIcon />
+    </span>
+  </Space>
+  <SaveGraphImage>
+    <Button>Download</Button>
+  </SaveGraphImage>
+  <Button
+    type="link"
+    className="flex items-center text-violet-500"
+    icon={<SaveOutlined />}
+    disabled={!dataHasChanged}
+    onClick={() => {
+      handleSave('data');
+    }}
+  >
+    Save
+  </Button>
+</Space> */
+}
