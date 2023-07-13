@@ -1,3 +1,6 @@
+import { IWorkflowVersionData } from '@types';
+import { ITag } from '../ui.reducer/interface';
+
 export interface IWorkflowVersion {
   id?: number;
   title?: string;
@@ -5,7 +8,8 @@ export interface IWorkflowVersion {
   version?: '';
   created_at?: '';
   workflow_id?: number;
-  data: any;
+  data: IWorkflowVersionData;
+  status?: string;
 }
 
 export interface IWorkflow {
@@ -16,4 +20,5 @@ export interface IWorkflow {
   banner_url?: string;
   owner_org_id?: number;
   workflow_version: IWorkflowVersion[];
+  tags?: ITag[];
 }

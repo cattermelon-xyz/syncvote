@@ -26,9 +26,9 @@ const BannerDashBoard = ({
   setOrg,
   setShowOrgEdit,
 }: {
-  org: any,
-  setOrg: (data:any) => void,
-  setShowOrgEdit: (data: boolean) => void,
+  org: any;
+  setOrg: (data: any) => void;
+  setShowOrgEdit: (data: boolean) => void;
 }) => {
   const [isDropDown, setIsDropDown] = useState<boolean>(false);
   const optionRef = useClickOutside(() => setIsDropDown(false));
@@ -37,13 +37,21 @@ const BannerDashBoard = ({
 
   let bannerUrl = org.banner_url ? org.banner_url : `preset:${OrgPresetBanner}`;
   bannerUrl = getImageUrl({
-    filePath: bannerUrl.indexOf('preset:') === 0 ? bannerUrl.replace('preset:', '') : bannerUrl, isPreset: bannerUrl.indexOf('preset:') === 0, type: 'banner',
+    filePath:
+      bannerUrl.indexOf('preset:') === 0
+        ? bannerUrl.replace('preset:', '')
+        : bannerUrl,
+    isPreset: bannerUrl.indexOf('preset:') === 0,
+    type: 'banner',
   });
   const isAdmin = org.role === 'ADMIN';
   const presetBanners = useSelector((state: any) => state.ui.presetBanners);
-  const handleIconChange = ({ filePath, isPreset }:{
-    filePath: string,
-    isPreset: boolean,
+  const handleIconChange = ({
+    filePath,
+    isPreset,
+  }: {
+    filePath: string;
+    isPreset: boolean;
   }) => {
     setOrg({
       ...org,
@@ -51,7 +59,10 @@ const BannerDashBoard = ({
     });
   };
   return (
-    <div className="banner-image" style={{ backgroundImage: `url(${bannerUrl})` }}>
+    <div
+      className="banner-image"
+      style={{ backgroundImage: `url(${bannerUrl})` }}
+    >
       <Modal
         title="Choose Banner"
         open={shouldShowModal}
@@ -64,82 +75,85 @@ const BannerDashBoard = ({
           <input type="file" /> */}
         </div>
         <div className="grid grid-cols-3 mt-4">
-          {
-            presetBanners.map((banner: any) => (
-              <div
-                key={banner}
-                className="flex items-center w-[150px] p-1 cursor-pointer hover:bg-slate-200"
-                onClick={
-                  () => {
-                    setOrg({
-                      ...org,
-                      banner_url: `preset:${banner}`,
-                    });
-                    setShouldShowModal(false);
-                  }
-                }
-              >
-                <img src={`${getImageUrl({ filePath: banner, isPreset: true, type: 'banner' })}`} alt="banner" className="w-[150px]" />
-              </div>
-            ))
-          }
+          {presetBanners.map((banner: any) => (
+            <div
+              key={banner}
+              className="flex items-center w-[150px] p-1 cursor-pointer hover:bg-slate-200"
+              onClick={() => {
+                setOrg({
+                  ...org,
+                  banner_url: `preset:${banner}`,
+                });
+                setShouldShowModal(false);
+              }}
+            >
+              <img
+                src={`${getImageUrl({
+                  filePath: banner,
+                  isPreset: true,
+                  type: 'banner',
+                })}`}
+                alt="banner"
+                className="w-[150px]"
+              />
+            </div>
+          ))}
         </div>
       </Modal>
       <div className="container relative mx-auto h-full">
         <div className="flex items-end justify-between absolute bottom-[50px] left-0 right-0">
           <div className="flex">
-            {org.icon_url ?
-              (
-                <Icon
-                  editable={org.role === 'ADMIN'}
-                  iconUrl={org.icon_url}
-                  onUpload={handleIconChange}
-                />
-              )
-              :
-              (
-                <Icon
-                  editable={org.role === 'ADMIN'}
-                  onUpload={handleIconChange}
-                >
-                  <span style={{ fontSize: '48px' }}>{org.title.charAt(0)}</span>
-                </Icon>
-              )
-            }
+            {org.icon_url ? (
+              <Icon
+                editable={org.role === 'ADMIN'}
+                iconUrl={org.icon_url}
+                onUpload={handleIconChange}
+              />
+            ) : (
+              <Icon editable={org.role === 'ADMIN'} onUpload={handleIconChange}>
+                <span style={{ fontSize: '48px' }}>{org.title.charAt(0)}</span>
+              </Icon>
+            )}
             <Space direction="vertical" className="text-white ml-4">
               <Space direction="horizontal" className="text-white">
                 <p className="text-lg font-semibold tracking-[0.374px]">
                   {org.title}
                 </p>
-                {isAdmin ? <EditOutlined className="cursor-pointer" onClick={() => { setShowOrgEdit(true); }} /> : null}
+                {isAdmin ? (
+                  <EditOutlined
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setShowOrgEdit(true);
+                    }}
+                  />
+                ) : null}
               </Space>
-              <p>
-                {org.desc}
-              </p>
+              <p>{org.desc}</p>
             </Space>
           </div>
           <div className="flex">
-            {isAdmin ?
-              (
-                <Button
-                  variant="outline"
-                  className="text-white mr-2 change-banner-btn"
-                  onClick={() => {
-                    setShouldShowModal(true);
-                  }}
-                >
-                  Change Banner
-                </Button>
-              )
-              :
-              null
-            }
+            {isAdmin ? (
+              <Button
+                variant="outline"
+                className="text-white mr-2 change-banner-btn"
+                onClick={() => {
+                  setShouldShowModal(true);
+                }}
+              >
+                Change Banner
+              </Button>
+            ) : null}
             <Button
               startIcon={<PlusIcon />}
               className="bg-white text-violet-version-5 py-[12px] px-[16px] border-[1.5px] border-solid border-[#5D23BB] !text-[17px] h-[48px]"
               variant="text"
               onClick={() => {
-                navigate(`/${createIdString(org.title, org.id.toString())}/new-workflow`);
+                navigate(
+                  `/${createIdString(
+                    org.title,
+                    org.id.toString()
+                  )}/new-workflow`
+                );
               }}
             >
               {L('newBlueprint')}
@@ -166,7 +180,12 @@ const BannerDashBoard = ({
                     <li>
                       <div
                         onClick={() => {
-                          navigate(`/${createIdString(org.title, org.id.toString())}/new-mission`);
+                          navigate(
+                            `/${createIdString(
+                              org.title,
+                              org.id.toString()
+                            )}/new-mission`
+                          );
                         }}
                         className="block py-[26px] px-[16px] text-[16px] hover:bg-gray-100 hover:rounded-tl-lg hover:rounded-tr-lg cursor-pointer"
                       >

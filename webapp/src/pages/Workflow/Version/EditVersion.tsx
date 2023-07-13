@@ -125,6 +125,9 @@ export const EditVersion = () => {
           extractWorkflowFromList(wfList);
         },
       });
+    } else {
+      extractWorkflowFromList(workflows);
+      setWeb2IntegrationsState(web2Integrations);
     }
   }, [workflows, web2Integrations, lastFetch]);
   const handleSave = async (
@@ -222,7 +225,7 @@ export const EditVersion = () => {
       if (newLayout != undefined) {
         const tmp = structuredClone(version);
         tmp.data.cosmetic.layouts[selectedLayoutIndex] = newLayout;
-        console.log(tmp);
+        // console.log(tmp);
         setVersion({
           ...tmp,
         });
