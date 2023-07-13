@@ -121,7 +121,6 @@ export interface IWorkflowVersionCosmetic {
   };
   layouts: IWorkflowVersionLayout[];
 }
-// TODO: rename to IWorkflowVersionData
 export interface IWorkflowVersionData {
   start: string;
   checkpoints: ICheckPoint[];

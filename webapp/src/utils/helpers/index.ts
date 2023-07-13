@@ -137,3 +137,20 @@ export const shouldUseCachedData = (lastFetch: number) => {
   }
   return false;
 };
+/**
+ * 13 - 4 = 9; 13: minuend, 4: substrahend, 9: difference
+ * @param minuend: number[]
+ * @param subtrahend: number[]
+ * @returns number[] of which elements are in minuend but not in substrahend
+ */
+export const subtractArray = ({
+  minuend,
+  subtrahend,
+}: {
+  minuend: number[];
+  subtrahend: number[];
+}) => {
+  var set2 = new Set(subtrahend);
+  var difference = minuend.filter((x) => !set2.has(x));
+  return difference;
+};

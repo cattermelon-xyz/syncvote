@@ -125,6 +125,9 @@ export const EditVersion = () => {
           extractWorkflowFromList(wfList);
         },
       });
+    } else {
+      extractWorkflowFromList(workflows);
+      setWeb2IntegrationsState(web2Integrations);
     }
   }, [workflows, web2Integrations, lastFetch]);
   const handleSave = async (

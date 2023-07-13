@@ -1,6 +1,6 @@
 import { getImageUrl } from '@utils/helpers';
 import { OrgPresetBanner } from '@utils/constants/organization';
-import { Modal } from 'antd';
+import { Button, Modal, Space } from 'antd';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -21,6 +21,7 @@ const Banner = ({ banner_url, onSave }: BannerProps) => {
   });
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const presetBanners = useSelector((state: any) => state.ui.presetBanners);
+  const [showButtonPanel, setShowButtonPanel] = useState(false);
   return (
     <>
       <Modal
@@ -31,8 +32,8 @@ const Banner = ({ banner_url, onSave }: BannerProps) => {
         }}
       >
         <div>
-          {/* <span>Upload </span>
-          <input type="file" /> */}
+          <span>Upload </span>
+          <input type="file" />
         </div>
         <div className="grid grid-cols-3 mt-4">
           {presetBanners.map((banner: any) => (
@@ -57,9 +58,30 @@ const Banner = ({ banner_url, onSave }: BannerProps) => {
         </div>
       </Modal>
       <div
-        className="w-full h-[150px] bg-cover bg-center"
+        className="w-full h-[150px] bg-cover bg-center relative"
         style={{ backgroundImage: `url(${bannerUrl})` }}
-      ></div>
+        onMouseOver={() => setShowButtonPanel(true)}
+        onMouseLeave={() => setShowButtonPanel(false)}
+      >
+        <div
+          className={`absolute right-2 bottom-2 ${
+            showButtonPanel ? '' : 'hidden'
+          }`}
+        >
+          <Space size="middle">
+            <Button
+              type="default"
+              className="bg-slate-100"
+              onClick={() => setShouldShowModal(true)}
+            >
+              Change cover
+            </Button>
+            <Button type="default" className="bg-slate-100">
+              Reposition
+            </Button>
+          </Space>
+        </div>
+      </div>
     </>
   );
 };
