@@ -22,12 +22,12 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
       prefix={
         <Popover
           content={
-            <Space direction="horizontal">
+            <Space direction='horizontal'>
               {Markers.map((marker: any) => {
                 return (
                   <div
                     key={marker.title.backgroundColor}
-                    className="w-[16px] h-[16px] border-2 cursor-pointer"
+                    className='w-[16px] h-[16px] border-2 cursor-pointer'
                     style={{
                       backgroundColor: marker.title.backgroundColor,
                     }}
@@ -39,6 +39,7 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
                         const style = {
                           ...marker.path,
                         };
+                        const labelStyle = marker.labelStyle;
                         const newMarker = {
                           color: marker.title.backgroundColor,
                           title: marker.markerTitle,
@@ -55,9 +56,11 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
                             markers.push(newMarker);
                           }
                         }
+
                         const newEdgeStyle = {
                           id: selectedEdge?.id,
                           style,
+                          labelStyle,
                         };
                         if (!edges) {
                           tmp.edges = [];
@@ -73,6 +76,8 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
                               ...edges[idx].style,
                               ...style,
                             };
+
+                            edges[idx].labelStyle = labelStyle;
                           }
                         }
                         onChangeLayout
@@ -89,22 +94,23 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
           }
         >
           <div
-            className="w-[24px] h-[24px] rounded-md border cursor-pointer mr-2"
+            className='w-[24px] h-[24px] rounded-md border cursor-pointer mr-2'
             style={{
               backgroundColor: style?.stroke,
             }}
           ></div>
         </Popover>
       }
-      className="w-full"
+      className='w-full'
       value={
         markers.find((marker: any) => marker.color === style?.stroke)?.title ||
         ''
       }
-      placeholder="Write a label"
+      placeholder='Write a label'
       onChange={(e) => {
         const label = e.target.value;
         const tmp = structuredClone(selectedLayout);
+
         if (tmp) {
           const idx = markers?.findIndex(
             (marker: any) => marker.color === style?.stroke
