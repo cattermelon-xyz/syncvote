@@ -52,7 +52,6 @@ export const upsertWorkflowVersion = async ({
     .upsert(toUpsert)
     .select();
   if (data) {
-    console.log('data from server: ', data);
     dispatch(changeWorkflowVersion(data[0]));
     onSuccess(data[0]);
   } else {
@@ -76,7 +75,6 @@ export const queryWorkflow = async ({
   filter?: any;
 }) => {
   dispatch(startLoading({}));
-  // TODO: should we stuff workflow_version into workflow?
   const { data, error } = await supabase
     .from('workflow')
     .select('*, workflow_version ( * ), tag_workflow ( tag (*))')
@@ -254,14 +252,15 @@ export const updateAWorkflowTag = async ({
   });
   dispatch(startLoading({}));
   if (toInsert.length > 0) {
-    const { data, error } = await supabase.from('tag_workflow').insert(
-      toInsert.map((tagId) => {
-        return {
-          workflow_id: workflow.id,
-          tag_id: tagId,
-        };
-      })
-    );
+    const toInsertObjects = toInsert.map((tagId) => {
+      return {
+        workflow_id: workflow.id,
+        tag_id: tagId,
+      };
+    });
+    const { data, error } = await supabase
+      .from('tag_workflow')
+      .insert(toInsertObjects);
     if (!error) {
       dispatch(changeWorkflow({ ...workflow, tags: newTags }));
     } else {
