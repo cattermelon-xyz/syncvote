@@ -5,8 +5,8 @@ import { createSlice } from '@reduxjs/toolkit';
 import { IWorkflow } from './interface';
 
 const initialState: {
-  workflows: IWorkflow[],
-  lastFetch: number,
+  workflows: IWorkflow[];
+  lastFetch: number;
 } = {
   workflows: [],
   lastFetch: -1,
@@ -23,7 +23,9 @@ const workflowSlice = createSlice({
       state.workflows = action.payload;
     },
     changeWorkflow: (state, action) => {
-      const index = state.workflows.findIndex((w:any) => w.id === action.payload.id);
+      const index = state.workflows.findIndex(
+        (w: any) => w.id === action.payload.id
+      );
       if (index === -1) {
         state.workflows.push({ ...structuredClone(action.payload) });
       } else {
@@ -34,30 +36,44 @@ const workflowSlice = createSlice({
       }
     },
     deleteWorkflow: (state, action) => {
-      const index = state.workflows.findIndex((w:any) => w.id === action.payload.id);
+      const index = state.workflows.findIndex(
+        (w: any) => w.id === action.payload.id
+      );
       if (index !== -1) {
         state.workflows.splice(index, 1);
       }
     },
     deleteWorkflowVersion: (state, action) => {
-      const index = state.workflows.findIndex((w:any) => w.workflowId === action.payload.id);
+      const index = state.workflows.findIndex(
+        (w: any) => w.workflowId === action.payload.id
+      );
       if (index !== -1) {
-        const vIndex = state.workflows[index].workflow_version.findIndex((v:any) => v.id === action.payload.versionId);
+        const vIndex = state.workflows[index].workflow_version.findIndex(
+          (v: any) => v.id === action.payload.versionId
+        );
         if (vIndex !== undefined && vIndex !== -1) {
           state.workflows[index].workflow_version.splice(vIndex, 1);
         }
       }
     },
     changeWorkflowVersion: (state, action) => {
-      const index = state.workflows.findIndex((w:any) => w.workflowId === action.payload.id);
+      const index = state.workflows.findIndex(
+        (w: any) => w.id === action.payload.workflow_id
+      );
       if (index !== -1) {
-        if (action.payload.verionId) {
-          const vIndex = state.workflows[index].workflow_version?.findIndex((v:any) => v.id === action.payload.versionId);
+        if (action.payload.id) {
+          const vIndex = state.workflows[index].workflow_version?.findIndex(
+            (v: any) => v.id === action.payload.id
+          );
           if (vIndex !== undefined && vIndex !== -1) {
-            state.workflows[index].workflow_version[vIndex] = { ...structuredClone(action.payload.versionData) };
+            state.workflows[index].workflow_version[vIndex] = {
+              ...structuredClone(action.payload),
+            };
           }
         } else {
-          state.workflows[index].workflow_version.push({ ...structuredClone(action.payload.versionData) });
+          state.workflows[index].workflow_version.push({
+            ...structuredClone(action.payload),
+          });
         }
       }
     },

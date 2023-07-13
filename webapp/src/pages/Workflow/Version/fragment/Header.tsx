@@ -14,7 +14,8 @@ import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import Icon from '@components/Icon/Icon';
 import Paragraph from 'antd/es/skeleton/Paragraph';
 import EditWorkflow from '@pages/Workflow/BluePrint/fragment/EditWorkflow';
-import { updateAWorkflowInfo } from '@middleware/data';
+import { updateAWorkflowInfo, upsertWorkflowVersion } from '@middleware/data';
+import { IWorkflowVersion } from '@types';
 
 type HeaderProps = {
   session: any;
@@ -45,15 +46,15 @@ function Header({ session, workflow }: HeaderProps) {
     desc,
     iconUrl,
   }: {
-    title?: string;
-    desc?: string;
-    iconUrl?: string;
+    title?: string | undefined;
+    desc?: string | undefined;
+    iconUrl?: string | undefined;
   }) => {
     const toUpdate: any = {};
-    if (title !== workflow.title) toUpdate.title = title;
-    if (desc !== workflow.desc) toUpdate.desc = desc;
-    if (iconUrl !== workflow.icon_url) toUpdate.iconUrl = iconUrl;
-    updateAWorkflowInfo({
+    if (title && title !== workflow.title) toUpdate.title = title;
+    if (desc && desc !== workflow.desc) toUpdate.desc = desc;
+    if (iconUrl && iconUrl !== workflow.icon_url) toUpdate.iconUrl = iconUrl;
+    await updateAWorkflowInfo({
       info: {
         id: workflowId,
         ...toUpdate,
@@ -68,13 +69,46 @@ function Header({ session, workflow }: HeaderProps) {
       },
     });
   };
+  const handleWorkflowStatusChanged = async ({
+    versionId,
+    status,
+    onSuccess,
+    onError,
+  }: {
+    versionId: number;
+    status: string;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+  }) => {
+    const workflowVersion = {
+      versionId,
+      workflowId,
+      status,
+    };
+    await upsertWorkflowVersion({
+      dispatch,
+      mode: 'info',
+      workflowVersion,
+      onSuccess: (data) => {
+        onSuccess(data);
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: 'Failed to update workflow status',
+        });
+        onError(error);
+      },
+    });
+  };
   return (
     <>
       <EditWorkflow
         open={showWorkflowPanel}
         setOpen={setShowWorkflowPanel}
         workflow={workflow}
-        onSave={() => {}}
+        onSave={handleSaveWorkflowInfo}
+        onStatusChange={handleWorkflowStatusChanged}
       />
       <div
         className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}

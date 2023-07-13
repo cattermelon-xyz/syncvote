@@ -1,11 +1,14 @@
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { ITag } from '@types';
 import {
   setWorkflows,
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
 } from '@redux/reducers/workflow.reducer';
+import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
+import { subtractArray } from '@utils/helpers';
 
 export const upsertWorkflowVersion = async ({
   dispatch,
@@ -19,10 +22,10 @@ export const upsertWorkflowVersion = async ({
   workflowVersion: {
     versionId: number;
     workflowId: number;
-    version: string;
-    status: string;
-    versionData: any;
-    recommended: boolean;
+    version?: string;
+    status?: string;
+    versionData?: any;
+    recommended?: boolean;
   };
   dispatch: any;
   onSuccess: (data: any) => void;
@@ -40,21 +43,22 @@ export const upsertWorkflowVersion = async ({
     toUpsert.data = versionData;
   }
   if (!mode || mode === 'info') {
-    toUpsert.version = version;
-    toUpsert.status = status;
-    toUpsert.recommended = recommended;
+    version ? (toUpsert.version = version) : null;
+    status ? (toUpsert.status = status) : null;
+    recommended ? (toUpsert.recommended = recommended) : null;
   }
   const { data, error } = await supabase
     .from('workflow_version')
     .upsert(toUpsert)
     .select();
-  dispatch(finishLoading({}));
   if (data) {
-    dispatch(changeWorkflowVersion(data));
-    onSuccess(data);
+    console.log('data from server: ', data);
+    dispatch(changeWorkflowVersion(data[0]));
+    onSuccess(data[0]);
   } else {
     onError(error);
   }
+  dispatch(finishLoading({}));
 };
 export const queryWorkflow = async ({
   orgId,
@@ -75,7 +79,7 @@ export const queryWorkflow = async ({
   // TODO: should we stuff workflow_version into workflow?
   const { data, error } = await supabase
     .from('workflow')
-    .select('*, workflow_version ( * )')
+    .select('*, workflow_version ( * ), tag_workflow ( tag (*))')
     .eq('owner_org_id', orgId)
     .order('created_at', { ascending: false });
   dispatch(finishLoading({}));
@@ -84,18 +88,31 @@ export const queryWorkflow = async ({
     const newData: any[] = [];
     wfList.forEach((d: any, index: number) => {
       newData[index] = { ...structuredClone(d) };
-      const presetIcon = d.preset_icon_url
-        ? `preset:${d.preset_icon_url}`
-        : d.icon_url;
-      const presetBanner = d.preset_banner_url
-        ? `preset:${d.preset_banner_url}`
-        : d.bann_url;
-      newData[index].icon_url = d.icon_url ? d.icon_url : presetIcon;
-      newData[index].banner_url = d.banner_url ? d.banner_url : presetBanner;
+      const presetIcon =
+        d.preset_icon_url && d.preset_icon_url !== ''
+          ? `preset:${d.preset_icon_url}`
+          : d.icon_url;
+      const presetBanner =
+        d.preset_banner_url && d.preset_banner_url !== ''
+          ? `preset:${d.preset_banner_url}`
+          : d.bann_url;
+      newData[index].icon_url =
+        d.icon_url && d.icon_url !== '' ? d.icon_url : presetIcon;
+      newData[index].banner_url =
+        d.banner_url && d.banner_url !== '' ? d.banner_url : presetBanner;
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
       newData[index].workflow_version =
         [...newData[index].workflow_version] || [];
+      const tags: ITag[] = [];
+      newData[index].tag_workflow.map((itm: any) => {
+        tags.push({
+          value: itm.tag.id,
+          label: itm.tag.label,
+        });
+      });
+      delete newData[index].tag_workflow;
+      newData[index].tags = [...tags];
     });
     // TODO: is the data match the interface?
     dispatch(setWorkflows(newData));
@@ -177,14 +194,16 @@ export const updateAWorkflowInfo = async ({
   let icon_url, preset_icon_url; // eslint-disable-line
   if (iconUrl?.startsWith('preset:')) {
     preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
+    icon_url = '';
   } else {
+    preset_icon_url = '';
     icon_url = iconUrl; // eslint-disable-line
   }
   const toUpdate: any = {};
   if (title) toUpdate.title = title;
   if (desc) toUpdate.desc = desc;
-  if (icon_url) toUpdate.icon_url = icon_url;
-  if (preset_icon_url) toUpdate.preset_icon_url = preset_icon_url;
+  if (icon_url !== undefined) toUpdate.icon_url = icon_url;
+  if (preset_icon_url !== undefined) toUpdate.preset_icon_url = preset_icon_url;
   const { data, error } = await supabase
     .from('workflow')
     .update(toUpdate)
@@ -205,11 +224,64 @@ export const updateAWorkflowInfo = async ({
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
     });
-    dispatch(changeWorkflow(data[0]));
-    onSuccess(data);
+    dispatch(changeWorkflow(newData[0]));
+    onSuccess(newData);
   } else {
     onError(error);
   }
+};
+export const updateAWorkflowTag = async ({
+  workflow,
+  newTags,
+  dispatch,
+  onSuccess,
+  onError = () => {},
+}: {
+  workflow: IWorkflow;
+  newTags: ITag[];
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+}) => {
+  const oldSetOfTagIds = workflow.tags?.map((t) => t.value) || [];
+  const toInsert = subtractArray({
+    minuend: newTags.map((t) => t.value),
+    subtrahend: oldSetOfTagIds,
+  });
+  const toDelete = subtractArray({
+    minuend: oldSetOfTagIds,
+    subtrahend: newTags.map((t) => t.value),
+  });
+  dispatch(startLoading({}));
+  if (toInsert.length > 0) {
+    const { data, error } = await supabase.from('tag_workflow').insert(
+      toInsert.map((tagId) => {
+        return {
+          workflow_id: workflow.id,
+          tag_id: tagId,
+        };
+      })
+    );
+    if (!error) {
+      dispatch(changeWorkflow({ ...workflow, tags: newTags }));
+    } else {
+      onError(error);
+    }
+  }
+  if (toDelete.length > 0) {
+    const { data, error } = await supabase
+      .from('tag_workflow')
+      .delete()
+      .in('tag_id', toDelete)
+      .eq('workflow_id', workflow.id);
+    if (!error) {
+      dispatch(changeWorkflow({ ...workflow, tags: newTags }));
+    } else {
+      onError(error);
+    }
+  }
+  onSuccess({});
+  dispatch(finishLoading({}));
 };
 
 export const deleteAWorkflow = async ({
