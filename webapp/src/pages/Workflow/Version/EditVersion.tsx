@@ -225,7 +225,7 @@ export const EditVersion = () => {
       if (newLayout != undefined) {
         const tmp = structuredClone(version);
         tmp.data.cosmetic.layouts[selectedLayoutIndex] = newLayout;
-        console.log(tmp);
+        // console.log(tmp);
         setVersion({
           ...tmp,
         });

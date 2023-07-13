@@ -13,6 +13,9 @@ export const Markers = [
       stroke: '#E0E0E0',
       strokeWidth: 2,
     },
+    labelStyle: {
+      backgroundColor: '#A8A196',
+    },
   },
   {
     markerTitle: 'Red',
@@ -29,7 +32,9 @@ export const Markers = [
       stroke: '#FAB9B5',
       strokeWidth: 2,
     },
-    labelPath: {},
+    labelStyle: {
+      backgroundColor: '#F31559',
+    },
   },
   {
     markerTitle: 'Orange',
@@ -44,6 +49,9 @@ export const Markers = [
     path: {
       stroke: '#FAC78B',
       strokeWidth: 2,
+    },
+    labelStyle: {
+      backgroundColor: '#F1C93B',
     },
   },
   {
@@ -60,6 +68,9 @@ export const Markers = [
       stroke: '#FCE493',
       strokeWidth: 2,
     },
+    labelStyle: {
+      backgroundColor: '#FAF0D7',
+    },
   },
   {
     markerTitle: 'Green',
@@ -74,6 +85,9 @@ export const Markers = [
     path: {
       stroke: '#9CEAB3',
       strokeWidth: 2,
+    },
+    labelStyle: {
+      backgroundColor: '#CCEEBC',
     },
   },
   {
@@ -90,6 +104,9 @@ export const Markers = [
       stroke: '#A9D3F5',
       strokeWidth: 2,
     },
+    labelStyle: {
+      backgroundColor: '#8CC0DE',
+    },
   },
   {
     markerTitle: 'Purple',
@@ -105,6 +122,9 @@ export const Markers = [
       stroke: '#D4B6F5',
       strokeWidth: 2,
     },
+    labelStyle: {
+      backgroundColor: '#A076F9',
+    },
   },
   {
     markerTitle: 'Pink',
@@ -119,6 +139,9 @@ export const Markers = [
     path: {
       stroke: '#E7AEF0',
       strokeWidth: 2,
+    },
+    labelStyle: {
+      backgroundColor: '#FF52A2',
     },
   },
 ];
