@@ -14,3 +14,8 @@ export interface IOrgType {
 export interface IPresetType {
   url: string;
 }
+
+export interface ITag {
+  value: number;
+  label: string;
+}

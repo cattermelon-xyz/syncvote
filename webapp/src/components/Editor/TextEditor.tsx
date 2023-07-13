@@ -9,12 +9,20 @@ interface TextEditorInterface {
   value?: any;
   hideToolbar?: boolean;
   heightEditor?: number;
+  onBlur?: () => {};
 }
 
 const TextEditor = forwardRef(
-  ({
-    setValue, value, hideToolbar = false, heightEditor = 500,
-  }: TextEditorInterface, ref) => {
+  (
+    {
+      setValue,
+      value,
+      hideToolbar = false,
+      heightEditor = 500,
+      onBlur,
+    }: TextEditorInterface,
+    ref
+  ) => {
     const editorRef = useRef(null);
 
     const handleEditorChange = (nextValue: any) => {
@@ -74,6 +82,7 @@ const TextEditor = forwardRef(
       <>
         <div className="App">
           <Editor
+            onBlur={onBlur}
             ref={editorRef}
             value={value}
             onEditorChange={handleEditorChange}
@@ -224,10 +233,13 @@ const TextEditor = forwardRef(
                     '<h2>My List</h2><ul><li></li><li></li></ul></div>',
                 },
               ],
-              template_cdate_format: '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
-              template_mdate_format: '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
+              template_cdate_format:
+                '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
+              template_mdate_format:
+                '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
               image_caption: true,
-              quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 lineheight blockquote',
+              quickbars_selection_toolbar:
+                'bold italic | quicklink h2 h3 lineheight blockquote',
               noneditable_noneditable_class: 'mceNonEditable',
               toolbar_drawer: 'sliding',
               spellchecker_dialog: true,
@@ -246,7 +258,7 @@ const TextEditor = forwardRef(
         </div>
       </>
     );
-  },
+  }
 );
 
 export default TextEditor;
