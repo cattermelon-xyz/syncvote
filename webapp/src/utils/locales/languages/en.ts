@@ -307,5 +307,9 @@ export const LANG: any = {
   searchAWorkflow: 'Search a workflow',
   backToSharedSpaces: 'Back to shared spaces',
   backToMySpaces: 'Back to my spaces',
-  accountSettings: "Account settings",
+  accountSettings: 'Account settings',
+  changeName: 'Change name',
+  email: 'Email',
+  aboutMe: 'About me',
+  changeContent: 'Change content',
 };

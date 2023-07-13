@@ -1,6 +1,6 @@
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { supabase } from '@utils/supabaseClient';
-import { addUserToOrg } from '@redux/reducers/orginfo.reducer';
+import { addUserToOrg, setUser } from '@redux/reducers/orginfo.reducer';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -44,6 +44,7 @@ export const inviteUserByEmail = async ({
   }
   dispatch(finishLoading({}));
 };
+
 export const queryUserByEmail = async ({
   email,
   dispatch,
@@ -66,6 +67,42 @@ export const queryUserByEmail = async ({
     onError(error);
   } else {
     onSuccess(data);
+  }
+};
+
+export const queryUserById = async ({
+  userId,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
+}: {
+  userId: string;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (error: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('profile')
+    .select('id, email, full_name, avatar_url, about_me')
+    .eq('id', userId);
+  console.log('hihi', data);
+  if (error) {
+    onError(error);
+  } else {
+    onSuccess(data);
+    dispatch(
+      setUser({
+        id: data[0].id,
+        email: data[0].email,
+        full_name: data[0].full_name,
+        avatar_url: data[0].avatar_url,
+        about_me: data[0].about_me,
+      })
+    );
+    dispatch(finishLoading({}));
   }
 };
 
@@ -95,6 +132,8 @@ export const addMemberToOrg = async ({
   if (error) {
     onError(error);
   } else {
+    console.log('data user', data);
+
     const infoMember = {
       id: user_id,
       email: email,

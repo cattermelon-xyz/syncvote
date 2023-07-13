@@ -16,6 +16,7 @@ const initialState: {
     email: "",
     full_name: "",
     avatar_url: "",
+    about_me: "",
   },
 };
 

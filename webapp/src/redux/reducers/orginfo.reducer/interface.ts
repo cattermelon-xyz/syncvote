@@ -17,6 +17,7 @@ export interface IProfile {
   email: string;
   full_name: string;
   avatar_url: string;
+  about_me: string;
 }
 
 export interface IMember {
