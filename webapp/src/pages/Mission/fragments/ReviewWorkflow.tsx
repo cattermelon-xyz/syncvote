@@ -66,7 +66,7 @@ const ReviewWorkflow = ({
             data={currentWorkflowVersion.data}
             onNodeClick={(e: any, node: any) => {
               const { checkpoints } = currentWorkflowVersion.data;
-              const selected: ICheckPoint = checkpoints?.find(
+              const selected: ICheckPoint | undefined = checkpoints?.find(
                 (c: any) => c.id === node.id
               );
               setSelectedCheckPoint(selected);
