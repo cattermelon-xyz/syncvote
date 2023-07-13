@@ -38,8 +38,6 @@ function Header({ session, workflow }: HeaderProps) {
   const [currentOrg, setCurrentOrg] = useState(
     orgs.find((org: any) => org.id === orgId)
   );
-  console.log('org: ', currentOrg);
-  console.log('workflow: ', workflow);
   const handleClearStore = () => {};
   const [showWorkflowPanel, setShowWorkflowPanel] = useState(false);
   const handleSaveWorkflowInfo = async ({
@@ -82,9 +80,9 @@ function Header({ session, workflow }: HeaderProps) {
         className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
       >
         <Space
-          className="flex items-center"
-          direction="horizontal"
-          size="middle"
+          className='flex items-center'
+          direction='horizontal'
+          size='middle'
         >
           <div
             onClick={() => {
@@ -92,36 +90,36 @@ function Header({ session, workflow }: HeaderProps) {
               navigate('/');
             }}
           >
-            <div className="flex items-center">
+            <div className='flex items-center'>
               <LogoSyncVote />
-              <div className="text-violet-700 text-[20px] font-bold ">
+              <div className='text-violet-700 text-[20px] font-bold '>
                 Syncvote
               </div>
             </div>
           </div>
-          <Divider type="vertical" />
+          <Divider type='vertical' />
           <div
-            className="px-3 py-2 rounded-lg bg-violet-100 text-violet-700 hover:bg-violet-200 cursor-pointer"
+            className='px-3 py-2 rounded-lg bg-violet-100 text-violet-700 hover:bg-violet-200 cursor-pointer'
             onClick={() => navigate(`/my-spaces/${orgIdString}`)}
           >
-            <FolderOutlined className="stroke-2" />
+            <FolderOutlined className='stroke-2' />
           </div>
           <Space
-            direction="horizontal"
-            size="small"
-            className="cursor-pointer"
+            direction='horizontal'
+            size='small'
+            className='cursor-pointer'
             onClick={() => setShowWorkflowPanel(true)}
           >
-            <Icon iconUrl={workflow?.icon_url} size="medium" />
-            <div className="flex items-center font-bold">{workflow?.title}</div>
+            <Icon iconUrl={workflow?.icon_url} size='medium' />
+            <div className='flex items-center font-bold'>{workflow?.title}</div>
           </Space>
         </Space>
-        <div className="flex w-w_3 items-center justify-end gap-3">
-          <div className="flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer">
+        <div className='flex w-w_3 items-center justify-end gap-3'>
+          <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
             <BellOutlined style={{ fontSize: '20px' }} />
           </div>
           <div
-            className="cursor-pointer flex items-center"
+            className='cursor-pointer flex items-center'
             onClick={async () => {
               dispatch(startLoading({}));
               await supabase.auth.signOut();
@@ -132,8 +130,8 @@ function Header({ session, workflow }: HeaderProps) {
           >
             <img
               src={session?.user?.user_metadata?.avatar_url}
-              alt="user_avatar"
-              className="w-[36px] h-[36px] rounded-full inline-block mr-2"
+              alt='user_avatar'
+              className='w-[36px] h-[36px] rounded-full inline-block mr-2'
             />
           </div>
         </div>

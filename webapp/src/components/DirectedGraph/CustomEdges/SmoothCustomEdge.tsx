@@ -26,6 +26,7 @@ const Path = memo((props: CustomProps) => {
     targetPosition,
     id,
   } = props;
+
   const smoothOpts = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -38,10 +39,10 @@ const Path = memo((props: CustomProps) => {
   const path = smoothOpts[0];
   const labelX = smoothOpts[1];
   const labelY = smoothOpts[2];
-
+  
   return (
     <>
-      <BaseEdge path={path} markerEnd={markerEnd} style={style} />
+      <BaseEdge path={path} markerEnd={markerEnd} style={style} />\{' '}
       <EdgeLabelRenderer>
         <div
           style={{
@@ -52,8 +53,9 @@ const Path = memo((props: CustomProps) => {
             // if you have an interactive element, set pointer-events: all
             pointerEvents: 'all',
             ...labelStyle,
+            // backgroundColor: "beige"
           }}
-          className="nodrag nopan text-center rounded-md p-2"
+          className='nodrag nopan text-center rounded-md p-2'
         >
           {label}
         </div>

@@ -64,6 +64,7 @@ const Flow = () => {
   });
   useEffect(() => {
     const obj: any = buildATree({ data, selectedNodeId, selectedLayoutId });
+
     setNodes(obj.nodes);
     setEdges(obj.edges);
   }, [data, selectedNodeId, selectedLayoutId]);
@@ -75,6 +76,7 @@ const Flow = () => {
   const [showCosmeticPanel, setShowCosmeticPanel] = useState(false);
   const [showQuickStartDialog, setShowQuickStartDialog] = useState(false);
   const selectedEdge = edges?.find((edge: any) => edge.id === selectedEdgeId);
+
   return (
     <>
       {renderVoteMachineConfigPanel({

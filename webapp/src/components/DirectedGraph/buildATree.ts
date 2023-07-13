@@ -74,11 +74,13 @@ const buildEdge = ({
   target,
   label,
   style = {},
+  labelStyle = {},
 }: {
   source: any;
   target: any;
   label: JSX.Element;
   style?: any;
+  labelStyle?: any;
 }) => {
   const sourcePos = getCenterPos({
     node: source,
@@ -131,6 +133,7 @@ const buildEdge = ({
       type: MarkerType.Arrow,
       color: style.stroke || '#000',
     },
+    labelStyle,
   };
 };
 
@@ -205,6 +208,7 @@ export const buildATree = ({
           (n: any) => n.id === sourceId + '-' + childId
         );
         let edgeStyle = { ...edgeFromLayout?.style };
+        let edgeLableStyle = { ...edgeFromLayout?.labelStyle };
 
         if (selectedNodeId && sourceId === selectedNodeId) {
           edgeStyle = SELECTED_EDGE_STYLE;
@@ -220,6 +224,7 @@ export const buildATree = ({
             target: child,
           }),
           style: edgeStyle,
+          labelStyle: edgeLableStyle,
         });
         // return the newEdge
         edges.push(newEdge);

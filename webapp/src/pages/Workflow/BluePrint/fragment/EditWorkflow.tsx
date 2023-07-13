@@ -25,7 +25,6 @@ const EditWorkflow = ({
     desc: '',
     icon_url: '',
   };
-  console.log(workflow);
   const [title, setTitle] = useState(workflowTitle);
   const [desc, setDesc] = useState(workflowDesc);
   const [iconUrl, setIconUrl] = useState(workflowIcon);
