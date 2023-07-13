@@ -7,8 +7,13 @@ import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
-import { Avatar, Button } from 'antd';
-import { HomeOutlined, BellOutlined } from '@ant-design/icons';
+import { Avatar, Button, Popover } from 'antd';
+import {
+  HomeOutlined,
+  BellOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 
@@ -53,6 +58,25 @@ function Header({ session }: HeaderProps) {
       currentPage = Pages.UNKNOWN;
       break;
   }
+
+  const contentPopOver = (
+    <div>
+      <div>
+        <Button type='text' icon={<SettingOutlined />} block>
+          {L('accountSettings')}{' '}
+        </Button>
+      </div>
+      <div>
+        <Button
+          type='text'
+          icon={<LogoutOutlined />}
+          className="w-full flex items-center"
+        >
+          {L('logOut')}
+        </Button>
+      </div>
+    </div>
+  );
 
   const onSearch = (value: string) => console.log(value);
   return (
@@ -145,26 +169,32 @@ function Header({ session }: HeaderProps) {
           <div className='flex rounded-full h-11 w-11 bg-gray-100 justify-center cursor-pointer'>
             <BellOutlined style={{ fontSize: '24px' }} />
           </div>
-          <div
-            className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'
-            onClick={async () => {
-              dispatch(startLoading({}));
-              await supabase.auth.signOut();
-              dispatch(finishLoading({}));
-              navigate('/login');
-            }}
-            title={L('clickToLogout')}
+          <Popover
+            placement='bottomRight'
+            content={contentPopOver}
+            trigger='click'
           >
-            <p className='text-text_2 text-[#252422]'>
-              {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
-              <img
-                src={session?.user?.user_metadata?.avatar_url}
-                alt='user_avatar'
-                className='w-8 h-8 rounded-full inline-block mr-2'
-              />
-              {session?.user?.user_metadata?.full_name}
-            </p>
-          </div>
+            <div
+              className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'
+              // onClick={async () => {
+              //   dispatch(startLoading({}));
+              //   await supabase.auth.signOut();
+              //   dispatch(finishLoading({}));
+              //   navigate('/login');
+              // }}
+              // title={L('clickToLogout')}
+            >
+              <p className='text-text_2 text-[#252422]'>
+                {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
+                <img
+                  src={session?.user?.user_metadata?.avatar_url}
+                  alt='user_avatar'
+                  className='w-8 h-8 rounded-full inline-block mr-2'
+                />
+                {session?.user?.user_metadata?.full_name}
+              </p>
+            </div>
+          </Popover>
         </div>
       </div>
     </div>

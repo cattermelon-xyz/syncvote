@@ -108,7 +108,7 @@ const ListHome = () => {
         </Space>
         <SortButton />
       </div>
-      <div className="grid 2xl:grid-cols-3 xl:grid-cols-3 gap-y-6 w-full justify-items-center">
+      <div className="grid 2xl:grid-cols-4 xl:grid-cols-3 gap-y-6 w-full justify-items-center">
         {workflows &&
           workflows.map((workflow, index) => (
             <WorkflowCard
