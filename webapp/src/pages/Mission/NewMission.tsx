@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { IMission, IWorkflowVersion } from '@types';
 import ReviewWorkflow from './fragments/ReviewWorkflow';
 import MissionMeta from './fragments/MissionMeta';
+import { emptyStage } from '@components/DirectedGraph';
 
 // 3 state:
 // review, metadata, edit
@@ -28,7 +29,7 @@ const NewMission = () => {
       version: '',
       created_at: '',
       workflow_id: workflowId,
-      data: '',
+      data: emptyStage,
     });
   const [currentMission, setCurrentMission] = useState<IMission>({
     id: -1,
