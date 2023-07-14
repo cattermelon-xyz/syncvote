@@ -89,5 +89,7 @@ export const {
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
+  deleteWorkflow,
+  deleteWorkflowVersion,
 } = workflowSlice.actions;
 export default workflowSlice.reducer;
