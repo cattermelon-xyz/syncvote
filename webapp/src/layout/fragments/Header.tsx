@@ -8,6 +8,7 @@ import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
 import { Avatar, Button, Popover, Space } from 'antd';
+import Icon from '@components/Icon/Icon';
 import {
   HomeOutlined,
   BellOutlined,
@@ -196,13 +197,12 @@ function Header({ session }: HeaderProps) {
             onOpenChange={handleOpenChange}
           >
             <div className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'>
-              <p className='text-text_2 text-[#252422]'>
+              <Icon
+                size='medium'
+                iconUrl={user?.avatar_url}
+              />
+              <p className='text-text_2 text-[#252422] ml-2'>
                 {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
-                <img
-                  src={user?.avatar_url}
-                  alt='user_avatar'
-                  className='w-8 h-8 rounded-full inline-block mr-2'
-                />
                 {user?.full_name}
               </p>
             </div>
