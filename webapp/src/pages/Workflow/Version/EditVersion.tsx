@@ -25,7 +25,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditInfo from './fragment/EditInfo';
 import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '@types';
-import SaveGraphImage from '@components/SaveGraphImage/SaveGraphImage';
 import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
 import EditWorkflow from '../BluePrint/fragment/EditWorkflow';
@@ -96,6 +95,8 @@ export const EditVersion = () => {
     extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
   );
   const [dataHasChanged, setDataHasChanged] = useState(false);
+  const [lastSaved, setLastSaved] = useState(-1);
+  const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const extractWorkflowFromList = (wfList: any) => {
     let extractedVersion = extractVersion({
       workflows: wfList,
@@ -129,6 +130,7 @@ export const EditVersion = () => {
       extractWorkflowFromList(workflows);
       setWeb2IntegrationsState(web2Integrations);
     }
+    setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
@@ -153,6 +155,7 @@ export const EditVersion = () => {
           },
           dispatch,
         });
+        setLastSaved(Date.now());
       },
       onError: (error) => {
         Modal.error({
@@ -210,6 +213,7 @@ export const EditVersion = () => {
         setDataHasChanged(true);
       }
       setSelectedNodeId('');
+      setDataHasChanged(true);
     }
   };
   const onChangeLayout = (changedData: IWorkflowVersionLayout) => {
@@ -230,6 +234,7 @@ export const EditVersion = () => {
           ...tmp,
         });
       }
+      setDataHasChanged(true);
     }
   };
   const onEdgeClick = (e: any, edge: any) => {
@@ -267,9 +272,7 @@ export const EditVersion = () => {
       ...version,
       data: newData,
     });
-    if (selectedNodeId) {
-      setDataHasChanged(true);
-    }
+    setDataHasChanged(true);
   };
   const onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {
     const cosmetic = changeCosmetic(version?.data.cosmetic, changed);
@@ -277,6 +280,7 @@ export const EditVersion = () => {
       ...version,
       data: { ...version.data, cosmetic },
     });
+    setDataHasChanged(true);
   };
   const onResetPosition = () => {
     const newData = structuredClone(version?.data);
@@ -316,15 +320,23 @@ export const EditVersion = () => {
     <>
       <AuthContext.Consumer>
         {({ session }) => (
-          <div className="w-full bg-slate-100 h-screen">
-            <Header session={session} workflow={workflow} />
-
+          <div className='w-full bg-slate-100 h-screen'>
+            <Header
+              session={session}
+              workflow={workflow}
+              dataChanged={dataHasChanged}
+              handleSave={handleSave}
+              lastSaved={lastSaved}
+              handleDownloadImage={setShouldDownloadImage}
+            />
             <div
               className={`w-full flex justify-center`}
               style={{ height: 'calc(100% - 80px)' }}
             >
-              <div className="w-full h-full">
+              <div className='w-full h-full'>
                 <DirectedGraph
+                  shouldExportImage={shouldDownloadImage}
+                  setExportImage={setShouldDownloadImage}
                   navPanel={<></>}
                   editable
                   data={version?.data || emptyStage}
@@ -381,9 +393,6 @@ export const EditVersion = () => {
       <EditIcon />
     </span>
   </Space>
-  <SaveGraphImage>
-    <Button>Download</Button>
-  </SaveGraphImage>
   <Button
     type="link"
     className="flex items-center text-violet-500"
