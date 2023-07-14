@@ -312,4 +312,5 @@ export const LANG: any = {
   email: 'Email',
   aboutMe: 'About me',
   changeContent: 'Change content',
+  changeAboutMe: 'Change “About me” content',
 };

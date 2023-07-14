@@ -5,17 +5,19 @@ import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUserProfile } from '@middleware/data';
 import { setUser } from '@redux/reducers/orginfo.reducer';
-import Modal from 'antd';
+import { Modal } from 'antd';
+import ChangeModal from './ChangeModal';
 
 const AccountSetting = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.orginfo);
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url);
+  const [openModal, setOpenModal] = useState(false);
+  const [isChangeName, setIsChangeName] = useState(false);
 
   useEffect(() => {
-    console.log('user in account setting', user);
-    console.log('icon_url', avatarUrl);
-  }, [user, avatarUrl]);
+    setAvatarUrl(user?.avatar_url);
+  }, [user]);
 
   const handleChangeAvatar = (obj: any) => {
     const newAvatarUrl = obj.isPreset ? `preset:${obj.filePath}` : obj.filePath;
@@ -35,36 +37,81 @@ const AccountSetting = () => {
             avatar_url: newAvatarUrl,
           })
         );
+        Modal.success({
+          title: 'Success',
+          content: 'Change avatar successfully',
+        });
+      },
+      onError: () => {
+        Modal.error({
+          title: 'Error',
+          content: 'Cannot change avatar',
+        });
       },
     });
   };
 
+  const showModal = () => {
+    setOpenModal(true);
+  };
+
+  const closeModal = () => {
+    setOpenModal(false);
+  };
+
   return (
-    <Space className='mt-12 w-1/3' align='start' size='large'>
-      <Icon editable={true} iconUrl={avatarUrl} onUpload={handleChangeAvatar} />
-      <Card className='w-full'>
-        <div className='flex flex-col gap-6 w-full'>
-          <div>
-            <p className='font-medium text-xl'>{L('name')}</p>
-            <p className='font-medium text-base'>{user?.full_name}</p>
-            <Button className='p-0 text-base' type='link'>
-              {L('changeName')}
-            </Button>
-          </div>
-          <div>
-            <p className='font-medium text-xl'>{L('email')}</p>
-            <p className='font-medium text-base'>{user?.email}</p>
-          </div>
-          <div>
-            <p className='font-medium text-xl'>{L('aboutMe')}</p>
-            <p className='font-medium text-base'>{user?.about_me}</p>
-            <Button className='p-0 text-base' type='link'>
-              {L('changeContent')}
-            </Button>
-          </div>
-        </div>
-      </Card>
-    </Space>
+    <>
+      <div className='flex w-1/3 mt-12 gap-8 items-start'>
+        <Space>
+          <Icon
+            editable={true}
+            iconUrl={avatarUrl}
+            onUpload={handleChangeAvatar}
+          />
+        </Space>
+        <Card className='w-full'>
+          <Space direction='vertical' size='large'>
+            <div>
+              <p className='font-medium text-xl'>{L('name')}</p>
+              <p className='font-medium text-base'>{user?.full_name}</p>
+              <Button
+                className='p-0 text-base'
+                type='link'
+                onClick={() => {
+                  showModal();
+                  setIsChangeName(true);
+                }}
+              >
+                {L('changeName')}
+              </Button>
+            </div>
+            <div>
+              <p className='font-medium text-xl'>{L('email')}</p>
+              <p className='font-medium text-base'>{user?.email}</p>
+            </div>
+            <div>
+              <p className='font-medium text-xl'>{L('aboutMe')}</p>
+              <p className='font-medium text-base'>{user?.about_me}</p>
+              <Button
+                className='p-0 text-base'
+                type='link'
+                onClick={() => {
+                  showModal();
+                  setIsChangeName(false);
+                }}
+              >
+                {L('changeContent')}
+              </Button>
+            </div>
+          </Space>
+        </Card>
+      </div>
+      <ChangeModal
+        open={openModal}
+        onClose={closeModal}
+        isChangeName={isChangeName}
+      />
+    </>
   );
 };
 
