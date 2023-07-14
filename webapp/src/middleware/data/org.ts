@@ -163,7 +163,8 @@ export const queryOrgs = async ({
         id,
         email,
         full_name,
-        avatar_url
+        icon_url,
+        preset_icon_url
       )
     )
   `
@@ -295,7 +296,7 @@ export const queryOrg = async ({
         id,
         email,
         full_name,
-        avatar_url
+        icon_url
       ),
     )
   `

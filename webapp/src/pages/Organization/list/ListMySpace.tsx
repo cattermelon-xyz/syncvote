@@ -53,7 +53,7 @@ const ListMySpace = () => {
           </div>
           <div className='font-medium text-[#252422] mb-4'>{L('Spaces')}</div>
         </div>
-        <div className='grid 2xl:grid-cols-4 xl:grid-cols-4 gap-4 gap-y-6'>
+        <div className='grid 2xl:grid-cols-5 xl:grid-cols-4 gap-4 gap-y-6'>
           {adminOrgs &&
             adminOrgs.map((adminOrg, index) => (
               <SpaceCard key={index} dataSpace={adminOrg} isMySpace={true} />
@@ -64,7 +64,7 @@ const ListMySpace = () => {
         <div className="font-['General_Sans'] font-medium text-[#252422] mb-4">
           {L('workflows')}
         </div>
-        <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-4 gap-y-6 justify-items-center'>
+        <div className='grid 2xl:grid-cols-4 xl:grid-cols-3 gap-4 gap-y-6 justify-items-center'>
           {workflows &&
             workflows.map((workflow, index) => (
               <WorkflowCard key={index} dataWorkflow={workflow} />

@@ -59,6 +59,13 @@ h6 {
   }
 }
 
+@layer base {
+  svg {
+    display: inline;
+    vertical-align: baseline;
+  }
+}
+
 @layer components {
   .overlay-modal {
     @apply fixed top-0 left-0 right-0 bottom-0 h-full bg-gray-700 bg-opacity-75 transition-opacity z-50;
