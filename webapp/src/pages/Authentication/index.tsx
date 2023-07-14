@@ -74,7 +74,7 @@ function Login() {
                 Icon={<Twitter />}
                 title={`${L('continueWidth')} ${L('twitter')}`}
               />
-              <div className='flex items-center justify-between w-11/12 '>
+              <div className='flex items-center justify-between w-full'>
                 <hr className='border-[#D9D9D9] border-t-1 flex-grow' />
                 <p className='text-[15px] mx-4'>or</p>
                 <hr className='border-[#D9D9D9] border-t-1 flex-grow' />

@@ -43,7 +43,7 @@ const WorkflowOfASharedSpace = () => {
         <div className="font-['General_Sans'] font-medium text-[#252422] mb-4">
           {L('workflows')}
         </div>
-        <div className='grid 2xl:grid-cols-3 xl:grid-cols-3 gap-4 gap-y-6'>
+        <div className='grid 2xl:grid-cols-4 xl:grid-cols-3 gap-4 gap-y-6'>
           {workflows &&
             workflows.map((workflow, index) => (
               <WorkflowCard key={index} dataWorkflow={workflow} />
