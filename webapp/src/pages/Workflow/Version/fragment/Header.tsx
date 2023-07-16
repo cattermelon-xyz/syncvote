@@ -19,21 +19,6 @@ import {
   DeleteOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Divider, Modal, Popover, Space } from 'antd';
-import {
-  BellOutlined,
-  FolderOutlined,
-  SaveOutlined,
-  CheckOutlined,
-  EllipsisOutlined,
-  QuestionCircleOutlined,
-  ShareAltOutlined,
-  EyeOutlined,
-  DownloadOutlined,
-  CopyOutlined,
-  DeleteOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import Icon from '@components/Icon/Icon';
@@ -68,7 +53,6 @@ function Header({
   const navigate = useNavigate();
   const { orgIdString, workflowIdString } = useParams();
   const workflowId = extractIdFromIdString(workflowIdString);
-  const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const handleClearStore = () => {};
   const [showWorkflowPanel, setShowWorkflowPanel] = useState(false);
@@ -130,28 +114,6 @@ function Header({
           content: 'Failed to update workflow status',
         });
         onError(error);
-      },
-    });
-  };
-  const handleDeleteWorkflow = async () => {
-    deleteAWorkflow({
-      workflowId: workflow.id,
-      dispatch,
-      onSuccess: () => {
-        Modal.success({
-          title: 'Success',
-          content: 'Workflow deleted',
-          maskClosable: false,
-          onOk: () => {
-            navigate(`/my-spaces/${orgIdString}`);
-          },
-        });
-      },
-      onError: () => {
-        Modal.error({
-          title: 'Error',
-          content: 'Failed to delete workflow',
-        });
       },
     });
   };
@@ -240,6 +202,7 @@ function Header({
             <div className='flex items-center font-bold'>{workflow?.title}</div>
           </Space>
         </Space>
+        <Space
           className='flex items-center justify-end'
           direction='horizontal'
           size='small'
@@ -356,7 +319,6 @@ function Header({
               className='w-[36px] h-[36px] rounded-full inline-block mr-2'
             />
           </div>
-        </Space>
         </Space>
       </div>
     </>
