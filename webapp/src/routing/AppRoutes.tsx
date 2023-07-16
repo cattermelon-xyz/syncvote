@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import App from '@App';
-
+import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import PageScreen from '@components/HomeScreen/PageScreen';
 import ChooseWorkflow from '@pages/Mission/ChooseWorkflow';
@@ -23,7 +23,11 @@ import WebLayout from '@layout/WebLayout';
 import PublicAppLayout from '@layout/PublicAppLayout';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
-import { AccountSetting } from '@pages/Account';
+import AccountSetting from '@pages/AccounRefactor/pages/AccountSetting';
+import FixedLayout from '@layout/FixedLayout';
+const SpacePage = React.lazy(() => import('@pages/OrganizationRefactor'));
+import { ROUTER_SPACE } from '@pages/OrganizationRefactor/config/route';
+import { ROUTER_ACCOUNT } from '@pages/AccounRefactor/config/route';
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
@@ -62,18 +66,26 @@ const AppRoutes = () => (
         <Route path='login' element={<CreatorLogin />} />
       </Route>
 
-      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        <Route index element={<OrganizationList />} />
-        <Route path='my-spaces/' element={<OrganizationList />}>
-          <Route path=':spaceId' element={<OrganizationList />} />
-        </Route>
-        <Route path='shared-spaces/' element={<OrganizationList />}>
-          <Route path=':spaceId' element={<OrganizationList />} />
-        </Route>
+
+      {/* ROUTE FOR SPACE */}
+      <Route
+        path='/'
+        element={<App layout={FixedLayout} requiredLogin={true} />}
+      >
+        <Route index element={<SpacePage tabKey={ROUTER_SPACE.HOME} />} />
+        <Route
+          path={ROUTER_SPACE.MY_SPACES}
+          element={<SpacePage tabKey={ROUTER_SPACE.MY_SPACES} />}
+        />
+        <Route
+          path={ROUTER_SPACE.SHARED_SPACES}
+          element={<SpacePage tabKey={ROUTER_SPACE.SHARED_SPACES} />}
+        />
       </Route>
 
+      {/* ROUTE FOR ACCOUNT */}
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        <Route path='account-setting/:userId' element={<AccountSetting />} />
+        <Route path={ROUTER_ACCOUNT.ACCOUNT_SETTING} element={<AccountSetting />} />
       </Route>
 
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
