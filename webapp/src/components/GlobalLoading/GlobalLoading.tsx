@@ -4,14 +4,14 @@ import { useSelector } from 'react-redux';
 
 function Spinner() {
   return (
-    <Space size="large">
-      <Spin size="large" />
+    <Space size='large'>
+      <Spin size='large' />
     </Space>
   );
 }
 
 const GlobalLoading = () => {
-  const { loading } = useSelector((state:any) => state.ui);
+  const { loading } = useSelector((state: any) => state.ui);
   const [open, setOpen] = useState(false);
   useEffect(() => {
     setOpen(loading);
@@ -21,7 +21,8 @@ const GlobalLoading = () => {
       <Modal
         open={open}
         modalRender={Spinner}
-        width="62px"
+        width='62px'
+        style={{ zIndex: 999 }}
         centered
       />
     </div>
