@@ -29,8 +29,8 @@ import {
   upsertWorkflowVersion,
 } from '@middleware/data';
 import moment from 'moment';
-import ZapIcon from '@assets/icons/svg-icons/ZapIcoin';
 import VersionHistoryDialog from './VersionHistoryDialog';
+import ShareModal from './ShareModal';
 
 type HeaderProps = {
   session: any;
@@ -40,13 +40,6 @@ type HeaderProps = {
   lastSaved: number;
   handleDownloadImage: (data: any) => void;
 };
-
-enum Pages {
-  ORG_HOME,
-  ORG_SELECTOR,
-  ORG_SETTING,
-  UNKNOWN,
-}
 
 function Header({
   session,
@@ -63,6 +56,7 @@ function Header({
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const handleClearStore = () => {};
   const [showWorkflowPanel, setShowWorkflowPanel] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const handleSaveWorkflowInfo = async ({
     title,
     desc,
@@ -159,6 +153,17 @@ function Header({
         visible={showVersionHistory}
         onCancel={() => setShowVersionHistory(false)}
       />
+      <ShareModal
+        workflow={workflow}
+        showShareModal={showShareModal}
+        setShowShareModal={setShowShareModal}
+        handleWorkflowStatusChanged={handleWorkflowStatusChanged}
+      />
+      <VersionHistoryDialog
+        workflow={workflow}
+        visible={showVersionHistory}
+        onCancel={() => setShowVersionHistory(false)}
+      />
       <div
         className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
       >
@@ -235,6 +240,7 @@ function Header({
               type='primary'
               className='flex justify-center items-center'
               icon={<ShareAltOutlined />}
+              onClick={() => setShowShareModal(true)}
             >
               Share
             </Button>
