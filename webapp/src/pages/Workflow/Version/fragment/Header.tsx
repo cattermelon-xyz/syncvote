@@ -66,15 +66,19 @@ function Header({
     title,
     desc,
     iconUrl,
+    bannerUrl,
   }: {
     title?: string | undefined;
     desc?: string | undefined;
     iconUrl?: string | undefined;
+    bannerUrl?: string | undefined;
   }) => {
     const toUpdate: any = {};
     if (title && title !== workflow.title) toUpdate.title = title;
     if (desc && desc !== workflow.desc) toUpdate.desc = desc;
     if (iconUrl && iconUrl !== workflow.icon_url) toUpdate.iconUrl = iconUrl;
+    if (bannerUrl && bannerUrl !== workflow.banner_url)
+      toUpdate.bannerUrl = bannerUrl;
     await updateAWorkflowInfo({
       info: {
         id: workflowId,
@@ -170,7 +174,7 @@ function Header({
         onCancel={() => setShowVersionHistory(false)}
       />
       <div
-        className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
+        className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white drop-shadow-md`}
       >
         <Space
           className='flex items-center'
@@ -183,7 +187,7 @@ function Header({
               navigate('/');
             }}
           >
-            <div className='flex items-center'>
+            <div className='flex items-center cursor-pointer'>
               <LogoSyncVote />
               <div className='text-violet-700 text-[20px] font-bold '>
                 Syncvote
@@ -200,7 +204,7 @@ function Header({
           <Space
             direction='horizontal'
             size='small'
-            className='cursor-pointer'
+            className='cursor-pointer hover:text-violet-500'
             onClick={() => setShowWorkflowPanel(true)}
           >
             <Icon iconUrl={workflow?.icon_url} size='medium' />

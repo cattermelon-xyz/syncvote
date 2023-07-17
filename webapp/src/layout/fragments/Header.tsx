@@ -101,7 +101,7 @@ function Header({ session }: HeaderProps) {
 
   return (
     <div
-      className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
+      className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white drop-shadow-md`}
     >
       <div className=' w-full flex justify-between'>
         <div className='flex p-0 gap-2 items-center'>
@@ -197,10 +197,7 @@ function Header({ session }: HeaderProps) {
             onOpenChange={handleOpenChange}
           >
             <div className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'>
-              <Icon
-                size='medium'
-                iconUrl={user?.avatar_url}
-              />
+              <Icon size='medium' iconUrl={user?.avatar_url} />
               <p className='text-text_2 text-[#252422] ml-2'>
                 {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
                 {user?.full_name}
