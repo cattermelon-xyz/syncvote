@@ -356,7 +356,8 @@ export const queryVersionHistory = async ({
     .from('workflow_version_history_view')
     .select()
     .eq('workflow_version_id', versionId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(5);
   if (!error) {
     // pre-process data
     const newData = structuredClone(data) || [];

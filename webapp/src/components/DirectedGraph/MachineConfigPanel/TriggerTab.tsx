@@ -1,4 +1,4 @@
-import { IWeb2Integration } from '@types';
+import { GraphViewMode, IWeb2Integration } from '@types';
 import { Button, Space } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useContext, useState } from 'react';
@@ -38,7 +38,7 @@ const getProvider = (provider: string) => {
 };
 
 const TriggerTab = () => {
-  const { data, selectedNodeId, web2Integrations, editable, onChange } =
+  const { data, selectedNodeId, web2Integrations, viewMode, onChange } =
     useContext(GraphPanelContext);
   const selectedNode = data.checkpoints?.find(
     (chk: any) => chk.id === selectedNodeId
@@ -76,33 +76,37 @@ const TriggerTab = () => {
     });
   });
   return (
-    <Space direction="vertical" className="w-full" size="large">
+    <Space direction='vertical' className='w-full' size='large'>
       {!triggers || triggers.length === 0 ? (
         <TriggerEmptyStage
           onClick={() => {
             setShowAddTriggerDrawer(true);
           }}
-          editable={editable || false}
+          editable={
+            viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
+            viewMode === GraphViewMode.EDIT_MISSION ||
+            false
+          }
         />
       ) : (
         <>
-          <Space direction="vertical" size="middle" className="w-full">
+          <Space direction='vertical' size='middle' className='w-full'>
             {triggers.map((trigger: ITrigger, index: number) => {
               const display = getProvider(trigger.provider).Display;
               return (
                 <Space
-                  direction="vertical"
-                  size="small"
-                  className="rounded-md border-2 p-4 w-full"
+                  direction='vertical'
+                  size='small'
+                  className='rounded-md border-2 p-4 w-full'
                   key={trigger.id || Math.random()}
                 >
                   <Space
-                    direction="horizontal"
-                    className="w-full flex justify-between"
+                    direction='horizontal'
+                    className='w-full flex justify-between'
                   >
                     <Paragraph
                       style={{ marginBottom: '0px' }}
-                      className="text-lg font-semibold flex items-center"
+                      className='text-lg font-semibold flex items-center'
                       editable={{
                         onChange: (name) => {
                           const newTriggers = [...triggers];
@@ -118,7 +122,7 @@ const TriggerTab = () => {
                     </Paragraph>
                     <Button
                       icon={<DeleteOutlined />}
-                      className="text-red-500"
+                      className='text-red-500'
                       onClick={() => {
                         const tmpSelectedNode = structuredClone(selectedNode);
                         const tmpTriggers = [...triggers];
@@ -128,7 +132,12 @@ const TriggerTab = () => {
                           triggers: tmpTriggers,
                         });
                       }}
-                      disabled={!editable}
+                      disabled={
+                        !(
+                          viewMode === GraphViewMode.EDIT_MISSION ||
+                          viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                        )
+                      }
                     />
                   </Space>
                   {display({
@@ -150,12 +159,17 @@ const TriggerTab = () => {
             })}
           </Space>
           <Button
-            type="default"
-            className="w-full"
+            type='default'
+            className='w-full'
             onClick={() => {
               setShowAddTriggerDrawer(true);
             }}
-            disabled={!editable}
+            disabled={
+              !(
+                viewMode === GraphViewMode.EDIT_MISSION ||
+                viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+              )
+            }
           >
             Add Trigger
           </Button>

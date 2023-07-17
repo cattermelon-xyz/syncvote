@@ -28,7 +28,7 @@ export interface IToken {
   min?: number;
 }
 
-export enum GraphStatus {
+export enum GraphViewMode {
   EDIT_WORKFLOW_VERSION,
   EDIT_MISSION,
   VIEW_ONLY,
@@ -36,7 +36,7 @@ export enum GraphStatus {
 
 // TODO: do we need this interface or the ICheckPoint interface is sufficient?
 export interface IVoteMachineConfigProps {
-  editable: boolean;
+  viewMode: GraphViewMode;
   currentNodeId?: string;
   allNodes: any[];
   children: string[];
@@ -140,8 +140,7 @@ export interface IGraph {
   selectedEdgeId?: string;
   selectedLayoutId?: string;
   cosmetic?: IWorkflowVersionCosmetic;
-  // TODO: replace with enum
-  editable?: boolean;
+  viewMode?: GraphViewMode;
   navPanel?: JSX.Element;
   web2Integrations?: any[];
   shouldExportImage?: boolean;
@@ -167,7 +166,7 @@ export interface IConfigPanel {
   selectedNodeId?: string;
   selectedLayoutId?: string;
   web2Integrations?: any[];
-  editable?: boolean;
+  viewMode?: GraphViewMode;
   onChange: (data: ICheckPoint) => void;
   onDelete: (ckpId: string) => void;
   onClose: () => void;

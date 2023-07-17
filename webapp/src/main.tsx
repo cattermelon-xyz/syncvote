@@ -10,17 +10,19 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
     {/* <React.StrictMode> */}
     <ConfigProvider
-     theme={{
+      theme={{
         token: {
           colorPrimary: '#5D23BB',
           colorLink: '#5D23BB',
           colorSuccessBg: '#EAF6EE',
           colorSuccessText: '#29A259',
+          colorTextDisabled: '#BDA5E3',
+          colorBgContainerDisabled: '#F4F0FA',
         },
       }}
     >
-      <AppRoutes />  
+      <AppRoutes />
     </ConfigProvider>
     {/* </React.StrictMode> */}
-  </Provider>,
+  </Provider>
 );

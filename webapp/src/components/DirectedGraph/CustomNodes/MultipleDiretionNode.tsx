@@ -8,6 +8,14 @@ import { Handle, Position } from 'reactflow';
 
 import parse from 'html-react-parser';
 import moment from 'moment';
+import {
+  FaLocationArrow,
+  FaLocationPin,
+  FaMapLocation,
+  FaMapPin,
+} from 'react-icons/fa6';
+import { GrLocationPin } from 'react-icons/gr';
+import { LuMapPin } from 'react-icons/lu';
 // TODO: how to register getIcon in 1 place?
 const getIcon = (provider: string, id: number | undefined) => {
   let rs = <></>;
@@ -41,32 +49,33 @@ const Node = memo(
       ? 'border-2 border-violet-500'
       : 'border border-slate-700 ';
     const style = data.style;
+    const votingLocation = data.raw?.votingLocation || '';
     return (
       <>
         <Handle
           id={`t-${Position.Top}`}
-          type="target"
+          type='target'
           position={Position.Top}
           style={{ background: '#aca' }}
           isConnectable={isConnectable}
         />
         <Handle
           id={`t-${Position.Left}`}
-          type="target"
+          type='target'
           position={Position.Left}
           style={{ background: '#aca' }}
           isConnectable={isConnectable}
         />
         <Handle
           id={`t-${Position.Bottom}`}
-          type="target"
+          type='target'
           position={Position.Bottom}
           style={{ background: '#aca' }}
           isConnectable={isConnectable}
         />
         <Handle
           id={`t-${Position.Right}`}
-          type="target"
+          type='target'
           position={Position.Right}
           style={{ background: '#aca' }}
           isConnectable={isConnectable}
@@ -74,28 +83,28 @@ const Node = memo(
 
         <Handle
           id={`s-${Position.Top}`}
-          type="source"
+          type='source'
           position={Position.Top}
           style={{ background: '#ccc' }}
           isConnectable={isConnectable}
         />
         <Handle
           id={`s-${Position.Left}`}
-          type="source"
+          type='source'
           position={Position.Left}
           style={{ background: '#ccc' }}
           isConnectable={isConnectable}
         />
         <Handle
           id={`s-${Position.Bottom}`}
-          type="source"
+          type='source'
           position={Position.Bottom}
           style={{ background: '#ccc' }}
           isConnectable={isConnectable}
         />
         <Handle
           id={`s-${Position.Right}`}
-          type="source"
+          type='source'
           position={Position.Right}
           style={{ background: '#ccc' }}
           isConnectable={isConnectable}
@@ -106,20 +115,31 @@ const Node = memo(
           }`}
         >
           {duration > 0 ? (
-            <div className="absolute -top-8 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs">
-              <ClockCircleOutlined className="pr-2" />
+            <div className='absolute -top-8 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
+              <ClockCircleOutlined className='pr-2' />
               {moment.duration(duration).humanize()}
             </div>
           ) : null}
           <div
-            className={
-              description ? 'bg-zinc-100 p-2 rounded-t-md' : 'p-2 rounded-md'
-            }
+            className={`p-2 font-bold ${
+              description ? 'bg-zinc-100 rounded-t-md' : 'rounded-md'
+            }`}
             style={style.title ? style.title : {}}
           >
             {data.label ? parse(data.label) : id}
           </div>
-          {data.triggers && data.triggers.length > 0 ? (
+          {votingLocation ? ( // TODO: voting condition
+            <div style={style.content ? style.content : {}} className='py-2'>
+              {votingLocation ? (
+                <div className='flex text-ellipsis items-center px-2'>
+                  <LuMapPin className='mr-2' />
+                  {votingLocation}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {/* {data.triggers && data.triggers.length > 0 ? (
             <div className="text-xs flex justify-center gap-0.5 p-2">
               {data.triggers.map((trigger: any) => {
                 const icon = getIcon(trigger.provider, trigger.id);
@@ -137,7 +157,7 @@ const Node = memo(
             >
               {parse(description)}
             </div>
-          ) : null}
+          ) : null} */}
         </div>
       </>
     );
