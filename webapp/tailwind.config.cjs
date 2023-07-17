@@ -1199,6 +1199,8 @@ module.exports = {
     },
   },
   plugins: [],
-  corePlugins: {},
+  corePlugins: {
+    preflight: false,
+  },
   content: ['./src/**/*.{js,jsx,ts,tsx,html}', './index.html'],
 };

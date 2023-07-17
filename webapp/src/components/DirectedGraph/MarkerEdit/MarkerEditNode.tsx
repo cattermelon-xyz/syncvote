@@ -1,7 +1,8 @@
-import { Input, Popover, Space } from 'antd';
+import { Divider, Input, Popover, Space } from 'antd';
 import { Markers } from '../markers';
 import { GraphPanelContext } from '../context';
 import { useContext } from 'react';
+import { DownOutlined } from '@ant-design/icons';
 
 const MarkerEditNode = () => {
   const { data, selectedLayoutId, selectedNodeId, onChangeLayout } =
@@ -25,15 +26,16 @@ const MarkerEditNode = () => {
   const markers = selectedLayout?.markers || [];
   return (
     <Input
-      prefix={
+      size='large'
+      addonBefore={
         <Popover
           content={
-            <Space direction="horizontal">
+            <Space direction='horizontal'>
               {Markers.map((marker: any) => {
                 return (
                   <div
                     key={marker.title.backgroundColor}
-                    className="w-[16px] h-[16px] border-2 cursor-pointer"
+                    className='w-[16px] h-[16px] border-2 cursor-pointer'
                     style={{
                       backgroundColor: marker.title.backgroundColor,
                     }}
@@ -96,22 +98,26 @@ const MarkerEditNode = () => {
               })}
             </Space>
           }
+          trigger='click'
         >
-          <div
-            className="w-[24px] h-[24px] rounded-md border cursor-pointer mr-2"
-            style={{
-              backgroundColor: style?.title.backgroundColor,
-            }}
-          ></div>
+          <Space.Compact direction='horizontal' className='flex items-center'>
+            <div
+              className='w-[24px] h-[24px] rounded-md border cursor-pointer mr-1'
+              style={{
+                backgroundColor: style?.title.backgroundColor,
+              }}
+            ></div>
+            <DownOutlined />
+          </Space.Compact>
         </Popover>
       }
-      className="w-full"
+      className='w-full py-2'
       value={
         markers.find(
           (marker: any) => marker.color === style?.title?.backgroundColor
         )?.title || ''
       }
-      placeholder="Write a label"
+      placeholder='Write a label'
       onChange={(e) => {
         const label = e.target.value;
         const tmp = structuredClone(selectedLayout);
