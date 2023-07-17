@@ -26,8 +26,7 @@ import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
 import AccountSetting from '@pages/AccounRefactor/pages/AccountSetting';
 import FixedLayout from '@layout/FixedLayout';
 const SpacePage = React.lazy(() => import('@pages/OrganizationRefactor'));
-import { ROUTER_SPACE } from '@pages/OrganizationRefactor/config/route';
-import { ROUTER_ACCOUNT } from '@pages/AccounRefactor/config/route';
+
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
@@ -66,26 +65,27 @@ const AppRoutes = () => (
         <Route path='login' element={<CreatorLogin />} />
       </Route>
 
-
       {/* ROUTE FOR SPACE */}
       <Route
         path='/'
         element={<App layout={FixedLayout} requiredLogin={true} />}
       >
-        <Route index element={<SpacePage tabKey={ROUTER_SPACE.HOME} />} />
+        <Route index element={<SpacePage tabKey={'/'} />} />
         <Route
-          path={ROUTER_SPACE.MY_SPACES}
-          element={<SpacePage tabKey={ROUTER_SPACE.MY_SPACES} />}
+          path='/my-spaces'
+          element={<SpacePage tabKey={'/my-spaces'} />}
         />
         <Route
-          path={ROUTER_SPACE.SHARED_SPACES}
-          element={<SpacePage tabKey={ROUTER_SPACE.SHARED_SPACES} />}
+          path='/shared_spaces'
+          element={<SpacePage tabKey={'/shared_spaces'} />}
         />
       </Route>
 
       {/* ROUTE FOR ACCOUNT */}
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        <Route path={ROUTER_ACCOUNT.ACCOUNT_SETTING} element={<AccountSetting />} />
+        <Route path='account'>
+          <Route path='setting' element={<AccountSetting />} />
+        </Route>
       </Route>
 
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>

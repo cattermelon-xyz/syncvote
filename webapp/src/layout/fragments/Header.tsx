@@ -75,7 +75,7 @@ function Header({ session }: HeaderProps) {
           icon={<SettingOutlined />}
           onClick={() => {
             setOpenPopover(false);
-            navigate(`/account-setting/${user?.id}`);
+            navigate(`/account/setting`);
           }}
         >
           {L('accountSettings')}

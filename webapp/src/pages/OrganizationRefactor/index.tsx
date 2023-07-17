@@ -1,9 +1,50 @@
 import React from 'react';
 import { Tabs, Button } from 'antd';
-import { ROUTER_SPACE } from './config/route';
+import { TabsProps } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { tabItems } from './config/navigationConfig';
 import { UploadOutlined } from '@ant-design/icons';
+import { Footer } from 'antd/es/layout/layout';
+import './styles.scss';
+import {
+  HomeOutlined,
+  FolderOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons';
+
+import Home from './pages/Home';
+
+const tabItems: TabsProps['items'] = [
+  {
+    key: '/',
+    label: (
+      <>
+        <HomeOutlined /> Home
+      </>
+    ),
+    children: <Home />,
+  },
+  {
+    key: '/my-spaces',
+    label: (
+      <>
+        <>
+          <FolderOutlined /> My Spaces
+        </>
+      </>
+    ),
+    children: `Content of Tab Pane 2`,
+  },
+  {
+    key: '/shared_spaces',
+    label: (
+      <>
+        <ShareAltOutlined /> Shared Spaces
+      </>
+    ),
+    children: `Content of Tab Pane 3`,
+  },
+];
+
 export interface PageProps {
   tabKey: string;
 }
@@ -18,11 +59,11 @@ const SpacePage: React.FC<PageProps> = (props) => {
   return (
     <React.Fragment>
       <Tabs
-        className='w-full h-full'
+        className='tabs-homepage-config-panel w-full h-full pl-4'
         tabBarStyle={{ maxHeight: '95%' }}
         size='large'
         tabPosition='left'
-        defaultActiveKey={ROUTER_SPACE.HOME}
+        defaultActiveKey={'/'}
         activeKey={tabKey}
         items={tabItemsMemo}
         tabBarExtraContent={{
