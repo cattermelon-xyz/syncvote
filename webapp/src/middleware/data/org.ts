@@ -127,6 +127,79 @@ export const upsertAnOrg = async ({
     onError(error);
   }
 };
+export const getDataOrgs = async ({
+  userId,
+  offset,
+  limit,
+  dispatch,
+  onSuccess,
+  onError = (error) => {
+    console.error(error);
+  },
+}: {
+  userId: any;
+  offset: any;
+  limit: any;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+}) => {
+  const start = offset;
+  const end = offset + limit - 1;
+
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('user_org')
+    .select(
+      `
+    org (
+      id,
+      title,
+      desc,
+      icon_url,
+      banner_url,
+      preset_icon_url,
+      preset_banner_url,
+      org_size,
+      org_type
+    )
+  `
+    )
+    .eq('user_id', userId)
+    .range(start, end);
+
+  if (!error) {
+    const tmp: any[] = [];
+    data.forEach((d: any) => {
+      const org: any = d?.org || {
+        id: '',
+        title: '',
+        desc: '',
+      };
+      const presetIcon = org?.preset_icon_url
+        ? `preset:${org.preset_icon_url}`
+        : org.preset_icon_url;
+      const presetBanner = org?.preset_banner_url
+        ? `preset:${org.preset_banner_url}`
+        : org.preset_banner_url;
+      tmp.push({
+        id: org?.id,
+        title: org?.title,
+        desc: org.desc,
+        icon_url: org.icon_url ? org.icon_url : presetIcon,
+        banner_url: org.banner_url ? org.banner_url : presetBanner,
+        org_size: org.org_size,
+        org_type: org.org_type,
+      });
+    });
+    dispatch(setOrgsInfo(tmp));
+    dispatch(setLastFetch({}));
+    onSuccess(tmp);
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
+};
 export const queryOrgs = async ({
   filter,
   onSuccess,
@@ -162,8 +235,7 @@ export const queryOrgs = async ({
       profile (
         id,
         email,
-        full_name,
-        avatar_url
+        full_name
       )
     )
   `

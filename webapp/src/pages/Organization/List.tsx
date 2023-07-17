@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from '@components/Button/Button';
 import { L } from '@utils/locales/L';
-import { Layout } from 'antd';
+import { Dropdown, Layout, MenuProps, Space } from 'antd';
 import {
   PlusOutlined,
   DownOutlined,
@@ -9,6 +9,7 @@ import {
   FolderOutlined,
   ShareAltOutlined,
   LogoutOutlined,
+  FileOutlined,
 } from '@ant-design/icons';
 import HomeButton from '@components/HomeScreen/HomeButton';
 import ListHome from './list/ListHome';
@@ -21,11 +22,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { supabase } from '@utils/supabaseClient';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import CreateWorkflowModal from './list/CreateWorkflowModal';
 
 const { Sider } = Layout;
 
 const Organization = () => {
-  const [openModal, setOpenModal] = useState(false);
+  const [openModalCreateWorkspace, setOpenModalCreateWorkspace] =
+    useState(false);
+  const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(false);
   const [currentStatus, setCurrentStatus] = useState('listHome');
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,12 +53,53 @@ const Organization = () => {
     }
   }, [location.pathname]);
 
-  const showModal = () => {
-    setOpenModal(true);
+  const showModalCreateWorkspace = () => {
+    setOpenModalCreateWorkspace(true);
   };
 
-  const closeModal = () => {
-    setOpenModal(false);
+  const closeModalCreateWorkspace = () => {
+    setOpenModalCreateWorkspace(false);
+  };
+
+  const showModalCreateWorkflow = () => {
+    setOpenModalCreateWorkflow(true);
+  };
+
+  const closeModalCreateWorkflow = () => {
+    setOpenModalCreateWorkflow(false);
+  };
+
+  const items: MenuProps['items'] = [
+    {
+      label: (
+        <p>
+          <FileOutlined /> Workflow
+        </p>
+      ),
+      key: '0',
+    },
+    {
+      label: (
+        <p>
+          <FolderOutlined /> Workspace
+        </p>
+      ),
+      key: '1',
+    },
+  ];
+
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e?.key === '0') {
+      showModalCreateWorkflow();
+    } else if (e?.key === '1') {
+      showModalCreateWorkspace();
+    }
+    console.log('click', e?.key);
+  };
+
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
   };
 
   return (
@@ -63,14 +108,15 @@ const Organization = () => {
         theme='light'
         className='overflow-auto min-h-screen border-r w-1/5 flex flex-col relative'
       >
-        <Button
-          startIcon={<PlusOutlined />}
-          endIcon={<DownOutlined />}
-          className='my-6 ml-8 mr-4'
-          onClick={showModal}
-        >
-          {L('createNew')}
-        </Button>
+        <Dropdown menu={menuProps} trigger={['click']}>
+          <Button
+            startIcon={<PlusOutlined />}
+            endIcon={<DownOutlined />}
+            className='my-6 ml-8 mr-4'
+          >
+            <Space>{L('createNew')}</Space>
+          </Button>
+        </Dropdown>
         <div className='flex flex-col pl-4'>
           <HomeButton
             startIcon={<HomeOutlined />}
@@ -133,7 +179,15 @@ const Organization = () => {
           )}
         </div>
       </div>
-      <CreateSpaceModal open={openModal} onClose={closeModal} />
+      <CreateSpaceModal
+        open={openModalCreateWorkspace}
+        onClose={closeModalCreateWorkspace}
+      />
+
+      <CreateWorkflowModal
+        open={openModalCreateWorkflow}
+        onClose={closeModalCreateWorkflow}
+      />
     </div>
   );
 };
