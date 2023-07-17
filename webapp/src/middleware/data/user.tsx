@@ -1,6 +1,6 @@
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { supabase } from '@utils/supabaseClient';
-import { addUserToOrg } from '@redux/reducers/orginfo.reducer';
+import { addUserToOrg, setUser } from '@redux/reducers/orginfo.reducer';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -44,6 +44,7 @@ export const inviteUserByEmail = async ({
   }
   dispatch(finishLoading({}));
 };
+
 export const queryUserByEmail = async ({
   email,
   dispatch,
@@ -67,6 +68,94 @@ export const queryUserByEmail = async ({
   } else {
     onSuccess(data);
   }
+};
+
+export const queryUserById = async ({
+  userId,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
+}: {
+  userId: string;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (error: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('profile')
+    .select('id, email, full_name, icon_url,preset_icon_url, about_me')
+    .eq('id', userId);
+  if (error) {
+    onError(error);
+  } else {
+    const profileInfo = data[0];
+    const presetIcon = profileInfo?.preset_icon_url
+      ? `preset:${profileInfo.preset_icon_url}`
+      : profileInfo.preset_icon_url;
+    onSuccess(data);
+    dispatch(
+      setUser({
+        id: profileInfo.id,
+        email: profileInfo.email,
+        full_name: profileInfo.full_name,
+        avatar_url: profileInfo.icon_url ? profileInfo.icon_url : presetIcon,
+        about_me: profileInfo.about_me,
+      })
+    );
+    dispatch(finishLoading({}));
+  }
+};
+
+export const updateUserProfile = async ({
+  userProfile,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
+}: {
+  userProfile: any;
+  dispatch: any;
+  onSuccess: () => void;
+  onError?: (error: any) => void;
+}) => {
+  const newUserProfile = { ...userProfile };
+  dispatch(startLoading({}));
+  const props = [
+    'id',
+    'email',
+    'full_name',
+    'icon_url',
+    'preset_icon_url',
+    'about_me',
+  ];
+  Object.keys(newUserProfile).forEach((key) => {
+    if (props.indexOf(key) === -1) {
+      delete newUserProfile[key];
+    }
+  });
+  if (newUserProfile.icon_url?.indexOf('preset:') === 0) {
+    newUserProfile.preset_icon_url = newUserProfile.icon_url.replace(
+      'preset:',
+      ''
+    );
+    newUserProfile.icon_url = '';
+  }
+  console.log('debug1');
+  const { error } = await supabase
+    .from('profile')
+    .update(newUserProfile)
+    .eq('id', newUserProfile.id);
+  if (!error) {
+    console.log('debug2');
+    onSuccess();
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
 };
 
 export const addMemberToOrg = async ({
@@ -95,6 +184,8 @@ export const addMemberToOrg = async ({
   if (error) {
     onError(error);
   } else {
+    console.log('data user', data);
+
     const infoMember = {
       id: user_id,
       email: email,

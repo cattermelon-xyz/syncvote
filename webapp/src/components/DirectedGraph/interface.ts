@@ -136,6 +136,8 @@ export interface IGraph {
   editable?: boolean;
   navPanel?: JSX.Element;
   web2Integrations?: any[];
+  shouldExportImage?: boolean;
+  setExportImage?: (value: boolean) => void;
   onNodeClick?: (event: any, data: any) => void;
   onEdgeClick?: (event: any, data: any) => void;
   onLayoutClick?: (data: any) => void;

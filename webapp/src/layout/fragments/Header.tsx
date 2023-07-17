@@ -7,8 +7,14 @@ import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
-import { Avatar, Button } from 'antd';
-import { HomeOutlined, BellOutlined } from '@ant-design/icons';
+import { Avatar, Button, Popover, Space } from 'antd';
+import Icon from '@components/Icon/Icon';
+import {
+  HomeOutlined,
+  BellOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 
@@ -27,14 +33,21 @@ function Header({ session }: HeaderProps) {
   const params = useLocation();
   // const token = window.localStorage.getItem('isConnectWallet');
   const dispatch = useDispatch();
-  const { orgs } = useSelector((state: any) => state.orginfo);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
   const navigate = useNavigate();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
   const [currentOrg, setCurrentOrg] = useState(
     orgs.find((org: any) => org.id === orgId)
   );
+  const [openPopover, setOpenPopover] = useState(false);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpenPopover(newOpen);
+  };
+
   const handleClearStore = () => {};
+
   useEffect(() => {
     setCurrentOrg(orgs.find((org: any) => org.id === orgId));
   }, [orgs, orgId]);
@@ -54,7 +67,38 @@ function Header({ session }: HeaderProps) {
       break;
   }
 
-  const onSearch = (value: string) => console.log(value);
+  const contentPopOver = (
+    <div>
+      <div>
+        <Button
+          type='text'
+          icon={<SettingOutlined />}
+          onClick={() => {
+            setOpenPopover(false);
+            navigate(`/account-setting/${user?.id}`);
+          }}
+        >
+          {L('accountSettings')}
+        </Button>
+      </div>
+      <div>
+        <Button
+          type='text'
+          icon={<LogoutOutlined />}
+          className='w-full flex items-center'
+          onClick={async () => {
+            dispatch(startLoading({}));
+            await supabase.auth.signOut();
+            dispatch(finishLoading({}));
+            navigate('/login');
+          }}
+        >
+          {L('logOut')}
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div
       className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
@@ -141,31 +185,29 @@ function Header({ session }: HeaderProps) {
             </span>
           </div>
         </div>
-        <div className='flex w-w_3 items-center justify-end gap-3'>
+        <Space className='flex w-w_3 items-center justify-end gap-3'>
           <div className='flex rounded-full h-11 w-11 bg-gray-100 justify-center cursor-pointer'>
             <BellOutlined style={{ fontSize: '24px' }} />
           </div>
-          <div
-            className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'
-            onClick={async () => {
-              dispatch(startLoading({}));
-              await supabase.auth.signOut();
-              dispatch(finishLoading({}));
-              navigate('/login');
-            }}
-            title={L('clickToLogout')}
+          <Popover
+            placement='bottomRight'
+            content={contentPopOver}
+            trigger='click'
+            open={openPopover}
+            onOpenChange={handleOpenChange}
           >
-            <p className='text-text_2 text-[#252422]'>
-              {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
-              <img
-                src={session?.user?.user_metadata?.avatar_url}
-                alt='user_avatar'
-                className='w-8 h-8 rounded-full inline-block mr-2'
+            <div className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'>
+              <Icon
+                size='medium'
+                iconUrl={user?.avatar_url}
               />
-              {session?.user?.user_metadata?.full_name}
-            </p>
-          </div>
-        </div>
+              <p className='text-text_2 text-[#252422] ml-2'>
+                {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
+                {user?.full_name}
+              </p>
+            </div>
+          </Popover>
+        </Space>
       </div>
     </div>
   );

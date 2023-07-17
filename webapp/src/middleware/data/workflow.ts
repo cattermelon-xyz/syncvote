@@ -5,6 +5,8 @@ import {
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
+  deleteWorkflow,
+  deleteWorkflowVersion,
 } from '@redux/reducers/workflow.reducer';
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
@@ -115,7 +117,6 @@ export const upsertWorkflowVersion = async ({
     .upsert(toUpsert)
     .select();
   if (data) {
-    console.log('data from server: ', data);
     dispatch(changeWorkflowVersion(data[0]));
     onSuccess(data[0]);
   } else {
@@ -139,7 +140,6 @@ export const queryWorkflow = async ({
   filter?: any;
 }) => {
   dispatch(startLoading({}));
-  // TODO: should we stuff workflow_version into workflow?
   const { data, error } = await supabase
     .from('workflow')
     .select('*, workflow_version ( * ), tag_workflow ( tag (*))')
@@ -317,14 +317,15 @@ export const updateAWorkflowTag = async ({
   });
   dispatch(startLoading({}));
   if (toInsert.length > 0) {
-    const { data, error } = await supabase.from('tag_workflow').insert(
-      toInsert.map((tagId) => {
-        return {
-          workflow_id: workflow.id,
-          tag_id: tagId,
-        };
-      })
-    );
+    const toInsertObjects = toInsert.map((tagId) => {
+      return {
+        workflow_id: workflow.id,
+        tag_id: tagId,
+      };
+    });
+    const { data, error } = await supabase
+      .from('tag_workflow')
+      .insert(toInsertObjects);
     if (!error) {
       dispatch(changeWorkflow({ ...workflow, tags: newTags }));
     } else {
@@ -360,17 +361,111 @@ export const deleteAWorkflow = async ({
 }) => {
   dispatch(startLoading({}));
 
+  await supabase.from('workflow').delete().eq('id', workflowId);
+  const { data, error } = await supabase
+    .from('workflow')
+    .select('id')
+    .eq('id', workflowId);
+  dispatch(finishLoading({}));
+  if (error || (data && data.length === 0)) {
+    dispatch(deleteWorkflow({ id: workflowId }));
+    onSuccess(data);
+  } else {
+    onError({
+      message: 'Failed to delete workflow',
+    });
+  }
+};
+
+export const deleteAWorkflowVersion = async ({
+  workflowVersionId,
+  dispatch,
+  onSuccess,
+  onError = () => {},
+}: {
+  workflowVersionId: number;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+}) => {
+  dispatch(startLoading({}));
+
   const { data, error } = await supabase
     .from('workflow_version')
     .delete()
-    .eq('id', workflowId);
+    .eq('id', workflowVersionId);
 
   dispatch(finishLoading({}));
-
   if (!error) {
-    // dispatch(removeWorkflow(workflowId));
     onSuccess(data);
   } else if (error) {
     onError(error);
   }
+};
+
+export const queryVersionHistory = async ({
+  versionId,
+  dispatch,
+  onSuccess,
+  onError = () => {},
+}: {
+  versionId: number;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  // dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('workflow_version_history_view')
+    .select()
+    .eq('workflow_version_id', versionId)
+    .order('created_at', { ascending: false });
+  if (!error) {
+    // pre-process data
+    const newData = structuredClone(data) || [];
+    data.forEach((d: any, index: number) => {
+      const presetIcon = d.preset_icon_url
+        ? `preset:${d.preset_icon_url}`
+        : d.icon_url;
+      newData[index].icon_url = d.icon_url ? d.icon_url : presetIcon;
+      delete newData[index].preset_icon_url;
+    });
+    onSuccess(data);
+  } else {
+    console.error('Cannot fetch version history', error);
+    onError(error);
+  }
+  // dispatch(finishLoading({}));
+};
+
+export const queryVersionEditor = async ({
+  versionId,
+  dispatch,
+  onSuccess,
+  onError,
+}: {
+  versionId: number;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  // dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('workflow_version_editor_view')
+    .select()
+    .eq('workflow_version_id', versionId);
+  if (!error) {
+    const newData = structuredClone(data) || [];
+    data.forEach((d: any, index: number) => {
+      const presetIcon = d.preset_icon_url
+        ? `preset:${d.preset_icon_url}`
+        : d.icon_url;
+      newData[index].icon_url = d.icon_url ? d.icon_url : presetIcon;
+      delete newData[index].preset_icon_url;
+    });
+    onSuccess(newData);
+  } else {
+    console.error('Cannot load version editor', error);
+  }
+  // dispatch(finishLoading({}));
 };

@@ -5,7 +5,11 @@ import ReactFlow, {
   Panel,
   ReactFlowProvider,
   useOnViewportChange,
+  useReactFlow,
+  getRectOfNodes,
+  getTransformForBounds,
 } from 'reactflow';
+import { toPng } from 'html-to-image';
 import React, { useEffect, useCallback, useState, useContext } from 'react';
 import { Button, Drawer, Modal, Space } from 'antd';
 import { BulbOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons';
@@ -29,6 +33,13 @@ const edgeTypes = {
   ...BezierCustomEdge.getType(),
   ...SmoothCustomEdge.getType(),
 };
+function downloadImage(dataUrl: any) {
+  const a = document.createElement('a');
+
+  a.setAttribute('download', 'reactflow.png');
+  a.setAttribute('href', dataUrl);
+  a.click();
+}
 
 // TODO: should change editable to isWorkflow to reflect the real meaning
 const Flow = () => {
@@ -54,6 +65,8 @@ const Flow = () => {
     onConfigPanelClose,
     onChangeLayout,
     onConfigEdgePanelClose,
+    shouldExportImage,
+    setExportImage,
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -67,7 +80,11 @@ const Flow = () => {
 
     setNodes(obj.nodes);
     setEdges(obj.edges);
-  }, [data, selectedNodeId, selectedLayoutId]);
+    if (shouldExportImage) {
+      selfDownloadImage({ imageWidth: 1344, imageHeight: 768 });
+      setExportImage ? setExportImage(false) : null;
+    }
+  }, [data, selectedNodeId, selectedLayoutId, shouldExportImage]);
   const proOptions = {
     hideAttribution: true,
   };
@@ -77,6 +94,38 @@ const Flow = () => {
   const [showQuickStartDialog, setShowQuickStartDialog] = useState(false);
   const selectedEdge = edges?.find((edge: any) => edge.id === selectedEdgeId);
 
+  const { getNodes } = useReactFlow();
+  const selfDownloadImage = ({
+    imageWidth = 1344,
+    imageHeight = 768,
+  }: {
+    imageWidth?: number;
+    imageHeight?: number;
+  }) => {
+    // we calculate a transform for the nodes so that all nodes are visible
+    // we then overwrite the transform of the `.react-flow__viewport` element
+    // with the style option of the html-to-image library
+    const nodesBounds = getRectOfNodes(getNodes());
+    const transform = getTransformForBounds(
+      nodesBounds,
+      imageWidth,
+      imageHeight,
+      0.4,
+      10
+    );
+
+    toPng(document.querySelector('.react-flow__viewport') as HTMLElement, {
+      backgroundColor: '#fff',
+      width: imageWidth,
+      height: imageHeight,
+      skipAutoScale: true,
+      style: {
+        width: imageWidth + 'px',
+        height: imageHeight + 'px',
+        transform: `translate(${transform[0]}px, ${transform[1]}px) scale(${transform[2]})`,
+      },
+    }).then(downloadImage);
+  };
   return (
     <>
       {renderVoteMachineConfigPanel({

@@ -1,46 +1,62 @@
-import Logo from '@assets/icons/svg-icons/Logo';
 import { L } from '@utils/locales/L';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-// import { sliceAddressToken } from '@utils/helpers';
-// import { AddressToken } from '@utils/mockData/addressToken';
+import { useNavigate, useParams } from 'react-router-dom';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
-import { Avatar, Button, Divider, Modal, Space, Typography } from 'antd';
-import { HomeOutlined, BellOutlined, FolderOutlined } from '@ant-design/icons';
+import { Button, Divider, Modal, Popover, Space } from 'antd';
+import {
+  BellOutlined,
+  FolderOutlined,
+  SaveOutlined,
+  CheckOutlined,
+  EllipsisOutlined,
+  QuestionCircleOutlined,
+  ShareAltOutlined,
+  EyeOutlined,
+  DownloadOutlined,
+  CopyOutlined,
+  DeleteOutlined,
+  ClockCircleOutlined,
+} from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import Icon from '@components/Icon/Icon';
-import Paragraph from 'antd/es/skeleton/Paragraph';
 import EditWorkflow from '@pages/Workflow/BluePrint/fragment/EditWorkflow';
-import { updateAWorkflowInfo, upsertWorkflowVersion } from '@middleware/data';
-import { IWorkflowVersion } from '@types';
+import {
+  deleteAWorkflow,
+  updateAWorkflowInfo,
+  upsertWorkflowVersion,
+} from '@middleware/data';
+import moment from 'moment';
+import VersionHistoryDialog from './VersionHistoryDialog';
+import ShareModal from './ShareModal';
 
 type HeaderProps = {
   session: any;
   workflow: any;
+  dataChanged: boolean;
+  handleSave: (mode: 'data' | 'info' | undefined, changedData?: any) => void;
+  lastSaved: number;
+  handleDownloadImage: (data: any) => void;
 };
 
-enum Pages {
-  ORG_HOME,
-  ORG_SELECTOR,
-  ORG_SETTING,
-  UNKNOWN,
-}
-
-function Header({ session, workflow }: HeaderProps) {
+function Header({
+  session,
+  workflow,
+  dataChanged,
+  handleSave,
+  lastSaved,
+  handleDownloadImage,
+}: HeaderProps) {
   const dispatch = useDispatch();
-  const { orgs } = useSelector((state: any) => state.orginfo);
   const navigate = useNavigate();
   const { orgIdString, workflowIdString } = useParams();
   const workflowId = extractIdFromIdString(workflowIdString);
-  const orgId = extractIdFromIdString(orgIdString);
-  const [currentOrg, setCurrentOrg] = useState(
-    orgs.find((org: any) => org.id === orgId)
-  );
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
   const handleClearStore = () => {};
   const [showWorkflowPanel, setShowWorkflowPanel] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const handleSaveWorkflowInfo = async ({
     title,
     desc,
@@ -101,6 +117,28 @@ function Header({ session, workflow }: HeaderProps) {
       },
     });
   };
+  const handleDeleteWorkflow = async () => {
+    deleteAWorkflow({
+      workflowId: workflow.id,
+      dispatch,
+      onSuccess: () => {
+        Modal.success({
+          title: 'Success',
+          content: 'Workflow deleted',
+          maskClosable: false,
+          onOk: () => {
+            navigate(`/my-spaces/${orgIdString}`);
+          },
+        });
+      },
+      onError: () => {
+        Modal.error({
+          title: 'Error',
+          content: 'Failed to delete workflow',
+        });
+      },
+    });
+  };
   return (
     <>
       <EditWorkflow
@@ -109,6 +147,22 @@ function Header({ session, workflow }: HeaderProps) {
         workflow={workflow}
         onSave={handleSaveWorkflowInfo}
         onStatusChange={handleWorkflowStatusChanged}
+      />
+      <VersionHistoryDialog
+        workflow={workflow}
+        visible={showVersionHistory}
+        onCancel={() => setShowVersionHistory(false)}
+      />
+      <ShareModal
+        workflow={workflow}
+        showShareModal={showShareModal}
+        setShowShareModal={setShowShareModal}
+        handleWorkflowStatusChanged={handleWorkflowStatusChanged}
+      />
+      <VersionHistoryDialog
+        workflow={workflow}
+        visible={showVersionHistory}
+        onCancel={() => setShowVersionHistory(false)}
       />
       <div
         className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
@@ -148,7 +202,104 @@ function Header({ session, workflow }: HeaderProps) {
             <div className='flex items-center font-bold'>{workflow?.title}</div>
           </Space>
         </Space>
-        <div className='flex w-w_3 items-center justify-end gap-3'>
+        <Space
+          className='flex items-center justify-end'
+          direction='horizontal'
+          size='small'
+        >
+          <Space direction='horizontal'>
+            {dataChanged ? (
+              <div>
+                <Button
+                  type='text'
+                  shape='round'
+                  icon={<SaveOutlined />}
+                  className='flex items-center text-violet-500'
+                  onClick={() => handleSave('data')}
+                />
+              </div>
+            ) : (
+              <div className='p-1 rounded-full bg-green-100 w-[24px] h-[24px] flex items-center'>
+                <CheckOutlined className='text-green-500' />
+              </div>
+            )}
+            <div className='text-zinc-500'>
+              {lastSaved !== -1 ? moment(lastSaved).fromNow() : ''}
+            </div>
+          </Space>
+          <Divider type='vertical' />
+          <Space direction='horizontal' size='small'>
+            <Button
+              type='default'
+              className='flex justify-center items-center text-violet-500 bg-violet-100 border-0'
+              icon={<EyeOutlined />}
+            >
+              Preview
+            </Button>
+            <Button
+              type='primary'
+              className='flex justify-center items-center'
+              icon={<ShareAltOutlined />}
+              onClick={() => setShowShareModal(true)}
+            >
+              Share
+            </Button>
+            <Button
+              type='default'
+              className='flex justify-center items-center text-violet-500 bg-violet-100 border-0'
+              icon={<QuestionCircleOutlined />}
+              onClick={() => {
+                window.open('https://docs.syncvote.com', '_blank');
+              }}
+            />
+            <Popover
+              trigger='click'
+              content={
+                <Space direction='vertical' className='w-full'>
+                  <Button
+                    type='link'
+                    icon={<ClockCircleOutlined />}
+                    className='flex items-center p-0 m-0 text-zinc-500 hover:text-violet-500'
+                    onClick={() => setShowVersionHistory(true)}
+                  >
+                    History
+                  </Button>
+                  <Button
+                    type='link'
+                    icon={<DownloadOutlined />}
+                    className='flex items-center p-0 m-0 text-zinc-500 hover:text-violet-500'
+                    onClick={() => handleDownloadImage(true)}
+                  >
+                    Download Image
+                  </Button>
+                  <Button
+                    type='link'
+                    icon={<CopyOutlined />}
+                    className='flex items-center p-0 m-0 text-zinc-500 hover:text-violet-500'
+                    disabled
+                  >
+                    Duplicate new
+                  </Button>
+                  <Button
+                    type='link'
+                    danger
+                    icon={<DeleteOutlined />}
+                    className='flex items-center p-0 m-0 text-zinc-500 hover:text-violet-500'
+                    onClick={handleDeleteWorkflow}
+                  >
+                    Delete
+                  </Button>
+                </Space>
+              }
+            >
+              <Button
+                type='default'
+                className='flex justify-center items-center text-violet-500 bg-violet-100 border-0'
+                icon={<EllipsisOutlined />}
+              />
+            </Popover>
+          </Space>
+          <Divider type='vertical' />
           <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
             <BellOutlined style={{ fontSize: '20px' }} />
           </div>
@@ -168,7 +319,7 @@ function Header({ session, workflow }: HeaderProps) {
               className='w-[36px] h-[36px] rounded-full inline-block mr-2'
             />
           </div>
-        </div>
+        </Space>
       </div>
     </>
   );

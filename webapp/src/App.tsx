@@ -14,6 +14,7 @@ import {
   queryOrgs,
   queryPresetBanner,
   queryPresetIcon,
+  queryUserById,
 } from '@middleware/data';
 import { shouldUseCachedData } from '@utils/helpers';
 import { AuthContext } from '@layout/context/AuthContext';
@@ -63,13 +64,20 @@ function App({
         });
       }
       if (initialized === false) {
-        dispatch(
-          setUser({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata.full_name,
-          })
-        );
+        queryUserById({
+          userId: user.id,
+          onSuccess: () => {},
+          dispatch,
+        })
+        // console.log('user', user);
+        // dispatch(
+        //   setUser({
+        //     id: user.id,
+        //     email: user.email,
+        //     full_name: user.user_metadata.full_name,
+        //     // avatar_url: user.user_metadata.avatar_url,
+        //   })
+        // );
       }
     }
   };

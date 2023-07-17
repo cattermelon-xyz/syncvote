@@ -5,7 +5,7 @@ import {
   queryWorkflow,
   updateAWorkflowInfo,
   upsertWorkflowVersion,
-  deleteAWorkflow,
+  deleteAWorkflowVersion,
 } from '@middleware/data';
 import {
   createIdString,
@@ -60,7 +60,7 @@ const BluePrint = () => {
     let rs = <></>;
     if (recommended === true) {
       rs = (
-        <Tag style={{ border: 'none' }} color="purple">
+        <Tag style={{ border: 'none' }} color='purple'>
           Recommended
         </Tag>
       );
@@ -68,14 +68,14 @@ const BluePrint = () => {
       switch (status) {
         case 'PUBLISHED':
           rs = (
-            <Tag style={{ border: 'none' }} color="green">
+            <Tag style={{ border: 'none' }} color='green'>
               Published
             </Tag>
           );
           break;
         case 'DRAFT':
           rs = (
-            <Tag style={{ border: 'none' }} color="gray">
+            <Tag style={{ border: 'none' }} color='gray'>
               Draft
             </Tag>
           );
@@ -178,8 +178,8 @@ const BluePrint = () => {
   };
 
   const handleDeleteWorkflowVersion = (versionToDelete: { id: number }) => {
-    deleteAWorkflow({
-      workflowId: versionToDelete.id,
+    deleteAWorkflowVersion({
+      workflowVersionId: versionToDelete.id,
       dispatch,
       onSuccess: () => {
         setWorkflow((prevWorkflow) => ({
@@ -204,7 +204,7 @@ const BluePrint = () => {
   };
 
   return (
-    <div className="container mx-auto relative">
+    <div className='container mx-auto relative'>
       <NewVersion
         open={openDupplicate}
         setOpen={(toOpen: boolean) => {
@@ -214,25 +214,25 @@ const BluePrint = () => {
         versionTitle={`Copy of ${versionToCopy?.version}`}
         onSave={handleNewVersion}
       />
-      <Space direction="vertical" className="w-full mt-8">
-        <Space direction="horizontal">
-          <Icon iconUrl={workflow.icon_url} size="medium" />
+      <Space direction='vertical' className='w-full mt-8'>
+        <Space direction='horizontal'>
+          <Icon iconUrl={workflow.icon_url} size='medium' />
           {workflow.title}
         </Space>
         {workflow.desc}
-        <Space direction="horizontal" className="flex justify-between">
+        <Space direction='horizontal' className='flex justify-between'>
           <Button
-            type="link"
+            type='link'
             onClick={() => setOpenWorkflowEdit(true)}
             icon={<EditOutlined />}
-            className="text-violet-500 flex items-center p-0"
+            className='text-violet-500 flex items-center p-0'
           >
             Edit workflow information
           </Button>
-          <Space direction="horizontal">
+          <Space direction='horizontal'>
             <Button
-              type="default"
-              className="flex items-center"
+              type='default'
+              className='flex items-center'
               icon={<PlusOutlined />}
               onClick={() => navigateToNewVersion()}
             >
@@ -240,9 +240,9 @@ const BluePrint = () => {
             </Button>
             {/* TODO: filter by workflow version! */}
             <Button
-              type="default"
+              type='default'
               icon={<PlusOutlined />}
-              className="flex items-center bg-violet-500 text-white hover:text-white"
+              className='flex items-center bg-violet-500 text-white hover:text-white'
             >
               Create a new mission
             </Button>
@@ -250,20 +250,20 @@ const BluePrint = () => {
         </Space>
       </Space>
       <Divider />
-      <div className="flex items-center mb-6 container justify-between">
-        <div className="text-gray-title font-semibold text-text_5 pl-1.5 flex flex-row items-center">
-          <div className="flex flex-row items-center">
-            <span className="inline-block">
+      <div className='flex items-center mb-6 container justify-between'>
+        <div className='text-gray-title font-semibold text-text_5 pl-1.5 flex flex-row items-center'>
+          <div className='flex flex-row items-center'>
+            <span className='inline-block'>
               <ZapIcon />
             </span>
-            <span className="ml-2 hover:text-slate-500 cursor-pointer">
+            <span className='ml-2 hover:text-slate-500 cursor-pointer'>
               <span>Versions</span>
-              <span className="mx-2">({workflow.workflow_version.length})</span>
+              <span className='mx-2'>({workflow.workflow_version.length})</span>
             </span>
           </div>
         </div>
       </div>
-      <div className="grid grid-flow-row grid-cols-3 gap-4 justify-items-left">
+      <div className='grid grid-flow-row grid-cols-3 gap-4 justify-items-left'>
         {workflow.workflow_version.map((version: any) => {
           return (
             <Card
@@ -275,20 +275,20 @@ const BluePrint = () => {
               }`}
               onClick={() => navigateToVersion(version)}
               hoverable
-              size="small"
+              size='small'
             >
-              <Space direction="vertical" size="large" className="w-full">
+              <Space direction='vertical' size='large' className='w-full'>
                 {renderTag(version.status, version.recommended)}
                 <Space
-                  direction="horizontal"
-                  size="large"
-                  className="flex justify-between w-full"
+                  direction='horizontal'
+                  size='large'
+                  className='flex justify-between w-full'
                 >
-                  <Space direction="vertical" size="small" className="w-full">
-                    <div className="font-bold">{version.version}</div>
-                    <div className="text-xs">
+                  <Space direction='vertical' size='small' className='w-full'>
+                    <div className='font-bold'>{version.version}</div>
+                    <div className='text-xs'>
                       Created on
-                      <span className="mx-1">
+                      <span className='mx-1'>
                         {moment(version.created_at).format(
                           'YYYY-MM-DD HH:mm:ss'
                         )}
@@ -298,14 +298,14 @@ const BluePrint = () => {
                   <Popover
                     // trigger={['click']}
                     content={
-                      <Space direction="vertical" size="middle">
+                      <Space direction='vertical' size='middle'>
                         <Button
                           onClick={(e: any) => {
                             e.stopPropagation();
                             navigateToVersion(version);
                           }}
-                          type="default"
-                          className="w-full"
+                          type='default'
+                          className='w-full'
                         >
                           Edit
                         </Button>
@@ -315,8 +315,8 @@ const BluePrint = () => {
                             setVersionToCopy(version);
                             setOpenDupplicate(true);
                           }}
-                          type="default"
-                          className="w-full"
+                          type='default'
+                          className='w-full'
                         >
                           Dupplicate
                         </Button>
@@ -327,20 +327,20 @@ const BluePrint = () => {
                                 e.stopPropagation();
                                 handleDeleteWorkflowVersion(version);
                               }}
-                              type="default"
-                              className="w-full"
+                              type='default'
+                              className='w-full'
                             >
                               Delete
                             </Button>
                           )}
                         {version.status === 'PUBLISHED' ? (
                           <Button
-                            type="default"
+                            type='default'
                             onClick={(e: any) => {
                               e.stopPropagation();
                               navigateToNewMission(version);
                             }}
-                            className="w-full"
+                            className='w-full'
                           >
                             New Mission
                           </Button>
@@ -350,8 +350,8 @@ const BluePrint = () => {
                   >
                     <Button
                       icon={<MoreOutlined />}
-                      shape="circle"
-                      className="flex items-center justify-center"
+                      shape='circle'
+                      className='flex items-center justify-center'
                     />
                   </Popover>
                 </Space>
