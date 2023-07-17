@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
 import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
 import { SaveOutlined } from '@ant-design/icons';
+import { GraphViewMode } from '@types';
 // TODO: forbid special character
 export const NewVersion = () => {
   const [versionToCopy, setVersionToCopy] = useState(-1);
@@ -86,15 +87,15 @@ export const NewVersion = () => {
     });
   };
   return (
-    <Space direction="vertical" size="large" className="container my-8">
+    <Space direction='vertical' size='large' className='container my-8'>
       <h1>Create a new Version</h1>
-      <Space direction="horizontal" className="flex justify-between">
+      <Space direction='horizontal' className='flex justify-between'>
         <span>Version to clone</span>
         <Select
           options={options}
           onChange={(value) => setVersionToCopy(value)}
           style={{ minWidth: '200px' }}
-          className="w-full"
+          className='w-full'
           disabled={screen !== 'chooseVersion'}
         />
       </Space>
@@ -108,7 +109,7 @@ export const NewVersion = () => {
           >
             <DirectedGraph
               data={currentVersion}
-              editable={false}
+              viewMode={GraphViewMode.VIEW_ONLY}
               onChange={() => {}}
               onConfigPanelClose={() => {}}
               onConfigEdgePanelClose={() => {}}
@@ -116,12 +117,12 @@ export const NewVersion = () => {
               onChangeLayout={() => {}}
             />
           </div>
-          <Space direction="horizontal" className="w-full flex justify-between">
-            <Button type="default" disabled>
+          <Space direction='horizontal' className='w-full flex justify-between'>
+            <Button type='default' disabled>
               Back
             </Button>
             <Button
-              type="default"
+              type='default'
               onClick={() => {
                 setScreen('metadata');
               }}
@@ -132,21 +133,21 @@ export const NewVersion = () => {
         </>
       ) : (
         <>
-          <Space direction="vertical" size="small" className="w-full">
+          <Space direction='vertical' size='small' className='w-full'>
             <span>Version title</span>
             <Input
-              placeholder="Version title"
-              className="w-full"
+              placeholder='Version title'
+              className='w-full'
               value={versionTitle}
               onChange={(e) => setVersionTitle(e.target.value)}
             />
           </Space>
           <Space
-            direction="horizontal"
-            className="w-full flex justify-between mt-4"
+            direction='horizontal'
+            className='w-full flex justify-between mt-4'
           >
             <Button
-              type="default"
+              type='default'
               onClick={() => {
                 setScreen('chooseVersion');
               }}
@@ -154,7 +155,7 @@ export const NewVersion = () => {
               Back
             </Button>
             <Button
-              type="default"
+              type='default'
               icon={<SaveOutlined />}
               onClick={handleCreateNew}
             >
