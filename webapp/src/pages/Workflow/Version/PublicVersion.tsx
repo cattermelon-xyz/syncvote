@@ -1,4 +1,4 @@
-import { LeftOutlined } from '@ant-design/icons';
+import { LeftOutlined, LoadingOutlined } from '@ant-design/icons';
 import { GrDocumentText } from 'react-icons/gr';
 import parse from 'html-react-parser';
 import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
@@ -8,7 +8,15 @@ import {
   queryWorkflowVersion,
 } from '@middleware/data';
 import { extractIdFromIdString } from '@utils/helpers';
-import { Button, Layout, Space, Image, Avatar, notification } from 'antd';
+import {
+  Button,
+  Layout,
+  Space,
+  Image,
+  Avatar,
+  notification,
+  Skeleton,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -25,6 +33,8 @@ import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
 import { HiMiniFire } from 'react-icons/hi2';
 import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import { GraphViewMode } from '@types';
+import Banner from '@components/Banner/Banner';
+import Icon from '@components/Icon/Icon';
 
 const extractOrg = ({ orgList, orgId }: { orgList: any; orgId: number }) => {
   const org = orgList.find((org: any) => org.id === orgId);
@@ -113,10 +123,7 @@ export const PublicVersion = () => {
         {version?.status === 'PUBLISHED' ||
         version?.status === 'PUBLIC_COMMUNITY' ? (
           <>
-            <Image
-              height={134}
-              src='https://media.discordapp.net/attachments/1080674075669700728/1122847243100246026/Screenshot_2023-06-26_at_18.13.41.png?width=1440&height=163'
-            />
+            <Banner bannerUrl={workflow?.banner_url} />
             <Layout>
               <Sider
                 collapsed={!collapsed}
@@ -126,31 +133,22 @@ export const PublicVersion = () => {
                 style={{ backgroundColor: '#EEEEEE' }}
                 className='information-collapsed'
               >
-                <Space className='p-5'>
-                  <Space>
-                    <Space>
-                      <Avatar
-                        shape='circle'
-                        src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Uniswap_Logo.svg/1026px-Uniswap_Logo.svg.png'
-                        size={48}
-                        className='bg-[#FFE1EF]'
-                      />
-                    </Space>
-                  </Space>
-                  <Space className='flex-col'>
-                    <p className='text-[17px] font-normal'>
+                <Space direction='horizontal' className='p-5 bg-white'>
+                  <Icon iconUrl={workflow?.icon_url} size='large' />
+                  <Space direction='vertical'>
+                    <p className='text-lg font-normal'>
                       {worflowInfo.workflow}
                     </p>
                     <Space direction='horizontal'>
-                      <div className='flex items-center text-[13px]'>
+                      <div className='flex items-center text-sm'>
                         <FiHome className='mr-1' size={16} />
                         {worflowInfo.org}
                       </div>
-                      <div className='flex items-center text-[13px]'>
+                      <div className='flex items-center text-sm'>
                         <FiUser className='mr-1' size={16} />
                         {worflowInfo.authority}
                       </div>
-                      <div className='flex items-center text-[13px]'>
+                      <div className='flex items-center text-sm'>
                         <FiCalendar className='mr-1' size={16} />
                         {worflowInfo.date}
                       </div>
@@ -187,17 +185,12 @@ export const PublicVersion = () => {
               </Sider>
               <Layout className='relative flex items-center'>
                 {!collapsed && (
-                  <Space className='absolute left-0 m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit mt-16'>
+                  <Space className='absolute left-0 m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit mt-7'>
                     <Space>
-                      <Avatar
-                        shape='circle'
-                        src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Uniswap_Logo.svg/1026px-Uniswap_Logo.svg.png'
-                        size={48}
-                        className='bg-[#FFE1EF]'
-                      />
+                      <Icon iconUrl={workflow?.icon_url} size='large' />
                     </Space>
-                    <Space className='flex-col'>
-                      <p className='text-[17px] font-normal'>
+                    <Space direction='vertical' className='w-full'>
+                      <p className='text-[17px] font-normal items-left w-full'>
                         {worflowInfo?.workflow}
                       </p>
                       <Space direction='horizontal'>
@@ -290,6 +283,9 @@ export const PublicVersion = () => {
                   viewMode={GraphViewMode.VIEW_ONLY}
                   data={version?.data || emptyStage}
                   selectedNodeId={selectedNodeId}
+                  selectedLayoutId={
+                    version?.data?.cosmetic?.defaultLayout?.horizontal
+                  }
                   onChange={(newData) => {}}
                   onChangeLayout={(newData) => {}}
                   onDeleteNode={(nodeId) => {}}
@@ -333,7 +329,7 @@ export const PublicVersion = () => {
             </Layout>
           </>
         ) : (
-          <h1>Not published</h1>
+          <Skeleton />
         )}
       </Layout>
     </>
