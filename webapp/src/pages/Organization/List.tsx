@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from '@components/Button/Button';
 import { L } from '@utils/locales/L';
-import { Layout } from 'antd';
+import { Dropdown, Layout, MenuProps, Space } from 'antd';
 import {
   PlusOutlined,
   DownOutlined,
@@ -9,6 +9,7 @@ import {
   FolderOutlined,
   ShareAltOutlined,
   LogoutOutlined,
+  FileOutlined,
 } from '@ant-design/icons';
 import HomeButton from '@components/HomeScreen/HomeButton';
 import ListHome from './list/ListHome';
@@ -21,11 +22,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { supabase } from '@utils/supabaseClient';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import CreateWorkflowModal from './list/CreateWorkflowModal';
 
 const { Sider } = Layout;
 
 const Organization = () => {
-  const [openModal, setOpenModal] = useState(false);
+  const [openModalCreateWorkspace, setOpenModalCreateWorkspace] =
+    useState(false);
+  const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(false);
   const [currentStatus, setCurrentStatus] = useState('listHome');
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,58 +53,87 @@ const Organization = () => {
     }
   }, [location.pathname]);
 
-  const showModal = () => {
-    setOpenModal(true);
+  const items: MenuProps['items'] = [
+    {
+      label: (
+        <>
+          <FileOutlined className='text-base mr-1' />{' '}
+          <span className='text-[17px]'>Worflow</span>
+        </>
+      ),
+      key: '0',
+    },
+    {
+      label: (
+        <div>
+          <FolderOutlined className='text-base mr-1' />{' '}
+          <span className='text-sm'>Workspace</span>
+        </div>
+      ),
+      key: '1',
+    },
+  ];
+
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e?.key === '0') {
+      setOpenModalCreateWorkflow(true);
+    } else if (e?.key === '1') {
+      setOpenModalCreateWorkspace(true);
+    }
   };
 
-  const closeModal = () => {
-    setOpenModal(false);
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
   };
 
   return (
-    <div className='flex w-full'>
+    <div className='flex w-full rtl'>
       <Sider
+        style={{ borderRight: '1px solid #E3E3E2' }}
         theme='light'
-        className='overflow-auto min-h-screen border-r w-1/5 flex flex-col relative'
+        className='overflow-auto min-h-screen border-r flex flex-col relative pr-5'
+        width='18.3%'
       >
-        <Button
-          startIcon={<PlusOutlined />}
-          endIcon={<DownOutlined />}
-          className='my-6 ml-8 mr-4'
-          onClick={showModal}
-        >
-          {L('createNew')}
-        </Button>
+        <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
+          <Button
+            startIcon={<PlusOutlined />}
+            endIcon={<DownOutlined />}
+            className='my-6 ml-8 mr-4'
+          >
+            <Space>{L('createNew')}</Space>
+          </Button>
+        </Dropdown>
         <div className='flex flex-col pl-4'>
           <HomeButton
-            startIcon={<HomeOutlined />}
+            startIcon={<HomeOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listHome');
               navigate('/');
             }}
             isFocused={currentStatus === 'listHome'}
           >
-            {L('home')}
+            <span className='text-base'>{L('home')}</span>
           </HomeButton>
           <HomeButton
-            startIcon={<FolderOutlined />}
+            startIcon={<FolderOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listMySpace');
               navigate('/my-spaces');
             }}
             isFocused={currentStatus === 'listMySpace'}
           >
-            {L('mySpace')}
+            <span className='text-base'>{L('mySpace')}</span>
           </HomeButton>
           <HomeButton
-            startIcon={<ShareAltOutlined />}
+            startIcon={<ShareAltOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listSharedSpaces');
               navigate('/shared-spaces');
             }}
             isFocused={currentStatus === 'listSharedSpaces'}
           >
-            {L('sharedSpaces')}
+            <span className='text-base'>{L('sharedSpaces')}</span>
           </HomeButton>
         </div>
         <div
@@ -133,7 +166,19 @@ const Organization = () => {
           )}
         </div>
       </div>
-      <CreateSpaceModal open={openModal} onClose={closeModal} />
+      <CreateSpaceModal
+        open={openModalCreateWorkspace}
+        onClose={() => setOpenModalCreateWorkspace(false)}
+      />
+
+      <CreateWorkflowModal
+        open={openModalCreateWorkflow}
+        onClose={() => setOpenModalCreateWorkflow(false)}
+        setOpenCreateWorkspaceModal={() => {
+          setOpenModalCreateWorkflow(false);
+          setOpenModalCreateWorkspace(true);
+        }}
+      />
     </div>
   );
 };
