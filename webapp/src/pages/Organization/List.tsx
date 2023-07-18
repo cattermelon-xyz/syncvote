@@ -44,7 +44,6 @@ const Organization = () => {
   let query = useQuery();
 
   useEffect(() => {
-    let query = useQuery();
     if (query.get('action') === 'new-workflow') {
       setOpenModalCreateWorkflow(true);
     }
@@ -117,15 +116,6 @@ const Organization = () => {
             <Space>{L('createNew')}</Space>
           </Button>
         </Dropdown>
-        <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
-          <Button
-            startIcon={<PlusOutlined />}
-            endIcon={<DownOutlined />}
-            className='my-6 ml-8 mr-4'
-          >
-            <Space>{L('createNew')}</Space>
-          </Button>
-        </Dropdown>
         <div className='flex flex-col pl-4'>
           <HomeButton
             startIcon={<HomeOutlined className='text-2xl' />}
@@ -135,7 +125,6 @@ const Organization = () => {
             }}
             isFocused={currentStatus === 'listHome'}
           >
-            <span className='text-base'>{L('home')}</span>
             <span className='text-base'>{L('home')}</span>
           </HomeButton>
           <HomeButton
@@ -147,7 +136,6 @@ const Organization = () => {
             isFocused={currentStatus === 'listMySpace'}
           >
             <span className='text-base'>{L('mySpace')}</span>
-            <span className='text-base'>{L('mySpace')}</span>
           </HomeButton>
           <HomeButton
             startIcon={<ShareAltOutlined className='text-2xl' />}
@@ -157,7 +145,6 @@ const Organization = () => {
             }}
             isFocused={currentStatus === 'listSharedSpaces'}
           >
-            <span className='text-base'>{L('sharedSpaces')}</span>
             <span className='text-base'>{L('sharedSpaces')}</span>
           </HomeButton>
         </div>
