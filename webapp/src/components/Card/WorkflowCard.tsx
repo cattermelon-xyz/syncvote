@@ -16,8 +16,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   dataWorkflow,
   isListHome,
 }) => {
-  console.log('dataWorkflow', dataWorkflow);
-
   const navigate = useNavigate();
   return (
     <Card

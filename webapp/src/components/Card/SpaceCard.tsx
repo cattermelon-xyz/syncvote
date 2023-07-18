@@ -12,7 +12,6 @@ interface SpaceCardProps {
 
 const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
   const navigate = useNavigate();
-  console.log('data space', dataSpace);
 
   return (
     <Card

@@ -39,7 +39,6 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <SpaceContentLayout>
       <div className='w-[800px] flex flex-col gap-y-14'>
         <section className='w-full'>
           <Title level={2} className='text-center'>
@@ -73,7 +72,6 @@ const Home: React.FC = () => {
           )}
         </section>
       </div>
-    </SpaceContentLayout>
   );
 };
 

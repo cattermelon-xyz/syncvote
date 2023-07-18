@@ -69,26 +69,12 @@ const AppRoutes = () => (
         path='/'
         element={<App layout={FixedLayout} requiredLogin={true} />}
       >
-        <Route index element={<SpacePage tabKey={'/'} />} />
-        <Route
-          path='/my-spaces'
-          element={<SpacePage tabKey={'/my-spaces'} type='list_space' />}
-        >
-          <Route
-            path=':spaceId'
-            element={<SpacePage tabKey={'/my-spaces'} type='list_workflow' />}
-          />
+        <Route index element={<SpacePage />} />
+        <Route path='/my-spaces' element={<SpacePage />}>
+          <Route path=':spaceId' element={<SpacePage />} />
         </Route>
-        <Route
-          path='/shared_spaces'
-          element={<SpacePage tabKey={'/shared_spaces'} type='list_space' />}
-        >
-          <Route
-            path=':spaceId'
-            element={
-              <SpacePage tabKey={'/shared_spaces'} type='list_workflow' />
-            }
-          />
+        <Route path='/shared-spaces' element={<SpacePage />}>
+          <Route path=':spaceId' element={<SpacePage />} />
         </Route>
       </Route>
 

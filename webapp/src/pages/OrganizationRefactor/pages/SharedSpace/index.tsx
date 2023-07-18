@@ -50,7 +50,6 @@ const SharedSpace: React.FC = () => {
   }, [user]);
 
   return (
-    <SpaceContentLayout>
       <div className='w-[800px] flex flex-col'>
         <p className='text-3xl font-semibold mb-8'>{L('mySpace')}</p>
         <section className='w-full mb-8'>
@@ -90,7 +89,6 @@ const SharedSpace: React.FC = () => {
           )}
         </section>
       </div>
-    </SpaceContentLayout>
   );
 };
 

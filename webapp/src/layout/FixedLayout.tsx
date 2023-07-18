@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import Header from './fragments/Header';
 import { AuthContext } from '@layout/context/AuthContext';
-import { Footer } from 'antd/es/layout/layout';
 
 type Props = {
   children?: JSX.Element;
@@ -16,7 +15,9 @@ const FixedLayout = ({ children }: Props) => {
             <div className='w-full z-50 bg-white'>
               <Header session={session} />
             </div>
-            <div className={`w-full h-fixed-layout`}>{children}</div>
+            <div className='w-full h-fixed-layout overflow-y-auto'>
+              {children}
+            </div>
           </div>
         )}
       </AuthContext.Consumer>

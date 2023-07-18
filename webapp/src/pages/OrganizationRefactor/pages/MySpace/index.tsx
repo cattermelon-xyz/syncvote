@@ -48,7 +48,6 @@ const MySpace: React.FC = () => {
   }, [user]);
 
   return (
-    <SpaceContentLayout>
       <div className='w-[800px] flex flex-col'>
         <p className='text-3xl font-semibold mb-8'>{L('mySpace')}</p>
         <section className='w-full mb-8'>
@@ -88,7 +87,6 @@ const MySpace: React.FC = () => {
           )}
         </section>
       </div>
-    </SpaceContentLayout>
   );
 };
 
