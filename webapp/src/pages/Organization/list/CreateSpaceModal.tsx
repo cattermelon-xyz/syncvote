@@ -4,9 +4,10 @@ import { L } from '@utils/locales/L';
 import Icon from '@components/Icon/Icon';
 import Input from '@components/Input/Input';
 import { useSelector, useDispatch } from 'react-redux';
-import { newOrg, queryLastOrg } from '@middleware/data';
+import { newOrg } from '@middleware/data';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
+import './create-new.scss';
 
 interface CreateSpaceModalProps {
   open: boolean;

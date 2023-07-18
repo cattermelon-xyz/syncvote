@@ -338,57 +338,6 @@ export const queryOrgsAndWorkflowForHome = async ({
   return data;
 };
 
-export const queryLastOrg = async ({
-  filter,
-  onSuccess,
-  onError = (error) => {
-    console.error(error);
-  },
-  dispatch,
-}: {
-  filter: any;
-  onSuccess: (data: any) => void;
-  onError?: (data: any) => void;
-  dispatch: any;
-}) => {
-  const { userId } = filter;
-  console.log(userId);
-
-  dispatch(startLoading({}));
-  // TODO: add email in table profile, use ref in profile to select user
-  // TODO: query list of user
-  const { data, error } = await supabase
-    .from('user_org')
-    .select(
-      `
-    org (
-      id,
-    )
-  `
-    )
-    .eq('user_id', userId)
-    .limit(1); // limiting results to the first one
-
-  if (!error) {
-    const tmp: any[] = [];
-    data.forEach((d: any) => {
-      const org: any = d?.org || {
-        id: '',
-      };
-      tmp.push({
-        id: org?.id,
-        role: d.role,
-      });
-    });
-    dispatch(setOrgsInfo(tmp));
-    dispatch(setLastFetch({}));
-    onSuccess(tmp);
-  } else {
-    onError(error);
-  }
-  dispatch(finishLoading({}));
-};
-
 export const queryOrgAndUser = async ({
   orgId,
   onSuccess,

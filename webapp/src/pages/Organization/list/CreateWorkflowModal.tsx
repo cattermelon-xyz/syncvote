@@ -7,7 +7,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
-import CreateSpaceModal from './CreateSpaceModal';
+import './create-new.scss'
 
 interface CreateWorkflowModalProps {
   open: boolean;
