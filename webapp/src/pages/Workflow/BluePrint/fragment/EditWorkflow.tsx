@@ -31,10 +31,12 @@ const EditWorkflow = ({
     title,
     desc,
     iconUrl,
+    bannerUrl,
   }: {
     title?: string | undefined;
     desc?: string | undefined;
     iconUrl?: string | undefined;
+    bannerUrl?: string | undefined;
   }) => void;
   onStatusChange: ({
     status,
@@ -122,14 +124,24 @@ const EditWorkflow = ({
       onClose={() => {
         setOpen(false);
       }}
-      size="large"
+      size='large'
       bodyStyle={{ padding: '0px', backgroundColor: '#f6f6f6', width: '100%' }}
     >
-      <div className="relative w-full">
-        <Banner banner_url={workflow?.banner_url || ''} onSave={() => {}} />
-        <div className="absolute -bottom-[30px] left-[16px]">
+      <div className='relative w-full'>
+        <Banner
+          bannerUrl={workflow?.banner_url || ''}
+          onChange={async ({ filePath, isPreset }) => {
+            setOpen(false);
+            await onSave({
+              bannerUrl: isPreset ? `preset:${filePath}` : filePath,
+            });
+            setOpen(true);
+          }}
+          editable
+        />
+        <div className='absolute -bottom-[30px] left-[16px]'>
           <Icon
-            size="xlarge"
+            size='xlarge'
             iconUrl={iconUrl}
             editable
             onUpload={async ({ filePath, isPreset }) => {
@@ -143,13 +155,13 @@ const EditWorkflow = ({
           />
         </div>
       </div>
-      <Space direction="vertical" size="large" className="px-4 py-10 w-full">
+      <Space direction='vertical' size='large' className='px-4 py-10 w-full'>
         <Space
-          direction="vertical"
-          size="small"
-          className="p-4 rounded-lg bg-white w-full"
+          direction='vertical'
+          size='small'
+          className='p-4 rounded-lg bg-white w-full'
         >
-          <Space direction="vertical" size="small" className="w-full">
+          <Space direction='vertical' size='small' className='w-full'>
             <div>Workflow name</div>
             <Input
               value={title}
@@ -165,7 +177,7 @@ const EditWorkflow = ({
               }}
             />
           </Space>
-          <Space direction="vertical" size="small" className="w-full">
+          <Space direction='vertical' size='small' className='w-full'>
             <div>Description</div>
             <TextEditor
               value={desc}
@@ -184,13 +196,13 @@ const EditWorkflow = ({
           </Space>
         </Space>
         <Space
-          direction="vertical"
-          size="small"
-          className="p-4 rounded-lg bg-white w-full"
+          direction='vertical'
+          size='small'
+          className='p-4 rounded-lg bg-white w-full'
         >
           <Space
-            direction="horizontal"
-            className="px-2 py-2 bg-zinc-100 flex justify-between rounded-lg"
+            direction='horizontal'
+            className='px-2 py-2 bg-zinc-100 flex justify-between rounded-lg'
           >
             <div>Publish to Synvote community?</div>
             <Switch
@@ -211,11 +223,11 @@ const EditWorkflow = ({
               }}
             />
           </Space>
-          <Space direction="vertical" className="w-full">
+          <Space direction='vertical' className='w-full'>
             <div>Tags</div>
             <Select
-              className="w-full"
-              mode="tags"
+              className='w-full'
+              mode='tags'
               options={options}
               onChange={onChangeTagValue}
               value={existedTags}

@@ -19,12 +19,16 @@ import {
 } from '@middleware/data';
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
-import { Button, Drawer, Modal, Space } from 'antd';
+import { Button, Drawer, Modal, Skeleton, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditInfo from './fragment/EditInfo';
-import { IWorkflowVersionCosmetic, IWorkflowVersionLayout } from '@types';
+import {
+  GraphViewMode,
+  IWorkflowVersionCosmetic,
+  IWorkflowVersionLayout,
+} from '@types';
 import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
 import EditWorkflow from '../BluePrint/fragment/EditWorkflow';
@@ -97,6 +101,7 @@ export const EditVersion = () => {
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
+  const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
   const extractWorkflowFromList = (wfList: any) => {
     let extractedVersion = extractVersion({
       workflows: wfList,
@@ -328,44 +333,52 @@ export const EditVersion = () => {
               handleSave={handleSave}
               lastSaved={lastSaved}
               handleDownloadImage={setShouldDownloadImage}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
             />
             <div
               className={`w-full flex justify-center`}
               style={{ height: 'calc(100% - 80px)' }}
             >
-              <div className='w-full h-full'>
-                <DirectedGraph
-                  shouldExportImage={shouldDownloadImage}
-                  setExportImage={setShouldDownloadImage}
-                  navPanel={<></>}
-                  editable
-                  data={version?.data || emptyStage}
-                  selectedNodeId={selectedNodeId}
-                  selectedEdgeId={selectedEdgeId}
-                  selectedLayoutId={selectedLayoutId}
-                  web2Integrations={web2IntegrationsState}
-                  onChange={onChange}
-                  onDeleteNode={onDeleteNode}
-                  onConfigPanelClose={() => setSelectedNodeId('')}
-                  onChangeLayout={onChangeLayout}
-                  onEdgeClick={onEdgeClick}
-                  onConfigEdgePanelClose={() => setSelectedEdgeId('')}
-                  onNodeChanged={onNodeChanged}
-                  onCosmeticChanged={onCosmeticChanged}
-                  onLayoutClick={(selectedLayoutId) => {
-                    setSelectedLayoutId(selectedLayoutId);
-                  }}
-                  onNodeClick={(event, node) => {
-                    setSelectedNodeId(node.id);
-                  }}
-                  onPaneClick={() => {
-                    setSelectedNodeId('');
-                  }}
-                  onResetPosition={onResetPosition}
-                  onAddNewNode={onAddNewNode}
-                  onViewPortChange={onViewPortChange}
-                />
-              </div>
+              {versionId && !version?.data ? (
+                <div className='w-full h-full'>
+                  <Skeleton className='p-16' />
+                </div>
+              ) : (
+                <div className='w-full h-full'>
+                  <DirectedGraph
+                    shouldExportImage={shouldDownloadImage}
+                    setExportImage={setShouldDownloadImage}
+                    navPanel={<></>}
+                    viewMode={viewMode}
+                    data={version?.data || emptyStage}
+                    selectedNodeId={selectedNodeId}
+                    selectedEdgeId={selectedEdgeId}
+                    selectedLayoutId={selectedLayoutId}
+                    web2Integrations={web2IntegrationsState}
+                    onChange={onChange}
+                    onDeleteNode={onDeleteNode}
+                    onConfigPanelClose={() => setSelectedNodeId('')}
+                    onChangeLayout={onChangeLayout}
+                    onEdgeClick={onEdgeClick}
+                    onConfigEdgePanelClose={() => setSelectedEdgeId('')}
+                    onNodeChanged={onNodeChanged}
+                    onCosmeticChanged={onCosmeticChanged}
+                    onLayoutClick={(selectedLayoutId) => {
+                      setSelectedLayoutId(selectedLayoutId);
+                    }}
+                    onNodeClick={(event, node) => {
+                      setSelectedNodeId(node.id);
+                    }}
+                    onPaneClick={() => {
+                      setSelectedNodeId('');
+                    }}
+                    onResetPosition={onResetPosition}
+                    onAddNewNode={onAddNewNode}
+                    onViewPortChange={onViewPortChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}

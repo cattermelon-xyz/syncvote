@@ -69,12 +69,13 @@ const Comment = ({
   };
 
   const loadCommentData = async (offset: number, limit: number) => {
-    const newComments = await getDataComment({
-      limit: limit,
-      offset: offset,
-      where: where,
-      dispatch: dispatch,
-    });
+    const newComments =
+      (await getDataComment({
+        limit: limit,
+        offset: offset,
+        where: where,
+        dispatch: dispatch,
+      })) || [];
     setDataComment((prevData) => [...prevData, ...newComments]);
     setOffset(offset);
   };

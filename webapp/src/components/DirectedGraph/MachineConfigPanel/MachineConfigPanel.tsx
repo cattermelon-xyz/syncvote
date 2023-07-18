@@ -3,6 +3,9 @@ import ContextTab from './ContextTab';
 import RulesTab from './RulesTab';
 import TriggerTab from './TriggerTab';
 import '../styles.scss';
+import { useContext } from 'react';
+import { GraphPanelContext } from '../context';
+import { GraphViewMode } from '../interface';
 
 const MachineConfigPanel = ({
   vmConfigPanel,
@@ -12,7 +15,7 @@ const MachineConfigPanel = ({
   const items = [
     {
       key: '1',
-      label: 'Content',
+      label: 'Summary',
       children: <ContextTab />,
     },
     {
@@ -20,18 +23,31 @@ const MachineConfigPanel = ({
       label: 'Rules and conditions',
       children: <RulesTab vmConfigPanel={vmConfigPanel} />,
     },
-    {
-      key: '3',
-      label: 'Automated actions',
-      children: <TriggerTab />,
-    },
+    // {
+    //   key: '3',
+    //   label: 'Automated actions',
+    //   children: <TriggerTab />,
+    // },
   ];
+  const { viewMode } = useContext(GraphPanelContext);
+  const editable =
+    viewMode !== undefined &&
+    (viewMode === GraphViewMode.EDIT_MISSION ||
+      viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION);
   return (
-    <Tabs
-      className="w-full machine-config-panel-tabs"
-      defaultActiveKey="1"
-      items={items}
-    />
+    <>
+      {editable ? (
+        <Tabs
+          className='w-full machine-config-panel-tabs'
+          defaultActiveKey='1'
+          items={items}
+        />
+      ) : (
+        <div style={{ backgroundColor: '#f6f6f6' }} className='p-4'>
+          <ContextTab />
+        </div>
+      )}
+    </>
   );
 };
 

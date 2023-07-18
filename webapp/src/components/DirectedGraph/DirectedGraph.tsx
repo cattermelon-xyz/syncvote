@@ -19,7 +19,7 @@ import MultipleDirectNode from './CustomNodes/MultipleDiretionNode';
 import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
 import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
 import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
-import { IGraph, IWorkflowVersionLayout } from './interface';
+import { GraphViewMode, IGraph, IWorkflowVersionLayout } from './interface';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import CosmeticConfigPanel from './CosmeticConfigPanel';
 import QuickStartDialog from './QuickStartDialog';
@@ -57,7 +57,7 @@ const Flow = () => {
     onViewPortChange,
     onCosmeticChanged,
     selectedLayoutId,
-    editable = true,
+    viewMode,
     navPanel,
     web2Integrations,
     onDeleteNode,
@@ -77,7 +77,6 @@ const Flow = () => {
   });
   useEffect(() => {
     const obj: any = buildATree({ data, selectedNodeId, selectedLayoutId });
-
     setNodes(obj.nodes);
     setEdges(obj.edges);
     if (shouldExportImage) {
@@ -129,7 +128,7 @@ const Flow = () => {
   return (
     <>
       {renderVoteMachineConfigPanel({
-        editable,
+        viewMode,
         web2Integrations,
         data,
         selectedNodeId,
@@ -223,48 +222,50 @@ const Flow = () => {
             </Space> */}
           </Space>
         </Panel>
-        <Panel position='bottom-center'>
-          <Space direction='horizontal'>
-            <div
-              className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer'
-              style={{ backgroundColor: '#F4F0FA' }}
-              onClick={onResetPosition}
-            >
-              <SyncOutlined />
-            </div>
-            <div
-              className={`flex items-center justify-center w-[44px] h-[44px] rounded-lg ${
-                editable ? `text-violet-500 cursor-pointer` : `text-gray-400`
-              }`}
-              style={{ backgroundColor: editable ? '#F4F0FA' : '#aaa' }}
-              onClick={() => {
-                editable && onAddNewNode ? onAddNewNode() : null;
-              }}
-            >
-              <PlusOutlined />
-            </div>
-          </Space>
-        </Panel>
-        <Panel position='bottom-right'>
+        {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
           <>
-            <Modal
-              open={showQuickStartDialog}
-              onCancel={() => setShowQuickStartDialog(false)}
-              title='🔥 Guide to master Syncvote'
-              footer={null}
-            >
-              <QuickStartDialog />
-            </Modal>
-            <Button
-              icon={<BulbOutlined />}
-              type='link'
-              className='flex items-center'
-              onClick={() => setShowQuickStartDialog(true)}
-            >
-              Quick Start
-            </Button>
+            <Panel position='bottom-center'>
+              <Space direction='horizontal'>
+                <div
+                  className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer'
+                  style={{ backgroundColor: '#F4F0FA' }}
+                  onClick={onResetPosition}
+                >
+                  <SyncOutlined />
+                </div>
+                <div
+                  className={`flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer`}
+                  style={{ backgroundColor: '#F4F0FA' }}
+                  onClick={() => {
+                    onAddNewNode ? onAddNewNode() : null;
+                  }}
+                >
+                  <PlusOutlined />
+                </div>
+              </Space>
+            </Panel>
+            <Panel position='bottom-right'>
+              <>
+                <Modal
+                  open={showQuickStartDialog}
+                  onCancel={() => setShowQuickStartDialog(false)}
+                  title='🔥 Guide to master Syncvote'
+                  footer={null}
+                >
+                  <QuickStartDialog />
+                </Modal>
+                <Button
+                  icon={<BulbOutlined />}
+                  type='link'
+                  className='flex items-center'
+                  onClick={() => setShowQuickStartDialog(true)}
+                >
+                  Quick Start
+                </Button>
+              </>
+            </Panel>
           </>
-        </Panel>
+        ) : null}
       </ReactFlow>
     </>
   );

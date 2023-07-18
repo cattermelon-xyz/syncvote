@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { Button, Drawer, Modal, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import MissionMeta from './MissionMeta';
-import { IWorkflowVersionLayout } from '@types';
+import { GraphViewMode, IWorkflowVersionLayout } from '@types';
 
 const Data = ({
   currentMission,
@@ -100,8 +100,8 @@ const Data = ({
     }
   };
   return (
-    <div className="w-full h-full">
-      <div className="flex w-full h-full">
+    <div className='w-full h-full'>
+      <div className='flex w-full h-full'>
         <Modal
           open={open}
           onOk={() => {
@@ -112,7 +112,7 @@ const Data = ({
           }}
         >
           <TextArea
-            className="w-full"
+            className='w-full'
             value={JSON.stringify(versionData)}
             rows={10}
             onChange={(e) => {
@@ -121,7 +121,7 @@ const Data = ({
           />
         </Modal>
         <Drawer
-          title="Edit Info"
+          title='Edit Info'
           open={showEditInfo}
           onClose={() => {
             setShowEditInfo(false);
@@ -134,13 +134,13 @@ const Data = ({
         </Drawer>
         <DirectedGraph
           navPanel={
-            <Space direction="vertical">
-              <div className="flex justify-between px-4 font-bold">
+            <Space direction='vertical'>
+              <div className='flex justify-between px-4 font-bold'>
                 {currentMission.title}
               </div>
-              <Space className="flex justify-between px-4">
+              <Space className='flex justify-between px-4'>
                 <Button
-                  type="default"
+                  type='default'
                   onClick={() => {
                     setShowEditInfo(true);
                   }}
@@ -149,14 +149,14 @@ const Data = ({
                 </Button>
                 {currentMission.status === 'PUBLISHED' ? (
                   <div>
-                    <span className="mr-4">Development Only:</span>
-                    <Button type="default" onClick={onUnPublish}>
+                    <span className='mr-4'>Development Only:</span>
+                    <Button type='default' onClick={onUnPublish}>
                       Unpublish
                     </Button>
                   </div>
                 ) : null}
                 <Button
-                  type="default"
+                  type='default'
                   icon={<UploadOutlined />}
                   disabled={currentMission.status === 'PUBLISHED'}
                   onClick={onPublish}
@@ -164,7 +164,7 @@ const Data = ({
                   Publish Mission
                 </Button>
                 <Button
-                  type="default"
+                  type='default'
                   icon={<DeleteOutlined />}
                   onClick={onDelete}
                 >
@@ -174,7 +174,7 @@ const Data = ({
             </Space>
           }
           web2Integrations={web2IntegrationsState}
-          editable={editable}
+          viewMode={GraphViewMode.EDIT_MISSION}
           data={versionData}
           selectedNodeId={selectedNodeId}
           onNodeChanged={(changedNodes) => {

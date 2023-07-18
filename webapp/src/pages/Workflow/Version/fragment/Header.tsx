@@ -31,6 +31,7 @@ import {
 import moment from 'moment';
 import VersionHistoryDialog from './VersionHistoryDialog';
 import ShareModal from './ShareModal';
+import { GraphViewMode } from '@types';
 
 type HeaderProps = {
   session: any;
@@ -39,6 +40,8 @@ type HeaderProps = {
   handleSave: (mode: 'data' | 'info' | undefined, changedData?: any) => void;
   lastSaved: number;
   handleDownloadImage: (data: any) => void;
+  viewMode: GraphViewMode;
+  setViewMode: (data: GraphViewMode) => void;
 };
 
 function Header({
@@ -48,6 +51,8 @@ function Header({
   handleSave,
   lastSaved,
   handleDownloadImage,
+  viewMode,
+  setViewMode,
 }: HeaderProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -61,15 +66,19 @@ function Header({
     title,
     desc,
     iconUrl,
+    bannerUrl,
   }: {
     title?: string | undefined;
     desc?: string | undefined;
     iconUrl?: string | undefined;
+    bannerUrl?: string | undefined;
   }) => {
     const toUpdate: any = {};
     if (title && title !== workflow.title) toUpdate.title = title;
     if (desc && desc !== workflow.desc) toUpdate.desc = desc;
     if (iconUrl && iconUrl !== workflow.icon_url) toUpdate.iconUrl = iconUrl;
+    if (bannerUrl && bannerUrl !== workflow.banner_url)
+      toUpdate.bannerUrl = bannerUrl;
     await updateAWorkflowInfo({
       info: {
         id: workflowId,
@@ -165,7 +174,7 @@ function Header({
         onCancel={() => setShowVersionHistory(false)}
       />
       <div
-        className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
+        className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white drop-shadow-md`}
       >
         <Space
           className='flex items-center'
@@ -178,7 +187,7 @@ function Header({
               navigate('/');
             }}
           >
-            <div className='flex items-center'>
+            <div className='flex items-center cursor-pointer'>
               <LogoSyncVote />
               <div className='text-violet-700 text-[20px] font-bold '>
                 Syncvote
@@ -195,7 +204,7 @@ function Header({
           <Space
             direction='horizontal'
             size='small'
-            className='cursor-pointer'
+            className='cursor-pointer hover:text-violet-500'
             onClick={() => setShowWorkflowPanel(true)}
           >
             <Icon iconUrl={workflow?.icon_url} size='medium' />
@@ -207,32 +216,47 @@ function Header({
           direction='horizontal'
           size='small'
         >
-          <Space direction='horizontal'>
-            {dataChanged ? (
-              <div>
-                <Button
-                  type='text'
-                  shape='round'
-                  icon={<SaveOutlined />}
-                  className='flex items-center text-violet-500'
-                  onClick={() => handleSave('data')}
-                />
-              </div>
-            ) : (
-              <div className='p-1 rounded-full bg-green-100 w-[24px] h-[24px] flex items-center'>
-                <CheckOutlined className='text-green-500' />
-              </div>
-            )}
-            <div className='text-zinc-500'>
-              {lastSaved !== -1 ? moment(lastSaved).fromNow() : ''}
-            </div>
-          </Space>
-          <Divider type='vertical' />
+          {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
+            <>
+              <Space direction='horizontal'>
+                {dataChanged ? (
+                  <div>
+                    <Button
+                      type='text'
+                      shape='round'
+                      icon={<SaveOutlined />}
+                      className='flex items-center text-violet-500'
+                      onClick={() => handleSave('data')}
+                    />
+                  </div>
+                ) : (
+                  <div className='p-1 rounded-full bg-green-100 w-[24px] h-[24px] flex items-center'>
+                    <CheckOutlined className='text-green-500' />
+                  </div>
+                )}
+                <div className='text-zinc-500'>
+                  {lastSaved !== -1 ? moment(lastSaved).fromNow() : ''}
+                </div>
+              </Space>
+              <Divider type='vertical' />
+            </>
+          ) : null}
           <Space direction='horizontal' size='small'>
             <Button
               type='default'
-              className='flex justify-center items-center text-violet-500 bg-violet-100 border-0'
+              className={`flex justify-center items-center text-violet-500 bg-violet-100 ${
+                viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                  ? `border-0`
+                  : `border-1 border-violet-500`
+              } `}
               icon={<EyeOutlined />}
+              onClick={() => {
+                setViewMode(
+                  viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                    ? GraphViewMode.VIEW_ONLY
+                    : GraphViewMode.EDIT_WORKFLOW_VERSION
+                );
+              }}
             >
               Preview
             </Button>

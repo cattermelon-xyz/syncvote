@@ -219,14 +219,14 @@ export const validateMission = ({
 }: {
   checkPoint: ICheckPoint | undefined;
 }) => {
-  let message = '';
+  let message: string[] = [];
   let isValid = true;
   if (checkPoint?.isEnd) {
     // End checkPoint require no condition
     isValid = true;
   } else {
     isValid = true;
-    message = 'nothing has been done';
+    message = ['nothing has been done'];
   }
   return {
     isValid,

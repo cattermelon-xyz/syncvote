@@ -1,6 +1,7 @@
 import React from 'react';
 import { Session } from '@supabase/gotrue-js';
 import {
+  GraphViewMode,
   ICheckPoint,
   IConfigPanel,
   IGraph,
@@ -14,7 +15,7 @@ export const GraphContext = React.createContext<IGraph>({
   selectedNodeId: '',
   selectedLayoutId: '',
   selectedEdgeId: '',
-  editable: true,
+  viewMode: GraphViewMode.VIEW_ONLY,
   navPanel: undefined,
   onNodeClick: () => {},
   onLayoutClick: () => {},
@@ -39,6 +40,6 @@ export const GraphPanelContext = React.createContext<IConfigPanel>({
   onChange: (data: ICheckPoint) => {},
   onDelete: (ckpId: string) => {},
   onClose: () => {},
-  editable: false,
+  viewMode: GraphViewMode.VIEW_ONLY,
   onChangeLayout: (data: IWorkflowVersionLayout) => {},
 });
