@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from '@components/Button/Button';
 import { L } from '@utils/locales/L';
-import { Dropdown, Layout, MenuProps, Space } from 'antd';
+import { Dropdown, Dropdown, Layout, MenuProps, Space, MenuProps, Space } from 'antd';
 import {
   PlusOutlined,
   DownOutlined,
@@ -22,8 +22,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { supabase } from '@utils/supabaseClient';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
-import CreateWorkflowModal from './list/CreateWorkflowModal';
-import React from 'react';
 
 const { Sider } = Layout;
 
@@ -93,6 +91,33 @@ const Organization = () => {
     } else if (e?.key === '1') {
       setOpenModalCreateWorkspace(true);
     }
+  const items: MenuProps['items'] = [
+    {
+      label: (
+        <>
+          <FileOutlined className='text-base mr-1' />{' '}
+          <span className='text-[17px]'>Worflow</span>
+        </>
+      ),
+      key: '0',
+    },
+    {
+      label: (
+        <div>
+          <FolderOutlined className='text-base mr-1' />{' '}
+          <span className='text-sm'>Workspace</span>
+        </div>
+      ),
+      key: '1',
+    },
+  ];
+
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e?.key === '0') {
+      setOpenModalCreateWorkflow(true);
+    } else if (e?.key === '1') {
+      setOpenModalCreateWorkspace(true);
+    }
   };
 
   const menuProps = {
@@ -102,9 +127,12 @@ const Organization = () => {
 
   return (
     <div className='flex w-full rtl'>
+    <div className='flex w-full rtl'>
       <Sider
         style={{ borderRight: '1px solid #E3E3E2' }}
         theme='light'
+        className='overflow-auto min-h-screen border-r flex flex-col relative pr-5'
+        width='18.3%'
         className='overflow-auto min-h-screen border-r flex flex-col relative pr-5'
         width='18.3%'
       >
@@ -117,8 +145,18 @@ const Organization = () => {
             <Space>{L('createNew')}</Space>
           </Button>
         </Dropdown>
+        <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
+          <Button
+            startIcon={<PlusOutlined />}
+            endIcon={<DownOutlined />}
+            className='my-6 ml-8 mr-4'
+          >
+            <Space>{L('createNew')}</Space>
+          </Button>
+        </Dropdown>
         <div className='flex flex-col pl-4'>
           <HomeButton
+            startIcon={<HomeOutlined className='text-2xl' />}
             startIcon={<HomeOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listHome');
@@ -127,8 +165,10 @@ const Organization = () => {
             isFocused={currentStatus === 'listHome'}
           >
             <span className='text-base'>{L('home')}</span>
+            <span className='text-base'>{L('home')}</span>
           </HomeButton>
           <HomeButton
+            startIcon={<FolderOutlined className='text-2xl' />}
             startIcon={<FolderOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listMySpace');
@@ -137,8 +177,10 @@ const Organization = () => {
             isFocused={currentStatus === 'listMySpace'}
           >
             <span className='text-base'>{L('mySpace')}</span>
+            <span className='text-base'>{L('mySpace')}</span>
           </HomeButton>
           <HomeButton
+            startIcon={<ShareAltOutlined className='text-2xl' />}
             startIcon={<ShareAltOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listSharedSpaces');
@@ -146,6 +188,7 @@ const Organization = () => {
             }}
             isFocused={currentStatus === 'listSharedSpaces'}
           >
+            <span className='text-base'>{L('sharedSpaces')}</span>
             <span className='text-base'>{L('sharedSpaces')}</span>
           </HomeButton>
         </div>
@@ -179,6 +222,19 @@ const Organization = () => {
           )}
         </div>
       </div>
+      <CreateSpaceModal
+        open={openModalCreateWorkspace}
+        onClose={() => setOpenModalCreateWorkspace(false)}
+      />
+
+      <CreateWorkflowModal
+        open={openModalCreateWorkflow}
+        onClose={() => setOpenModalCreateWorkflow(false)}
+        setOpenCreateWorkspaceModal={() => {
+          setOpenModalCreateWorkflow(false);
+          setOpenModalCreateWorkspace(true);
+        }}
+      />
       <CreateSpaceModal
         open={openModalCreateWorkspace}
         onClose={() => setOpenModalCreateWorkspace(false)}

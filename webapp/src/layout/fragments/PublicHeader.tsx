@@ -145,6 +145,7 @@ function PublicHeader(session: any) {
               ></path>
             </svg>
 
+            
             {user.id !== '' ? (
               <p>{session?.session?.user?.user_metadata?.full_name}</p>
             ) : (
