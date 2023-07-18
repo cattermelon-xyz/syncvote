@@ -34,8 +34,6 @@ function useQuery() {
 }
 
 const Organization = () => {
-  let query = useQuery();
-
   const [openModalCreateWorkspace, setOpenModalCreateWorkspace] =
     useState(false);
   const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(false);
@@ -43,8 +41,10 @@ const Organization = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  let query = useQuery();
 
   useEffect(() => {
+    let query = useQuery();
     if (query.get('action') === 'new-workflow') {
       setOpenModalCreateWorkflow(true);
     }
@@ -93,147 +93,119 @@ const Organization = () => {
     } else if (e?.key === '1') {
       setOpenModalCreateWorkspace(true);
     }
-    const items: MenuProps['items'] = [
-      {
-        label: (
-          <>
-            <FileOutlined className='text-base mr-1' />{' '}
-            <span className='text-[17px]'>Worflow</span>
-          </>
-        ),
-        key: '0',
-      },
-      {
-        label: (
-          <div>
-            <FolderOutlined className='text-base mr-1' />{' '}
-            <span className='text-sm'>Workspace</span>
-          </div>
-        ),
-        key: '1',
-      },
-    ];
-
-    const handleMenuClick: MenuProps['onClick'] = (e) => {
-      if (e?.key === '0') {
-        setOpenModalCreateWorkflow(true);
-      } else if (e?.key === '1') {
-        setOpenModalCreateWorkspace(true);
-      }
-    };
-
-    const menuProps = {
-      items,
-      onClick: handleMenuClick,
-    };
-
-    return (
-      <div className='flex w-full rtl'>
-        <Sider
-          style={{ borderRight: '1px solid #E3E3E2' }}
-          theme='light'
-          className='overflow-auto min-h-screen border-r flex flex-col relative pr-5'
-          width='18.3%'
-        >
-          <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
-            <Button
-              startIcon={<PlusOutlined />}
-              endIcon={<DownOutlined />}
-              className='my-6 ml-8 mr-4'
-            >
-              <Space>{L('createNew')}</Space>
-            </Button>
-          </Dropdown>
-          <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
-            <Button
-              startIcon={<PlusOutlined />}
-              endIcon={<DownOutlined />}
-              className='my-6 ml-8 mr-4'
-            >
-              <Space>{L('createNew')}</Space>
-            </Button>
-          </Dropdown>
-          <div className='flex flex-col pl-4'>
-            <HomeButton
-              startIcon={<HomeOutlined className='text-2xl' />}
-              onClick={() => {
-                setCurrentStatus('listHome');
-                navigate('/');
-              }}
-              isFocused={currentStatus === 'listHome'}
-            >
-              <span className='text-base'>{L('home')}</span>
-              <span className='text-base'>{L('home')}</span>
-            </HomeButton>
-            <HomeButton
-              startIcon={<FolderOutlined className='text-2xl' />}
-              onClick={() => {
-                setCurrentStatus('listMySpace');
-                navigate('/my-spaces');
-              }}
-              isFocused={currentStatus === 'listMySpace'}
-            >
-              <span className='text-base'>{L('mySpace')}</span>
-              <span className='text-base'>{L('mySpace')}</span>
-            </HomeButton>
-            <HomeButton
-              startIcon={<ShareAltOutlined className='text-2xl' />}
-              onClick={() => {
-                setCurrentStatus('listSharedSpaces');
-                navigate('/shared-spaces');
-              }}
-              isFocused={currentStatus === 'listSharedSpaces'}
-            >
-              <span className='text-base'>{L('sharedSpaces')}</span>
-              <span className='text-base'>{L('sharedSpaces')}</span>
-            </HomeButton>
-          </div>
-          <div
-            className='flex gap-3 pl-8 absolute bottom-12 cursor-pointer'
-            onClick={async () => {
-              dispatch(startLoading({}));
-              await supabase.auth.signOut();
-              dispatch(finishLoading({}));
-              navigate('/login');
-            }}
-          >
-            <LogoutOutlined />
-            <p> {L('logOut')}</p>
-          </div>
-        </Sider>
-        <div className='w-4/5 flex-grow my-8'>
-          <div className='w-3/4 mx-auto'>
-            {currentStatus === 'listHome' ? (
-              <ListHome />
-            ) : currentStatus === 'listMySpace' ? (
-              <ListMySpace />
-            ) : currentStatus === 'listSharedSpaces' ? (
-              <ListSharedSpaces />
-            ) : currentStatus === 'WorkflowOfAMySpace' ? (
-              <WorkflowOfAMySpace />
-            ) : currentStatus === 'WorkflowOfASharedSpace' ? (
-              <WorkflowOfASharedSpace />
-            ) : (
-              <></>
-            )}
-          </div>
-        </div>
-        <CreateSpaceModal
-          open={openModalCreateWorkspace}
-          onClose={() => setOpenModalCreateWorkspace(false)}
-        />
-
-        <CreateWorkflowModal
-          open={openModalCreateWorkflow}
-          onClose={() => setOpenModalCreateWorkflow(false)}
-          setOpenCreateWorkspaceModal={() => {
-            setOpenModalCreateWorkflow(false);
-            setOpenModalCreateWorkspace(true);
-          }}
-        />
-      </div>
-    );
   };
+
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+  };
+
+  return (
+    <div className='flex w-full rtl'>
+      <Sider
+        style={{ borderRight: '1px solid #E3E3E2' }}
+        theme='light'
+        className='overflow-auto min-h-screen border-r flex flex-col relative pr-5'
+        width='18.3%'
+      >
+        <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
+          <Button
+            startIcon={<PlusOutlined />}
+            endIcon={<DownOutlined />}
+            className='my-6 ml-8 mr-4'
+          >
+            <Space>{L('createNew')}</Space>
+          </Button>
+        </Dropdown>
+        <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
+          <Button
+            startIcon={<PlusOutlined />}
+            endIcon={<DownOutlined />}
+            className='my-6 ml-8 mr-4'
+          >
+            <Space>{L('createNew')}</Space>
+          </Button>
+        </Dropdown>
+        <div className='flex flex-col pl-4'>
+          <HomeButton
+            startIcon={<HomeOutlined className='text-2xl' />}
+            onClick={() => {
+              setCurrentStatus('listHome');
+              navigate('/');
+            }}
+            isFocused={currentStatus === 'listHome'}
+          >
+            <span className='text-base'>{L('home')}</span>
+            <span className='text-base'>{L('home')}</span>
+          </HomeButton>
+          <HomeButton
+            startIcon={<FolderOutlined className='text-2xl' />}
+            onClick={() => {
+              setCurrentStatus('listMySpace');
+              navigate('/my-spaces');
+            }}
+            isFocused={currentStatus === 'listMySpace'}
+          >
+            <span className='text-base'>{L('mySpace')}</span>
+            <span className='text-base'>{L('mySpace')}</span>
+          </HomeButton>
+          <HomeButton
+            startIcon={<ShareAltOutlined className='text-2xl' />}
+            onClick={() => {
+              setCurrentStatus('listSharedSpaces');
+              navigate('/shared-spaces');
+            }}
+            isFocused={currentStatus === 'listSharedSpaces'}
+          >
+            <span className='text-base'>{L('sharedSpaces')}</span>
+            <span className='text-base'>{L('sharedSpaces')}</span>
+          </HomeButton>
+        </div>
+        <div
+          className='flex gap-3 pl-8 absolute bottom-12 cursor-pointer'
+          onClick={async () => {
+            dispatch(startLoading({}));
+            await supabase.auth.signOut();
+            dispatch(finishLoading({}));
+            navigate('/login');
+          }}
+        >
+          <LogoutOutlined />
+          <p> {L('logOut')}</p>
+        </div>
+      </Sider>
+      <div className='w-4/5 flex-grow my-8'>
+        <div className='w-3/4 mx-auto'>
+          {currentStatus === 'listHome' ? (
+            <ListHome />
+          ) : currentStatus === 'listMySpace' ? (
+            <ListMySpace />
+          ) : currentStatus === 'listSharedSpaces' ? (
+            <ListSharedSpaces />
+          ) : currentStatus === 'WorkflowOfAMySpace' ? (
+            <WorkflowOfAMySpace />
+          ) : currentStatus === 'WorkflowOfASharedSpace' ? (
+            <WorkflowOfASharedSpace />
+          ) : (
+            <></>
+          )}
+        </div>
+      </div>
+      <CreateSpaceModal
+        open={openModalCreateWorkspace}
+        onClose={() => setOpenModalCreateWorkspace(false)}
+      />
+
+      <CreateWorkflowModal
+        open={openModalCreateWorkflow}
+        onClose={() => setOpenModalCreateWorkflow(false)}
+        setOpenCreateWorkspaceModal={() => {
+          setOpenModalCreateWorkflow(false);
+          setOpenModalCreateWorkspace(true);
+        }}
+      />
+    </div>
+  );
 };
 
 export default Organization;

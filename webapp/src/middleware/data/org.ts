@@ -240,7 +240,7 @@ export const queryOrgs = async ({
       profile (
         id,
         email,
-         ,
+        full_name,
         icon_url,
         preset_icon_url
       )
