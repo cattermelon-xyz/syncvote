@@ -27,7 +27,6 @@ import AccountSetting from '@pages/AccounRefactor/pages/AccountSetting';
 import FixedLayout from '@layout/FixedLayout';
 const SpacePage = React.lazy(() => import('@pages/OrganizationRefactor'));
 
-
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
     <Routes>
@@ -73,12 +72,24 @@ const AppRoutes = () => (
         <Route index element={<SpacePage tabKey={'/'} />} />
         <Route
           path='/my-spaces'
-          element={<SpacePage tabKey={'/my-spaces'} />}
-        />
+          element={<SpacePage tabKey={'/my-spaces'} type='list_space' />}
+        >
+          <Route
+            path=':spaceId'
+            element={<SpacePage tabKey={'/my-spaces'} type='list_workflow' />}
+          />
+        </Route>
         <Route
           path='/shared_spaces'
-          element={<SpacePage tabKey={'/shared_spaces'} />}
-        />
+          element={<SpacePage tabKey={'/shared_spaces'} type='list_space' />}
+        >
+          <Route
+            path=':spaceId'
+            element={
+              <SpacePage tabKey={'/shared_spaces'} type='list_workflow' />
+            }
+          />
+        </Route>
       </Route>
 
       {/* ROUTE FOR ACCOUNT */}

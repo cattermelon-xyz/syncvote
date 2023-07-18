@@ -20,7 +20,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
     <Card
       hoverable={true}
       style={{ position: 'relative' }}
-      className='w-full h-[176px] relative rounded-xl'
+      className='w-[256px] h-[176px] relative rounded-xl'
       onClick={() => {
         if (isListHome) {
           navigate(

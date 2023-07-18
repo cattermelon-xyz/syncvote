@@ -12,7 +12,7 @@ import ListItem from '@pages/OrganizationRefactor/fragments/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { Skeleton } from 'antd';
 
-const MySpace: React.FC = () => {
+const SharedSpace: React.FC = () => {
   const { user } = useSelector((state: any) => state.orginfo);
   const [adminOrgs, setAdminOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
@@ -29,7 +29,7 @@ const MySpace: React.FC = () => {
         dispatch,
       });
       if (orgs) {
-        const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+        const adminOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
         setAdminOrgs(adminOrgsData);
 
         // Get all workflows from the admin orgs and include org title
@@ -39,6 +39,7 @@ const MySpace: React.FC = () => {
             org_title: adminOrg.org.title,
           }))
         );
+
         setWorkflows(allWorkflows);
       }
       setLoading(false);
@@ -94,4 +95,4 @@ const MySpace: React.FC = () => {
   );
 };
 
-export default MySpace;
+export default React.memo(SharedSpace);

@@ -15,7 +15,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
 
   return (
     <Card
-      className='w-[200px] bg-white rounded-xl border border-neutral-200 flex-col justify-start items-start gap-2'
+      className='w-[189px] bg-white rounded-xl border border-neutral-200 flex-col justify-start items-start gap-2'
       onClick={() => {
         if (isMySpace) {
           navigate(
@@ -65,7 +65,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
       <div className='justify-start items-center gap-2'>
         <div className='flex-col justify-start items-start gap-1'>
           <div className='text-neutral-800 text-base font-medium truncate'>
-            {dataSpace.org.title}
+            {dataSpace.org.title ? dataSpace.org.title : 'No title'}
           </div>
           <div className='flex justify-between'>
             <div className='text-zinc-500 text-sm font-medium'>

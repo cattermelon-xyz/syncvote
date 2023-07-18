@@ -41,7 +41,6 @@ const SearchBar: React.FC = () => {
             </CheckableTag>
           ))}
         </Space>
-        <SortButton />
       </div>
     </React.Fragment>
   );

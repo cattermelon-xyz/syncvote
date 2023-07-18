@@ -13,47 +13,51 @@ import {
 
 import Home from './pages/Home';
 import MySpace from './pages/MySpace';
-
-const tabItems: TabsProps['items'] = [
-  {
-    key: '/',
-    label: (
-      <>
-        <HomeOutlined /> Home
-      </>
-    ),
-    children: <Home />,
-  },
-  {
-    key: '/my-spaces',
-    label: (
-      <>
-        <>
-          <FolderOutlined /> My Spaces
-        </>
-      </>
-    ),
-    children: <MySpace />,
-  },
-  {
-    key: '/shared_spaces',
-    label: (
-      <>
-        <ShareAltOutlined /> Shared Spaces
-      </>
-    ),
-    children: `Content of Tab Pane 3`,
-  },
-];
+import ShareSpace from './pages/SharedSpace';
+import WorkflowsOfASpace from './pages/WorkflowsOfASpace';
 
 export interface PageProps {
   tabKey: string;
+  type?: string;
 }
 
 const SpacePage: React.FC<PageProps> = (props) => {
-  const { tabKey } = props;
+  const { tabKey, type } = props;
+  console.log('type', type);
+
+  const tabItems: TabsProps['items'] = [
+    {
+      key: '/',
+      label: (
+        <>
+          <HomeOutlined /> Home
+        </>
+      ),
+      children: <Home />,
+    },
+    {
+      key: '/my-spaces',
+      label: (
+        <>
+          <>
+            <FolderOutlined /> My Spaces
+          </>
+        </>
+      ),
+      children: type === 'list_space' ? <MySpace /> : <WorkflowsOfASpace />,
+    },
+    {
+      key: '/shared_spaces',
+      label: (
+        <>
+          <ShareAltOutlined /> Shared Spaces
+        </>
+      ),
+      children: type === 'list_space' ? <ShareSpace /> : <WorkflowsOfASpace />,
+    },
+  ];
   const navigate = useNavigate();
-  const tabItemsMemo = React.useMemo(() => tabItems, []);
+  // const tabItemsMemo = React.useMemo(() => tabItems, [type]);
 
   const handleNavigate = (path: string) => navigate(path);
 
@@ -66,7 +70,7 @@ const SpacePage: React.FC<PageProps> = (props) => {
         tabPosition='left'
         defaultActiveKey={'/'}
         activeKey={tabKey}
-        items={tabItemsMemo}
+        items={tabItems}
         tabBarExtraContent={{
           left: (
             <Button className='w-[115%] my-4' size='large' type='primary'>
