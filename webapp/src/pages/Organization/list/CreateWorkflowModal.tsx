@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getDataOrgs } from '@middleware/data';
 import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
+import { useNavigate } from 'react-router-dom';
+import { createIdString } from '@utils/helpers';
 
 interface CreateWorkflowModalProps {
   open: boolean;
@@ -15,6 +17,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   open,
   onClose,
 }) => {
+  const navigate = useNavigate();
   const { user } = useSelector((state: any) => state.orginfo);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const dispatch = useDispatch();
@@ -30,41 +33,33 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
         limit: limit,
         dispatch: dispatch,
         onSuccess: (data: any) => {
-          // setDataOrgs((prevData: any) => [...prevData, ...data]);
           setDataOrgs(data);
-          console.log(dataOrgs);
         },
       });
 
       setOffset(offset);
     }
   };
-  const handleOk = async () => {
-    console.log('Handle oke');
 
-    onClose();
+  const handleOk = async () => {
+    const org = dataOrgs.find((org: any) => org.id === value);
+    const orgIdString = createIdString(`${org.title}`, `${org.id}`);
+    navigate(`${orgIdString}/new-workflow/`);
   };
 
   const handleCancel = () => {
-    console.log('Handle cancel');
+    setValue(null);
     onClose();
   };
 
-  const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
-    if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === 200) {
-      loadWorkflowData(offset + limit, limit);
-    }
-  };
-
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState(null);
+  const [hovered, setHovered] = useState(null);
 
   const onChange = (e: RadioChangeEvent) => {
-    console.log('radio checked', e.target.value);
     setValue(e.target.value);
   };
 
   useEffect(() => {
-    console.log('CreateWorkflowModal');
     loadWorkflowData(offset, limit);
   }, [user]);
 
@@ -76,23 +71,38 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       confirmLoading={confirmLoading}
       onCancel={handleCancel}
       okText={L('createANewWorkflow')}
+      okButtonProps={{ disabled: value === null }}
       cancelButtonProps={{ style: { display: 'none' } }}
       className='flex-col'
     >
       <Space className='flex'>
-        <div style={{ color: '#575655' }} className='text-base not-italic	'>
+        <div style={{ color: '#575655' }} className='text-base not-italic	mb-3'>
           Select a workspace to contain your new workflow{' '}
         </div>
       </Space>
 
-      <Space className='h-64 flex-col'>
-        <Radio.Group onChange={onChange} className='flex-col'>
-          {dataOrgs.map((org: any) => (
+      <Space className='h-64 w-full' direction='vertical'>
+        <Radio.Group onChange={onChange} value={value} className='w-full'>
+          {dataOrgs.map((org: any, index: any) => (
             <>
-              <Radio className='flex' key={org?.title} value={org?.id}>
-                {org?.title}
-              </Radio>
-              <Icon iconUrl={org?.icon_url} size='small'/>
+              <div
+                className='flex h-12 items-center radio'
+                key={index}
+                onMouseEnter={() => setHovered(index)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {hovered === index || org.id === value ? (
+                  <Space className='p-3'>
+                    <Radio value={org.id} className='w-6 h-6' />
+                    <div className='text-base'>{org?.title}</div>
+                  </Space>
+                ) : (
+                  <Space className='p-3'>
+                    <Icon iconUrl={org.icon_url} size='medium' />
+                    <div className='ml-2 text-base'>{org?.title}</div>
+                  </Space>
+                )}
+              </div>
             </>
           ))}
         </Radio.Group>
