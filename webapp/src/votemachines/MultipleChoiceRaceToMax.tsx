@@ -12,6 +12,7 @@ import {
   IVoteMachineGetLabelProps,
   IVoteMachineConfigProps,
   ICheckPoint,
+  GraphViewMode,
 } from '../types';
 
 interface Option {
@@ -53,7 +54,7 @@ const ConfigPanel = ({
     fallback: '',
   },
   allNodes,
-  editable = false,
+  viewMode = GraphViewMode.VIEW_ONLY,
 }: IVoteMachineConfigProps) => {
   // TODO: config `upTo`
   const { max, options, next, fallback, upTo } = data;
@@ -84,9 +85,9 @@ const ConfigPanel = ({
   const renderChildren = (type: any, val: any) => {
     return !val ? (
       <Space
-        direction="horizontal"
-        className="flex items-center justify-between"
-        size="small"
+        direction='horizontal'
+        className='flex items-center justify-between'
+        size='small'
       >
         <div>
           {type === 'next'
@@ -105,18 +106,23 @@ const ConfigPanel = ({
               children: [...children, value],
             });
           }}
-          disabled={!editable}
+          disabled={
+            !(
+              viewMode === GraphViewMode.EDIT_MISSION ||
+              viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+            )
+          }
         />
       </Space>
     ) : (
       <Space
-        direction="horizontal"
-        size="small"
-        className="flex items-center justify-between"
+        direction='horizontal'
+        size='small'
+        className='flex items-center justify-between'
       >
         <Button
-          type="link"
-          className="flex items-center text-red-500 justify-between"
+          type='link'
+          className='flex items-center text-red-500 justify-between'
           icon={<DeleteOutlined />}
           onClick={() => {
             const newData: any = structuredClone(data);
@@ -129,7 +135,12 @@ const ConfigPanel = ({
               children: newChildren,
             });
           }}
-          disabled={!editable}
+          disabled={
+            !(
+              viewMode === GraphViewMode.EDIT_MISSION ||
+              GraphViewMode.EDIT_WORKFLOW_VERSION
+            )
+          }
         />
         {type === 'next' ? 'Winner found' : 'No winner found'}
         <ArrowRightOutlined />
@@ -139,23 +150,23 @@ const ConfigPanel = ({
   };
   // const lOptions = options ? options.length : 0;
   return (
-    <Space direction="vertical" size="large" className="mb-4 w-full">
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="bg-slate-100 p-2 w-full">{`Everyone choose up to ${
+    <Space direction='vertical' size='large' className='mb-4 w-full'>
+      <Space direction='vertical' size='small' className='w-full'>
+        <div className='bg-slate-100 p-2 w-full'>{`Everyone choose up to ${
           upTo || 'X'
         } options until ${upTo || 'X'} options reach ${
           maxStr || 'condition to pass'
         }`}</div>
       </Space>
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="text-md">Min no of vote to pass (e.g: 3, 10%)</div>
-        <Space.Compact className="w-full">
+      <Space direction='vertical' size='small' className='w-full'>
+        <div className='text-md'>Min no of vote to pass (e.g: 3, 10%)</div>
+        <Space.Compact className='w-full'>
           <Input
-            type="text"
-            className="w-full"
+            type='text'
+            className='w-full'
             prefix={
-              <div className="text-slate-300">
-                <ArrowRightOutlined className="inline-flex items-center pr-2" />
+              <div className='text-slate-300'>
+                <ArrowRightOutlined className='inline-flex items-center pr-2' />
               </div>
             }
             value={maxStr}
@@ -175,28 +186,38 @@ const ConfigPanel = ({
                 },
               });
             }}
-            disabled={!editable}
+            disabled={
+              !(
+                viewMode === GraphViewMode.EDIT_MISSION ||
+                GraphViewMode.EDIT_WORKFLOW_VERSION
+              )
+            }
           />
         </Space.Compact>
       </Space>
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="text-md">
+      <Space direction='vertical' size='small' className='w-full'>
+        <div className='text-md'>
           Max number of choices
           {/* (&lt;
           {lOptions}
           ) */}
         </div>
-        <Space.Compact className="w-full">
+        <Space.Compact className='w-full'>
           <Input
-            type="number"
-            className="w-full"
+            type='number'
+            className='w-full'
             prefix={
-              <div className="text-slate-300">
-                <ArrowRightOutlined className="inline-flex items-center pr-2" />
+              <div className='text-slate-300'>
+                <ArrowRightOutlined className='inline-flex items-center pr-2' />
               </div>
             }
             value={upTo}
-            disabled={!editable}
+            disabled={
+              !(
+                viewMode === GraphViewMode.EDIT_MISSION ||
+                viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+              )
+            }
             onChange={(e) => {
               onChange({
                 data: {
@@ -230,16 +251,16 @@ const ConfigPanel = ({
         </Space.Compact>
       </Space>
       {options && options.length > 0 ? (
-        <Space direction="vertical" size="small" className="w-full">
+        <Space direction='vertical' size='small' className='w-full'>
           <div>List of options</div>
           {options?.map((option: any, index: any) => (
             <Space
-              direction="horizontal"
+              direction='horizontal'
               key={option.title}
-              className="flex items-center"
+              className='flex items-center'
             >
               <Button
-                className="mr-2 flex-inline items-center text-center text-red-500"
+                className='mr-2 flex-inline items-center text-center text-red-500'
                 icon={<DeleteOutlined />}
                 onClick={() => {
                   onChange({
@@ -253,9 +274,9 @@ const ConfigPanel = ({
                   });
                 }}
               />
-              <Space direction="vertical" size="small">
-                <div className="text-slate-700">{option.title}</div>
-                <div className="text-xs">{option.description}</div>
+              <Space direction='vertical' size='small'>
+                <div className='text-slate-700'>{option.title}</div>
+                <div className='text-xs'>{option.description}</div>
               </Space>
             </Space>
           ))}
@@ -265,7 +286,7 @@ const ConfigPanel = ({
       )}
       <Button
         icon={<PlusOutlined />}
-        className="w-full"
+        className='w-full'
         onClick={() => {
           setShowNewOptionDrawer(true);
         }}
@@ -277,13 +298,13 @@ const ConfigPanel = ({
         onClose={() => {
           setShowNewOptionDrawer(false);
         }}
-        title="New Option"
+        title='New Option'
       >
-        <Space direction="vertical" size="small" className="w-full">
-          <div className="text-slate-700">Title</div>
+        <Space direction='vertical' size='small' className='w-full'>
+          <div className='text-slate-700'>Title</div>
           <Input
-            type="text"
-            className="w-full"
+            type='text'
+            className='w-full'
             value={newOption.title}
             onChange={(e) => {
               setNewOption({
@@ -292,9 +313,9 @@ const ConfigPanel = ({
               });
             }}
           />
-          <div className="text-slate-700">Description</div>
+          <div className='text-slate-700'>Description</div>
           <Input.TextArea
-            className="w-full"
+            className='w-full'
             value={newOption.description}
             onChange={(e) => {
               setNewOption({
@@ -304,8 +325,8 @@ const ConfigPanel = ({
             }}
           />
           <Button
-            type="default"
-            className="w-full"
+            type='default'
+            className='w-full'
             icon={<PlusOutlined />}
             onClick={() => {
               setNewOption({ title: '', description: '' });

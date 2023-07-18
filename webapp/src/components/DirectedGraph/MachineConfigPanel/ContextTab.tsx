@@ -1,13 +1,21 @@
-import { Alert, Button, Input, Popover, Space } from 'antd';
+import { Alert, Button, Input, Modal, Popover, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
-import { CommentOutlined, LockFilled, UnlockOutlined } from '@ant-design/icons';
+import {
+  CommentOutlined,
+  DeleteOutlined,
+  LockFilled,
+  UnlockOutlined,
+} from '@ant-design/icons';
 import { validateWorkflow, validateMission } from '@middleware/logic';
+import parse from 'html-react-parser';
 import TextEditor from '@components/Editor/TextEditor';
 import { getVoteMachine } from '../voteMachine';
 import { Markers } from '../markers';
 import { useContext } from 'react';
 import { GraphPanelContext } from '../context';
 import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
+import { GraphViewMode } from '../interface';
+import CollapsiblePanel from './fragments/CollapsiblePanel';
 
 const ContextTab = () => {
   const {
@@ -15,8 +23,9 @@ const ContextTab = () => {
     selectedNodeId,
     selectedLayoutId,
     onChange,
-    editable,
+    viewMode,
     onChangeLayout,
+    onDelete,
   } = useContext(GraphPanelContext);
   const selectedNode = data.checkpoints?.find(
     (chk: any) => chk.id === selectedNodeId
@@ -47,12 +56,11 @@ const ContextTab = () => {
     isValid: true,
   };
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
-  let validation;
-  // TODO: change edible to workflow or mission state!
-  if (editable) {
+  let validation = { isValid: true, message: [''] };
+  if (viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION) {
     // this is workflow
     validation = validateWorkflow({ checkPoint: selectedNode });
-  } else {
+  } else if (viewMode === GraphViewMode.EDIT_MISSION) {
     // this is mission
     validation = validateMission({ checkPoint: selectedNode });
   }
@@ -62,7 +70,7 @@ const ContextTab = () => {
       rs = (
         <>
           {params.message.map((msg: string) => {
-            return <Alert key={msg} message={msg} type="error" />;
+            return <Alert key={msg} message={msg} type='error' />;
           })}
         </>
       );
@@ -70,7 +78,7 @@ const ContextTab = () => {
     return rs;
   };
   return (
-    <Space direction="vertical" size="large" className="w-full">
+    <Space direction='vertical' size='large' className='w-full'>
       {/* <Space.Compact className="w-full">
         <Input
           value={selectedNode?.title ? selectedNode.title : selectedNode.id}
@@ -92,76 +100,44 @@ const ContextTab = () => {
           disabled={!editable}
         />
       </Space.Compact> */}
-      <Space
-        direction="vertical"
-        size="small"
-        className="w-full bg-white rounded-lg"
-      >
-        {/* <Space direction="horizontal" className="justify-between w-full">
-          <span>Information supporting the decision</span>
-          <Button
-            icon={locked.description ? <LockFilled /> : <UnlockOutlined />}
-            onClick={() => {
-              const newLocked = { ...locked, description: !locked.description };
-              const newNode = structuredClone(selectedNode);
-              newNode.locked = newLocked;
-              onChange(newNode);
-            }}
-            disabled={!editable}
-          />
-        </Space> */}
-        <TextEditor
-          value={selectedNode?.description}
-          setValue={(value: any) => {
-            const newNode = structuredClone(selectedNode);
-            if (newNode) {
-              newNode.description = value;
-              onChange(newNode);
-            }
-          }}
-          heightEditor={200}
-          // disabled={locked.description}
-        />
-      </Space>
-      <Space direction="vertical" className="w-full p-4 bg-white rounded-lg">
-        <div className="text-gray-400">Voting location</div>
-        <Input
-          value={selectedNode?.votingLocation}
-          onChange={(e) => {
-            const val = e.target.value || ' ';
-            const newNode = structuredClone(selectedNode);
-            if (newNode) {
-              newNode.votingLocation = val;
-              onChange(newNode);
-            }
-          }}
-          placeholder="Discourse Forum"
-        />
-      </Space>
-      <Space direction="vertical" className="w-full p-4 bg-white rounded-lg">
-        <div className="text-gray-400">Checkpoint color & label</div>
-        <MarkerEditNode />
-      </Space>
       {!selectedNode?.isEnd && selectedNode?.vote_machine_type ? (
         <>
-          <Space
-            direction="vertical"
-            className="p-4 rounded-lg bg-white border-1 w-full"
-          >
-            <div className="flex items-center text-lg font-bold">
-              <CommentOutlined className="mr-2" />
-              Summary
-            </div>
-            {summary}
-          </Space>
+          <CollapsiblePanel title='Summary' collapsable={false}>
+            <Space direction='vertical' size='small'>
+              {summary}
+              {renderValidation(validation)}
+              {renderValidation(vmValidation)}
+            </Space>
+          </CollapsiblePanel>
         </>
       ) : (
         <></>
       )}
-      <Space direction="vertical" size="middle" className="w-full">
-        {renderValidation(validation)}
-        {renderValidation(vmValidation)}
-      </Space>
+      <Space direction='vertical' size='middle' className='w-full'></Space>
+      <CollapsiblePanel title='Note' collapsable={false}>
+        {parse(selectedNode?.description || 'Not added')}
+      </CollapsiblePanel>
+      {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
+        <Button
+          type='default'
+          className='flex items-center w-full justify-center'
+          size='large'
+          onClick={() => {
+            Modal.confirm({
+              title: `Delete '${selectedNode?.title}'`,
+              content:
+                'Are you sure you want to delete this checkpoint? This action cannot be undone and all associated data will be permanently removed from the system.',
+              onOk: () => {
+                onDelete(selectedNodeId || '');
+              },
+            });
+          }}
+          danger
+        >
+          <DeleteOutlined />
+          Delete this checkpoint
+        </Button>
+      ) : null}
     </Space>
   );
 };

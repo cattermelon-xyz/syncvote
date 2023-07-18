@@ -3,9 +3,10 @@ import { GraphPanelContext } from '@components/DirectedGraph/context';
 import { Space, Input, Button, Modal } from 'antd';
 import moment from 'moment';
 import { useContext } from 'react';
+import CollapsiblePanel from '../fragments/CollapsiblePanel';
 
 const VotingDuration = () => {
-  const { data, onChange, editable, selectedNodeId } =
+  const { data, onChange, viewMode, selectedNodeId } =
     useContext(GraphPanelContext);
   const selectedNode = data.checkpoints?.find(
     (chk: any) => chk.id === selectedNodeId
@@ -25,52 +26,50 @@ const VotingDuration = () => {
   };
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
   return (
-    <Space
-      direction="vertical"
-      size="small"
-      className="bg-white p-4 rounded-lg w-full"
-    >
-      <span>Duration: {moment.duration(duration, 'seconds').humanize()}</span>
+    <CollapsiblePanel title='Duration'>
       {/* <Space direction="horizontal" className="w-full flex justify-between"> */}
       {/* {`Voting duration (${duration ? moment.duration(duration,
           'seconds').humanize() : 'missing'})`} */}
-      <Space direction="horizontal" className="w-full flex justify-between">
-        <Input
-          addonAfter="Days"
-          value={days}
-          placeholder="Day"
-          className="text-center"
-          onChange={(e) => {
-            dateChange(
-              parseInt(e.target.value, 10) * 86400 + hours * 3600 + mins * 60
-            );
-          }}
-          disabled={locked.duration}
-        />
-        <Input
-          value={hours}
-          addonAfter="Hour"
-          placeholder="Hour"
-          className="text-center"
-          onChange={(e) => {
-            dateChange(
-              days * 86400 + parseInt(e.target.value, 10) * 3600 + mins * 60
-            );
-          }}
-          disabled={locked.duration}
-        />
-        <Input
-          value={mins}
-          addonAfter="Minute"
-          placeholder="Minute"
-          className="text-center"
-          onChange={(e) => {
-            dateChange(
-              days * 86400 + hours * 3600 + parseInt(e.target.value, 10) * 60
-            );
-          }}
-          disabled={locked.duration}
-        />
+      <Space direction='vertical'>
+        <div>{moment.duration(duration, 'seconds').humanize()}</div>
+        <Space direction='horizontal' className='w-full flex justify-between'>
+          <Input
+            addonAfter='Days'
+            value={days}
+            placeholder='Day'
+            className='text-center'
+            onChange={(e) => {
+              dateChange(
+                parseInt(e.target.value, 10) * 86400 + hours * 3600 + mins * 60
+              );
+            }}
+            disabled={locked.duration}
+          />
+          <Input
+            value={hours}
+            addonAfter='Hour'
+            placeholder='Hour'
+            className='text-center'
+            onChange={(e) => {
+              dateChange(
+                days * 86400 + parseInt(e.target.value, 10) * 3600 + mins * 60
+              );
+            }}
+            disabled={locked.duration}
+          />
+          <Input
+            value={mins}
+            addonAfter='Minute'
+            placeholder='Minute'
+            className='text-center'
+            onChange={(e) => {
+              dateChange(
+                days * 86400 + hours * 3600 + parseInt(e.target.value, 10) * 60
+              );
+            }}
+            disabled={locked.duration}
+          />
+        </Space>
       </Space>
       {/* <Button
           icon={locked.duration ? <LockFilled /> : <UnlockOutlined />}
@@ -89,7 +88,7 @@ const VotingDuration = () => {
           }}
           disabled={!editable}
         /> */}
-    </Space>
+    </CollapsiblePanel>
     // </Space>
   );
 };

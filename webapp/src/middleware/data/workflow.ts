@@ -253,8 +253,9 @@ export const updateAWorkflowInfo = async ({
   onError?: (data: any) => void;
 }) => {
   dispatch(startLoading({}));
-  const { id, title, desc, iconUrl } = info;
+  const { id, title, desc, iconUrl, bannerUrl } = info;
   let icon_url, preset_icon_url; // eslint-disable-line
+  let banner_url, preset_banner_url;
   if (iconUrl?.startsWith('preset:')) {
     preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
     icon_url = '';
@@ -262,11 +263,21 @@ export const updateAWorkflowInfo = async ({
     preset_icon_url = '';
     icon_url = iconUrl; // eslint-disable-line
   }
+  if (bannerUrl?.startsWith('preset:')) {
+    preset_banner_url = bannerUrl.replace('preset:', ''); // eslint-disable-line
+    banner_url = '';
+  } else {
+    preset_banner_url = '';
+    banner_url = bannerUrl; // eslint-disable-line
+  }
   const toUpdate: any = {};
   if (title) toUpdate.title = title;
   if (desc) toUpdate.desc = desc;
   if (icon_url !== undefined) toUpdate.icon_url = icon_url;
+  if (banner_url !== undefined) toUpdate.banner_url = banner_url;
   if (preset_icon_url !== undefined) toUpdate.preset_icon_url = preset_icon_url;
+  if (preset_banner_url !== undefined)
+    toUpdate.preset_banner_url = preset_banner_url;
   const { data, error } = await supabase
     .from('workflow')
     .update(toUpdate)
@@ -419,7 +430,8 @@ export const queryVersionHistory = async ({
     .from('workflow_version_history_view')
     .select()
     .eq('workflow_version_id', versionId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(5);
   if (!error) {
     // pre-process data
     const newData = structuredClone(data) || [];

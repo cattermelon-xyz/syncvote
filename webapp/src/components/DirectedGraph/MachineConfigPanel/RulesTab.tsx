@@ -1,15 +1,18 @@
-import { Space, Drawer, Tabs } from 'antd';
+import { Space, Drawer, Tabs, Collapse, Input } from 'antd';
 import { useContext, useState } from 'react';
 import { EditOutlined } from '@ant-design/icons';
-import { ICheckPoint, IVoteMachine } from '../../../types';
+import { GraphViewMode, ICheckPoint, IVoteMachine } from '../../../types';
 import ChooseVoteMachine from './ChooseVoteMachine';
 import VotingPartipation from './rules/VotingParticipant';
 import VotingDuration from './rules/VotingDuration';
 import { getVoteMachine } from '../voteMachine';
 import { GraphPanelContext } from '../context';
+import CollapsiblePanel from './fragments/CollapsiblePanel';
+import TextEditor from '@components/Editor/TextEditor';
+import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
 
 const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
-  const { data, selectedNodeId, onChange, editable } =
+  const { data, selectedNodeId, onChange, viewMode } =
     useContext(GraphPanelContext);
   const selectedNode = data.checkpoints?.find(
     (chk: any) => chk.id === selectedNodeId
@@ -46,49 +49,97 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
         onClose={() => {
           setvmDrawerVisbibility(false);
         }}
-        title="Choose Vote Machine"
+        headerStyle={{ display: 'none' }}
       >
         <ChooseVoteMachine
           changeVoteMachineType={setVoteMachine}
           currentType={selectedNode?.vote_machine_type}
         />
       </Drawer>
-      <div className="w-full">
-        <div className="pt-4 px-4 bg-white rounded-t-lg">
-          <div className="mb-2">Voting method</div>
-          {editable && !selectedNode?.isEnd ? (
-            <div
-              className="w-full flex justify-between items-center text-lg p-2 cursor-pointer rounded-lg border-2 hover:border-violet-500 hover:text-violet-500"
-              onClick={() => {
-                setvmDrawerVisbibility(true);
-              }}
-            >
-              <div className="flex items-center gap-4">
-                {machine?.getIcon()}
-                {machine?.getName()}
+      <Space className='w-full pb-4' direction='vertical' size='large'>
+        {!selectedNode?.isEnd ? <VotingPartipation /> : null}
+        <CollapsiblePanel title='Voting method'>
+          <>
+            {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION &&
+            !selectedNode?.isEnd ? (
+              <div
+                className='w-full flex justify-between items-center text-lg p-2 cursor-pointer rounded-lg border-2 border-solid border-violet-500 hover:text-violet-500'
+                onClick={() => {
+                  setvmDrawerVisbibility(true);
+                }}
+              >
+                <div className='flex items-center gap-4'>
+                  {machine?.getIcon()}
+                  {machine?.getName()}
+                </div>
+                <EditOutlined />
               </div>
-              <EditOutlined />
-            </div>
-          ) : (
-            <></>
-          )}
-          {editable && selectedNode?.isEnd ? (
-            <ChooseVoteMachine
-              changeVoteMachineType={setVoteMachine}
-              currentType={undefined}
-            />
-          ) : (
-            <></>
-          )}
-        </div>
-        {!selectedNode?.isEnd ? (
-          <Space direction="vertical" size="middle" className="w-full mb-4">
-            {vmConfigPanel}
-            <VotingPartipation />
-            <VotingDuration />
+            ) : (
+              <></>
+            )}
+            {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION &&
+            selectedNode?.isEnd ? (
+              <ChooseVoteMachine
+                changeVoteMachineType={setVoteMachine}
+                currentType={undefined}
+              />
+            ) : (
+              <></>
+            )}
+          </>
+        </CollapsiblePanel>
+        {vmConfigPanel}
+        {!selectedNode?.isEnd ? <VotingDuration /> : null}
+        <CollapsiblePanel title='General info'>
+          <Space direction='vertical' size='middle' className='w-full'>
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='text-gray-400'>Voting location</div>
+              <Input
+                value={selectedNode?.votingLocation}
+                onChange={(e) => {
+                  const val = e.target.value || ' ';
+                  const newNode = structuredClone(selectedNode);
+                  if (newNode) {
+                    newNode.votingLocation = val;
+                    onChange(newNode);
+                  }
+                }}
+                placeholder='Discourse Forum'
+              />
+            </Space>
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='text-gray-400'>Checkpoint color & label</div>
+              <MarkerEditNode />
+            </Space>
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='text-gray-400'>Note</div>
+              {/* <Space direction="horizontal" className="justify-between w-full">
+                <span>Information supporting the decision</span>
+                <Button
+                  icon={locked.description ? <LockFilled /> : <UnlockOutlined />}
+                  onClick={() => {
+                    const newLocked = { ...locked, description: !locked.description };
+                    const newNode = structuredClone(selectedNode);
+                    newNode.locked = newLocked;
+                    onChange(newNode);
+                  }}
+                  disabled={!editable}
+                />
+              </Space> */}
+              <Input.TextArea
+                defaultValue={selectedNode?.description}
+                onBlur={(e: any) => {
+                  const newNode = structuredClone(selectedNode);
+                  if (newNode) {
+                    newNode.description = e.target.value;
+                    onChange(newNode);
+                  }
+                }}
+              />
+            </Space>
           </Space>
-        ) : null}
-      </div>
+        </CollapsiblePanel>
+      </Space>
     </>
   );
 };

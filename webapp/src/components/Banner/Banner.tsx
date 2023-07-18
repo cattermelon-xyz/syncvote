@@ -1,88 +1,173 @@
 import { getImageUrl } from '@utils/helpers';
 import { OrgPresetBanner } from '@utils/constants/organization';
-import { Button, Modal, Space } from 'antd';
+import { Button, Modal, Space, Tabs } from 'antd';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import './index.scss';
+import { LoadingOutlined } from '@ant-design/icons';
+import { supabase } from '@utils/supabaseClient';
 
 type BannerProps = {
-  banner_url: string;
-  onSave: (banner_url: string) => void;
+  bannerUrl: string;
+  onChange?: (args: { filePath: string; isPreset: boolean }) => void;
+  editable?: boolean;
 };
 
-const Banner = ({ banner_url, onSave }: BannerProps) => {
-  let bannerUrl = banner_url ? banner_url : `preset:${OrgPresetBanner}`;
-  bannerUrl = getImageUrl({
-    filePath:
-      bannerUrl.indexOf('preset:') === 0
-        ? bannerUrl.replace('preset:', '')
-        : bannerUrl,
-    isPreset: bannerUrl.indexOf('preset:') === 0,
+const Banner = ({ bannerUrl, onChange, editable = false }: BannerProps) => {
+  let url = bannerUrl ? bannerUrl : `preset:${OrgPresetBanner}`;
+  url = getImageUrl({
+    filePath: url.indexOf('preset:') === 0 ? url.replace('preset:', '') : url,
+    isPreset: url.indexOf('preset:') === 0,
     type: 'banner',
   });
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const presetBanners = useSelector((state: any) => state.ui.presetBanners);
   const [showButtonPanel, setShowButtonPanel] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const uploadBanner = async (event: any) => {
+    setUploading(true);
+    try {
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.');
+      }
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const newFilePath = `${fileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from('public_images')
+        .upload(newFilePath, file);
+      if (uploadError) {
+        throw uploadError;
+      }
+      onChange
+        ? onChange({
+            filePath: newFilePath,
+            isPreset: false,
+          })
+        : null;
+      setUploading(false);
+      setShouldShowModal(false);
+    } catch (error: any) {
+      Modal.error({
+        title: 'Upload image error',
+        content: error.message,
+      });
+      setUploading(false);
+    }
+  };
   return (
-    <>
+    <div className='_banner'>
       <Modal
-        title="Choose Banner"
+        title={null}
         open={shouldShowModal}
         onCancel={() => {
           setShouldShowModal(false);
         }}
+        footer={null}
+        width={600}
       >
-        <div>
-          <span>Upload </span>
-          <input type="file" />
-        </div>
-        <div className="grid grid-cols-3 mt-4">
-          {presetBanners.map((banner: any) => (
-            <div
-              key={banner}
-              className="flex items-center w-[150px] p-1 cursor-pointer hover:bg-slate-200"
-              onClick={() => {
-                setShouldShowModal(false);
-              }}
-            >
-              <img
-                src={`${getImageUrl({
-                  filePath: banner,
-                  isPreset: true,
-                  type: 'banner',
-                })}`}
-                alt="banner"
-                className="w-[150px]"
-              />
-            </div>
-          ))}
-        </div>
+        <Tabs
+          items={[
+            {
+              key: '1',
+              label: 'Library',
+              children: (
+                <div className='grid grid-cols-3 mt-4 h-[300px] overflow-y-scroll gap-2 p-1'>
+                  {presetBanners.map((banner: any) => (
+                    <div
+                      key={banner}
+                      className='flex items-center w-[167px] h-[100px] p-1 cursor-pointer bg-center outline-violet-500 hover:outline rounded-md bg-cover'
+                      onClick={() => {
+                        setShouldShowModal(false);
+                        onChange
+                          ? onChange({
+                              filePath: banner,
+                              isPreset: true,
+                            })
+                          : null;
+                      }}
+                      style={{
+                        backgroundImage: `url(${getImageUrl({
+                          filePath: banner,
+                          isPreset: true,
+                          type: 'banner',
+                        })})`,
+                      }}
+                    ></div>
+                  ))}
+                </div>
+              ),
+            },
+            {
+              key: '2',
+              label: 'Upload',
+              children: (
+                <Space
+                  direction='vertical'
+                  size='small'
+                  className='w-full -mt-2'
+                >
+                  <div>
+                    <input
+                      type='file'
+                      id='single'
+                      accept='image/*'
+                      onChange={uploadBanner}
+                      className='hidden'
+                    />
+                    <Button
+                      type='default'
+                      className='w-full'
+                      onClick={() =>
+                        document?.getElementById('single')?.click()
+                      }
+                    >
+                      <div className='flex items-center w-full justify-center'>
+                        {uploading ? <LoadingOutlined className='mr-2' /> : ''}
+                        Upload file
+                      </div>
+                    </Button>
+                  </div>
+                  <div className='text-sx text-gray-400 w-full text-center'>
+                    Maximum size per file is 5MB
+                  </div>
+                </Space>
+              ),
+            },
+          ]}
+        />
       </Modal>
       <div
-        className="w-full h-[150px] bg-cover bg-center relative"
-        style={{ backgroundImage: `url(${bannerUrl})` }}
-        onMouseOver={() => setShowButtonPanel(true)}
-        onMouseLeave={() => setShowButtonPanel(false)}
+        className='w-full h-[150px] bg-cover bg-center relative'
+        style={{ backgroundImage: `url(${url})` }}
+        onMouseOver={() => {
+          editable ? setShowButtonPanel(true) : null;
+        }}
+        onMouseLeave={() => {
+          editable ? setShowButtonPanel(false) : null;
+        }}
       >
         <div
           className={`absolute right-2 bottom-2 ${
             showButtonPanel ? '' : 'hidden'
           }`}
         >
-          <Space size="middle">
+          <Space size='middle'>
             <Button
-              type="default"
-              className="bg-slate-100"
+              type='default'
+              className='bg-slate-100'
               onClick={() => setShouldShowModal(true)}
             >
               Change cover
             </Button>
-            <Button type="default" className="bg-slate-100">
+            <Button type='default' className='bg-slate-100'>
               Reposition
             </Button>
           </Space>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,16 +1,19 @@
-import { ICheckPoint, IToken } from '@types';
-import { Divider, Select, Space } from 'antd';
+import { GraphViewMode, IToken } from '@types';
+import { Select, Space } from 'antd';
 import AllowedByIdentity from './fragment/AllowedByIdentity';
 import AllowedByToken from './fragment/AllowedByToken';
 import { useContext } from 'react';
 import { GraphPanelContext } from '@components/DirectedGraph/context';
+import { FiUserCheck } from 'react-icons/fi';
+import { TbAtom } from 'react-icons/tb';
+import CollapsiblePanel from '../fragments/CollapsiblePanel';
 
 const VotingPartipation = () => {
   const {
     data: allData,
     selectedNodeId,
     onChange,
-    editable,
+    viewMode,
   } = useContext(GraphPanelContext);
   const selectedNode = allData.checkpoints?.find(
     (chk: any) => chk.id === selectedNodeId
@@ -21,15 +24,11 @@ const VotingPartipation = () => {
   const identity = type === 'identity' && data ? (data as string[]) : [];
   const tokenData = type === 'token' && data ? (data as IToken) : {};
   return (
-    <Space
-      direction="vertical"
-      size="large"
-      className="w-full rounded-lg bg-white p-4"
-    >
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="text-sm">Voter allowed by</div>
+    <CollapsiblePanel title='Participants'>
+      <Space direction='vertical' size='small' className='w-full'>
+        <div className='text-sm'>Voter</div>
         <Select
-          disabled={!editable}
+          disabled={!(viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION)}
           value={type}
           style={{ width: '100%' }}
           onChange={(value) => {
@@ -42,23 +41,35 @@ const VotingPartipation = () => {
           options={[
             {
               key: 'identity',
-              label: 'Identity',
+              label: (
+                <div className='flex items-center'>
+                  <FiUserCheck className='mr-2' />
+                  Other identity
+                </div>
+              ),
               value: 'identity',
             },
             // choosing this option would engage Votemachine
             {
               key: 'token',
-              label: 'Token',
+              label: (
+                <div className='flex items-center'>
+                  <TbAtom className='mr-2' />
+                  Token holder
+                </div>
+              ),
               value: 'token',
             },
           ]}
         />
-        <div className="py-2">
-          <hr />
-        </div>
+        {type ? (
+          <div className='py-2'>
+            <hr />
+          </div>
+        ) : null}
         {type === 'identity' ? (
           <AllowedByIdentity
-            editable={editable || false}
+            editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
             identity={identity}
             setIdentity={(newIdentity: string[]) => {
               onChange({
@@ -72,7 +83,7 @@ const VotingPartipation = () => {
         ) : null}
         {type === 'token' ? (
           <AllowedByToken
-            editable={editable || false}
+            editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
             address={tokenData?.address}
             setAddress={(address: string) => {
               onChange({
@@ -100,7 +111,7 @@ const VotingPartipation = () => {
           />
         ) : null}
       </Space>
-    </Space>
+    </CollapsiblePanel>
   );
 };
 
