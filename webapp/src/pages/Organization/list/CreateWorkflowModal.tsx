@@ -104,7 +104,10 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
                   </Space>
                 ) : (
                   <Space className='p-3'>
-                    <Icon iconUrl={org.icon_url} size='medium' />
+                    <Icon
+                      iconUrl={org.icon_url ? org.icon_url : ''}
+                      size='medium'
+                    />
                     <div className='ml-2 text-base'>{org?.title}</div>
                   </Space>
                 )}
