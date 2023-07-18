@@ -34,6 +34,7 @@ function useQuery() {
 }
 
 const Organization = () => {
+  let query = useQuery();
   const [openModalCreateWorkspace, setOpenModalCreateWorkspace] =
     useState(false);
   const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(false);
@@ -41,7 +42,6 @@ const Organization = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  let query = useQuery();
 
   useEffect(() => {
     if (query.get('action') === 'new-workflow') {
