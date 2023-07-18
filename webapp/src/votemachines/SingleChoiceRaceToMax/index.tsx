@@ -35,7 +35,7 @@ export const getLabel = (props: IVoteMachineGetLabelProps) => {
       <div>
         {filteredTriggers?.map((trg: any) =>
           trg.provider === 'twitter' ? (
-            <TwitterOutlined key={trg.id || Math.random()} className="pr-2" />
+            <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
           ) : (
             <span key={trg.id || Math.random()}>{trg.provider}</span>
           )
@@ -46,7 +46,7 @@ export const getLabel = (props: IVoteMachineGetLabelProps) => {
     <div>
       {filteredTriggers?.map((trg: any) =>
         trg.provider === 'twitter' ? (
-          <TwitterOutlined key={trg.id || Math.random()} className="pr-2" />
+          <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
         ) : (
           <span key={trg.id || Math.random()}>{trg.provider}</span>
         )
@@ -75,61 +75,68 @@ export const explain = ({
   const renderParticipation = (participation: IParticipant | undefined) => {
     let rs = null;
     if (!participation || (participation.type && !participation.data)) {
-      rs = <div className="text-red-500">Missing participation setup</div>;
+      rs = <span className='text-red-500'>Missing participation setup</span>;
     } else {
       const { type, data: pdata } = participation;
       if (type === 'identity') {
         rs = (
-          <div>
-            <Tag className="text-violet-500 mx-2">
+          <span className='mr-1'>
+            Only
+            <span className='text-violet-500 mx-1'>
               {((pdata as string[]) || []).length}
-            </Tag>
-            users can participate
-          </div>
+            </span>
+            can participate in the voting process.
+          </span>
         );
       } else if (type === 'token') {
         rs = (
-          <div>
-            User with
-            <Tag className="text-violet-500 mx-2">{(pdata as IToken)?.min}</Tag>
-            <Tag className="text-violet-500 mx-2">
+          <span className='mr-1'>
+            Only
+            <span className='text-violet-500 mx-1'>
               {(pdata as IToken)?.address}
-            </Tag>
-            can participate
-          </div>
+            </span>{' '}
+            token holders with a minimum of
+            <span className='text-violet-500 mx-1'>
+              {(pdata as IToken)?.min}
+            </span>{' '}
+            tokens can participate.
+          </span>
         );
       }
     }
     return rs;
   };
   const p1 = (
-    <div className="block">
-      <div>
-        Voting method is
-        <Tag className="text-red-500 mx-2 font-bold">
-          {getVoteMachine(checkpoint.vote_machine_type || '')?.getName()}
-        </Tag>
-      </div>
-      The voting would lasts
-      <Tag className="text-violet-500 mx-2">
+    <div className='block'>
+      The voting duration for this checkpoint is set for
+      <span className='text-violet-500 mx-1'>
         apprx.&nbsp;
         {moment.duration((checkpoint?.duration || 0) * 1000).humanize()}
-      </Tag>
-      and the user would have to choose ONE of
-      <Tag className="text-violet-500 mx-2">{noOfOptions}</Tag>
+      </span>{' '}
+      from the active time.
+      {/* <div>
+        Voting method is
+        <Tag className='text-red-500 mx-2 font-bold'>
+          {getVoteMachine(checkpoint.vote_machine_type || '')?.getName()}
+        </Tag>
+      </div> */}
+      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+      {renderParticipation(participation)}
+      Each of them can vote ONE option from a list of
+      <span className='text-violet-500 mx-1'>{noOfOptions}</span>
       options.
       {data.includedAbstain
         ? ' User can also choose to abstain from voting.'
         : ''}
       {/* Only user with ... can vote. */}
-      <br />
-      The winning option must reach
-      <Tag className="text-violet-500 mx-2">
+      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+      Winning option is the option that receive the highest number of votes and
+      reach a minimum of{' '}
+      <span className='text-violet-500 mx-1'>
         {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
         {!data.token ? 'votes' : ` voted token ${data.token}`}
-      </Tag>
-      to win.
-      {renderParticipation(participation)}
+      </span>
+      made by participants.
     </div>
   );
   return p1;

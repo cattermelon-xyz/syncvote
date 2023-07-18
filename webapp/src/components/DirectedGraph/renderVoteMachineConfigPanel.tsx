@@ -25,11 +25,7 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
         <MachineConfigPanel
           vmConfigPanel={
             <ConfigPanel
-              // TODO: change to viewMode
-              editable={
-                viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
-                viewMode === GraphViewMode.EDIT_MISSION
-              }
+              viewMode={viewMode}
               currentNodeId={selectedNodeId}
               onChange={onChange}
               children={selectedNode.children || []}
