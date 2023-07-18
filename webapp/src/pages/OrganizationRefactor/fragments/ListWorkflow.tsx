@@ -14,7 +14,7 @@ const ListWorkflow: React.FC<Props> = ({ workflows }) => {
             <WorkflowCard dataWorkflow={workflow} isListHome={true} />
           </div>
         ))}
-    </div>k
+    </div>
   );
 };
 

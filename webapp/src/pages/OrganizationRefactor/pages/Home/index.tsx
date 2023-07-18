@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography } from 'antd';
 import SearchBar from './fragments/SearchBar';
 import SpaceContentLayout from '../../fragments/SpaceContentLayout';
-import ListWorkflow from './fragments/ListWorkflow';
+import ListWorkflow from '../../fragments/ListWorkflow';
 const { Title } = Typography;
 import { useFetchData } from './hooks/useFetchData';
 import { L } from '@utils/locales/L';

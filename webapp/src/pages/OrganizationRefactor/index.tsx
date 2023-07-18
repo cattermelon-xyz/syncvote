@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 
 import Home from './pages/Home';
+import MySpace from './pages/MySpace';
 
 const tabItems: TabsProps['items'] = [
   {
@@ -32,7 +33,7 @@ const tabItems: TabsProps['items'] = [
         </>
       </>
     ),
-    children: `Content of Tab Pane 2`,
+    children: <MySpace />,
   },
   {
     key: '/shared_spaces',
