@@ -2,6 +2,7 @@ import {
   ClockCircleOutlined,
   SettingOutlined,
   TwitterOutlined,
+  VerticalAlignTopOutlined,
 } from '@ant-design/icons';
 import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
@@ -50,6 +51,10 @@ const Node = memo(
       : 'border border-slate-700 ';
     const style = data.style;
     const votingLocation = data.raw?.votingLocation || '';
+    let threshold = data.raw?.data?.max || 0;
+    threshold =
+      threshold > 0 && threshold < 1 ? threshold * 100 + '%' : threshold;
+    let token = data.raw?.data?.token || '';
     return (
       <>
         <Handle
@@ -111,7 +116,7 @@ const Node = memo(
         />
         <div
           className={`rounded-md text-base border-solid ${selected} ${
-            data.isEnd ? 'bg-slate-700 text-white' : ''
+            data.isEnd ? 'bg-zinc-700 text-white' : ''
           }`}
         >
           {duration > 0 ? (
@@ -121,16 +126,21 @@ const Node = memo(
             </div>
           ) : null}
           <div
-            className={`p-2 font-bold ${
-              description ? 'bg-zinc-100 rounded-t-md' : 'rounded-md'
-            }`}
+            className={`p-2 font-bold`}
             style={style.title ? style.title : {}}
           >
-            {data.label ? parse(data.label) : id}
+            {data.label ? parse(data.label) : 'untitled'}
           </div>
-          {votingLocation ? ( // TODO: voting condition
+          {(votingLocation && votingLocation !== ' ') || threshold ? ( // TODO: voting condition
             <div style={style.content ? style.content : {}} className='py-2'>
-              {votingLocation ? (
+              {threshold ? (
+                <div className='flex text-ellipsis items-center px-2'>
+                  <VerticalAlignTopOutlined className='mr-2' />
+                  {/* {`Threshold ${threshold} ${token}`} */}
+                  {`Threshold ${threshold}`}
+                </div>
+              ) : null}
+              {votingLocation && votingLocation !== ' ' ? (
                 <div className='flex text-ellipsis items-center px-2'>
                   <LuMapPin className='mr-2' />
                   {votingLocation}
