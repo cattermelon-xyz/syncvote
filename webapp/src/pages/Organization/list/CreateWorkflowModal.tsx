@@ -7,15 +7,18 @@ import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
+import CreateSpaceModal from './CreateSpaceModal';
 
 interface CreateWorkflowModalProps {
   open: boolean;
   onClose: () => void;
+  setOpenCreateWorkspaceModal: () => void;
 }
 
 const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   open,
   onClose,
+  setOpenCreateWorkspaceModal,
 }) => {
   const navigate = useNavigate();
   const { user } = useSelector((state: any) => state.orginfo);
@@ -59,6 +62,8 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
     setValue(e.target.value);
   };
 
+  const createNewWorkSpace = () => {};
+
   useEffect(() => {
     loadWorkflowData(offset, limit);
   }, [user]);
@@ -73,10 +78,10 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       okText={L('createANewWorkflow')}
       okButtonProps={{ disabled: value === null }}
       cancelButtonProps={{ style: { display: 'none' } }}
-      className='flex-col'
+      className='flex-col create-new'
     >
       <Space className='flex'>
-        <div style={{ color: '#575655' }} className='text-base not-italic	mb-3'>
+        <div style={{ color: '#575655' }} className='text-sm not-italic	mb-3'>
           Select a workspace to contain your new workflow{' '}
         </div>
       </Space>
@@ -110,7 +115,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       </Space>
 
       <Space className='flex'>
-        <a style={{ color: '#6d28d9' }}>
+        <a style={{ color: '#6d28d9' }} onClick={setOpenCreateWorkspaceModal}>
           <PlusOutlined /> {L('createANewSpace')}
         </a>
       </Space>

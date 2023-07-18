@@ -190,3 +190,7 @@ html body {
 .radio:hover {
   background-color: #f6f6f6; /* Change to your desired color */
 }
+
+.create-new .ant-modal-title {
+  font-size: 20px; /* Replace with your desired font size */
+}

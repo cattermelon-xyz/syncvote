@@ -164,7 +164,7 @@ const Icon = ({
   return (
     <>
       {url ? (
-        <div className='relative block'>
+        <div className='relative block' style={{ width: getSize(size) }}>
           <Avatar
             size={getSize(size)}
             src={
@@ -183,7 +183,10 @@ const Icon = ({
           ) : null}
         </div>
       ) : (
-        <div className='relative block' style={{ position: 'relative' }}>
+        <div
+          className='relative block'
+          style={{ position: 'relative', width: getSize(size) }}
+        >
           {children ? (
             <Avatar
               size={getSize(size)}

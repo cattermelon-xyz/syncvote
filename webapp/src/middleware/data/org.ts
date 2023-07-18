@@ -30,6 +30,7 @@ export const newOrg = async ({
   onError?: (data: any) => void;
   dispatch: any;
 }) => {
+  dispatch(startLoading({}));
   try {
     const url = 'https://uafmqopjujmosmilsefw.supabase.co/functions/v1/new-org';
     const response = await fetch(url, {
@@ -62,7 +63,9 @@ export const newOrg = async ({
   } catch (error) {
     onError(error);
   }
+  dispatch(finishLoading({}));
 };
+
 export const upsertAnOrg = async ({
   org,
   onLoad,
@@ -127,6 +130,7 @@ export const upsertAnOrg = async ({
     onError(error);
   }
 };
+
 export const getDataOrgs = async ({
   userId,
   offset,
@@ -200,6 +204,7 @@ export const getDataOrgs = async ({
   }
   dispatch(finishLoading({}));
 };
+
 export const queryOrgs = async ({
   filter,
   onSuccess,
@@ -333,7 +338,7 @@ export const queryOrgsAndWorkflowForHome = async ({
   return data;
 };
 
-export const queryOrg = async ({
+export const queryLastOrg = async ({
   filter,
   onSuccess,
   onError = (error) => {
@@ -347,6 +352,8 @@ export const queryOrg = async ({
   dispatch: any;
 }) => {
   const { userId } = filter;
+  console.log(userId);
+
   dispatch(startLoading({}));
   // TODO: add email in table profile, use ref in profile to select user
   // TODO: query list of user
@@ -354,51 +361,23 @@ export const queryOrg = async ({
     .from('user_org')
     .select(
       `
-    role,
     org (
       id,
-      title,
-      desc,
-      icon_url,
-      banner_url,
-      preset_icon_url,
-      preset_banner_url,
-      org_size,
-      org_type,
-      profile (
-        id,
-        email,
-        full_name,
-        icon_url
-      ),
     )
   `
     )
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .limit(1); // limiting results to the first one
+
   if (!error) {
     const tmp: any[] = [];
     data.forEach((d: any) => {
       const org: any = d?.org || {
         id: '',
-        title: '',
-        desc: '',
       };
-      const presetIcon = org?.preset_icon_url
-        ? `preset:${org.preset_icon_url}`
-        : org.preset_icon_url;
-      const presetBanner = org?.preset_banner_url
-        ? `preset:${org.preset_banner_url}`
-        : org.preset_banner_url;
       tmp.push({
         id: org?.id,
         role: d.role,
-        title: org?.title,
-        desc: org.desc,
-        icon_url: org.icon_url ? org.icon_url : presetIcon,
-        banner_url: org.banner_url ? org.banner_url : presetBanner,
-        org_size: org.org_size,
-        org_type: org.org_type,
-        profile: org.profile || [],
       });
     });
     dispatch(setOrgsInfo(tmp));

@@ -4,7 +4,9 @@ import { L } from '@utils/locales/L';
 import Icon from '@components/Icon/Icon';
 import Input from '@components/Input/Input';
 import { useSelector, useDispatch } from 'react-redux';
-import { newOrg } from '@middleware/data';
+import { newOrg, queryLastOrg } from '@middleware/data';
+import { useNavigate } from 'react-router-dom';
+import { createIdString } from '@utils/helpers';
 
 interface CreateSpaceModalProps {
   open: boolean;
@@ -20,22 +22,29 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [icon_url, setIconUrl] = useState(''); //eslint-disable-line
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
+  const userId = user.id;
   const handleOk = async () => {
+    onClose();
+
     await newOrg({
       orgInfo: {
         title,
         icon_url,
       },
-      uid: user.id,
-      onSuccess: () => {
+      uid: userId,
+      onSuccess: async (org: any) => {
         setTitle('');
         setIconUrl('');
         Modal.success({
           title: 'Success',
           content: 'Create organization successfully',
         });
+        const orgIdString = createIdString(`${org.title}`, `${org.id}`);
+
+        navigate(`/my-spaces/${orgIdString}`);
       },
+
       dispatch,
       onError: () => {
         Modal.error({
@@ -44,22 +53,18 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
         });
       },
     });
-
-    onClose();
-    // setConfirmLoading(true);
-    // setTimeout(() => {
-    //   onClose();
-    //   setConfirmLoading(false);
-    // }, 2000);
   };
 
   const handleCancel = () => {
+    setTitle('');
+    setIconUrl('');
     onClose();
   };
 
   return (
     <Modal
       title={L('createANewSpace')}
+      className='create-new'
       open={open}
       onOk={handleOk}
       confirmLoading={confirmLoading}

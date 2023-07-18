@@ -53,36 +53,22 @@ const Organization = () => {
     }
   }, [location.pathname]);
 
-  const showModalCreateWorkspace = () => {
-    setOpenModalCreateWorkspace(true);
-  };
-
-  const closeModalCreateWorkspace = () => {
-    setOpenModalCreateWorkspace(false);
-  };
-
-  const showModalCreateWorkflow = () => {
-    setOpenModalCreateWorkflow(true);
-  };
-
-  const closeModalCreateWorkflow = () => {
-    setOpenModalCreateWorkflow(false);
-  };
-
   const items: MenuProps['items'] = [
     {
       label: (
-        <p>
-          <FileOutlined /> Workflow
-        </p>
+        <>
+          <FileOutlined className='text-base mr-1' />{' '}
+          <span className='text-[17px]'>Worflow</span>
+        </>
       ),
       key: '0',
     },
     {
       label: (
-        <p>
-          <FolderOutlined /> Workspace
-        </p>
+        <div>
+          <FolderOutlined className='text-base mr-1' />{' '}
+          <span className='text-sm'>Workspace</span>
+        </div>
       ),
       key: '1',
     },
@@ -90,11 +76,10 @@ const Organization = () => {
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     if (e?.key === '0') {
-      showModalCreateWorkflow();
+      setOpenModalCreateWorkflow(true);
     } else if (e?.key === '1') {
-      showModalCreateWorkspace();
+      setOpenModalCreateWorkspace(true);
     }
-    console.log('click', e?.key);
   };
 
   const menuProps = {
@@ -103,12 +88,14 @@ const Organization = () => {
   };
 
   return (
-    <div className='flex w-full'>
+    <div className='flex w-full rtl'>
       <Sider
+        style={{ borderRight: '1px solid #E3E3E2' }}
         theme='light'
-        className='overflow-auto min-h-screen border-r w-1/5 flex flex-col relative'
+        className='overflow-auto min-h-screen border-r flex flex-col relative pr-5'
+        width='18.3%'
       >
-        <Dropdown menu={menuProps} trigger={['click']}>
+        <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
           <Button
             startIcon={<PlusOutlined />}
             endIcon={<DownOutlined />}
@@ -119,34 +106,34 @@ const Organization = () => {
         </Dropdown>
         <div className='flex flex-col pl-4'>
           <HomeButton
-            startIcon={<HomeOutlined />}
+            startIcon={<HomeOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listHome');
               navigate('/');
             }}
             isFocused={currentStatus === 'listHome'}
           >
-            {L('home')}
+            <span className='text-base'>{L('home')}</span>
           </HomeButton>
           <HomeButton
-            startIcon={<FolderOutlined />}
+            startIcon={<FolderOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listMySpace');
               navigate('/my-spaces');
             }}
             isFocused={currentStatus === 'listMySpace'}
           >
-            {L('mySpace')}
+            <span className='text-base'>{L('mySpace')}</span>
           </HomeButton>
           <HomeButton
-            startIcon={<ShareAltOutlined />}
+            startIcon={<ShareAltOutlined className='text-2xl' />}
             onClick={() => {
               setCurrentStatus('listSharedSpaces');
               navigate('/shared-spaces');
             }}
             isFocused={currentStatus === 'listSharedSpaces'}
           >
-            {L('sharedSpaces')}
+            <span className='text-base'>{L('sharedSpaces')}</span>
           </HomeButton>
         </div>
         <div
@@ -181,12 +168,16 @@ const Organization = () => {
       </div>
       <CreateSpaceModal
         open={openModalCreateWorkspace}
-        onClose={closeModalCreateWorkspace}
+        onClose={() => setOpenModalCreateWorkspace(false)}
       />
 
       <CreateWorkflowModal
         open={openModalCreateWorkflow}
-        onClose={closeModalCreateWorkflow}
+        onClose={() => setOpenModalCreateWorkflow(false)}
+        setOpenCreateWorkspaceModal={() => {
+          setOpenModalCreateWorkflow(false);
+          setOpenModalCreateWorkspace(true);
+        }}
       />
     </div>
   );
