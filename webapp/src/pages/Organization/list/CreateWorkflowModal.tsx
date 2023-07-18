@@ -81,13 +81,14 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
         </div>
       </Space>
 
-      <Space className='h-64 w-full' direction='vertical'>
+      <Space className='h-60 w-full' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
           {dataOrgs.map((org: any, index: any) => (
             <>
               <div
                 className='flex h-12 items-center radio'
                 key={index}
+                style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
               >
