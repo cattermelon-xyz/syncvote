@@ -12,6 +12,7 @@ import {
 import { TbBolt } from 'react-icons/tb';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -35,7 +36,7 @@ function getItem(
 
 function PublicHeader(session: any) {
   const { orgs, user } = useSelector((state: any) => state.orginfo);
-
+  const handleClearStore = () => {};
   const navigate = useNavigate();
 
   const items: MenuProps['items'] = [
@@ -81,15 +82,21 @@ function PublicHeader(session: any) {
       className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white`}
     >
       <div className='w-full flex justify-between'>
-        <div className='flex p-0 gap-2 items-center'>
-          <div
-            className='flex items-center '
+        <div className='flex p-0 gap-2 items-center cursor-pointer'>
+          <span
+            className='mr-2'
             onClick={() => {
+              handleClearStore();
               navigate('/');
             }}
           >
-            <Logo width='128' height='24' />
-          </div>
+            <div className='flex top-[2%] left-[1.3%] gap-1'>
+              <LogoSyncVote />
+              <div className='text-violet-700 text-[20px] font-bold '>
+                Syncvote
+              </div>
+            </div>
+          </span>
         </div>
 
         <div className='flex w-w_5 items-center justify-end'>
