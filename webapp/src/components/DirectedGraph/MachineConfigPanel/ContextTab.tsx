@@ -102,7 +102,7 @@ const ContextTab = () => {
       </Space.Compact> */}
       {!selectedNode?.isEnd && selectedNode?.vote_machine_type ? (
         <>
-          <CollapsiblePanel title='Summary' collapsable={false}>
+          <CollapsiblePanel title='Rules & conditions' collapsable={false}>
             <Space direction='vertical' size='small'>
               {summary}
               {renderValidation(validation)}
