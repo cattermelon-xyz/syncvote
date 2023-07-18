@@ -12,6 +12,69 @@ import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { subtractArray } from '@utils/helpers';
 
+export const insertWorkflowAndVersion = async ({
+  dispatch,
+  props,
+  onError,
+  onSuccess,
+}: {
+  dispatch: any;
+  props: any;
+  onError: (error: any) => void;
+  onSuccess: (version: any, insertedId: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { title, desc, owner_org_id: orgId, emptyStage, iconUrl } = props;
+
+  let icon_url, preset_icon_url; // eslint-disable-line
+  if (iconUrl.startsWith('preset:')) {
+    preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
+  } else {
+    icon_url = iconUrl; // eslint-disable-line
+  }
+
+  const { data, error } = await supabase
+    .from('workflow')
+    .insert({
+      title,
+      desc,
+      icon_url,
+      preset_icon_url,
+      owner_org_id: orgId,
+    })
+    .select();
+
+  if (data) {
+    const insertedId = data[0].id;
+    const toInsert = {
+      workflow_id: insertedId,
+      status: 'DRAFT',
+      data: emptyStage,
+    };
+    const { data: versions, error: err } = await supabase
+      .from('workflow_version')
+      .insert(toInsert)
+      .select();
+    dispatch(finishLoading({}));
+    dispatch(
+      changeWorkflow({
+        id: insertedId,
+        title,
+        desc,
+        icon_url: iconUrl,
+        banner_url: '',
+        owner_org_id: orgId,
+        workflow_version: !err ? versions : [],
+      })
+    );
+    dispatch(finishLoading({}));
+    if (!error && versions) onSuccess(versions, insertedId);
+  }
+  if (error) {
+    onError(error);
+  }
+};
+
 export const upsertWorkflowVersion = async ({
   dispatch,
   workflowVersion,

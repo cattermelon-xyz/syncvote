@@ -23,12 +23,12 @@ const ChooseImageModal = ({
   return (
     <Modal open={isOpen} title={L('chooseIcon')} onCancel={onCancel}>
       <p>Choose or upload one</p>
-      <input type="file" id="single" accept="image/*" onChange={uploadIcon} />
-      <div className="grid grid-cols-6 mt-4">
+      <input type='file' id='single' accept='image/*' onChange={uploadIcon} />
+      <div className='grid grid-cols-6 mt-4'>
         {presetIcons.map((icon: string) => (
           <div
             key={icon}
-            className="flex items-center w-[36px] h-[36px] p-1 cursor-pointer hover:bg-slate-200"
+            className='flex items-center w-[36px] h-[36px] p-1 cursor-pointer hover:bg-slate-200'
             onClick={() => {
               uploadIcon(icon);
             }}
@@ -39,7 +39,7 @@ const ChooseImageModal = ({
                 isPreset: true,
                 type: 'icon',
               })}
-              alt="icon"
+              alt='icon'
               // className="w-[16px] h-[16px]"
             />
           </div>
@@ -63,9 +63,9 @@ const UploadBtn = ({
 }) => {
   const [shouldShowDialog, setShouldShowDialog] = useState(false);
   return (
-    <div className="absolute right-0 bottom-0">
+    <div className='absolute right-0 bottom-0'>
       <Avatar
-        className="cursor-pointer"
+        className='cursor-pointer'
         onClick={() => {
           setShouldShowDialog(true);
         }}
@@ -152,26 +152,26 @@ const Icon = ({
       case 'small':
         return 16;
       case 'medium':
-        return 32;
+        return 24;
       case 'large':
         return 48;
       case 'xlarge':
         return 96;
       default:
-        return 32;
+        return 24;
     }
   };
   return (
     <>
       {url ? (
-        <div className="relative block">
+        <div className='relative block' style={{ width: getSize(size) }}>
           <Avatar
             size={getSize(size)}
             src={
               <img
                 src={url}
-                alt="icon_+{getSize(size)}"
-                className="bg-white outline outline-2 outline-white"
+                alt='icon_+{getSize(size)}'
+                className='bg-white outline outline-2 outline-white'
                 onLoad={() => {
                   // TODO: make sure the image is loaded
                 }}
@@ -183,11 +183,14 @@ const Icon = ({
           ) : null}
         </div>
       ) : (
-        <div className="relative block" style={{ position: 'relative' }}>
+        <div
+          className='relative block'
+          style={{ position: 'relative', width: getSize(size) }}
+        >
           {children ? (
             <Avatar
               size={getSize(size)}
-              className="outline outline-2 bg-slate-400"
+              className='outline outline-2 bg-slate-400'
             >
               {children}
             </Avatar>
@@ -195,7 +198,7 @@ const Icon = ({
             <Avatar
               size={getSize(size)}
               icon={<UserOutlined />}
-              className="outline outline-2 outline-white"
+              className='outline outline-2 outline-white'
             />
           )}
           {editable === true ? (
