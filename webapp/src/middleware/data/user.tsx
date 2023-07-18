@@ -247,15 +247,3 @@ export const inviteExistingMember = async ({
   }
   dispatch(finishLoading({}));
 };
-
-export const isEmailExisted = async ({ email }: { email: string }) => {
-  const rs = await supabase
-    .from('profile')
-    .select('*', { count: 'exact', head: true })
-    .eq('email', email);
-  if (rs.error || rs.status !== 200) {
-    return false;
-  } else {
-    return rs.count;
-  }
-};
