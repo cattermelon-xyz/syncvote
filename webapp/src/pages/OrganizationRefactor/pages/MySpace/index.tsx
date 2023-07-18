@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Typography } from 'antd';
 import SpaceContentLayout from '../../fragments/SpaceContentLayout';
-import ListWorkflow from '../../fragments/ListWorkflow';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
