@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { getImageUrl } from '@utils/helpers';
+import Banner from '@components/Banner/Banner';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
@@ -15,6 +16,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   dataWorkflow,
   isListHome,
 }) => {
+  console.log('dataWorkflow', dataWorkflow);
+
   const navigate = useNavigate();
   return (
     <Card
@@ -45,22 +48,12 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         }
       }}
     >
-      {dataWorkflow.banner_url ? (
-        <img
+      {
+        <Banner
+          bannerUrl={dataWorkflow.banner_url}
           className='w-full h-[86px] rounded-lg m-0'
-          alt='example'
-          src={getImageUrl({
-            filePath: dataWorkflow?.banner_url?.replace('preset:', ''),
-            isPreset: dataWorkflow?.banner_url?.indexOf('preset:') === 0,
-            type: 'banner',
-          })}
         />
-      ) : (
-        <div
-          className='w-full h-[86px] rounded-lg m-0 border border-gray-200'
-          style={{ backgroundColor: '#FFFFFF' }}
-        />
-      )}
+      }
       {dataWorkflow.icon_url ? (
         <Avatar
           src={getImageUrl({

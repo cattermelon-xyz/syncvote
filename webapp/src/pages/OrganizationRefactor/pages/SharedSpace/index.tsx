@@ -13,7 +13,7 @@ import { Skeleton } from 'antd';
 
 const SharedSpace: React.FC = () => {
   const { user } = useSelector((state: any) => state.orginfo);
-  const [adminOrgs, setAdminOrgs] = useState<any[]>([]);
+  const [memberOrgs, setMemberOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -28,14 +28,14 @@ const SharedSpace: React.FC = () => {
         dispatch,
       });
       if (orgs) {
-        const adminOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
-        setAdminOrgs(adminOrgsData);
+        const MemberOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
+        setMemberOrgs(MemberOrgsData);
 
-        // Get all workflows from the admin orgs and include org title
-        const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
-          adminOrg.org.workflows.map((workflow: any) => ({
+        // Get all workflows from the member orgs and include org title
+        const allWorkflows = MemberOrgsData.flatMap((memberOrg: any) =>
+          memberOrg.workflows.map((workflow: any) => ({
             ...workflow,
-            org_title: adminOrg.org.title,
+            org_title: memberOrg?.title,
           }))
         );
 
@@ -59,11 +59,11 @@ const SharedSpace: React.FC = () => {
           ) : (
             <ListItem
               items={
-                adminOrgs &&
-                adminOrgs.map((adminOrg, index) => (
+                memberOrgs &&
+                memberOrgs.map((memberOrg, index) => (
                   <SpaceCard
                     key={index}
-                    dataSpace={adminOrg}
+                    dataSpace={memberOrg}
                     isMySpace={true}
                   />
                 ))

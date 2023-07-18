@@ -30,12 +30,11 @@ const MySpace: React.FC = () => {
       if (orgs) {
         const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
         setAdminOrgs(adminOrgsData);
-
         // Get all workflows from the admin orgs and include org title
         const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
-          adminOrg.org.workflows.map((workflow: any) => ({
+          adminOrg.workflows.map((workflow: any) => ({
             ...workflow,
-            org_title: adminOrg.org.title,
+            org_title: adminOrg.title,
           }))
         );
         setWorkflows(allWorkflows);

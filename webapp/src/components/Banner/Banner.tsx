@@ -11,9 +11,15 @@ type BannerProps = {
   bannerUrl: string;
   onChange?: (args: { filePath: string; isPreset: boolean }) => void;
   editable?: boolean;
+  className?: string;
 };
 
-const Banner = ({ bannerUrl, onChange, editable = false }: BannerProps) => {
+const Banner = ({
+  bannerUrl,
+  onChange,
+  editable = false,
+  className = '',
+}: BannerProps) => {
   let url = bannerUrl ? bannerUrl : `preset:${OrgPresetBanner}`;
   url = getImageUrl({
     filePath: url.indexOf('preset:') === 0 ? url.replace('preset:', '') : url,
@@ -139,7 +145,7 @@ const Banner = ({ bannerUrl, onChange, editable = false }: BannerProps) => {
         />
       </Modal>
       <div
-        className='w-full h-[150px] bg-cover bg-center relative'
+        className={`w-full h-[150px] bg-cover bg-center relative ${className}`}
         style={{ backgroundImage: `url(${url})` }}
         onMouseOver={() => {
           editable ? setShowButtonPanel(true) : null;
