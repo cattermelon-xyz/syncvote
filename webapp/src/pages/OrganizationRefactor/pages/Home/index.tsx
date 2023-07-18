@@ -12,7 +12,7 @@ const Home: React.FC = () => {
   console.log(workflows);
   return (
     <SpaceContentLayout>
-      <div className='w-full flex flex-col gap-y-14'>
+      <div className='w-[800px] flex flex-col gap-y-14'>
         {/* section 1 */}
         <section className='w-full'>
           <Title level={2} className='text-center'>
