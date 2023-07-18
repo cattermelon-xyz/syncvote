@@ -129,6 +129,7 @@ function PublicHeader(session: any) {
                 fill="#EA4335"
               ></path>
             </svg>
+            
             {user.id !== '' ? (
               <p>{session?.session?.user?.user_metadata?.full_name}</p>
             ) : (
