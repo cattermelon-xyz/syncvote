@@ -61,7 +61,8 @@ export const getDataComment = async ({
       id,
       email,
       full_name,
-      avatar_url
+      icon_url,
+      preset_icon_url
     )`
     )
     .range(start, end)
@@ -70,11 +71,38 @@ export const getDataComment = async ({
     .order('created_at', { ascending: false });
   dispatch(finishLoading({}));
 
+  const tmp: any[] = [];
   if (error) {
     console.log(error);
+  } else {
+    data.forEach((d: any) => {
+      const presetIcon = d.profile.preset_icon_url
+        ? `preset:${d.profile.preset_icon_url}`
+        : d.profile.preset_icon_url;
+
+      tmp.push({
+        id: d?.id,
+        created_at: d?.created_at,
+        text: d?.text,
+        comment_id: d?.comment_id,
+        where: d?.where,
+        by_who: d?.by_who,
+        comment: [
+          {
+            count: d?.comment[0].count,
+          },
+        ],
+        profile: {
+          id: d?.profile?.id,
+          email: d?.profile?.email,
+          full_name: d?.profile?.full_name,
+          avatar_url: d.profile.icon_url ? d.profile.icon_url : presetIcon,
+        },
+      });
+    });
   }
 
-  return data as unknown as CommentType[];
+  return tmp as unknown as CommentType[];
 };
 
 export const getDataReply = async ({
@@ -104,18 +132,39 @@ export const getDataReply = async ({
       id,
       email,
       full_name,
-      avatar_url
+      icon_url,
+      preset_icon_url
     )`
     )
-    .range(start, end)
     .eq('where', comment?.where)
     .eq('comment_id', comment?.id)
-    .order('created_at', { ascending: false });
-  dispatch(finishLoading({}));
+    .order('created_at', { ascending: false })
+    .range(start, end);
 
+  dispatch(finishLoading({}));
+  const tmp: any[] = [];
   if (error) {
     console.log(error);
+  } else {
+    data.forEach((d: any) => {
+      const presetIcon = d.profile.preset_icon_url
+        ? `preset:${d.profile.preset_icon_url}`
+        : d.profile.preset_icon_url;
+
+      tmp.push({
+        id: d?.id,
+        created_at: d?.created_at,
+        text: d?.text,
+        comment_id: d?.comment_id,
+        profile: {
+          id: d?.profile?.id,
+          email: d?.profile?.email,
+          full_name: d?.profile?.full_name,
+          avatar_url: d.profile.icon_url ? d.profile.icon_url : presetIcon,
+        },
+      });
+    });
   }
 
-  return data as unknown as CommentType[];
+  return tmp as unknown as CommentType[];
 };

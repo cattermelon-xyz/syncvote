@@ -18,6 +18,7 @@ import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
 import { LeftOutlined } from '@ant-design/icons';
 import ReactionBox from './Reaction';
+import Icon from '@components/Icon/Icon';
 
 const Comment = ({
   where,
@@ -59,6 +60,8 @@ const Comment = ({
   };
 
   const toReply = (item: CommentType) => {
+    console.log('To reply', item);
+
     setCommentStatus(false);
     setReplyStatus(true);
     setCurrentComment(item);
@@ -77,6 +80,7 @@ const Comment = ({
         dispatch: dispatch,
       })) || [];
     setDataComment((prevData) => [...prevData, ...newComments]);
+
     setOffset(offset);
   };
 
@@ -93,6 +97,8 @@ const Comment = ({
     });
 
     setDataReply((prevData) => [...prevData, ...newComments]);
+    console.log('Reply', dataReply);
+
     setOffsetReply(offset);
   };
 
@@ -185,9 +191,9 @@ const Comment = ({
                             >
                               <List.Item.Meta
                                 avatar={
-                                  <Avatar
-                                    size={'large'}
-                                    src={item?.profile?.avatar_url}
+                                  <Icon
+                                    size='large'
+                                    iconUrl={item?.profile?.avatar_url}
                                   />
                                 }
                                 title={
@@ -212,7 +218,11 @@ const Comment = ({
                                 >
                                   <List.Item.Meta
                                     avatar={
-                                      <Avatar src={item?.profile?.avatar_url} />
+                                      // <Avatar src={item?.profile?.avatar_url} />
+                                      <Icon
+                                        size='large'
+                                        iconUrl={item?.profile?.avatar_url}
+                                      />
                                     }
                                     title={
                                       <div className='flex'>
@@ -239,7 +249,11 @@ const Comment = ({
                                 >
                                   <List.Item.Meta
                                     avatar={
-                                      <Avatar src={item?.profile?.avatar_url} />
+                                      // <Avatar src={item?.profile?.avatar_url} />
+                                      <Icon
+                                        size='large'
+                                        iconUrl={item?.profile?.avatar_url}
+                                      />
                                     }
                                     title={
                                       <div className='flex'>

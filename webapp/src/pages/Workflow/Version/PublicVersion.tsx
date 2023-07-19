@@ -3,20 +3,12 @@ import { GrDocumentText } from 'react-icons/gr';
 import parse from 'html-react-parser';
 import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
 import {
-  queryOrgAndUser,
+  queryOrgByOrgId,
   queryWeb2Integration,
   queryWorkflowVersion,
 } from '@middleware/data';
 import { extractIdFromIdString } from '@utils/helpers';
-import {
-  Button,
-  Layout,
-  Space,
-  Image,
-  Avatar,
-  notification,
-  Skeleton,
-} from 'antd';
+import { Button, Layout, Space, notification, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -35,11 +27,6 @@ import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import { GraphViewMode } from '@types';
 import Banner from '@components/Banner/Banner';
 import Icon from '@components/Icon/Icon';
-
-const extractOrg = ({ orgList, orgId }: { orgList: any; orgId: number }) => {
-  const org = orgList.find((org: any) => org.id === orgId);
-  return org;
-};
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -97,14 +84,21 @@ export const PublicVersion = () => {
       onLoad: (worflow: any) => {
         setWorkflow(worflow[0]);
         setVersion(worflow[0]?.workflow_version[0]);
+
+        if (worflow[0].profile === null) {
+          setProfile({
+            full_name: 'Unknown',
+          });
+        } else {
+          setProfile(worflow[0].profile);
+        }
       },
     });
 
-    queryOrgAndUser({
+    queryOrgByOrgId({
       orgId,
       onSuccess: (data: any) => {
-        setOrg(data[0]?.org);
-        setProfile(data[0]?.profile);
+        setOrg(data[0]);
       },
       dispatch,
     });

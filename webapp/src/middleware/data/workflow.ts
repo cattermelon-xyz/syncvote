@@ -24,7 +24,14 @@ export const insertWorkflowAndVersion = async ({
   onSuccess: (version: any, insertedId: any) => void;
 }) => {
   dispatch(startLoading({}));
-  const { title, desc, owner_org_id: orgId, emptyStage, iconUrl } = props;
+  const {
+    title,
+    desc,
+    owner_org_id: orgId,
+    emptyStage,
+    iconUrl,
+    authority: userId,
+  } = props;
 
   let icon_url, preset_icon_url; // eslint-disable-line
   if (iconUrl.startsWith('preset:')) {
@@ -41,6 +48,7 @@ export const insertWorkflowAndVersion = async ({
       icon_url,
       preset_icon_url,
       owner_org_id: orgId,
+      authority: userId,
     })
     .select();
 
@@ -209,11 +217,12 @@ export const queryWorkflowVersion = async ({
   // TODO: should we stuff workflow_version into workflow?
   const { data, error } = await supabase
     .from('workflow')
-    .select('*, workflow_version ( * )')
+    .select('*, workflow_version ( * ), profile(*)')
     .eq('owner_org_id', orgId)
     .eq('id', workflowId)
     .eq('workflow_version.id', versionId)
     .order('created_at', { ascending: false });
+
   dispatch(finishLoading({}));
   if (data) {
     const wfList = Array.isArray(data) ? data : [data];

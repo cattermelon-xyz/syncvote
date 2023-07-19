@@ -338,7 +338,7 @@ export const queryOrgsAndWorkflowForHome = async ({
   return data;
 };
 
-export const queryOrgAndUser = async ({
+export const queryOrgByOrgId = async ({
   orgId,
   onSuccess,
   onError = (error) => {
@@ -355,26 +355,12 @@ export const queryOrgAndUser = async ({
   // TODO: add email in table profile, use ref in profile to select user
   // TODO: query list of user
   const { data, error } = await supabase
-    .from('user_org')
-    .select(
-      `
-      role,
-      org(*),
-      profile(*)
-      `
-    )
-    .eq('org_id', orgId)
-    .eq('role', 'ADMIN');
-
+    .from('org')
+    .select(`*`)
+    .eq('id', orgId);
   if (!error) {
     const tmp: any[] = [];
-    data.forEach((d: any) => {
-      const org: any = d?.org || {
-        id: '',
-        title: '',
-        desc: '',
-      };
-
+    data.forEach((org: any) => {
       const presetIcon = org?.preset_icon_url
         ? `preset:${org.preset_icon_url}`
         : org.preset_icon_url;
@@ -383,7 +369,6 @@ export const queryOrgAndUser = async ({
         : org.preset_banner_url;
       tmp.push({
         id: org?.id,
-        role: d.role,
         title: org?.title,
         desc: org.desc,
         icon_url: org.icon_url ? org.icon_url : presetIcon,
