@@ -36,20 +36,14 @@ const SpacePage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (location.pathname.startsWith('/my-spaces')) {
-      if (location.pathname === '/my-spaces') {
-        setCurrentStatus('listMySpace');
-      } else {
-        setCurrentStatus('WorkflowOfAMySpace');
-      }
-    } else if (location.pathname.startsWith('/shared-spaces')) {
-      if (location.pathname === '/shared-spaces') {
-        setCurrentStatus('listSharedSpaces');
-      } else {
-        setCurrentStatus('WorkflowOfASharedSpace'); // Trạng thái mới cho trường hợp URL chứa spaceId
-      }
-    } else {
+    if (location.pathname === '/my-spaces') {
+      setCurrentStatus('listMySpace');
+    } else if (location.pathname === '/shared-spaces') {
+      setCurrentStatus('listSharedSpaces');
+    } else if (location.pathname === '/') {
       setCurrentStatus('listHome');
+    } else {
+      setCurrentStatus('WorkflowOfASpace');
     }
   }, [location.pathname]);
 
@@ -94,7 +88,7 @@ const SpacePage = () => {
           style={{ borderRight: '1px solid #E3E3E2' }}
           theme='light'
           className='overflow-auto border-r flex flex-col relative pr-5'
-          width='18.4%'
+          width='269px'
         >
           <Dropdown menu={menuProps} trigger={['click']} className='w-48'>
             <Button
@@ -157,9 +151,7 @@ const SpacePage = () => {
             <MySpace />
           ) : currentStatus === 'listSharedSpaces' ? (
             <SharedSpace />
-          ) : currentStatus === 'WorkflowOfAMySpace' ? (
-            <WorkflowsOfASpace />
-          ) : currentStatus === 'WorkflowOfASharedSpace' ? (
+          ) : currentStatus === 'WorkflowOfASpace' ? (
             <WorkflowsOfASpace />
           ) : (
             <></>
@@ -181,10 +173,12 @@ const SpacePage = () => {
         />
       </div>
       {currentStatus === 'listHome' && (
-        <>
-          <hr />
-          <p>Hello world</p>
-        </>
+        <div className='w-full flex flex-col justify-center items-center'>
+          <div className='w-full'>
+            <hr />
+          </div>
+          <p>Footer</p>
+        </div>
       )}
     </>
   );

@@ -65,17 +65,10 @@ const AppRoutes = () => (
       </Route>
 
       {/* ROUTE FOR SPACE */}
-      <Route
-        path='/'
-        element={<App layout={FixedLayout} requiredLogin={true} />}
-      >
+      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
         <Route index element={<SpacePage />} />
-        <Route path='/my-spaces' element={<SpacePage />}>
-          <Route path=':spaceId' element={<SpacePage />} />
-        </Route>
-        <Route path='/shared-spaces' element={<SpacePage />}>
-          <Route path=':spaceId' element={<SpacePage />} />
-        </Route>
+        <Route path='/my-spaces' element={<SpacePage />} />
+        <Route path='/shared-spaces' element={<SpacePage />} />
       </Route>
 
       {/* ROUTE FOR ACCOUNT */}
@@ -89,7 +82,7 @@ const AppRoutes = () => (
         {/* TODO: this screen should only once for each new org */}
         <Route path='onboard' element={<PageScreen />} />
         <Route path=':orgIdString'>
-          <Route index element={<OrganizationHome />} />
+          <Route index element={<SpacePage />} />
           <Route path='setting' element={<OrganizationSetting />} />
           <Route path='new-workflow' element={<ChooseTemplate />} />
           <Route path='new-mission' element={<ChooseWorkflow />} />

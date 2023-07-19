@@ -17,27 +17,12 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
     <Card
       className='w-[189px] bg-white rounded-xl border border-neutral-200 flex-col justify-start items-start gap-2'
       onClick={() => {
-        if (isMySpace) {
-          navigate(
-            `/my-spaces/${createIdString(
-              dataSpace.title,
-              dataSpace.id.toString()
-            )}`,
-            {
-              state: { dataSpace },
-            }
-          );
-        } else {
-          navigate(
-            `/shared-spaces/${createIdString(
-              dataSpace.title,
-              dataSpace.id.toString()
-            )}`,
-            {
-              state: { dataSpace },
-            }
-          );
-        }
+        navigate(
+          `/${createIdString(dataSpace.title, dataSpace.id.toString())}`,
+          {
+            state: { dataSpace },
+          }
+        );
       }}
       hoverable={true}
     >

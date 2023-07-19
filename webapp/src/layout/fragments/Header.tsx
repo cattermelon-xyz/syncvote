@@ -107,7 +107,7 @@ function Header({ session }: HeaderProps) {
         <div className='flex p-0 gap-2 items-center'>
           <div className='flex items-center gap-2'>
             <span className='cursor-pointer flex'>
-              {orgId !== -1 ? (
+              {orgId !== -1 && currentPage !== Pages.ORG_HOME ? (
                 <span className='text-xl flex flex-row items-center'>
                   <HomeOutlined
                     style={{ fontSize: '24px' }}
@@ -148,7 +148,7 @@ function Header({ session }: HeaderProps) {
                   </span>
                   <Button
                     type='text'
-                    disabled={currentPage === Pages.ORG_HOME}
+                    // disabled={currentPage === Pages.ORG_HOME}
                     onClick={() => {
                       navigate(`/${orgIdString}`);
                     }}
