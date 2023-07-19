@@ -60,6 +60,8 @@ const Comment = ({
   };
 
   const toReply = (item: CommentType) => {
+    console.log("To reply", item);
+    
     setCommentStatus(false);
     setReplyStatus(true);
     setCurrentComment(item);
@@ -95,6 +97,8 @@ const Comment = ({
     });
 
     setDataReply((prevData) => [...prevData, ...newComments]);
+    console.log("Reply",dataReply);
+    
     setOffsetReply(offset);
   };
 

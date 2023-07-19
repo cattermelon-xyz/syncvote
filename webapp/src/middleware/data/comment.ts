@@ -71,8 +71,6 @@ export const getDataComment = async ({
     .order('created_at', { ascending: false });
   dispatch(finishLoading({}));
 
-  console.log(data);
-
   const tmp: any[] = [];
   if (error) {
     console.log(error);
@@ -87,6 +85,8 @@ export const getDataComment = async ({
         created_at: d?.created_at,
         text: d?.text,
         comment_id: d?.comment_id,
+        where: d?.where,
+        by_who: d?.by_who,
         comment: [
           {
             count: d?.comment[0].count,
@@ -136,10 +136,11 @@ export const getDataReply = async ({
       preset_icon_url
     )`
     )
-    .range(start, end)
     .eq('where', comment?.where)
     .eq('comment_id', comment?.id)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(start, end);
+
   dispatch(finishLoading({}));
   const tmp: any[] = [];
   if (error) {
