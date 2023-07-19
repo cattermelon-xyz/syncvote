@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from '@components/Button/Button';
 import { L } from '@utils/locales/L';
-import { Dropdown, Layout, MenuProps, Space } from 'antd';
+import { Dropdown, Layout, Space, MenuProps } from 'antd';
 import {
   PlusOutlined,
   DownOutlined,
@@ -22,11 +22,19 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { supabase } from '@utils/supabaseClient';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import React from 'react';
 import CreateWorkflowModal from './list/CreateWorkflowModal';
 
 const { Sider } = Layout;
 
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
+
 const Organization = () => {
+  let query = useQuery();
   const [openModalCreateWorkspace, setOpenModalCreateWorkspace] =
     useState(false);
   const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(false);
@@ -36,6 +44,10 @@ const Organization = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (query.get('action') === 'new-workflow') {
+      setOpenModalCreateWorkflow(true);
+    }
+
     if (location.pathname.startsWith('/my-spaces')) {
       if (location.pathname === '/my-spaces') {
         setCurrentStatus('listMySpace');
