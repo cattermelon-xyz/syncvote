@@ -3,12 +3,14 @@ import {
   CodeOutlined,
   GlobalOutlined,
   LinkOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
-import { queryVersionEditor } from '@middleware/data';
+import { isEmailExisted, queryVersionEditor } from '@middleware/data';
 import { IWorkflow } from '@types';
 import { createIdString } from '@utils/helpers';
 import {
+  Alert,
   Button,
   Input,
   Modal,
@@ -30,6 +32,8 @@ type TabProps = {
 const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
   const [newInvitee, setNewInvitee] = useState('');
   const [invitees, setInvitees] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailExisted, setEmailExisted] = useState('');
   const dispatch = useDispatch();
   useEffect(() => {
     const versionId = workflow?.workflow_version[0]?.id;
@@ -46,22 +50,44 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
   }, [workflow]);
   return (
     <Space direction='vertical' className='w-full flex' size='middle'>
-      <div className='font-2xl font-bold'>Share "{workflow.title}"</div>
-      <div className='w-full flex items-center justify-between'>
-        <Input
-          placeholder='Add someone'
-          value={newInvitee}
-          onChange={(e) => setNewInvitee(e.target.value)}
-          className='w-full flex-grow mr-2 flex'
-        />
-        <Button
-          type='default'
-          className='text-violet-500 bg-violet-100'
-          disabled={newInvitee === ''}
-        >
-          Invite
-        </Button>
-      </div>
+      <Space direction='vertical' size='small' className='w-full'>
+        <div className='font-2xl font-bold'>Share "{workflow.title}"</div>
+        <div className='w-full flex items-top justify-between'>
+          <Input
+            placeholder='Add someone'
+            value={newInvitee}
+            onChange={(e) => {
+              setNewInvitee(e.target.value);
+              setEmailExisted('');
+            }}
+            className='w-full flex-grow mr-2 flex'
+            onBlur={async () => {
+              setIsLoading(true);
+              const existed = await isEmailExisted({ email: newInvitee });
+              setIsLoading(false);
+              setEmailExisted(
+                existed
+                  ? 'User existed'
+                  : 'User not existed, invite to SyncVote'
+              );
+            }}
+          />
+          <Button
+            type='default'
+            className='text-violet-500 bg-violet-100'
+            disabled={newInvitee === '' || isLoading}
+          >
+            {isLoading ? <LoadingOutlined className='mr-1' /> : null}
+            Invite
+          </Button>
+        </div>
+        {emailExisted ? (
+          <Alert
+            type={emailExisted === 'User existed' ? 'info' : 'warning'}
+            message={emailExisted}
+          />
+        ) : null}
+      </Space>
       <Space direction='vertical' size='middle'>
         <div>Who can access</div>
         <Space direction='vertical' size='small'>

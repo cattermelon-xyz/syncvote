@@ -60,8 +60,8 @@ const Comment = ({
   };
 
   const toReply = (item: CommentType) => {
-    console.log("To reply", item);
-    
+    console.log('To reply', item);
+
     setCommentStatus(false);
     setReplyStatus(true);
     setCurrentComment(item);
@@ -97,8 +97,8 @@ const Comment = ({
     });
 
     setDataReply((prevData) => [...prevData, ...newComments]);
-    console.log("Reply",dataReply);
-    
+    console.log('Reply', dataReply);
+
     setOffsetReply(offset);
   };
 
@@ -194,7 +194,7 @@ const Comment = ({
                                   <Icon
                                     size='large'
                                     iconUrl={item?.profile?.avatar_url}
-                                  ></Icon>
+                                  />
                                 }
                                 title={
                                   <div className='flex'>
@@ -222,7 +222,7 @@ const Comment = ({
                                       <Icon
                                         size='large'
                                         iconUrl={item?.profile?.avatar_url}
-                                      ></Icon>
+                                      />
                                     }
                                     title={
                                       <div className='flex'>
@@ -253,7 +253,7 @@ const Comment = ({
                                       <Icon
                                         size='large'
                                         iconUrl={item?.profile?.avatar_url}
-                                      ></Icon>
+                                      />
                                     }
                                     title={
                                       <div className='flex'>
