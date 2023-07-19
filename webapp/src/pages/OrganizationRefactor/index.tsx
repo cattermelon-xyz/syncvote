@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@components/Button/Button';
 import { L } from '@utils/locales/L';
 import { Dropdown, Layout, MenuProps, Space } from 'antd';
@@ -26,7 +26,14 @@ import WorkflowsOfASpace from './pages/WorkflowsOfASpace';
 
 const { Sider } = Layout;
 
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
+
 const SpacePage = () => {
+  let query = useQuery();
   const [openModalCreateWorkspace, setOpenModalCreateWorkspace] =
     useState(false);
   const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(false);
@@ -36,6 +43,10 @@ const SpacePage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (query.get('action') === 'new-workflow') {
+      setOpenModalCreateWorkflow(true);
+    }
+
     if (location.pathname === '/my-spaces') {
       setCurrentStatus('listMySpace');
     } else if (location.pathname === '/shared-spaces') {
