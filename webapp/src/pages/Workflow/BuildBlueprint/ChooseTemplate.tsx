@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Input, Modal, Space } from 'antd';
 import Icon from '@components/Icon/Icon';
 import { supabase } from '@utils/supabaseClient';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import { changeWorkflow } from '@redux/reducers/workflow.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
@@ -17,6 +17,7 @@ const env = import.meta.env.VITE_EVN;
 
 const ChooseTemplate = () => {
   // document.title = 'Create new Workflow';
+  const { user } = useSelector((state: any) => state.orginfo);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
@@ -34,6 +35,7 @@ const ChooseTemplate = () => {
       owner_org_id: orgId,
       emptyStage,
       iconUrl,
+      authority: user.id,
     };
     insertWorkflowAndVersion({
       dispatch: dispatch,
