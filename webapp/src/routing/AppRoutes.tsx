@@ -23,9 +23,9 @@ import WebLayout from '@layout/WebLayout';
 import PublicAppLayout from '@layout/PublicAppLayout';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
-import AccountSetting from '@pages/AccounRefactor/pages/AccountSetting';
+import AccountSetting from '@pages/Account/pages/AccountSetting';
 import FixedLayout from '@layout/FixedLayout';
-const SpacePage = React.lazy(() => import('@pages/OrganizationRefactor'));
+const SpacePage = React.lazy(() => import('@pages/Space'));
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>

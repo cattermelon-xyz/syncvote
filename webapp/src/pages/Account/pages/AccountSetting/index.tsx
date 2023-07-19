@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateUserProfile } from '@middleware/data';
 import { setUser } from '@redux/reducers/orginfo.reducer';
 import { Modal } from 'antd';
-import ChangeModal from './ChangeModal';
+import ChangeModal from '@pages/Account/pages/AccountSetting/fragments/ChangeAccountModal';
 
 const AccountSetting = () => {
   const dispatch = useDispatch();
