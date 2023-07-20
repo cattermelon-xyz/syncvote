@@ -1,6 +1,8 @@
-import { useNavigate } from 'react-router-dom';
 import Header from './fragments/Header';
 import { AuthContext } from '@layout/context/AuthContext';
+import { Layout, Space } from 'antd';
+import VerticalNav from './fragments/VerticalNav';
+import Footer from './fragments/Footer';
 
 type Props = {
   children?: JSX.Element;
@@ -11,14 +13,26 @@ const WebLayout = ({ children }: Props) => {
     <>
       <AuthContext.Consumer>
         {({ session }) => (
-          <div className='w-full h-[100vh]'>
+          <Layout className='w-full'>
             <div className='w-full z-50 bg-white'>
               <Header session={session} />
             </div>
-            <div className='w-full h-fixed-layout overflow-y-auto'>
-              {children}
+            <Layout className='w-full overflow-y-auto'>
+              <Layout.Sider
+                theme='light'
+                className='overflow-auto border-r pr-5'
+                width={269}
+              >
+                <VerticalNav />
+              </Layout.Sider>
+              <Layout className='flex w-full justify-center items-center my-8'>
+                {children}
+              </Layout>
+            </Layout>
+            <div className='w-full'>
+              <Footer />
             </div>
-          </div>
+          </Layout>
         )}
       </AuthContext.Consumer>
     </>
