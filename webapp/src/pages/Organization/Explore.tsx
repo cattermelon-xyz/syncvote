@@ -51,7 +51,7 @@ const Home: React.FC = () => {
         <Title level={2} className='text-center'>
           {L('exploreTopTierWorkflows')}
         </Title>
-        <SearchBar />
+        <SearchBar setWorkflows={(workflow: any) => setWorkflows(workflow)} />
         {loading ? (
           <Skeleton />
         ) : (

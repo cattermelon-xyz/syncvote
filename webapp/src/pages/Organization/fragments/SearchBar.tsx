@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { L } from '@utils/locales/L';
 import { Input, Space, Tag } from 'antd';
 import SortButton from '@components/SortButton/SortButton';
+import { SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { searchWorflow } from '@middleware/data';
+import { useDispatch } from 'react-redux';
+import { error } from 'console';
 
 const { Search } = Input;
 const { CheckableTag } = Tag;
@@ -18,15 +22,50 @@ const listTag = [
   'Strategic Planning',
 ];
 
-const SearchBar: React.FC = () => {
+interface SearchBarProps {
+  setWorkflows: (worfklow: any) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ setWorkflows }) => {
+  const [inputSearch, setValue] = useState('');
+  const dispatch = useDispatch();
+  const handleEnter = async () => {
+    // Do something with the input value when Enter is pressed
+    console.log(inputSearch);
+
+    await searchWorflow({
+      inputSearch: inputSearch,
+      dispatch: dispatch,
+      onSuccess: (data: any) => {
+        const workflowData = data.filter(
+          (worfklow: any) =>
+            worfklow?.versions[0]?.status === 'PUBLIC_COMMUNITY'
+        );
+        setWorkflows(workflowData);
+      },
+      onError: (error: any) => {},
+    });
+    // Clear the input field
+    // setValue('');
+  };
+
+  const handleChange = (e: any) => {
+    setValue(e.target.value);
+  };
+
   return (
     <React.Fragment>
-      <Search
+      <Input
+        size='large'
         placeholder={`${L('searchAWorkflow')}...`}
+        prefix={<SearchOutlined />}
         allowClear
-        onSearch={() => 1}
-        className='mb-4 w-full'
+        className='mb-4'
+        value={inputSearch}
+        onChange={handleChange}
+        onPressEnter={handleEnter}
       />
+
       <div className='flex flex-col w-full mb-4 items-end'>
         <Space size={[16, 16]} wrap className='mb-10 '>
           {listTag.map((tag) => (
