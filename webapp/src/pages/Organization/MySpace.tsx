@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { queryOrgsAndWorkflowForHome } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import SpaceCard from '@components/Card/SpaceCard';
-import ListItem from './fragments/ListItem';
+import ListItem from '../../components/ListItem/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { Skeleton } from 'antd';
 
