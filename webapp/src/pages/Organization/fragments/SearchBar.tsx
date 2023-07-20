@@ -3,9 +3,11 @@ import { L } from '@utils/locales/L';
 import { Input, Space, Tag } from 'antd';
 import SortButton from '@components/SortButton/SortButton';
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { searchWorflow } from '@middleware/data';
+import { getWorkflowStatus, searchWorflow } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import { error } from 'console';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { supabase } from '@utils/supabaseClient';
 
 const { Search } = Input;
 const { CheckableTag } = Tag;
@@ -49,8 +51,22 @@ const SearchBar: React.FC<SearchBarProps> = ({ setWorkflows }) => {
     // setValue('');
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = async (e: any) => {
     setValue(e.target.value);
+
+    // Check if input is empty
+    if (e.target.value === '') {
+      await getWorkflowStatus({
+        status: 'PUBLIC_COMMUNITY',
+        dispatch,
+        onSuccess: (data: any) => {
+          setWorkflows(data);
+        },
+        onError: (error: any) => {
+          console.log(error);
+        },
+      });
+    }
   };
 
   return (

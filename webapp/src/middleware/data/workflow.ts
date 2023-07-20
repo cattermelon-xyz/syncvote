@@ -525,3 +525,33 @@ export const searchWorflow = async ({
 
   dispatch(finishLoading({}));
 };
+
+export const getWorkflowStatus = async ({
+  status,
+  dispatch,
+  onSuccess,
+  onError,
+}: {
+  status: any
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase.from('workflow').select(`*,
+         versions: workflow_version(id, status),
+         infoOrg: org(title)
+         `);
+
+  dispatch(finishLoading({}));
+  if (error) {
+    onError(error);
+  } else {
+    if (data) {
+      const workflowData = data.filter(
+        (worfklow) => worfklow?.versions[0]?.status === status
+      );
+      onSuccess(workflowData);
+    }
+  }
+};

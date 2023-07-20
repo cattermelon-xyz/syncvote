@@ -11,8 +11,8 @@ const Footer = () => {
         style={{ border: '1px solid #E3E3E2' }}
       >
         <div
-          className='flex w-1/2 text-center items-top pt-16 pb-20'
-          style={{ borderRight: '1px solid #E3E3E2' }}
+          className='flex text-center items-top pt-16 pb-20'
+          style={{ borderRight: '1px solid #E3E3E2', width: '47%' }}
         >
           <div className='flex items-top w-1/2 justify-end text-violet-500 text-xl'>
             <LogoSyncVote />
@@ -23,7 +23,10 @@ const Footer = () => {
             decisions.
           </div>
         </div>
-        <div className='flex flex-row w-1/2 pt-16 pb-20 justify-center'>
+        <div
+          className='flex flex-row pt-16 pb-20 justify-center'
+          style={{ width: '53%' }}
+        >
           <div className='mr-24 flex flex-col gap-4'>
             <div className='text-violet-500 text-base'>Resource</div>
             <div>Docs</div>
@@ -36,9 +39,9 @@ const Footer = () => {
           <div className='flex flex-col gap-4'>
             <div className='text-violet-500 text-base'>Join our community</div>
             <div className='flex flex-row gap-4'>
-              <FaTwitter className='text-base'/>
-              <FaDiscord className='text-base'/>
-              <FaGithub className='text-base'/>
+              <FaTwitter className='text-base' />
+              <FaDiscord className='text-base' />
+              <FaGithub className='text-base' />
             </div>
           </div>
         </div>

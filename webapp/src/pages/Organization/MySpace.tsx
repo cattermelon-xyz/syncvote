@@ -71,7 +71,6 @@ const MySpace: React.FC = () => {
           }))
         );
 
-        console.log('workflow', allWorkflows);
         setWorkflows(allWorkflows);
       }
       setLoading(false);

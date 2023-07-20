@@ -56,6 +56,7 @@ const SharedSpace: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      
       const orgs = await queryOrgsAndWorkflowForHome({
         userId: user.id,
         onSuccess: () => {},

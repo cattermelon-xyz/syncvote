@@ -101,7 +101,7 @@ function Header({ session }: HeaderProps) {
 
   return (
     <div
-      className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white drop-shadow-md`}
+      className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full font-sans z-20 bg-white border-b border-solid border-grey-version-3`}
     >
       <div className=' w-full flex justify-between'>
         <div className='flex p-0 gap-2 items-center'>

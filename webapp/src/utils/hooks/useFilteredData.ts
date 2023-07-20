@@ -22,7 +22,6 @@ export function useFilteredData(data: DataItem[], options: SortProps) {
           break;
         case 'Last created':
           filtered.sort((a, b) => {
-            console.log('hehe');
             if (a.versions && b.versions) {
               return (
                 new Date(b.versions[0].created_at).getTime() -

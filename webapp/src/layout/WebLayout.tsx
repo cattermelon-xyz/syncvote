@@ -30,11 +30,12 @@ const WebLayout = ({ children }: Props) => {
             <div className='w-full z-50 bg-white'>
               <Header session={session} />
             </div>
-            <Layout className='w-full overflow-y-auto'>
+            <Layout className='w-full overflow-y-auto bg-white'>
               {isSiderPath(location.pathname) && (
                 <Layout.Sider
                   theme='light'
-                  className='overflow-auto border-r pr-5'
+                  className='overflow-auto pr-5'
+                  style={{ borderRight: 'solid 1px #E3E3E2' }}
                   width={269}
                 >
                   <VerticalNav />
@@ -42,7 +43,7 @@ const WebLayout = ({ children }: Props) => {
               )}
               <Layout
                 className={clsx(
-                  'flex w-full items-center ',
+                  'flex w-full items-center bg-white',
                   { 'h-fixed-layout': !isSiderPath(location.pathname) },
                   {
                     'my-8 min-h-[83vh]': isSiderPath(location.pathname),
