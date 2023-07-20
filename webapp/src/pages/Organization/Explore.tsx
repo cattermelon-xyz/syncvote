@@ -4,7 +4,7 @@ import SearchBar from './fragments/SearchBar';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@components/Card/WorkflowCard';
-import ListItem from '@pages/Organization/fragments/ListItem';
+import ListItem from '@components/ListItem/ListItem';
 import { Skeleton } from 'antd';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';

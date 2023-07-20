@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { queryOrgsAndWorkflowForHome } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import SpaceCard from '@components/Card/SpaceCard';
-import ListItem from '@pages/Organization/fragments/ListItem';
+import ListItem from '@components/ListItem/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { Skeleton } from 'antd';
 
@@ -27,6 +27,7 @@ const SharedSpace: React.FC = () => {
         dispatch,
       });
       if (orgs) {
+        console.log('org', orgs);
         const MemberOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
         setMemberOrgs(MemberOrgsData);
 
@@ -44,6 +45,7 @@ const SharedSpace: React.FC = () => {
     };
 
     if (user) {
+      console.log('workflows', workflows);
       fetchData();
     }
   }, [user]);
