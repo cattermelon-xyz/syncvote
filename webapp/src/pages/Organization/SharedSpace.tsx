@@ -9,6 +9,17 @@ import SpaceCard from '@components/Card/SpaceCard';
 import ListItem from '@components/ListItem/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { Skeleton } from 'antd';
+import { useFilteredData } from '@utils/hooks/useFilteredData';
+
+interface SortProps {
+  by: string;
+  type: 'asc' | 'des';
+}
+
+interface DataItem {
+  title: string;
+  [key: string]: any;
+}
 
 const SharedSpace: React.FC = () => {
   const { user } = useSelector((state: any) => state.orginfo);
@@ -17,6 +28,30 @@ const SharedSpace: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
+
+  const [sortOptions, setSortOption] = useState<SortProps>({
+    by: '',
+    type: 'asc',
+  });
+
+  const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
+    by: '',
+    type: 'asc',
+  });
+
+  const handleSortSpaceDetail = (options: SortProps) => {
+    setSortOption(options);
+  };
+
+  const handleSortWorkflowDetail = (options: SortProps) => {
+    setSortWorkflowOption(options);
+  };
+
+  const filterSpaceByOptions = useFilteredData(memberOrgs, sortOptions);
+  const filterWorkflowByOptions = useFilteredData(
+    workflows,
+    sortWorkflowOptions
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +62,6 @@ const SharedSpace: React.FC = () => {
         dispatch,
       });
       if (orgs) {
-        console.log('org', orgs);
         const MemberOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
         setMemberOrgs(MemberOrgsData);
 
@@ -45,7 +79,6 @@ const SharedSpace: React.FC = () => {
     };
 
     if (user) {
-      console.log('workflows', workflows);
       fetchData();
     }
   }, [user]);
@@ -58,9 +91,10 @@ const SharedSpace: React.FC = () => {
           <Skeleton />
         ) : (
           <ListItem
+            handleSort={handleSortSpaceDetail}
             items={
-              memberOrgs &&
-              memberOrgs.map((memberOrg, index) => (
+              filterSpaceByOptions &&
+              filterSpaceByOptions.map((memberOrg, index) => (
                 <SpaceCard key={index} dataSpace={memberOrg} isMySpace={true} />
               ))
             }
@@ -74,9 +108,10 @@ const SharedSpace: React.FC = () => {
           <Skeleton />
         ) : (
           <ListItem
+            handleSort={handleSortWorkflowDetail}
             items={
-              workflows &&
-              workflows.map((workflow, index) => (
+              filterWorkflowByOptions &&
+              filterWorkflowByOptions.map((workflow, index) => (
                 <WorkflowCard key={index} dataWorkflow={workflow} />
               ))
             }

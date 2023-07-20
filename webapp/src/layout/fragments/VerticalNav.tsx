@@ -3,6 +3,7 @@ import {
   FileOutlined,
   FolderOutlined,
   HomeOutlined,
+  GlobalOutlined,
   LogoutOutlined,
   PlusOutlined,
   ShareAltOutlined,
@@ -97,24 +98,17 @@ const VerticalNav = () => {
         <Space direction='vertical' className='w-full'>
           <div className='w-full py-6 px-8'>
             <Dropdown menu={menuProps} trigger={['click']}>
-              <Button icon={<PlusOutlined />} type='primary'>
+              <Button
+                icon={<PlusOutlined />}
+                type='primary'
+                className='w-48 h-12'
+              >
                 Create new
                 {<DownOutlined />}
               </Button>
             </Dropdown>
           </div>
           <Space direction='vertical' size='small' className='w-full pl-4'>
-            <VerticalNavButton
-              label={
-                <>
-                  <HomeOutlined />
-                  Explore
-                </>
-              }
-              destinationUrl='/'
-              currentUrl={current}
-              navigate={navigate}
-            />
             <VerticalNavButton
               label={
                 <>
@@ -137,10 +131,21 @@ const VerticalNav = () => {
               currentUrl={current}
               navigate={navigate}
             />
+            <VerticalNavButton
+              label={
+                <>
+                  <GlobalOutlined />
+                  Explore
+                </>
+              }
+              destinationUrl='/'
+              currentUrl={current}
+              navigate={navigate}
+            />
           </Space>
         </Space>
         <Button
-          className='w-full border-0 text-left shadow-transparent ml-4 mb-4'
+          className='w-full border-0 text-left shadow-none ml-8 mb-14'
           type='default'
         >
           <LogoutOutlined />

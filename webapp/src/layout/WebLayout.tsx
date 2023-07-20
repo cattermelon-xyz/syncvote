@@ -42,9 +42,11 @@ const WebLayout = ({ children }: Props) => {
               )}
               <Layout
                 className={clsx(
-                  'flex w-full items-center my-8',
+                  'flex w-full items-center ',
                   { 'h-fixed-layout': !isSiderPath(location.pathname) },
-                  { 'justify-center': isSiderPath(location.pathname) }
+                  {
+                    'my-8 min-h-[83vh]': isSiderPath(location.pathname),
+                  }
                 )}
               >
                 {children}

@@ -312,6 +312,7 @@ export const queryOrgsAndWorkflowForHome = async ({
         preset_banner_url,
         org_size,
         org_type,
+        created_at,
         workflows:workflow (
           id,
           title,
@@ -322,7 +323,9 @@ export const queryOrgsAndWorkflowForHome = async ({
           preset_banner_url,
           versions: workflow_version(
             id, 
-            status
+            status,
+            created_at,
+            last_updated
           )
         )
       )
@@ -370,6 +373,7 @@ export const queryOrgsAndWorkflowForHome = async ({
         banner_url: org.banner_url ? org.banner_url : presetBanner,
         org_size: org.org_size,
         org_type: org.org_type,
+        created_at: org.created_at,
         workflows: workflows,
       });
     });

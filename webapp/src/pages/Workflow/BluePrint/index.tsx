@@ -7,6 +7,17 @@ import { Skeleton } from 'antd';
 import ListItem from '@components/ListItem/ListItem';
 import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
+import { useFilteredData } from '@utils/hooks/useFilteredData';
+
+interface SortProps {
+  by: string;
+  type: 'asc' | 'des';
+}
+
+interface DataItem {
+  title: string;
+  [key: string]: any;
+}
 
 const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
@@ -14,6 +25,20 @@ const BluePrint = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const data = location.state?.dataSpace;
+
+  const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
+    by: '',
+    type: 'asc',
+  });
+
+  const filterWorkflowByOptions = useFilteredData(
+    workflows,
+    sortWorkflowOptions
+  );
+
+  const handleSortWorkflowDetail = (options: SortProps) => {
+    setSortWorkflowOption(options);
+  };
 
   useEffect(() => {
     if (data) {
@@ -28,7 +53,10 @@ const BluePrint = () => {
 
   return (
     <div className='w-[800px]'>
-      <div className='flex mb-4 gap-1' onClick={() => navigate(-1)}>
+      <div
+        className='flex mb-4 gap-1 cursor-pointer'
+        onClick={() => navigate(-1)}
+      >
         <LeftOutlined style={{ color: '#6200ee' }} />
         <p className='font-medium text-[#6200ee] self-center'>
           {L('backToMySpaces')}
@@ -56,13 +84,16 @@ const BluePrint = () => {
           <Skeleton />
         ) : (
           <ListItem
-            items={workflows?.map((workflow, index) => (
-              <WorkflowCard
-                key={workflow?.id + index}
-                dataWorkflow={workflow}
-                isListHome={true}
-              />
-            ))}
+            handleSort={handleSortWorkflowDetail}
+            items={
+              filterWorkflowByOptions &&
+              filterWorkflowByOptions?.map((workflow, index) => (
+                <WorkflowCard
+                  key={workflow?.id + index}
+                  dataWorkflow={workflow}
+                />
+              ))
+            }
             columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
             title={L('workflows')}
           />

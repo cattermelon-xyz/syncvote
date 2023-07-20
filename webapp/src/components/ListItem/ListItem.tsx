@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Input, Tag, Space, Button, Popover } from 'antd';
 import {
   SortAscendingOutlined,
+  SortDescendingOutlined,
   ArrowDownOutlined,
   ArrowUpOutlined,
 } from '@ant-design/icons';
@@ -18,9 +19,10 @@ interface Props {
   items: React.ReactNode[];
   columns: GridColumnProps;
   title?: string;
+  handleSort?: (options: { by: any; type: any }) => void;
 }
 
-const ListItem: React.FC<Props> = ({ items, columns, title }) => {
+const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
   let classes = `w-full grid gap-4 grid-row-gap-10`;
 
   if (columns.xs) classes += `xs:grid-cols-${columns.xs} `;
@@ -29,24 +31,36 @@ const ListItem: React.FC<Props> = ({ items, columns, title }) => {
   if (columns.xl) classes += `xl:grid-cols-${columns.xl} `;
   if (columns['2xl']) classes += `2xl:grid-cols-${columns['2xl']} `;
 
+  const [typeSort, setTypeSort] = useState('asc');
+  const [selectedOption, setSelectedOption] = useState('');
   const options = ['Name', 'Last created', 'Last modified'];
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
+  const changeTypeSort = () => {
+    setTypeSort(typeSort === 'asc' ? 'des' : 'asc');
+  };
   const content = (
     <Space direction='vertical' size='middle' className='w-56'>
-      <div className='flex justify-between w-full'>
+      <div
+        className='flex justify-between w-full cursor-pointer'
+        onClick={changeTypeSort}
+      >
         <p>Sort by</p>
-        <ArrowDownOutlined />
+        {typeSort === 'asc' ? (
+          <ArrowDownOutlined style={{ fontSize: '20px', color: '#6200EE' }} />
+        ) : (
+          <ArrowUpOutlined style={{ fontSize: '20px', color: '#6200EE' }} />
+        )}
       </div>
       {options.map((option, index) => (
         <div
           key={index}
-          className={`w-full select-none rounded-3xl cursor-pointer ${
-            selectedOption === option
-              ? 'border text-violet-500 border-violet-500'
-              : ''
+          className={`w-full select-none rounded-3xl cursor-pointer hover:text-violet-500 ${
+            selectedOption === option ? 'text-violet-500' : ''
           }`}
-          onClick={() => setSelectedOption(option)}
+          onClick={() => {
+            setSelectedOption(option);
+            handleSort && handleSort({ by: option, type: typeSort });
+          }}
         >
           {option}
         </div>
@@ -63,9 +77,15 @@ const ListItem: React.FC<Props> = ({ items, columns, title }) => {
             style={{ border: 'None', padding: '5px' }}
             className='w-[44px] bg-[#F6F6F6]'
           >
-            <SortAscendingOutlined
-              style={{ fontSize: '20px', color: '#6200EE' }}
-            />
+            {typeSort === 'asc' ? (
+              <SortAscendingOutlined
+                style={{ fontSize: '20px', color: '#6200EE' }}
+              />
+            ) : (
+              <SortDescendingOutlined
+                style={{ fontSize: '20px', color: '#6200EE' }}
+              />
+            )}
           </Button>
         </Popover>
       </div>

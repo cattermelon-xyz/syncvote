@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Typography } from 'antd';
-const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
 import { queryOrgsAndWorkflowForHome } from '@middleware/data';
@@ -9,12 +8,47 @@ import SpaceCard from '@components/Card/SpaceCard';
 import ListItem from '../../components/ListItem/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { Skeleton } from 'antd';
+import { useFilteredData } from '@utils/hooks/useFilteredData';
+
+interface SortProps {
+  by: string;
+  type: 'asc' | 'des';
+}
+
+interface DataItem {
+  title: string;
+  [key: string]: any;
+}
 
 const MySpace: React.FC = () => {
   const { user } = useSelector((state: any) => state.orginfo);
-  const [adminOrgs, setAdminOrgs] = useState<any[]>([]);
-  const [workflows, setWorkflows] = useState<any[]>([]);
+  const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
+  const [workflows, setWorkflows] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const [sortOptions, setSortOption] = useState<SortProps>({
+    by: '',
+    type: 'asc',
+  });
+
+  const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
+    by: '',
+    type: 'asc',
+  });
+
+  const handleSortSpaceDetail = (options: SortProps) => {
+    setSortOption(options);
+  };
+
+  const handleSortWorkflowDetail = (options: SortProps) => {
+    setSortWorkflowOption(options);
+  };
+
+  const filterSpaceByOptions = useFilteredData(adminOrgs, sortOptions);
+  const filterWorkflowByOptions = useFilteredData(
+    workflows,
+    sortWorkflowOptions
+  );
 
   const dispatch = useDispatch();
 
@@ -28,14 +62,16 @@ const MySpace: React.FC = () => {
       });
       if (orgs) {
         const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+        console.log('adminOrgsData', adminOrgsData);
         setAdminOrgs(adminOrgsData);
-        // Get all workflows from the admin orgs and include org title
         const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
           adminOrg.workflows.map((workflow: any) => ({
             ...workflow,
             org_title: adminOrg.title,
           }))
         );
+
+        console.log('workflow', allWorkflows);
         setWorkflows(allWorkflows);
       }
       setLoading(false);
@@ -54,9 +90,10 @@ const MySpace: React.FC = () => {
           <Skeleton />
         ) : (
           <ListItem
+            handleSort={handleSortSpaceDetail}
             items={
-              adminOrgs &&
-              adminOrgs.map((adminOrg, index) => (
+              filterSpaceByOptions &&
+              filterSpaceByOptions.map((adminOrg, index) => (
                 <SpaceCard key={index} dataSpace={adminOrg} isMySpace={true} />
               ))
             }
@@ -70,9 +107,10 @@ const MySpace: React.FC = () => {
           <Skeleton />
         ) : (
           <ListItem
+            handleSort={handleSortWorkflowDetail}
             items={
-              workflows &&
-              workflows.map((workflow, index) => (
+              filterWorkflowByOptions &&
+              filterWorkflowByOptions.map((workflow, index) => (
                 <WorkflowCard key={index} dataWorkflow={workflow} />
               ))
             }

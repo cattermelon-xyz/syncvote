@@ -50,7 +50,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
       <div className='justify-start items-center gap-2'>
         <div className='flex-col justify-start items-start gap-1'>
           <div className='text-neutral-800 text-base font-medium truncate'>
-            {dataSpace.title ? dataSpace.title : 'No title'}
+            {dataSpace.title ? dataSpace.title : 'Null title'}
           </div>
           <div className='flex justify-between'>
             <div className='text-zinc-500 text-sm font-medium'>
