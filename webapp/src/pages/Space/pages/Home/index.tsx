@@ -5,7 +5,7 @@ import SpaceContentLayout from '../../fragments/SpaceContentLayout';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@components/Card/WorkflowCard';
-import ListItem from '@pages/Space/fragments/ListItem';
+import ListItem from '@pages/Organization/fragments/ListItem';
 import { Skeleton } from 'antd';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';

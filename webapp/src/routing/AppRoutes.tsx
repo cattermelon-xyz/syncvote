@@ -27,6 +27,7 @@ import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
 import AccountSetting from '@pages/Account/pages/AccountSetting';
 import FixedLayout from '@layout/FixedLayout';
 const SpacePage = React.lazy(() => import('@pages/Space'));
+import SharedSpace from '@pages/Organization/SharedSpace';
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
@@ -68,8 +69,8 @@ const AppRoutes = () => (
       {/* ROUTE FOR SPACE */}
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
         <Route index element={<OrganizationExplore />} />
-        <Route path='/my-spaces' element={<MySpace />} />
-        <Route path='/shared-spaces' element={<SpacePage />} />
+        <Route path='/my-workspaces' element={<MySpace />} />
+        <Route path='/shared-workspaces' element={<SharedSpace />} />
       </Route>
 
       {/* ROUTE FOR ACCOUNT */}

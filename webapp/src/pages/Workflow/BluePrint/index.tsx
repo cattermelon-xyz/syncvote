@@ -4,7 +4,7 @@ import { LeftOutlined } from '@ant-design/icons';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { L } from '@utils/locales/L';
 import { Skeleton } from 'antd';
-import ListItem from '@pages/Space/fragments/ListItem';
+import ListItem from '@pages/Organization/fragments/ListItem';
 import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
 

@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { queryOrgsAndWorkflowForHome } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import SpaceCard from '@components/Card/SpaceCard';
-import ListItem from '@pages/Space/fragments/ListItem';
+import ListItem from '@pages/Organization/fragments/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { Skeleton } from 'antd';
 
@@ -88,4 +88,4 @@ const SharedSpace: React.FC = () => {
   );
 };
 
-export default React.memo(SharedSpace);
+export default SharedSpace;

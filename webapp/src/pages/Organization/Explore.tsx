@@ -4,7 +4,7 @@ import SearchBar from './fragments/SearchBar';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@components/Card/WorkflowCard';
-import ListItem from '@pages/Space/fragments/ListItem';
+import ListItem from '@pages/Organization/fragments/ListItem';
 import { Skeleton } from 'antd';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
@@ -39,6 +39,14 @@ const Home: React.FC = () => {
 
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
+      <section className='w-full'>
+        <Title level={2} className='text-center'>
+          {L('syncvoteForEarlyAdopters')}
+        </Title>
+        <div className='w-full flex justify-center'>
+          <div className='w-full md:w-1/3 lg:w-1/2 bg-gray-300 rounded-8 h-[241px]' />
+        </div>
+      </section>
       <section className='w-full'>
         <Title level={2} className='text-center'>
           {L('exploreTopTierWorkflows')}

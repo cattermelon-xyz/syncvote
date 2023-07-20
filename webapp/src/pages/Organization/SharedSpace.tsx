@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Typography } from 'antd';
-import SpaceContentLayout from '../../fragments/SpaceContentLayout';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
@@ -11,9 +10,9 @@ import ListItem from '@pages/Organization/fragments/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { Skeleton } from 'antd';
 
-const MySpace: React.FC = () => {
+const SharedSpace: React.FC = () => {
   const { user } = useSelector((state: any) => state.orginfo);
-  const [adminOrgs, setAdminOrgs] = useState<any[]>([]);
+  const [memberOrgs, setMemberOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -28,15 +27,17 @@ const MySpace: React.FC = () => {
         dispatch,
       });
       if (orgs) {
-        const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
-        setAdminOrgs(adminOrgsData);
-        // Get all workflows from the admin orgs and include org title
-        const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
-          adminOrg.workflows.map((workflow: any) => ({
+        const MemberOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
+        setMemberOrgs(MemberOrgsData);
+
+        // Get all workflows from the member orgs and include org title
+        const allWorkflows = MemberOrgsData.flatMap((memberOrg: any) =>
+          memberOrg.workflows.map((workflow: any) => ({
             ...workflow,
-            org_title: adminOrg.title,
+            org_title: memberOrg?.title,
           }))
         );
+
         setWorkflows(allWorkflows);
       }
       setLoading(false);
@@ -56,9 +57,9 @@ const MySpace: React.FC = () => {
         ) : (
           <ListItem
             items={
-              adminOrgs &&
-              adminOrgs.map((adminOrg, index) => (
-                <SpaceCard key={index} dataSpace={adminOrg} isMySpace={true} />
+              memberOrgs &&
+              memberOrgs.map((memberOrg, index) => (
+                <SpaceCard key={index} dataSpace={memberOrg} isMySpace={true} />
               ))
             }
             columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
@@ -86,4 +87,4 @@ const MySpace: React.FC = () => {
   );
 };
 
-export default MySpace;
+export default SharedSpace;
