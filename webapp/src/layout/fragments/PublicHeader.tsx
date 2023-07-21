@@ -90,7 +90,7 @@ function PublicHeader(session: any) {
               navigate('/');
             }}
           >
-            <div className='flex top-[2%] left-[1.3%] gap-1'>
+            <div className='flex top-[2%] left-[1.3%] gap-2'>
               <LogoSyncVote />
               <div className='text-violet-700 text-[20px] font-bold '>
                 Syncvote

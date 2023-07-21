@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import App from '@App';
-import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import PageScreen from '@components/HomeScreen/PageScreen';
 import ChooseWorkflow from '@pages/Mission/ChooseWorkflow';
@@ -8,10 +7,10 @@ import ChooseTemplate from '@pages/Workflow/BuildBlueprint/ChooseTemplate';
 import Mission from 'pages/Mission';
 import Workflow from 'pages/Workflow';
 import {
-  OrganizationHome,
   OrganizationExplore,
   OrganizationSetting,
   MySpace,
+  SharedSpace,
 } from '@pages/Organization';
 import CreatorLogin from '@pages/Authentication/index';
 import BluePrint from '@pages/Workflow/BluePrint';
@@ -25,9 +24,6 @@ import PublicAppLayout from '@layout/PublicAppLayout';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
 import AccountSetting from '@pages/Account/pages/AccountSetting';
-import FixedLayout from '@layout/FixedLayout';
-const SpacePage = React.lazy(() => import('@pages/Space'));
-import SharedSpace from '@pages/Organization/SharedSpace';
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
@@ -66,22 +62,13 @@ const AppRoutes = () => (
         <Route path='login' element={<CreatorLogin />} />
       </Route>
 
-      {/* ROUTE FOR SPACE */}
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
         <Route index element={<OrganizationExplore />} />
         <Route path='/my-workspaces' element={<MySpace />} />
         <Route path='/shared-workspaces' element={<SharedSpace />} />
-      </Route>
-
-      {/* ROUTE FOR ACCOUNT */}
-      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
         <Route path='account'>
           <Route path='setting' element={<AccountSetting />} />
         </Route>
-      </Route>
-
-      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        {/* TODO: this screen should only once for each new org */}
         <Route path='onboard' element={<PageScreen />} />
         <Route path=':orgIdString'>
           <Route index element={<BluePrint />} />
