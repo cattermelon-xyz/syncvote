@@ -24,6 +24,7 @@ import PublicAppLayout from '@layout/PublicAppLayout';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
 import AccountSetting from '@pages/Account/pages/AccountSetting';
+import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
@@ -61,6 +62,26 @@ const AppRoutes = () => (
       >
         <Route path='login' element={<CreatorLogin />} />
       </Route>
+      <Route
+        path='/'
+        element={
+          <App layout={<WebLayoutWithoutSider />} requiredLogin={true} />
+        }
+      >
+        <Route path=':orgIdString'>
+          <Route path='setting' element={<OrganizationSetting />} />
+          <Route path='new-workflow' element={<ChooseTemplate />} />
+          <Route path='new-mission' element={<ChooseWorkflow />} />
+          <Route path='workflow/:workflowIdString' element={<Workflow />}>
+            <Route path='new-version' element={<NewVersion />} />
+            <Route
+              path=':versionIdString/new-mission'
+              element={<NewMission />}
+            />
+            <Route path=':versionIdString' element={<EditVersion />} />
+          </Route>
+        </Route>
+      </Route>
 
       <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
         <Route index element={<OrganizationExplore />} />
@@ -72,18 +93,6 @@ const AppRoutes = () => (
         <Route path='onboard' element={<PageScreen />} />
         <Route path=':orgIdString'>
           <Route index element={<BluePrint />} />
-          <Route path='setting' element={<OrganizationSetting />} />
-          <Route path='new-workflow' element={<ChooseTemplate />} />
-          <Route path='new-mission' element={<ChooseWorkflow />} />
-          <Route path='workflow/:workflowIdString' element={<Workflow />}>
-            <Route index element={<BluePrint />} />
-            <Route path='new-version' element={<NewVersion />} />
-            <Route
-              path=':versionIdString/new-mission'
-              element={<NewMission />}
-            />
-            <Route path=':versionIdString' element={<EditVersion />} />
-          </Route>
         </Route>
       </Route>
     </Routes>

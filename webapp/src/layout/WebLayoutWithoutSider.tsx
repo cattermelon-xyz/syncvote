@@ -10,7 +10,7 @@ type Props = {
   children?: JSX.Element;
 };
 
-const WebLayout = ({ children }: Props) => {
+const WebLayoutWithoutSider = ({ children }: Props) => {
   const location = useLocation();
 
   return (
@@ -22,21 +22,10 @@ const WebLayout = ({ children }: Props) => {
               <Header session={session} />
             </div>
             <Layout className='w-full overflow-y-auto bg-white'>
-              <Layout.Sider
-                theme='light'
-                className='overflow-hidden pr-5'
-                style={{ borderRight: 'solid 1px #E3E3E2' }}
-                width={269}
-              >
-                <VerticalNav />
-              </Layout.Sider>
-              <Layout className='flex w-full items-center bg-white my-8 min-h-[83vh]'>
+              <Layout className='flex w-full items-center bg-white h-fixed-layout'>
                 {children}
               </Layout>
             </Layout>
-            <div className='w-full'>
-              <Footer />
-            </div>
           </Layout>
         )}
       </AuthContext.Consumer>
@@ -44,4 +33,4 @@ const WebLayout = ({ children }: Props) => {
   );
 };
 
-export default WebLayout;
+export default WebLayoutWithoutSider;

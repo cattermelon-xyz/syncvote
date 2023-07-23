@@ -56,14 +56,6 @@ const Home: React.FC = () => {
     <div className='w-[800px] flex flex-col gap-y-14'>
       <section className='w-full'>
         <Title level={2} className='text-center'>
-          {L('syncvoteForEarlyAdopters')}
-        </Title>
-        <div className='w-full flex justify-center'>
-          <div className='w-full md:w-1/3 lg:w-1/2 bg-gray-300 rounded-8 h-[241px]' />
-        </div>
-      </section>
-      <section className='w-full'>
-        <Title level={2} className='text-center'>
           {L('exploreTopTierWorkflows')}
         </Title>
         <SearchBar setWorkflows={(workflow: any) => setWorkflows(workflow)} />

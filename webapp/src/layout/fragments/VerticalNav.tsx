@@ -18,12 +18,12 @@ import { current } from '@reduxjs/toolkit';
 const VerticalNavButton = ({
   label,
   destinationUrl,
-  currentUrl,
+  selected,
   navigate,
 }: {
   label: ReactNode;
   destinationUrl: string;
-  currentUrl: string;
+  selected: boolean;
   navigate: (url: string) => void;
 }) => {
   return (
@@ -32,9 +32,7 @@ const VerticalNavButton = ({
         navigate(destinationUrl);
       }}
       className={`w-full border-0 text-left shadow-transparent py-3 px-4 flex gap-2 hover:text-violet-500 hover:bg-violet-100 rounded-lg ${
-        currentUrl === destinationUrl
-          ? 'text-violet-500 bg-violet-100'
-          : 'cursor-pointer'
+        selected ? 'text-violet-500 bg-violet-100' : 'cursor-pointer'
       }`}
     >
       {label}
@@ -79,6 +77,38 @@ const VerticalNav = () => {
     useState(false);
   const navigate = useNavigate();
   const current = useLocation().pathname;
+  const navs = [
+    {
+      label: (
+        <>
+          <FolderOutlined />
+          My workspaces
+        </>
+      ),
+      destinationUrl: '/my-workspaces',
+    },
+    {
+      label: (
+        <>
+          <ShareAltOutlined />
+          Shared workspaces
+        </>
+      ),
+      destinationUrl: '/shared-workspaces',
+    },
+    {
+      label: (
+        <>
+          <GlobalOutlined />
+          Explore
+        </>
+      ),
+      destinationUrl: '/',
+    },
+  ];
+  const selectedNav = navs.find((nav) => nav.destinationUrl === current) || {
+    destinationUrl: '',
+  };
   return (
     <>
       <CreateSpaceModal
@@ -109,39 +139,17 @@ const VerticalNav = () => {
             </Dropdown>
           </div>
           <Space direction='vertical' size='small' className='w-full pl-4'>
-            <VerticalNavButton
-              label={
-                <>
-                  <FolderOutlined />
-                  My workspaces
-                </>
-              }
-              destinationUrl='/my-workspaces'
-              currentUrl={current}
-              navigate={navigate}
-            />
-            <VerticalNavButton
-              label={
-                <>
-                  <ShareAltOutlined />
-                  Shared workspaces
-                </>
-              }
-              destinationUrl='/shared-workspaces'
-              currentUrl={current}
-              navigate={navigate}
-            />
-            <VerticalNavButton
-              label={
-                <>
-                  <GlobalOutlined />
-                  Explore
-                </>
-              }
-              destinationUrl='/'
-              currentUrl={current}
-              navigate={navigate}
-            />
+            {navs.map((nav) => {
+              const { label, destinationUrl } = nav;
+              return (
+                <VerticalNavButton
+                  label={label}
+                  destinationUrl={destinationUrl}
+                  navigate={navigate}
+                  selected={selectedNav.destinationUrl === destinationUrl}
+                />
+              );
+            })}
           </Space>
         </Space>
         <Button
