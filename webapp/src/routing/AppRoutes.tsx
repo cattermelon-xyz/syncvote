@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import App from '@App';
-
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import PageScreen from '@components/HomeScreen/PageScreen';
 import ChooseWorkflow from '@pages/Mission/ChooseWorkflow';
@@ -8,9 +7,10 @@ import ChooseTemplate from '@pages/Workflow/BuildBlueprint/ChooseTemplate';
 import Mission from 'pages/Mission';
 import Workflow from 'pages/Workflow';
 import {
-  OrganizationHome,
-  OrganizationList,
+  OrganizationExplore,
   OrganizationSetting,
+  MySpace,
+  SharedSpace,
 } from '@pages/Organization';
 import CreatorLogin from '@pages/Authentication/index';
 import BluePrint from '@pages/Workflow/BluePrint';
@@ -23,7 +23,8 @@ import WebLayout from '@layout/WebLayout';
 import PublicAppLayout from '@layout/PublicAppLayout';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
-import { AccountSetting } from '@pages/Account';
+import AccountSetting from '@pages/Account/pages/AccountSetting';
+import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
@@ -61,31 +62,17 @@ const AppRoutes = () => (
       >
         <Route path='login' element={<CreatorLogin />} />
       </Route>
-
-      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        <Route index element={<OrganizationList />} />
-        <Route path='my-spaces/' element={<OrganizationList />}>
-          <Route path=':spaceId' element={<OrganizationList />} />
-        </Route>
-        <Route path='shared-spaces/' element={<OrganizationList />}>
-          <Route path=':spaceId' element={<OrganizationList />} />
-        </Route>
-      </Route>
-
-      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        <Route path='account-setting/:userId' element={<AccountSetting />} />
-      </Route>
-
-      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        {/* TODO: this screen should only once for each new org */}
-        <Route path='onboard' element={<PageScreen />} />
+      <Route
+        path='/'
+        element={
+          <App layout={<WebLayoutWithoutSider />} requiredLogin={true} />
+        }
+      >
         <Route path=':orgIdString'>
-          <Route index element={<OrganizationHome />} />
           <Route path='setting' element={<OrganizationSetting />} />
           <Route path='new-workflow' element={<ChooseTemplate />} />
           <Route path='new-mission' element={<ChooseWorkflow />} />
           <Route path='workflow/:workflowIdString' element={<Workflow />}>
-            <Route index element={<BluePrint />} />
             <Route path='new-version' element={<NewVersion />} />
             <Route
               path=':versionIdString/new-mission'
@@ -93,6 +80,19 @@ const AppRoutes = () => (
             />
             <Route path=':versionIdString' element={<EditVersion />} />
           </Route>
+        </Route>
+      </Route>
+
+      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
+        <Route index element={<OrganizationExplore />} />
+        <Route path='/my-workspaces' element={<MySpace />} />
+        <Route path='/shared-workspaces' element={<SharedSpace />} />
+        <Route path='account'>
+          <Route path='setting' element={<AccountSetting />} />
+        </Route>
+        <Route path='onboard' element={<PageScreen />} />
+        <Route path=':orgIdString'>
+          <Route index element={<BluePrint />} />
         </Route>
       </Route>
     </Routes>

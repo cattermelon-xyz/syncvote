@@ -187,7 +187,7 @@ function Header({
               navigate('/');
             }}
           >
-            <div className='flex items-center cursor-pointer'>
+            <div className='flex items-center cursor-pointer gap-2'>
               <LogoSyncVote />
               <div className='text-violet-700 text-[20px] font-bold '>
                 Syncvote

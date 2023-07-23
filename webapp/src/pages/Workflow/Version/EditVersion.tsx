@@ -52,6 +52,9 @@ const extractVersion = ({
     return {};
   }
   const cosmetic = extractedVersion.data.cosmetic;
+  if (typeof extractedVersion.data === 'string') {
+    extractedVersion.data = emptyStage;
+  }
   if (!cosmetic) {
     extractedVersion.data.cosmetic = emptyCosmetic;
   } else if (cosmetic.layouts.length === 0) {
