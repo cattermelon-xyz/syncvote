@@ -10,7 +10,7 @@ import {
 } from '@redux/reducers/workflow.reducer';
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
-import { subtractArray } from '@utils/helpers';
+import { randomBanner, subtractArray } from '@utils/helpers';
 
 export const insertWorkflowAndVersion = async ({
   dispatch,
@@ -30,14 +30,23 @@ export const insertWorkflowAndVersion = async ({
     owner_org_id: orgId,
     emptyStage,
     iconUrl,
+    bannerUrl,
     authority: userId,
   } = props;
 
-  let icon_url, preset_icon_url; // eslint-disable-line
+  let icon_url, preset_icon_url, banner_url, preset_banner_url; // eslint-disable-line
   if (iconUrl.startsWith('preset:')) {
     preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
   } else {
     icon_url = iconUrl; // eslint-disable-line
+  }
+  if (iconUrl.startsWith('preset:')) {
+    preset_banner_url = bannerUrl.replace('preset:', ''); // eslint-disable-line
+  } else {
+    banner_url = bannerUrl; // eslint-disable-line
+  }
+  if (!bannerUrl) {
+    preset_banner_url = randomBanner();
   }
 
   const { data, error } = await supabase
@@ -47,6 +56,8 @@ export const insertWorkflowAndVersion = async ({
       desc,
       icon_url,
       preset_icon_url,
+      banner_url,
+      preset_banner_url,
       owner_org_id: orgId,
       authority: userId,
     })
@@ -532,7 +543,7 @@ export const getWorkflowStatus = async ({
   onSuccess,
   onError,
 }: {
-  status: any
+  status: any;
   dispatch: any;
   onSuccess: (data: any) => void;
   onError: (error: any) => void;

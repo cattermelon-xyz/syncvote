@@ -136,7 +136,7 @@ function Header({
           content: 'Workflow deleted',
           maskClosable: false,
           onOk: () => {
-            navigate(`/my-spaces/${orgIdString}`);
+            navigate(`/${orgIdString}`);
           },
         });
       },
@@ -197,7 +197,7 @@ function Header({
           <Divider type='vertical' />
           <div
             className='px-3 py-2 rounded-lg bg-violet-100 text-violet-700 hover:bg-violet-200 cursor-pointer'
-            onClick={() => navigate(`/my-spaces/${orgIdString}`)}
+            onClick={() => navigate(`/${orgIdString}`)}
           >
             <FolderOutlined className='stroke-2' />
           </div>

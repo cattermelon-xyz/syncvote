@@ -64,9 +64,7 @@ const AppRoutes = () => (
       </Route>
       <Route
         path='/'
-        element={
-          <App layout={<WebLayoutWithoutSider />} requiredLogin={true} />
-        }
+        element={<App layout={WebLayoutWithoutSider} requiredLogin={true} />}
       >
         <Route path=':orgIdString'>
           <Route path='setting' element={<OrganizationSetting />} />
@@ -83,10 +81,14 @@ const AppRoutes = () => (
         </Route>
       </Route>
 
-      <Route path='/' element={<App layout={WebLayout} requiredLogin={true} />}>
-        <Route index element={<OrganizationExplore />} />
+      <Route
+        path='/'
+        element={<App layout={WebLayoutWithoutSider} requiredLogin={true} />}
+      >
+        <Route index element={<MySpace />} />
+        {/* <Route index element={<OrganizationExplore />} />
         <Route path='/my-workspaces' element={<MySpace />} />
-        <Route path='/shared-workspaces' element={<SharedSpace />} />
+        <Route path='/shared-workspaces' element={<SharedSpace />} /> */}
         <Route path='account'>
           <Route path='setting' element={<AccountSetting />} />
         </Route>

@@ -130,6 +130,10 @@ export const getImageUrl = ({
   return str;
 };
 
+export const randomBanner = () => {
+  return `${Math.floor(Math.random() * 20)}.jpg`;
+};
+
 export const shouldUseCachedData = (lastFetch: number) => {
   const now = new Date().getTime();
   if (!lastFetch || lastFetch < 0) {

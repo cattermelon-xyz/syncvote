@@ -22,30 +22,24 @@ export function useFilteredData(data: DataItem[], options: SortProps) {
           break;
         case 'Last created':
           filtered.sort((a, b) => {
-            if (a.versions && b.versions) {
-              return (
-                new Date(b.versions[0].created_at).getTime() -
-                new Date(a.versions[0].created_at).getTime()
-              );
-            }
-            return (
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime()
-            );
+            const a_time = a.versions
+              ? new Date(a.versions[0].created_at).getTime()
+              : new Date(a.created_at).getTime();
+            const b_time = b.versions
+              ? new Date(b.versions[0].created_at).getTime()
+              : new Date(b.created_at).getTime();
+            return b_time - a_time;
           });
           break;
         case 'Last modified':
           filtered.sort((a, b) => {
-            if (a.versions && b.versions) {
-              return (
-                new Date(b.versions[0].last_updated).getTime() -
-                new Date(a.versions[0].last_updated).getTime()
-              );
-            }
-            return (
-              new Date(b.last_updated).getTime() -
-              new Date(a.last_updated).getTime()
-            );
+            const a_time = a.versions
+              ? new Date(a.versions[0].last_updated).getTime()
+              : new Date(a.created_at).getTime();
+            const b_time = b.versions
+              ? new Date(b.versions[0].last_updated).getTime()
+              : new Date(b.created_at).getTime();
+            return b_time - a_time;
           });
           break;
         default:

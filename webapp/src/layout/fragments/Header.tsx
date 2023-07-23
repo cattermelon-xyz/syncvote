@@ -107,7 +107,21 @@ function Header({ session }: HeaderProps) {
         <div className='flex p-0 gap-2 items-center'>
           <div className='flex items-center gap-2'>
             <span className='cursor-pointer flex'>
-              {orgId !== -1 && currentPage !== Pages.ORG_HOME ? (
+              <span
+                className='mr-2'
+                onClick={() => {
+                  handleClearStore();
+                  navigate('/');
+                }}
+              >
+                <div className='flex top-[2%] left-[1.3%] gap-2'>
+                  <LogoSyncVote />
+                  <div className='text-violet-700 text-[20px] font-bold '>
+                    Syncvote
+                  </div>
+                </div>
+              </span>
+              {/* {orgId !== -1 && currentPage !== Pages.ORG_HOME ? (
                 <span className='text-xl flex flex-row items-center'>
                   <HomeOutlined
                     style={{ fontSize: '24px' }}
@@ -181,7 +195,7 @@ function Header({ session }: HeaderProps) {
                     </div>
                   </div>
                 </span>
-              )}
+              )} */}
             </span>
           </div>
         </div>
