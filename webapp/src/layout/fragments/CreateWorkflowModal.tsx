@@ -25,7 +25,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   const [confirmLoading, setConfirmLoading] = useState(false);
   const dispatch = useDispatch();
   const [offset, setOffset] = useState(0);
-  const limit = 5;
+  const limit = 100;
   const [dataOrgs, setDataOrgs] = useState<any>([]);
 
   const loadWorkflowData = async (offset: any, limit: any) => {

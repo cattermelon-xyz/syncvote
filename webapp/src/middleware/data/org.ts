@@ -150,7 +150,6 @@ export const getDataOrgs = async ({
 }) => {
   const start = offset;
   const end = offset + limit - 1;
-
   dispatch(startLoading({}));
   const { data, error } = await supabase
     .from('user_org')
@@ -165,7 +164,8 @@ export const getDataOrgs = async ({
       preset_icon_url,
       preset_banner_url,
       org_size,
-      org_type
+      org_type,
+      created_at
     )
   `
     )
@@ -195,7 +195,13 @@ export const getDataOrgs = async ({
         banner_url: org.banner_url ? org.banner_url : presetBanner,
         org_size: org.org_size,
         org_type: org.org_type,
+        created_at: org.created_at,
       });
+    });
+    data.sort((a: any, b: any) => {
+      const a_time = new Date(a.created_at).getTime();
+      const b_time = new Date(b.created_at).getTime();
+      return b_time - a_time;
     });
     dispatch(setOrgsInfo(tmp));
     dispatch(setLastFetch({}));

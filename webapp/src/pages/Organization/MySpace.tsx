@@ -12,6 +12,7 @@ import { useFilteredData } from '@utils/hooks/useFilteredData';
 import CreateSpaceModal from './list/CreateSpaceModal';
 import CreateWorkflowModal from './list/CreateWorkflowModal';
 import { FileOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
+import { useSearchParams } from 'react-router-dom';
 
 interface SortProps {
   by: string;
@@ -46,7 +47,10 @@ const MySpace: React.FC = () => {
   const handleSortWorkflowDetail = (options: SortProps) => {
     setSortWorkflowOption(options);
   };
-  const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(
+    searchParams.get('action') === 'new-workflow'
+  );
   const [openModalCreateWorkspace, setOpenModalCreateWorkspace] =
     useState(false);
 

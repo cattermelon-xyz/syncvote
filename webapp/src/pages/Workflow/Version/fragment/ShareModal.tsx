@@ -22,6 +22,8 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
 type TabProps = {
   workflow: IWorkflow;
@@ -150,6 +152,7 @@ const DraftWorkflow = ({
               Modal.success({
                 title: 'Success',
                 content: `Workflow is published!`,
+                onOk: () => setShowShareModal(true),
               });
             },
             onError: () => {
@@ -173,6 +176,11 @@ const PublishedWorkflow = ({
   setShowShareModal,
 }: TabProps) => {
   const status = workflow?.workflow_version[0]?.status;
+  const { orgIdString, versionIdString } = useParams();
+  const publicUrl = `${baseUrl}/public/${orgIdString}/${createIdString(
+    workflow.title || '',
+    workflow.id?.toString() || ''
+  )}/${versionIdString}`;
   return (
     <Space direction='vertical' className='w-full' size='middle'>
       <Typography.Text type='success'>
@@ -184,16 +192,23 @@ const PublishedWorkflow = ({
           type='text'
           disabled
           // TODO: this link is fake
-          value={`https://syncvote.com/${createIdString(
-            workflow.title || '',
-            workflow.id?.toString() || ''
-          )}`}
+          value={publicUrl}
         />
-        <Button type='default' icon={<LinkOutlined />}>
+        <Button
+          type='default'
+          icon={<LinkOutlined />}
+          onClick={() => {
+            navigator.clipboard.writeText(publicUrl);
+            Modal.success({
+              title: 'Url copied!',
+              content: `"${publicUrl}" is copied to your clipboard`,
+            });
+          }}
+        >
           Copy link
         </Button>
       </Space.Compact>
-      <Space className='w-full bg-zinc-100 justify-between p-2 rounded-lg'>
+      {/* <Space className='w-full bg-zinc-100 justify-between p-2 rounded-lg'>
         <div>Publish to Syncvote community?</div>
         <Switch
           checked={status === 'PUBLIC_COMMUNITY'}
@@ -221,7 +236,7 @@ const PublishedWorkflow = ({
             });
           }}
         />
-      </Space>
+      </Space> */}
       <Space className='w-full flex justify-between'>
         <Button
           type='primary'
@@ -234,6 +249,7 @@ const PublishedWorkflow = ({
                 Modal.success({
                   title: 'Success',
                   content: `Workflow is not published any more!`,
+                  onOk: () => setShowShareModal(true),
                 });
               },
               onError: () => {
@@ -247,9 +263,9 @@ const PublishedWorkflow = ({
         >
           Unpublish
         </Button>
-        <Button type='primary' disabled>
+        {/* <Button type='primary' disabled>
           Publish new changes
-        </Button>
+        </Button> */}
       </Space>
     </Space>
   );
@@ -292,11 +308,11 @@ const ShareModal = ({
   handleWorkflowStatusChanged: (status: any) => void;
 }) => {
   const items: TabsProps['items'] = [
-    {
-      key: '1',
-      label: 'Invite',
-      children: <InviteTab workflow={workflow} />,
-    },
+    // {
+    //   key: '1',
+    //   label: 'Invite',
+    //   children: <InviteTab workflow={workflow} />,
+    // },
     {
       key: '2',
       label: 'Publish',

@@ -344,7 +344,10 @@ const Comment = ({
                     onScroll={onScrollReply}
                   >
                     {(item: CommentType) => (
-                      <div className='rounded-xl	m-1.5'>
+                      <div
+                        className='rounded-xl	m-1.5'
+                        key={item.id?.toString()}
+                      >
                         <div className='px-3'>
                           <List.Item key={item.id?.toString()}>
                             <List.Item.Meta
