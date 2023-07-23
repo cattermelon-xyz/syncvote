@@ -14,6 +14,8 @@ import { Button, Modal } from 'antd';
 import { listConnectWallet, listOptionsConnectWallet } from './connectWallet';
 import loginBanner from '../../assets/images/loginBanner1.png';
 
+const baseUrl = import.meta.env.VITE_BASE_URL;
+
 function Login() {
   const [selectedOption, setSelectedOption] = useState(
     listOptionsConnectWallet[0]
@@ -36,6 +38,7 @@ function Login() {
           access_type: 'offline',
           prompt: 'consent',
         },
+        redirectTo: baseUrl,
       },
     });
     dispatch(finishLoading({}));
