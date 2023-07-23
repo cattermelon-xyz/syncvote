@@ -312,6 +312,7 @@ export const queryOrgsAndWorkflowForHome = async ({
         preset_banner_url,
         org_size,
         org_type,
+        created_at,
         workflows:workflow (
           id,
           title,
@@ -322,20 +323,66 @@ export const queryOrgsAndWorkflowForHome = async ({
           preset_banner_url,
           versions: workflow_version(
             id, 
-            status
+            status,
+            created_at,
+            last_updated
           )
         )
       )
     `
     )
     .eq('user_id', userId);
+  const tmp: any[] = [];
   if (!error) {
-    onSuccess(data);
+    data.forEach((d: any) => {
+      const org: any = d?.org || {
+        id: '',
+        title: '',
+        desc: '',
+      };
+      const presetIcon = org?.preset_icon_url
+        ? `preset:${org.preset_icon_url}`
+        : org.preset_icon_url;
+      const presetBanner = org?.preset_banner_url
+        ? `preset:${org.preset_banner_url}`
+        : org.preset_banner_url;
+
+      const workflows = org?.workflows?.map((workflow: any) => {
+        const workflowPresetIcon = workflow?.preset_icon_url
+          ? `preset:${workflow.preset_icon_url}`
+          : workflow.preset_icon_url;
+        const workflowPresetBanner = workflow?.preset_banner_url
+          ? `preset:${workflow.preset_banner_url}`
+          : workflow.preset_banner_url;
+
+        return {
+          ...workflow,
+          icon_url: workflow.icon_url ? workflow.icon_url : workflowPresetIcon,
+          banner_url: workflow.banner_url
+            ? workflow.banner_url
+            : workflowPresetBanner,
+        };
+      });
+
+      tmp.push({
+        id: org?.id,
+        role: d.role,
+        title: org?.title,
+        desc: org.desc,
+        icon_url: org.icon_url ? org.icon_url : presetIcon,
+        banner_url: org.banner_url ? org.banner_url : presetBanner,
+        org_size: org.org_size,
+        org_type: org.org_type,
+        created_at: org.created_at,
+        workflows: workflows,
+      });
+    });
+    onSuccess(tmp);
   } else {
     onError(error);
   }
   dispatch(finishLoading({}));
-  return data;
+  return tmp;
 };
 
 export const queryOrgByOrgId = async ({

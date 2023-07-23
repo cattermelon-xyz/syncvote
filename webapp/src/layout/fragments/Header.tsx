@@ -75,7 +75,7 @@ function Header({ session }: HeaderProps) {
           icon={<SettingOutlined />}
           onClick={() => {
             setOpenPopover(false);
-            navigate(`/account-setting/${user?.id}`);
+            navigate(`/account/setting`);
           }}
         >
           {L('accountSettings')}
@@ -101,13 +101,13 @@ function Header({ session }: HeaderProps) {
 
   return (
     <div
-      className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white drop-shadow-md`}
+      className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full font-sans z-20 bg-white border-b border-solid border-grey-version-3`}
     >
       <div className=' w-full flex justify-between'>
         <div className='flex p-0 gap-2 items-center'>
           <div className='flex items-center gap-2'>
             <span className='cursor-pointer flex'>
-              {orgId !== -1 ? (
+              {orgId !== -1 && currentPage !== Pages.ORG_HOME ? (
                 <span className='text-xl flex flex-row items-center'>
                   <HomeOutlined
                     style={{ fontSize: '24px' }}
@@ -148,7 +148,7 @@ function Header({ session }: HeaderProps) {
                   </span>
                   <Button
                     type='text'
-                    disabled={currentPage === Pages.ORG_HOME}
+                    // disabled={currentPage === Pages.ORG_HOME}
                     onClick={() => {
                       navigate(`/${orgIdString}`);
                     }}
@@ -174,7 +174,7 @@ function Header({ session }: HeaderProps) {
                     navigate('/');
                   }}
                 >
-                  <div className='flex top-[2%] left-[1.3%] gap-1'>
+                  <div className='flex top-[2%] left-[1.3%] gap-2'>
                     <LogoSyncVote />
                     <div className='text-violet-700 text-[20px] font-bold '>
                       Syncvote

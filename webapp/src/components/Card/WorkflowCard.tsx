@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { getImageUrl } from '@utils/helpers';
+import Banner from '@components/Banner/Banner';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
@@ -20,7 +21,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
     <Card
       hoverable={true}
       style={{ position: 'relative' }}
-      className="w-64 h-[176px] relative rounded-xl "
+      className='w-[256px] h-[176px] relative rounded-xl'
       onClick={() => {
         if (isListHome) {
           navigate(
@@ -45,22 +46,12 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         }
       }}
     >
-      {dataWorkflow.banner_url ? (
-        <img
-          className="w-full h-[86px] rounded-lg m-0"
-          alt="example"
-          src={getImageUrl({
-            filePath: dataWorkflow?.banner_url?.replace('preset:', ''),
-            isPreset: dataWorkflow?.banner_url?.indexOf('preset:') === 0,
-            type: 'banner',
-          })}
+      {
+        <Banner
+          bannerUrl={dataWorkflow.banner_url}
+          className='w-full h-[86px] rounded-lg m-0'
         />
-      ) : (
-        <div
-          className="w-full h-[86px] rounded-lg m-0 border border-gray-200"
-          style={{ backgroundColor: '#FFFFFF' }}
-        />
-      )}
+      }
       {dataWorkflow.icon_url ? (
         <Avatar
           src={getImageUrl({
@@ -77,7 +68,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         />
       ) : (
         <Avatar
-          shape="circle"
+          shape='circle'
           style={{
             backgroundColor: '#D3D3D3',
             position: 'absolute',
@@ -87,11 +78,11 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           }}
         />
       )}
-      <p className="text-xs text-[#252422] mt-[18px] mb-2 truncate">
+      <p className='text-xs text-[#252422] mt-[18px] mb-2 truncate'>
         {dataWorkflow.title}
       </p>
-      <div className="flex justify-between">
-        <div className="flex">
+      <div className='flex justify-between'>
+        <div className='flex'>
           {dataWorkflow?.owner_workflow_icon_url ? (
             <Avatar
               src={getImageUrl({
@@ -104,12 +95,12 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
                   0,
                 type: 'icon',
               })}
-              className="w-[16px] h-[16px]"
+              className='w-[16px] h-[16px]'
             />
           ) : (
             <Avatar
-              shape="circle"
-              className="w-[16px] h-[16px]"
+              shape='circle'
+              className='w-[16px] h-[16px]'
               style={{
                 backgroundColor: '#D3D3D3',
                 position: 'absolute',
@@ -117,7 +108,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
             />
           )}
           {dataWorkflow?.owner_workflow_name ? (
-            <p className="text-xs text-[#575655] self-center ml-[4px]">
+            <p className='text-xs text-[#575655] self-center ml-[4px]'>
               {dataWorkflow?.owner_workflow_name}
             </p>
           ) : (

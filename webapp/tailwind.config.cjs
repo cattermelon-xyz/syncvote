@@ -144,6 +144,7 @@ module.exports = {
         h_card_2: '280px',
         'h_1.5': '1.5px',
         h_7: '56px',
+        'fixed-layout': 'calc(100vh - 80px)',
       },
       minHeight: {
         '100vh-70': 'calc(100vh - 80px)',

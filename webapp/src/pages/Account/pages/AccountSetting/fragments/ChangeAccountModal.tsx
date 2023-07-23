@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
 import { L } from '@utils/locales/L';
-import Icon from '@components/Icon/Icon';
 import { useSelector, useDispatch } from 'react-redux';
-import { newOrg } from '@middleware/data';
 import { updateUserProfile } from '@middleware/data';
 import { setUser } from '@redux/reducers/orginfo.reducer';
 
