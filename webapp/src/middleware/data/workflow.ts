@@ -132,6 +132,7 @@ export const upsertWorkflowVersion = async ({
   }
   dispatch(finishLoading({}));
 };
+
 export const queryWorkflow = async ({
   orgId,
   onLoad,
@@ -250,6 +251,7 @@ export const queryWorkflowVersion = async ({
     onError(error);
   }
 };
+
 export const updateAWorkflowInfo = async ({
   info,
   dispatch,
@@ -313,6 +315,7 @@ export const updateAWorkflowInfo = async ({
     onError(error);
   }
 };
+
 export const updateAWorkflowTag = async ({
   workflow,
   newTags,
@@ -526,13 +529,13 @@ export const searchWorflow = async ({
   dispatch(finishLoading({}));
 };
 
-export const getWorkflowStatus = async ({
+export const getWorkflowByStatus = async ({
   status,
   dispatch,
   onSuccess,
   onError,
 }: {
-  status: any
+  status: any;
   dispatch: any;
   onSuccess: (data: any) => void;
   onError: (error: any) => void;
@@ -554,4 +557,34 @@ export const getWorkflowStatus = async ({
       onSuccess(workflowData);
     }
   }
+};
+
+export const insertNewEditor = async ({
+  props,
+  dispatch,
+  onSucess,
+  onError = (error: any) => {
+    console.log(error);
+  },
+}: {
+  props: any;
+  dispatch: any;
+  onSucess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  const { workflow_version_id: version_id, user_id: userId } = props;
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('workflow_version_editor')
+    .insert({
+      workflow_version_id: version_id,
+      user_id: userId,
+    })
+    .select();
+  if (error) {
+    onError(error);
+  } else {
+    onSucess(data);
+  }
+  dispatch(finishLoading({}));
 };

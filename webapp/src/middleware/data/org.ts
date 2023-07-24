@@ -170,7 +170,7 @@ export const getDataOrgs = async ({
   `
     )
     .eq('user_id', userId)
-    .range(start, end);
+    // .range(start, end);
 
   if (!error) {
     const tmp: any[] = [];

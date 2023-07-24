@@ -7,7 +7,7 @@ import WorkflowCard from '@components/Card/WorkflowCard';
 import ListItem from '@components/ListItem/ListItem';
 import { Skeleton } from 'antd';
 import { useDispatch } from 'react-redux';
-import { getWorkflowStatus } from '@middleware/data';
+import { getWorkflowByStatus } from '@middleware/data';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 
 interface SortProps {
@@ -36,7 +36,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchDataWorkflow = async () => {
       setLoading(true);
-      await getWorkflowStatus({
+      await getWorkflowByStatus({
         status: 'PUBLIC_COMMUNITY',
         dispatch,
         onSuccess: (data: any) => {
