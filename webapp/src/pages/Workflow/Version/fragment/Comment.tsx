@@ -16,7 +16,7 @@ import type {
 } from 'antd/es/notification/interface';
 import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
-import { LeftOutlined } from '@ant-design/icons';
+import { CloseOutlined, LeftOutlined } from '@ant-design/icons';
 import ReactionBox from './Reaction';
 import Icon from '@components/Icon/Icon';
 
@@ -24,10 +24,12 @@ const Comment = ({
   where,
   session,
   api,
+  collapse,
 }: {
   where: any;
   session: Session | null;
   api: NotificationInstance;
+  collapse: () => void;
 }) => {
   const [inputValue, setInputValue] = useState('');
   const dispatch = useDispatch();
@@ -60,8 +62,6 @@ const Comment = ({
   };
 
   const toReply = (item: CommentType) => {
-    console.log('To reply', item);
-
     setCommentStatus(false);
     setReplyStatus(true);
     setCurrentComment(item);
@@ -97,8 +97,6 @@ const Comment = ({
     });
 
     setDataReply((prevData) => [...prevData, ...newComments]);
-    console.log('Reply', dataReply);
-
     setOffsetReply(offset);
   };
 
@@ -157,15 +155,25 @@ const Comment = ({
         <>
           <div>
             <div className=''>
-              <Space direction='vertical' className='w-full p-4 cursor-pointer'>
-                <div className='text-lg	font-semibold'>Comments</div>
+              <Space direction='vertical' className='w-full cursor-pointer'>
+                <Space
+                  direction='horizontal'
+                  className='flex justify-between w-full p-2 bg-white drop-shadow'
+                >
+                  <div className='text-md	font-bold'>Comments</div>
+                  <Button
+                    icon={<CloseOutlined />}
+                    shape='circle'
+                    className='bg-white'
+                    onClick={() => collapse()}
+                  />
+                </Space>
                 <ReactionBox
                   where={where}
                   by_who={session?.user?.id}
                   dispatch={dispatch}
                   api={api}
                 />
-
                 <List>
                   <VirtualList
                     data={dataComment}
@@ -177,7 +185,7 @@ const Comment = ({
                     {(item: CommentType) => (
                       <div
                         key={item.id.toString()}
-                        className='rounded-xl	m-1.5'
+                        className='m-1.5'
                         style={{
                           border:
                             '1px solid var(--foundation-grey-g-3, #E3E3E2)',
@@ -284,7 +292,7 @@ const Comment = ({
               </Space>
             </div>
           </div>
-          <div className='p-4'>
+          <div className='px-4 pt-2 pb-2'>
             {session?.user?.id === undefined ? (
               <>
                 <Input
@@ -344,10 +352,7 @@ const Comment = ({
                     onScroll={onScrollReply}
                   >
                     {(item: CommentType) => (
-                      <div
-                        className='rounded-xl	m-1.5'
-                        key={item.id?.toString()}
-                      >
+                      <div className='m-1.5' key={item.id?.toString()}>
                         <div className='px-3'>
                           <List.Item key={item.id?.toString()}>
                             <List.Item.Meta
@@ -384,7 +389,7 @@ const Comment = ({
               width: '100%',
             }}
           >
-            <div className='p-4'>
+            <div className='pt-2 pb-2 px-4'>
               {session?.user?.id === undefined ? (
                 <>
                   <Input

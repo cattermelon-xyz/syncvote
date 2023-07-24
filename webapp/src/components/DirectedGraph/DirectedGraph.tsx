@@ -36,7 +36,7 @@ const edgeTypes = {
 function downloadImage(dataUrl: any) {
   const a = document.createElement('a');
 
-  a.setAttribute('download', 'reactflow.png');
+  a.setAttribute('download', 'syncvote-diagram.png');
   a.setAttribute('href', dataUrl);
   a.click();
 }

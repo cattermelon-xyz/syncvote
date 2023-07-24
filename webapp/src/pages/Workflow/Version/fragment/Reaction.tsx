@@ -118,7 +118,7 @@ const ReactionBox = ({
 
   return (
     <div
-      className='m-1.5 cursor-pointer rounded-3xl'
+      className='m-1.5 cursor-pointer rounded-lg flex justify-center'
       style={{
         border: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
       }}
