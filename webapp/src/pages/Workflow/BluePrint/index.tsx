@@ -9,6 +9,9 @@ import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
+import { queryOrgs, queryWorkflow } from '@middleware/data';
+import { extractIdFromIdString } from '@utils/helpers';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface SortProps {
   by: string;
@@ -26,7 +29,13 @@ const BluePrint = () => {
   const navigate = useNavigate();
   const { orgIdString } = useParams();
   const [loading, setLoading] = useState(false);
-  const data = location.state?.dataSpace;
+  const { orgs } = useSelector((state: any) => state.orginfo);
+  const org = orgs.find(
+    (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
+  );
+  const data = location.state?.dataSpace || org;
+  console.log('data:', data);
+  const dispatch = useDispatch();
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
     by: 'Last modified',
@@ -44,12 +53,17 @@ const BluePrint = () => {
 
   useEffect(() => {
     if (data) {
-      const workflowsData = data?.workflows.map((workflow: any) => ({
+      const workflowsData = data?.workflows?.map((workflow: any) => ({
         ...workflow,
         org_title: data.title,
       }));
-
       setWorkflows(workflowsData);
+    } else {
+      queryOrgs({
+        filter: {},
+        dispatch: dispatch,
+        onSuccess: (data: any) => {},
+      });
     }
   }, [data]);
 

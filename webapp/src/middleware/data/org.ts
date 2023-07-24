@@ -165,7 +165,22 @@ export const getDataOrgs = async ({
       preset_banner_url,
       org_size,
       org_type,
-      created_at
+      created_at,
+      workflows:workflow (
+        id,
+        title,
+        owner_org_id,
+        icon_url,
+        banner_url,
+        preset_icon_url,
+        preset_banner_url,
+        versions: workflow_version(
+          id, 
+          status,
+          created_at,
+          last_updated
+        )
+      )
     )
   `
     )
@@ -196,6 +211,7 @@ export const getDataOrgs = async ({
         org_size: org.org_size,
         org_type: org.org_type,
         created_at: org.created_at,
+        workflows: org.workflows || [],
       });
     });
     data.sort((a: any, b: any) => {
@@ -250,6 +266,21 @@ export const queryOrgs = async ({
         full_name,
         icon_url,
         preset_icon_url
+      ),
+      workflows:workflow (
+        id,
+        title,
+        owner_org_id,
+        icon_url,
+        banner_url,
+        preset_icon_url,
+        preset_banner_url,
+        versions: workflow_version(
+          id, 
+          status,
+          created_at,
+          last_updated
+        )
       )
     )
   `
@@ -279,6 +310,7 @@ export const queryOrgs = async ({
         org_size: org.org_size,
         org_type: org.org_type,
         profile: org.profile || [],
+        workflows: org.workflows || [],
       });
     });
     dispatch(setOrgsInfo(tmp));
@@ -410,7 +442,23 @@ export const queryOrgByOrgId = async ({
   // TODO: query list of user
   const { data, error } = await supabase
     .from('org')
-    .select(`*`)
+    .select(
+      `*, workflows:workflow (
+      id,
+      title,
+      owner_org_id,
+      icon_url,
+      banner_url,
+      preset_icon_url,
+      preset_banner_url,
+      versions: workflow_version(
+        id, 
+        status,
+        created_at,
+        last_updated
+      )
+    )`
+    )
     .eq('id', orgId);
   if (!error) {
     const tmp: any[] = [];
@@ -430,6 +478,7 @@ export const queryOrgByOrgId = async ({
         org_size: org.org_size,
         org_type: org.org_type,
         profile: org.profile || [],
+        workflows: org.workflows || [],
       });
     });
     dispatch(setOrgsInfo(tmp));

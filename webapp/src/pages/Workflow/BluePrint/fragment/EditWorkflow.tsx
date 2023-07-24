@@ -179,10 +179,24 @@ const EditWorkflow = ({
           </Space>
           <Space direction='vertical' size='small' className='w-full'>
             <div>Description</div>
-            <TextEditor
+            {/* <TextEditor
               value={desc}
               setValue={(val: any) => setDesc(val)}
               heightEditor={200}
+              onBlur={async () => {
+                if (desc !== originalDesc) {
+                  setOpen(false);
+                  await onSave({
+                    desc,
+                  });
+                  setOpen(true);
+                }
+              }}
+            /> */}
+            <Input.TextArea
+              value={desc}
+              onChange={(e: any) => setDesc(e.target.value)}
+              style={{ height: '150px' }}
               onBlur={async () => {
                 if (desc !== originalDesc) {
                   setOpen(false);
