@@ -9,8 +9,8 @@ import ListItem from '../../components/ListItem/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { Skeleton } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
-import CreateSpaceModal from './list/CreateSpaceModal';
-import CreateWorkflowModal from './list/CreateWorkflowModal';
+import CreateSpaceModal from '@components/CreateNewDialog/CreateSpaceModal';
+import CreateWorkflowModal from '@components/CreateNewDialog/CreateWorkflowModal';
 import { FileOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
 import { useSearchParams } from 'react-router-dom';
 

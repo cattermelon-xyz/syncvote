@@ -8,8 +8,8 @@ import {
   PlusOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
-import CreateSpaceModal from './CreateSpaceModal';
-import CreateWorkflowModal from './CreateWorkflowModal';
+import CreateSpaceModal from '@components/CreateNewDialog/CreateSpaceModal';
+import CreateWorkflowModal from '@components/CreateNewDialog/CreateWorkflowModal';
 import { Button, Dropdown, MenuProps, Space } from 'antd';
 import { ReactNode, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';

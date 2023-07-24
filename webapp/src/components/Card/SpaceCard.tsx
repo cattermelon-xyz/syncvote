@@ -57,9 +57,9 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
           >
             {dataSpace.title ? dataSpace.title : 'Untitled'}
             {isMySpace ? (
-              <FiShield className='mr-1' />
+              <FiShield className='ml-1' />
             ) : (
-              <TeamOutlined className='mr-1' />
+              <TeamOutlined className='ml-1' />
             )}
           </div>
           <div className='flex justify-between'>
