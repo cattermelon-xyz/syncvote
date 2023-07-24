@@ -114,7 +114,7 @@ export const getImageUrl = ({
   isPreset: boolean;
   type: string;
 }): string => {
-  if (filePath.includes('https')) {
+  if (filePath && filePath?.includes('https')) {
     return filePath;
   }
   if (filePath === null || filePath === 'null') {
@@ -132,6 +132,16 @@ export const getImageUrl = ({
 
 export const randomBanner = () => {
   return `${Math.floor(Math.random() * 20)}.jpg`;
+};
+export const randomIcon = () => {
+  const icons = [
+    'love.svg',
+    'cat.svg',
+    'money.svg',
+    'angel.svg',
+    'dribble.svg',
+  ];
+  return `${icons[Math.floor(Math.random() * icons.length)]}`;
 };
 
 export const shouldUseCachedData = (lastFetch: number) => {

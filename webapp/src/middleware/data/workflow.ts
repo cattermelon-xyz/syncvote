@@ -40,7 +40,7 @@ export const insertWorkflowAndVersion = async ({
   } else {
     icon_url = iconUrl; // eslint-disable-line
   }
-  if (iconUrl.startsWith('preset:')) {
+  if (bannerUrl?.startsWith('preset:')) {
     preset_banner_url = bannerUrl.replace('preset:', ''); // eslint-disable-line
   } else {
     banner_url = bannerUrl; // eslint-disable-line
@@ -86,12 +86,12 @@ export const insertWorkflowAndVersion = async ({
         workflow_version: !err ? versions : [],
       })
     );
-    dispatch(finishLoading({}));
     if (!error && versions) onSuccess(versions, insertedId);
   }
   if (error) {
     onError(error);
   }
+  dispatch(finishLoading({}));
 };
 
 export const upsertWorkflowVersion = async ({
@@ -276,19 +276,23 @@ export const updateAWorkflowInfo = async ({
   const { id, title, desc, iconUrl, bannerUrl } = info;
   let icon_url, preset_icon_url; // eslint-disable-line
   let banner_url, preset_banner_url;
-  if (iconUrl?.startsWith('preset:')) {
-    preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
-    icon_url = '';
-  } else {
-    preset_icon_url = '';
-    icon_url = iconUrl; // eslint-disable-line
+  if (iconUrl) {
+    if (iconUrl.startsWith('preset:')) {
+      preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
+      icon_url = '';
+    } else {
+      preset_icon_url = '';
+      icon_url = iconUrl; // eslint-disable-line
+    }
   }
-  if (bannerUrl?.startsWith('preset:')) {
-    preset_banner_url = bannerUrl.replace('preset:', ''); // eslint-disable-line
-    banner_url = '';
-  } else {
-    preset_banner_url = '';
-    banner_url = bannerUrl; // eslint-disable-line
+  if (bannerUrl) {
+    if (bannerUrl.startsWith('preset:')) {
+      preset_banner_url = bannerUrl.replace('preset:', ''); // eslint-disable-line
+      banner_url = '';
+    } else {
+      preset_banner_url = '';
+      banner_url = bannerUrl; // eslint-disable-line
+    }
   }
   const toUpdate: any = {};
   if (title) toUpdate.title = title;

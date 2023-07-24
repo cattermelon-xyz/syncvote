@@ -268,14 +268,14 @@ function Header({
             >
               Share
             </Button>
-            <Button
+            {/* <Button
               type='default'
               className='flex justify-center items-center text-violet-500 bg-violet-100 border-0'
               icon={<QuestionCircleOutlined />}
               onClick={() => {
                 window.open('https://docs.syncvote.com', '_blank');
               }}
-            />
+            /> */}
             <Popover
               trigger='click'
               content={
@@ -296,14 +296,14 @@ function Header({
                   >
                     Download Image
                   </Button>
-                  <Button
+                  {/* <Button
                     type='link'
                     icon={<CopyOutlined />}
                     className='flex items-center p-0 m-0 text-zinc-500 hover:text-violet-500'
                     disabled
                   >
                     Duplicate new
-                  </Button>
+                  </Button> */}
                   <Button
                     type='link'
                     danger
@@ -324,9 +324,9 @@ function Header({
             </Popover>
           </Space>
           <Divider type='vertical' />
-          <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
+          {/* <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
             <BellOutlined style={{ fontSize: '20px' }} />
-          </div>
+          </div> */}
           <div
             className='cursor-pointer flex items-center'
             onClick={async () => {

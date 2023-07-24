@@ -200,9 +200,9 @@ function Header({ session }: HeaderProps) {
           </div>
         </div>
         <Space className='flex w-w_3 items-center justify-end gap-3'>
-          <div className='flex rounded-full h-11 w-11 bg-gray-100 justify-center cursor-pointer'>
+          {/* <div className='flex rounded-full h-11 w-11 bg-gray-100 justify-center cursor-pointer'>
             <BellOutlined style={{ fontSize: '24px' }} />
-          </div>
+          </div> */}
           <Popover
             placement='bottomRight'
             content={contentPopOver}

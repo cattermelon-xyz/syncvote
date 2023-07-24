@@ -195,7 +195,7 @@ const EditWorkflow = ({
             />
           </Space>
         </Space>
-        <Space
+        {/* <Space
           direction='vertical'
           size='small'
           className='p-4 rounded-lg bg-white w-full'
@@ -233,7 +233,7 @@ const EditWorkflow = ({
               value={existedTags}
             />
           </Space>
-        </Space>
+        </Space> */}
         {/* <Button
           type="default"
           className="w-full"

@@ -2,8 +2,10 @@ import React from 'react';
 import { Avatar, Card } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { EllipsisOutlined, TeamOutlined } from '@ant-design/icons';
 import { getImageUrl } from '@utils/helpers';
+import { FaShareNodes, FaShield } from 'react-icons/fa6';
+import { FiShare, FiShield } from 'react-icons/fi';
 
 interface SpaceCardProps {
   dataSpace: any;
@@ -12,7 +14,7 @@ interface SpaceCardProps {
 
 const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
   const navigate = useNavigate();
-
+  console.log(dataSpace.title, ',', isMySpace);
   return (
     <Card
       className='w-[189px] bg-white rounded-xl border border-neutral-200 flex-col justify-start items-start gap-2'
@@ -49,8 +51,16 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
       </div>
       <div className='justify-start items-center gap-2'>
         <div className='flex-col justify-start items-start gap-1'>
-          <div className='text-neutral-800 text-base font-medium truncate'>
-            {dataSpace.title ? dataSpace.title : 'Null title'}
+          <div
+            className='text-neutral-800 text-base font-medium truncate flex items-center hover:text-violet-500'
+            title={`${isMySpace ? 'You are an ADMIN' : 'You are a Member'}`}
+          >
+            {dataSpace.title ? dataSpace.title : 'Untitled'}
+            {isMySpace ? (
+              <FiShield className='mr-1' />
+            ) : (
+              <TeamOutlined className='mr-1' />
+            )}
           </div>
           <div className='flex justify-between'>
             <div className='text-zinc-500 text-sm font-medium'>

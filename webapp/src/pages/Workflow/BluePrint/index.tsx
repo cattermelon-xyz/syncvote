@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { LeftOutlined, PlusOutlined } from '@ant-design/icons';
+import { LeftOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { L } from '@utils/locales/L';
 import { Button, Empty, Skeleton, Space } from 'antd';
@@ -8,6 +8,7 @@ import ListItem from '@components/ListItem/ListItem';
 import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
+import { FiShield } from 'react-icons/fi';
 
 interface SortProps {
   by: string;
@@ -76,8 +77,18 @@ const BluePrint = () => {
               }}
             />
           )}
-          <div className='text-3xl font-semibold text-[#252422]'>
+          <div
+            className='text-3xl font-semibold text-[#252422] flex items-center'
+            title={
+              data?.role === 'ADMIN' ? 'You are an ADMIN' : 'You are a Member'
+            }
+          >
             {data?.title}
+            {data?.role === 'ADMIN' ? (
+              <FiShield className='ml-1' />
+            ) : (
+              <TeamOutlined className='ml-1' />
+            )}
           </div>
         </div>
         <Button

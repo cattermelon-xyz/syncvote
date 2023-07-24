@@ -71,9 +71,9 @@ const MySpace: React.FC = () => {
         dispatch,
       });
       if (orgs) {
-        const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
-        setAdminOrgs(adminOrgsData);
-        const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
+        // const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+        setAdminOrgs(orgs);
+        const allWorkflows = orgs.flatMap((adminOrg: any) =>
           adminOrg.workflows.map((workflow: any) => ({
             ...workflow,
             org_title: adminOrg.title,
@@ -94,7 +94,7 @@ const MySpace: React.FC = () => {
       label: (
         <>
           <FileOutlined className='text-base mr-2' />
-          <span className='text-sm'>Worflow</span>
+          <span className='text-sm'>Workflow</span>
         </>
       ),
       key: 'workflow',
@@ -149,13 +149,16 @@ const MySpace: React.FC = () => {
               handleSort={handleSortSpaceDetail}
               items={
                 filterSpaceByOptions &&
-                filterSpaceByOptions.map((adminOrg, index) => (
-                  <SpaceCard
-                    key={index}
-                    dataSpace={adminOrg}
-                    isMySpace={true}
-                  />
-                ))
+                filterSpaceByOptions.map((adminOrg, index) => {
+                  console.log('adminOrg: ', adminOrg);
+                  return (
+                    <SpaceCard
+                      key={index}
+                      dataSpace={adminOrg}
+                      isMySpace={adminOrg.role === 'ADMIN'}
+                    />
+                  );
+                })
               }
               columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
               title={L('spaces')}

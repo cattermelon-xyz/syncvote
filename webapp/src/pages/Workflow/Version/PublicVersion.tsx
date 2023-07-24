@@ -59,7 +59,7 @@ export const PublicVersion = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
-  const [leftSiderStatus, setLeftSiderStatus] = useState('closed');
+  const [rightSiderStatus, setRSiderStatus] = useState('closed');
   const [api, contextHolder] = notification.useNotification();
   const where = `${orgId}$/${workflowId}$/${versionId}$`;
   const [dataReaction, setDataReaction] = useState<any[]>([]);
@@ -165,109 +165,6 @@ export const PublicVersion = () => {
             </div>
 
             <Layout>
-              <Sider
-                collapsed={leftSiderStatus === 'closed'}
-                collapsedWidth={0}
-                width='33%'
-                theme='light'
-                style={{ backgroundColor: '#f6f6f6' }}
-                className='information-collapsed'
-              >
-                {leftSiderStatus === 'description' ? (
-                  <Space
-                    direction='vertical'
-                    className='border-r border-gray-200 border-solid h-full w-full'
-                  >
-                    <Space direction='vertical' size='large' className='w-full'>
-                      <Space
-                        direction='horizontal'
-                        className='flex justify-between w-full p-2 bg-white drop-shadow'
-                      >
-                        <div className='font-bold text-md'>Description</div>
-                        <Button
-                          icon={<CloseOutlined />}
-                          shape='circle'
-                          className='bg-white'
-                          onClick={() => setLeftSiderStatus('closed')}
-                        />
-                      </Space>
-                    </Space>
-                    {worflowInfo.desc ? (
-                      <div className='m-4 p-4 bg-white rounded-lg'>
-                        {parse(worflowInfo.desc)}
-                      </div>
-                    ) : (
-                      <Empty />
-                    )}
-                  </Space>
-                ) : null}
-                {leftSiderStatus === 'comment' ? (
-                  <div className='bg-white w-full border-r border-gray-300 border-solid'>
-                    <Comment
-                      where={where}
-                      session={session}
-                      api={api}
-                      collapse={() => {
-                        setLeftSiderStatus('closed');
-                      }}
-                    />
-                  </div>
-                ) : // style={{
-                //   backgroundColor: '#FFF',
-                //   borderRadius: '12px',
-                //   borderRight: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
-                // }}
-                // className='comment-collapsedh'
-                null}
-                {leftSiderStatus === 'markers' ? (
-                  <Space
-                    direction='vertical'
-                    className='border-r border-gray-200 border-solid h-full w-full overflow-y-scroll'
-                  >
-                    <Space direction='vertical' size='large' className='w-full'>
-                      <Space
-                        direction='horizontal'
-                        className='flex justify-between w-full p-2 bg-white drop-shadow'
-                      >
-                        <div className='font-bold text-md'>Color legend</div>
-                        <Button
-                          icon={<CloseOutlined />}
-                          shape='circle'
-                          className='bg-white'
-                          onClick={() => setLeftSiderStatus('closed')}
-                        />
-                      </Space>
-                    </Space>
-                    {version?.data?.cosmetic?.layouts[0]?.markers ? (
-                      <Space
-                        direction='vertical'
-                        size='middle'
-                        className='w-full p-2'
-                      >
-                        {version?.data?.cosmetic?.layouts[0]?.markers.map(
-                          (marker: any) => {
-                            return (
-                              <Space
-                                direction='horizontal'
-                                className='flex items-center w-full bg-white p-4'
-                                size='middle'
-                              >
-                                <div
-                                  className='h-2 w-2'
-                                  style={{ backgroundColor: marker.color }}
-                                ></div>
-                                <div>{marker.title}</div>
-                              </Space>
-                            );
-                          }
-                        )}
-                      </Space>
-                    ) : (
-                      <Empty />
-                    )}
-                  </Space>
-                ) : null}
-              </Sider>
               <Layout className='relative flex items-center'>
                 <Space className='absolute left-0 m-3 flex items-center border border-solid border-[#E3E3E2] rounded-lg text-[#252422] p-3 w-fit mt-7 bg-white z-50'>
                   <Icon iconUrl={workflow?.icon_url} size='large' />
@@ -304,25 +201,25 @@ export const PublicVersion = () => {
                   >
                     <Button
                       className={`flex justify-center items-center ${
-                        leftSiderStatus === 'description'
+                        rightSiderStatus === 'description'
                           ? 'bg-violet-100'
                           : null
                       }`}
                       onClick={() => {
-                        leftSiderStatus === 'description'
-                          ? setLeftSiderStatus('closed')
-                          : setLeftSiderStatus('description');
+                        rightSiderStatus === 'description'
+                          ? setRSiderStatus('closed')
+                          : setRSiderStatus('description');
                       }}
                       icon={<GrDocumentText className='w-5 h-5' />}
                     />
                     <Button
                       className={`flex items-center justify-center ${
-                        leftSiderStatus === 'comment' ? 'bg-violet-100' : null
+                        rightSiderStatus === 'comment' ? 'bg-violet-100' : null
                       }`}
                       onClick={() => {
-                        leftSiderStatus === 'comment'
-                          ? setLeftSiderStatus('closed')
-                          : setLeftSiderStatus('comment');
+                        rightSiderStatus === 'comment'
+                          ? setRSiderStatus('closed')
+                          : setRSiderStatus('comment');
                       }}
                       icon={<MdChatBubbleOutline className='w-5 h-5' />}
                     />
@@ -346,13 +243,13 @@ export const PublicVersion = () => {
 
                     <Button
                       className={`flex items-center justify-center ${
-                        leftSiderStatus === 'markers' ? 'bg-violet-100' : null
+                        rightSiderStatus === 'markers' ? 'bg-violet-100' : null
                       }`}
                       icon={<LuPaintbrush className='w-5 h-5' />}
                       onClick={() => {
-                        leftSiderStatus === 'markers'
-                          ? setLeftSiderStatus('closed')
-                          : setLeftSiderStatus('markers');
+                        rightSiderStatus === 'markers'
+                          ? setRSiderStatus('closed')
+                          : setRSiderStatus('markers');
                       }}
                     />
                   </Space>
@@ -424,6 +321,109 @@ export const PublicVersion = () => {
                   }}
                 />
               </Layout>
+              <Sider
+                collapsed={rightSiderStatus === 'closed'}
+                collapsedWidth={0}
+                width='33%'
+                theme='light'
+                style={{ backgroundColor: '#f6f6f6' }}
+                className='information-collapsed'
+              >
+                {rightSiderStatus === 'description' ? (
+                  <Space
+                    direction='vertical'
+                    className='border-r border-gray-200 border-solid h-full w-full'
+                  >
+                    <Space direction='vertical' size='large' className='w-full'>
+                      <Space
+                        direction='horizontal'
+                        className='flex justify-between w-full p-2 bg-white drop-shadow'
+                      >
+                        <div className='font-bold text-md'>Description</div>
+                        <Button
+                          icon={<CloseOutlined />}
+                          shape='circle'
+                          className='bg-white'
+                          onClick={() => setRSiderStatus('closed')}
+                        />
+                      </Space>
+                    </Space>
+                    {worflowInfo.desc ? (
+                      <div className='m-4 p-4 bg-white rounded-lg'>
+                        {parse(worflowInfo.desc)}
+                      </div>
+                    ) : (
+                      <Empty />
+                    )}
+                  </Space>
+                ) : null}
+                {rightSiderStatus === 'comment' ? (
+                  <div className='bg-white w-full border-r border-gray-300 border-solid'>
+                    <Comment
+                      where={where}
+                      session={session}
+                      api={api}
+                      collapse={() => {
+                        setRSiderStatus('closed');
+                      }}
+                    />
+                  </div>
+                ) : // style={{
+                //   backgroundColor: '#FFF',
+                //   borderRadius: '12px',
+                //   borderRight: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
+                // }}
+                // className='comment-collapsedh'
+                null}
+                {rightSiderStatus === 'markers' ? (
+                  <Space
+                    direction='vertical'
+                    className='border-r border-gray-200 border-solid h-full w-full overflow-y-scroll'
+                  >
+                    <Space direction='vertical' size='large' className='w-full'>
+                      <Space
+                        direction='horizontal'
+                        className='flex justify-between w-full p-2 bg-white drop-shadow'
+                      >
+                        <div className='font-bold text-md'>Color legend</div>
+                        <Button
+                          icon={<CloseOutlined />}
+                          shape='circle'
+                          className='bg-white'
+                          onClick={() => setRSiderStatus('closed')}
+                        />
+                      </Space>
+                    </Space>
+                    {version?.data?.cosmetic?.layouts[0]?.markers ? (
+                      <Space
+                        direction='vertical'
+                        size='middle'
+                        className='w-full p-2'
+                      >
+                        {version?.data?.cosmetic?.layouts[0]?.markers.map(
+                          (marker: any) => {
+                            return (
+                              <Space
+                                direction='horizontal'
+                                className='flex items-center w-full bg-white p-4'
+                                size='middle'
+                              >
+                                <div
+                                  className='h-2 w-2'
+                                  style={{ backgroundColor: marker.color }}
+                                ></div>
+                                <div>{marker.title}</div>
+                              </Space>
+                            );
+                          }
+                        )}
+                      </Space>
+                    ) : (
+                      <Empty />
+                    )}
+                  </Space>
+                ) : null}
+              </Sider>
             </Layout>
           </>
         ) : (

@@ -21,7 +21,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
     <Card
       hoverable={true}
       style={{ position: 'relative' }}
-      className='w-[256px] h-[176px] relative rounded-xl'
+      className='w-[256px] h-[150px] relative rounded-lg'
       onClick={() => {
         if (isListHome) {
           navigate(
@@ -81,7 +81,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       <p className='text-xs text-[#252422] mt-[18px] mb-2 truncate'>
         {dataWorkflow.title}
       </p>
-      <div className='flex justify-between'>
+      {/* <div className='flex justify-between'>
         <div className='flex'>
           {dataWorkflow?.owner_workflow_icon_url ? (
             <Avatar
@@ -116,7 +116,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           )}
         </div>
         <EllipsisOutlined style={{ fontSize: '16px', color: '#000000' }} />
-      </div>
+      </div> */}
     </Card>
   );
 };
