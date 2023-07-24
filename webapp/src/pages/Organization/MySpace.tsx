@@ -132,7 +132,7 @@ const MySpace: React.FC = () => {
         onClose={() => setOpenModalCreateWorkflow(false)}
         setOpenCreateWorkspaceModal={() => setOpenModalCreateWorkflow}
       />
-      <div className='w-[800px] flex flex-col'>
+      <div className='xs:w-[350px] sm:w-[550px] md:w-[720px] lg:w-[800px] flex flex-col'>
         <Space direction='horizontal' className='flex justify-between'>
           <p className='text-3xl font-semibold my-8'>{L('mySpace')}</p>
           <Dropdown menu={menuProps} trigger={['click']}>
@@ -141,7 +141,7 @@ const MySpace: React.FC = () => {
             </Button>
           </Dropdown>
         </Space>
-        <section className='w-full mb-8'>
+        <div className='w-full mb-8'>
           {loading ? (
             <Skeleton />
           ) : filterWorkflowByOptions && filterSpaceByOptions.length > 0 ? (
@@ -150,7 +150,6 @@ const MySpace: React.FC = () => {
               items={
                 filterSpaceByOptions &&
                 filterSpaceByOptions.map((adminOrg, index) => {
-                  console.log('adminOrg: ', adminOrg);
                   return (
                     <SpaceCard
                       key={index}
@@ -160,14 +159,14 @@ const MySpace: React.FC = () => {
                   );
                 })
               }
-              columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
+              columns={{ xs: 1, sm: 2, md: 3, lg: 3, xl: 4, '2xl': 4 }}
               title={L('spaces')}
             />
           ) : (
             <Empty />
           )}
-        </section>
-        <section className='w-full mb-8'>
+        </div>
+        <div className='w-full mb-8'>
           {loading ? (
             <Skeleton />
           ) : filterWorkflowByOptions && filterWorkflowByOptions.length > 0 ? (
@@ -179,13 +178,13 @@ const MySpace: React.FC = () => {
                   <WorkflowCard key={index} dataWorkflow={workflow} />
                 ))
               }
-              columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
+              columns={{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, '2xl': 3 }}
               title={L('workflows')}
             />
           ) : (
             <Empty />
           )}
-        </section>
+        </div>
       </div>
     </>
   );

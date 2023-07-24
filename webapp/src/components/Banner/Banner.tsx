@@ -12,6 +12,7 @@ type BannerProps = {
   onChange?: (args: { filePath: string; isPreset: boolean }) => void;
   editable?: boolean;
   className?: string;
+  size?: 'full' | 'small';
 };
 
 const Banner = ({
@@ -19,10 +20,16 @@ const Banner = ({
   onChange,
   editable = false,
   className = '',
+  size = 'full',
 }: BannerProps) => {
   let url = bannerUrl ? bannerUrl : `preset:${OrgPresetBanner}`;
   url = getImageUrl({
-    filePath: url.indexOf('preset:') === 0 ? url.replace('preset:', '') : url,
+    filePath:
+      url.indexOf('preset:') === 0
+        ? size === 'full'
+          ? url.replace('preset:', '')
+          : url.replace('preset:', '').split('.')[0] + '_s.' + url.split('.')[1]
+        : url,
     isPreset: url.indexOf('preset:') === 0,
     type: 'banner',
   });
@@ -62,6 +69,14 @@ const Banner = ({
       setUploading(false);
     }
   };
+  // <div className='w-full block text-gray-500 text-sm'>Painting</div>
+  const presetGroup = [
+    { from: 0, to: 7, label: 'Painting' },
+    { from: 8, to: 11, label: 'Pattern' },
+    { from: 12, to: 15, label: 'Abstract' },
+    { from: 16, to: 19, label: 'Floral' },
+    { from: 20, to: 23, label: 'Pop art' },
+  ];
   return (
     <div className='_banner'>
       <Modal
@@ -79,29 +94,44 @@ const Banner = ({
               key: '1',
               label: 'Library',
               children: (
-                <div className='grid grid-cols-3 mt-4 h-[300px] overflow-y-scroll gap-2 p-1'>
-                  {presetBanners.map((banner: any) => (
-                    <div
-                      key={banner}
-                      className='flex items-center w-[167px] h-[100px] p-1 cursor-pointer bg-center outline-violet-500 hover:outline rounded-md bg-cover'
-                      onClick={() => {
-                        setShouldShowModal(false);
-                        onChange
-                          ? onChange({
-                              filePath: banner,
-                              isPreset: true,
-                            })
-                          : null;
-                      }}
-                      style={{
-                        backgroundImage: `url(${getImageUrl({
-                          filePath: banner,
-                          isPreset: true,
-                          type: 'banner',
-                        })})`,
-                      }}
-                    ></div>
-                  ))}
+                <div className='h-[300px] overflow-y-scroll'>
+                  {presetGroup.map((group: any, index: number) => {
+                    const arr = [];
+                    for (let i = group.from; i < group.to; i++) {
+                      arr.push(i + 1);
+                    }
+                    return (
+                      <div className='mt-2' key={index}>
+                        <div className='w-full block text-gray-500 text-sm pl-1 mb-2'>
+                          {group.label}
+                        </div>
+                        <div className='grid grid-cols-3 gap-2 p-1'>
+                          {arr.map((idx) => (
+                            <div
+                              key={idx}
+                              className='flex items-center w-[167px] h-[100px] p-1 cursor-pointer bg-center outline-violet-500 hover:outline rounded-md bg-cover'
+                              onClick={() => {
+                                setShouldShowModal(false);
+                                onChange
+                                  ? onChange({
+                                      filePath: idx + '.jpg',
+                                      isPreset: true,
+                                    })
+                                  : null;
+                              }}
+                              style={{
+                                backgroundImage: `url(${getImageUrl({
+                                  filePath: idx + '_s.jpg',
+                                  isPreset: true,
+                                  type: 'banner',
+                                })})`,
+                              }}
+                            ></div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ),
             },
@@ -167,9 +197,9 @@ const Banner = ({
             >
               Change cover
             </Button>
-            <Button type='default' className='bg-slate-100'>
+            {/* <Button type='default' className='bg-slate-100'>
               Reposition
-            </Button>
+            </Button> */}
           </Space>
         </div>
       </div>

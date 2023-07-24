@@ -14,7 +14,6 @@ interface SpaceCardProps {
 
 const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
   const navigate = useNavigate();
-  console.log(dataSpace.title, ',', isMySpace);
   return (
     <Card
       className='w-[189px] bg-white rounded-xl border border-neutral-200 flex-col justify-start items-start gap-2'

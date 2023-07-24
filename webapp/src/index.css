@@ -53,10 +53,13 @@ h6 {
   border: 1px solid #333333;
 }
 
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
   body {
     font-size: 14px;
   }
+} */
+body {
+  font-size: 14px;
 }
 
 @layer base {

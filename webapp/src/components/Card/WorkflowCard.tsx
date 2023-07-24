@@ -50,6 +50,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         <Banner
           bannerUrl={dataWorkflow.banner_url}
           className='w-full h-[86px] rounded-lg m-0'
+          size='small'
         />
       }
       {dataWorkflow.icon_url ? (

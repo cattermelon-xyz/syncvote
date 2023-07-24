@@ -9,6 +9,7 @@ import {
 
 interface GridColumnProps {
   xs?: number;
+  sm?: number;
   md?: number;
   lg?: number;
   xl?: number;
@@ -23,14 +24,6 @@ interface Props {
 }
 
 const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
-  let classes = `w-full grid gap-4 grid-row-gap-10`;
-
-  if (columns.xs) classes += `xs:grid-cols-${columns.xs} `;
-  if (columns.md) classes += `md:grid-cols-${columns.md} `;
-  if (columns.lg) classes += `lg:grid-cols-${columns.lg} `;
-  if (columns.xl) classes += `xl:grid-cols-${columns.xl} `;
-  if (columns['2xl']) classes += `2xl:grid-cols-${columns['2xl']} `;
-
   const [typeSort, setTypeSort] = useState('asc');
   const [selectedOption, setSelectedOption] = useState('');
   const options = ['Name', 'Last created', 'Last modified'];
@@ -70,8 +63,8 @@ const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
 
   return (
     <>
-      <div className='flex justify-between mb-4 '>
-        <p>{title}</p>
+      <div className='flex justify-between items-center mb-4 '>
+        <div className='text-md font-semibold'>{title}</div>
         <Popover content={content} trigger='click' placement='rightTop'>
           <Button
             style={{ border: 'None', padding: '5px' }}
@@ -89,7 +82,15 @@ const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
           </Button>
         </Popover>
       </div>
-      <div className={classes.trim()}>
+      <div
+        className={`w-full grid gap-4 ${
+          columns.xs ? `xs:grid-cols-${columns.xs}` : ''
+        } ${columns.sm ? `sm:grid-cols-${columns.sm}` : ''} ${
+          columns.md ? `md:grid-cols-${columns.md}` : ''
+        } ${columns.lg ? `lg:grid-cols-${columns.lg}` : ''} ${
+          columns.xl ? `xl:grid-cols-${columns.xl}` : ''
+        } ${columns['2xl'] ? `2xl:grid-cols-${columns['2xl']}` : ''}`}
+      >
         {items && items.map((item, index) => <div key={index}>{item}</div>)}
       </div>
     </>

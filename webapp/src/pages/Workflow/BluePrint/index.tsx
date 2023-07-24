@@ -34,7 +34,6 @@ const BluePrint = () => {
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
   );
   const data = location.state?.dataSpace || org;
-  console.log('data:', data);
   const dispatch = useDispatch();
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
@@ -68,7 +67,7 @@ const BluePrint = () => {
   }, [data]);
 
   return (
-    <div className='w-[800px]'>
+    <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
       <div
         className='flex my-4 gap-1 cursor-pointer'
         onClick={() => navigate('/')}
@@ -78,8 +77,11 @@ const BluePrint = () => {
           {L('backToMySpaces')}
         </p>
       </div>
-      <Space direction='horizontal' className='flex justify-between'>
-        <div className='mb-6 flex gap-2 items-center'>
+      <Space
+        direction='horizontal'
+        className='flex justify-between items-center mb-6 mt-2'
+      >
+        <div className='flex gap-2 items-center'>
           {data?.icon_url ? (
             <Icon iconUrl={data?.icon_url} size='large' />
           ) : (
@@ -128,7 +130,7 @@ const BluePrint = () => {
                 />
               ))
             }
-            columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
+            columns={{ sm: 2, md: 3, xl: 3, '2xl': 3 }}
             title={L('workflows')}
           />
         ) : (
