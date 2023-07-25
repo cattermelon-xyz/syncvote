@@ -3,15 +3,18 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { LeftOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { L } from '@utils/locales/L';
-import { Button, Empty, Skeleton, Space } from 'antd';
+import { Button, Empty, Modal, Skeleton, Space } from 'antd';
 import ListItem from '@components/ListItem/ListItem';
 import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
-import { queryOrgs, queryWorkflow } from '@middleware/data';
+import { queryOrgs, queryWorkflow, upsertAnOrg } from '@middleware/data';
 import { extractIdFromIdString } from '@utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
+import EditOrg from '@pages/Organization/home/EditOrg';
+
+// TODO: this file is placed in wrong folder!
 
 interface SortProps {
   by: string;
@@ -42,7 +45,7 @@ const BluePrint = () => {
   });
 
   const filterWorkflowByOptions = useFilteredData(
-    workflows,
+    workflows || [],
     sortWorkflowOptions
   );
 
@@ -65,9 +68,40 @@ const BluePrint = () => {
       });
     }
   }, [data]);
+  const [showEditOrg, setShowEditOrg] = useState(false);
 
   return (
     <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
+      <EditOrg
+        isOpen={showEditOrg}
+        onClose={() => setShowEditOrg(false)}
+        title={data?.title}
+        desc={data?.desc}
+        onSave={(title, desc) => {
+          upsertAnOrg({
+            org: {
+              id: data?.id,
+              title: title,
+              desc: desc,
+            },
+            dispatch: dispatch,
+            onLoad: () => {
+              Modal.success({
+                title: 'Saved!',
+                content: 'Your changes have been saved.',
+              });
+            },
+            onError: () => {
+              Modal.error({
+                title: 'Error',
+                content: 'Cannot save your changes.',
+              });
+            },
+          });
+          setShowEditOrg(false);
+        }}
+        profile={[]}
+      />
       <div
         className='flex my-4 gap-1 cursor-pointer'
         onClick={() => navigate('/')}
@@ -94,7 +128,8 @@ const BluePrint = () => {
             />
           )}
           <div
-            className='text-3xl font-semibold text-[#252422] flex items-center'
+            className='text-3xl font-semibold text-[#252422] flex items-center hover:text-violet-500 cursor-pointer'
+            onClick={() => setShowEditOrg(true)}
             title={
               data?.role === 'ADMIN' ? 'You are an ADMIN' : 'You are a Member'
             }

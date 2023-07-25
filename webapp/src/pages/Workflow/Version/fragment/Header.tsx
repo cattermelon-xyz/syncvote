@@ -220,14 +220,16 @@ function Header({
             <>
               <Space direction='horizontal'>
                 {dataChanged ? (
-                  <div>
+                  <div className='flex items-center'>
                     <Button
                       type='text'
                       shape='round'
                       icon={<SaveOutlined />}
                       className='flex items-center text-violet-500'
                       onClick={() => handleSave('data')}
-                    />
+                    >
+                      Save
+                    </Button>
                   </div>
                 ) : (
                   <div className='p-1 rounded-full bg-green-100 w-[24px] h-[24px] flex items-center'>
