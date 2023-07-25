@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { LeftOutlined } from '@ant-design/icons';
 import WorkflowCard from '@components/Card/WorkflowCard';
 import { L } from '@utils/locales/L';
-import { Skeleton } from 'antd';
+import { Skeleton, Empty } from 'antd';
 import ListItem from '@components/ListItem/ListItem';
 import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
+import { queryOrgs } from '@middleware/data';
+import { useDispatch, useSelector } from 'react-redux';
+import { extractIdFromIdString } from '@utils/helpers';
 
 interface SortProps {
   by: string;
@@ -23,8 +26,15 @@ const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
+  const { orgIdString } = useParams();
   const [loading, setLoading] = useState(false);
-  const data = location.state?.dataSpace;
+  const { orgs } = useSelector((state: any) => state.orginfo);
+  const org = orgs.find(
+    (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
+  );
+  const data = location.state?.dataSpace || org;
+  console.log('data:', data);
+  const dispatch = useDispatch();
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
     by: '',
@@ -42,7 +52,7 @@ const BluePrint = () => {
 
   useEffect(() => {
     if (data) {
-      const workflowsData = data?.workflows.map((workflow: any) => ({
+      const workflowsData = data?.workflows?.map((workflow: any) => ({
         ...workflow,
         org_title: data.title,
       }));
@@ -82,7 +92,7 @@ const BluePrint = () => {
       <div>
         {loading ? (
           <Skeleton />
-        ) : (
+        ) : filterWorkflowByOptions && filterWorkflowByOptions.length > 0 ? (
           <ListItem
             handleSort={handleSortWorkflowDetail}
             items={
@@ -97,6 +107,8 @@ const BluePrint = () => {
             columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
             title={L('workflows')}
           />
+        ) : (
+          <Empty />
         )}
       </div>
     </div>

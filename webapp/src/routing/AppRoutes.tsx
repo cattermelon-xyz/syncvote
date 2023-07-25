@@ -64,10 +64,11 @@ const AppRoutes = () => (
       </Route>
       <Route
         path='/'
-        element={
-          <App layout={<WebLayoutWithoutSider />} requiredLogin={true} />
-        }
+        element={<App layout={WebLayoutWithoutSider} requiredLogin={true} />}
       >
+        <Route path='account'>
+          <Route path='setting' element={<AccountSetting />} />
+        </Route>
         <Route path=':orgIdString'>
           <Route path='setting' element={<OrganizationSetting />} />
           <Route path='new-workflow' element={<ChooseTemplate />} />
@@ -87,9 +88,6 @@ const AppRoutes = () => (
         <Route index element={<OrganizationExplore />} />
         <Route path='/my-workspaces' element={<MySpace />} />
         <Route path='/shared-workspaces' element={<SharedSpace />} />
-        <Route path='account'>
-          <Route path='setting' element={<AccountSetting />} />
-        </Route>
         <Route path='onboard' element={<PageScreen />} />
         <Route path=':orgIdString'>
           <Route index element={<BluePrint />} />
