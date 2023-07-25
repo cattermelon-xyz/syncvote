@@ -10,6 +10,7 @@ export interface IOrgInfo {
   org_size: string;
   role: string;
   profile: IProfile[];
+  workflows?: any[];
 }
 
 export interface IProfile {

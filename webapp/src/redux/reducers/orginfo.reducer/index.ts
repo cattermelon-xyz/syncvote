@@ -37,6 +37,40 @@ const orgInfoSlice = createSlice({
         state.orgs[index] = { ...state.orgs[index], ...action.payload };
       }
     },
+    changeWorkflowInOrg: (state, action) => {
+      const { orgId, workflow } = action.payload;
+      const orgIndex = state.orgs.findIndex(
+        (org: IOrgInfo) => org.id === orgId
+      );
+      if (orgIndex !== -1) {
+        const workflows = state.orgs[orgIndex].workflows;
+        if (workflows !== undefined) {
+          const workflowIndex = workflows.findIndex(
+            (wf: any) => wf.id === workflow.id
+          );
+          if (workflowIndex !== undefined && workflowIndex !== -1) {
+            workflows[workflowIndex] = {
+              ...workflows[workflowIndex],
+              ...workflow,
+            };
+          } else {
+            workflows.push(workflow);
+          }
+        } else {
+          state.orgs[orgIndex].workflows = [workflow];
+        }
+      }
+    },
+    deleteWorkflowInOrg: (state, action) => {
+      const { workflowId } = action.payload;
+      state.orgs.map((org: any) => {
+        const workflows = org.worfklows;
+        if (workflows) {
+          const idx = workflows.findIndex((wf: any) => wf.id === workflowId);
+          workflows.splice(idx, 1);
+        }
+      });
+    },
     setOrgsInfo: (state, action) => {
       state.orgs = [...action.payload];
     },
@@ -66,5 +100,7 @@ export const {
   reset,
   setUser,
   addUserToOrg,
+  changeWorkflowInOrg,
+  deleteWorkflowInOrg,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;

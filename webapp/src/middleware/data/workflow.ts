@@ -11,6 +11,10 @@ import {
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { randomBanner, subtractArray } from '@utils/helpers';
+import {
+  changeWorkflowInOrg,
+  deleteWorkflowInOrg,
+} from '@redux/reducers/orginfo.reducer';
 
 export const insertWorkflowAndVersion = async ({
   dispatch,
@@ -74,18 +78,18 @@ export const insertWorkflowAndVersion = async ({
       .from('workflow_version')
       .insert(toInsert)
       .select();
+    const newWorkflow = {
+      id: insertedId,
+      title,
+      desc,
+      icon_url: iconUrl,
+      banner_url: '',
+      owner_org_id: orgId,
+      workflow_version: !err ? versions : [],
+    };
     dispatch(finishLoading({}));
-    dispatch(
-      changeWorkflow({
-        id: insertedId,
-        title,
-        desc,
-        icon_url: iconUrl,
-        banner_url: '',
-        owner_org_id: orgId,
-        workflow_version: !err ? versions : [],
-      })
-    );
+    dispatch(changeWorkflow(newWorkflow));
+    dispatch(changeWorkflowInOrg({ orgId, workflow: newWorkflow }));
     if (!error && versions) onSuccess(versions, insertedId);
   }
   if (error) {
@@ -323,6 +327,9 @@ export const updateAWorkflowInfo = async ({
       delete newData[index].preset_banner_url;
     });
     dispatch(changeWorkflow(newData[0]));
+    dispatch(
+      changeWorkflowInOrg({ orgId: info.owner_org_id, workflow: newData[0] })
+    );
     onSuccess(newData);
   } else {
     onError(error);
@@ -404,6 +411,7 @@ export const deleteAWorkflow = async ({
   dispatch(finishLoading({}));
   if (error || (data && data.length === 0)) {
     dispatch(deleteWorkflow({ id: workflowId }));
+    dispatch(deleteWorkflowInOrg({ workflowId }));
     onSuccess(data);
   } else {
     onError({

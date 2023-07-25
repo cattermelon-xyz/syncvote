@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { createIdString, randomIcon } from '@utils/helpers';
 import './create-new.scss';
 import { emptyStage } from '@components/DirectedGraph';
+import { changeOrgInfo } from '@redux/reducers/orginfo.reducer';
 
 interface CreateWorkflowModalProps {
   open: boolean;
