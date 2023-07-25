@@ -43,7 +43,7 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
         });
         const orgIdString = createIdString(`${org.title}`, `${org.id}`);
 
-        navigate(`/my-spaces/${orgIdString}`);
+        navigate(`/${orgIdString}`);
       },
 
       dispatch,

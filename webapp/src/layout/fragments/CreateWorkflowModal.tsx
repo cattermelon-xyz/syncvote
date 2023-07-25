@@ -25,7 +25,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   const [confirmLoading, setConfirmLoading] = useState(false);
   const dispatch = useDispatch();
   const [offset, setOffset] = useState(0);
-  const limit = 5;
+  const limit = 100;
   const [dataOrgs, setDataOrgs] = useState<any>([]);
 
   const loadWorkflowData = async (offset: any, limit: any) => {
@@ -86,7 +86,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
         </div>
       </Space>
 
-      <Space className='h-60 w-full' direction='vertical'>
+      <Space className='h-60 overflow-scroll py-2 w-full' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
           {dataOrgs.map((org: any, index: any) => (
             <div
