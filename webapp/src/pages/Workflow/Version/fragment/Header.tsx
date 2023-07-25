@@ -19,7 +19,7 @@ import {
   DeleteOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import Icon from '@components/Icon/Icon';
 import EditWorkflow from '@pages/Workflow/BluePrint/fragment/EditWorkflow';

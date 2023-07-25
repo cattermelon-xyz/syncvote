@@ -71,13 +71,13 @@ function Login() {
               onClick={handleLogin}
             />
             <div className=' flex gap-[16px] flex-col w-full'>
-              <ButtonLogin
+              {/* <ButtonLogin
                 className=' pl-[15px]'
                 disabled
                 Icon={<Twitter />}
                 title={`${L('continueWidth')} ${L('twitter')}`}
-              />
-              <div className='flex items-center justify-between w-full'>
+              /> */}
+              {/* <div className='flex items-center justify-between w-full'>
                 <hr className='border-[#D9D9D9] border-t-1 flex-grow' />
                 <p className='text-[15px] mx-4'>or</p>
                 <hr className='border-[#D9D9D9] border-t-1 flex-grow' />
@@ -87,7 +87,7 @@ function Login() {
                 disabled
                 Icon={<ConnectWallet />}
                 title={`${L('continueWidth')} ${L('twitter')}`}
-              />
+              /> */}
             </div>
           </div>
         </div>
@@ -108,10 +108,10 @@ function Login() {
                 Co-Founder, Syncvote
               </div>
             </div>
-            <div className='flex gap-[12%] self-end'>
-              {/* <ButtonLeft />
-              <ButtonRight /> */}
-            </div>
+            {/* <div className='flex gap-[12%] self-end'>
+              <ButtonLeft />
+              <ButtonRight />
+            </div> */}
           </div>
         </div>
       </div>

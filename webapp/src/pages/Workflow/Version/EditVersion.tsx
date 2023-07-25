@@ -20,7 +20,7 @@ import {
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import { Button, Drawer, Modal, Skeleton, Space } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditInfo from './fragment/EditInfo';
@@ -118,6 +118,19 @@ export const EditVersion = () => {
     setDataHasChanged(false);
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
   };
+  const autoSaveWorker: Worker = useMemo(
+    () => new Worker(new URL('../../../workers/AutoSave.ts', import.meta.url)),
+    []
+  );
+  autoSaveWorker.onmessage = (e) => {
+    if (dataHasChanged) {
+      handleSave('data');
+      autoSaveWorker.postMessage(null);
+    }
+  };
+  useEffect(() => {
+    autoSaveWorker.postMessage(null);
+  }, [dataHasChanged]);
   useEffect(() => {
     if (!shouldUseCachedData(lastFetch)) {
       queryWeb2Integration({
