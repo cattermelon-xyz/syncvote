@@ -607,6 +607,9 @@ export const getWorkflowFromEditor = async ({
       `*, 
     workflow_version(
       status,
+      id,
+      last_updated,
+      created_at,
         workflow(*,
           org(*)
           )
@@ -614,12 +617,38 @@ export const getWorkflowFromEditor = async ({
     )
     .eq('user_id', userId);
 
+  console.log(data);
+
   dispatch(finishLoading({}));
   if (error) {
     onError(error);
   } else {
     if (data) {
-      onSuccess(data);
+      let tmp = <any>[];
+      data.forEach((version: any) => {
+        const workflow = {
+          banner_url: version.workflow_version.workflow.banner_url,
+          icon_url: version.workflow_version.workflow.icon_url,
+          id: version.workflow_version.workflow.id,
+          org_title: version.workflow_version.workflow.org.title,
+          owner_org_id: version.workflow_version.workflow.owner_org_id,
+          preset_banner_url:
+            version.workflow_version.workflow.preset_banner_url,
+          preset_icon_url: version.workflow_version.workflow.preset_icon_url,
+          title: version.workflow_version.workflow.title,
+          version: [
+            {
+              created_at: version.workflow_version.created_at,
+              id: version.workflow_version.id,
+              last_updated: version.workflow_version.last_updated,
+              status: version.workflow_version.status,
+            },
+          ],
+        };
+        tmp.push(workflow);
+      });
+
+      onSuccess(tmp);
     }
   }
 };
