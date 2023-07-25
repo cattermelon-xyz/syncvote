@@ -86,7 +86,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
         </div>
       </Space>
 
-      <Space className='h-60 overflow-scroll py-2 w-full' direction='vertical'>
+      <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
           {dataOrgs.map((org: any, index: any) => (
             <div
@@ -116,7 +116,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       </Space>
 
       <Space className='flex'>
-        <a style={{ color: '#6d28d9' }} onClick={setOpenCreateWorkspaceModal}>
+        <a className='p-4' style={{ color: '#6d28d9' }} onClick={setOpenCreateWorkspaceModal}>
           <PlusOutlined /> {L('createANewSpace')}
         </a>
       </Space>

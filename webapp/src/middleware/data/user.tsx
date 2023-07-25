@@ -251,11 +251,11 @@ export const inviteExistingMember = async ({
 export const isEmailExisted = async ({ email }: { email: string }) => {
   const rs = await supabase
     .from('profile')
-    .select('*', { count: 'exact', head: true })
+    .select('*', { count: 'exact', head: false })
     .eq('email', email);
   if (rs.error || rs.status !== 200) {
-    return false;
+    return { existed: false, userId: null };
   } else {
-    return rs.count;
+    return { existed: rs.count, userId: rs.data[0]?.id };
   }
 };
