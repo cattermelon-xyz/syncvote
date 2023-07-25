@@ -118,19 +118,19 @@ export const EditVersion = () => {
     setDataHasChanged(false);
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
   };
-  const autoSaveWorker: Worker = useMemo(
-    () => new Worker(new URL('../../../workers/AutoSave.ts', import.meta.url)),
-    []
-  );
-  autoSaveWorker.onmessage = (e) => {
-    if (dataHasChanged) {
-      handleSave('data');
-      autoSaveWorker.postMessage(null);
-    }
-  };
-  useEffect(() => {
-    autoSaveWorker.postMessage(null);
-  }, [dataHasChanged]);
+  // const autoSaveWorker: Worker = useMemo(
+  //   () => new Worker(new URL('../../../workers/AutoSave.ts', import.meta.url)),
+  //   []
+  // );
+  // autoSaveWorker.onmessage = (e) => {
+  //   if (dataHasChanged) {
+  //     handleSave('data');
+  //     autoSaveWorker.postMessage(null);
+  //   }
+  // };
+  // useEffect(() => {
+  //   autoSaveWorker.postMessage(null);
+  // }, [dataHasChanged]);
   useEffect(() => {
     if (!shouldUseCachedData(lastFetch)) {
       queryWeb2Integration({
