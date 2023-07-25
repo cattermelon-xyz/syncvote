@@ -9,10 +9,20 @@ import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
-import { queryOrgs, queryWorkflow, upsertAnOrg } from '@middleware/data';
-import { extractIdFromIdString } from '@utils/helpers';
+import {
+  insertWorkflowAndVersion,
+  queryOrgs,
+  queryWorkflow,
+  upsertAnOrg,
+} from '@middleware/data';
+import {
+  createIdString,
+  extractIdFromIdString,
+  randomIcon,
+} from '@utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
+import { emptyStage } from '@components/DirectedGraph';
 
 // TODO: this file is placed in wrong folder!
 
@@ -28,6 +38,7 @@ interface DataItem {
 
 const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
+  const { user } = useSelector((state: any) => state.orginfo);
   const location = useLocation();
   const navigate = useNavigate();
   const { orgIdString } = useParams();
@@ -69,6 +80,28 @@ const BluePrint = () => {
     }
   }, [data]);
   const [showEditOrg, setShowEditOrg] = useState(false);
+  const handleNewWorkflow = async () => {
+    const orgIdString = createIdString(`${org.title}`, `${org.id}`);
+    // navigate(`${orgIdString}/new-workflow/`);
+    const props = {
+      title: 'Untitled Workflow',
+      desc: '',
+      owner_org_id: org.id,
+      emptyStage: emptyStage,
+      iconUrl: 'preset:' + randomIcon(),
+      authority: user.id,
+    };
+    insertWorkflowAndVersion({
+      dispatch: dispatch,
+      props: props,
+      onError: (error) => {
+        Modal.error({ content: error.message });
+      },
+      onSuccess: (versions, insertedId) => {
+        navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      },
+    });
+  };
 
   return (
     <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
@@ -145,7 +178,7 @@ const BluePrint = () => {
         <Button
           type='primary'
           icon={<PlusOutlined />}
-          onClick={() => navigate(`/${orgIdString}/new-workflow`)}
+          onClick={() => handleNewWorkflow()}
         >
           New Workflow
         </Button>
