@@ -581,10 +581,45 @@ export const insertNewEditor = async ({
       user_id: userId,
     })
     .select();
+  dispatch(finishLoading({}));
   if (error) {
     onError(error);
   } else {
     onSucess(data);
   }
+};
+
+export const getWorkflowFromEditor = async ({
+  userId,
+  dispatch,
+  onSuccess,
+  onError,
+}: {
+  userId: any;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('workflow_version_editor')
+    .select(
+      `*, 
+    workflow_version(
+      status,
+        workflow(*,
+          org(*)
+          )
+    )`
+    )
+    .eq('user_id', userId);
+
   dispatch(finishLoading({}));
+  if (error) {
+    onError(error);
+  } else {
+    if (data) {
+      onSuccess(data);
+    }
+  }
 };
