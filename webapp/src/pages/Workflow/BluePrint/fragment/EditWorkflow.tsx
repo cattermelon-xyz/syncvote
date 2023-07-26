@@ -37,7 +37,7 @@ const EditWorkflow = ({
     desc?: string | undefined;
     iconUrl?: string | undefined;
     bannerUrl?: string | undefined;
-  }) => void;
+  }) => Promise<void>;
   onStatusChange: ({
     status,
     versionId,
@@ -182,7 +182,6 @@ const EditWorkflow = ({
             <TextEditor
               value={desc}
               setValue={(val: any) => setDesc(val)}
-              heightEditor={200}
               onBlur={async () => {
                 if (desc !== originalDesc) {
                   setOpen(false);
