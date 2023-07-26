@@ -73,8 +73,6 @@ const MySpace: React.FC = () => {
             org_title: adminOrg.title,
           }))
         );
-        console.log('Hehe:', allWorkflows);
-
         // Querry from org
         setWorkflows(allWorkflows);
 

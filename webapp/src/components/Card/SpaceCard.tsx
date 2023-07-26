@@ -129,7 +129,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
           setIsInviteModalVisible(false);
           setIsPopoverVisible(true);
         }}
-        data={dataSpace}
+        dataSpace={dataSpace}
       />
     </>
   );

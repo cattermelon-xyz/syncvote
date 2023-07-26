@@ -1,21 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from 'antd';
+import { queryOrgByIdForInvite } from '@middleware/data';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface ModalInviteOfSpaceCardProps {
   visible: boolean;
   onClose: () => void;
-  data: any;
+  dataSpace: any;
 }
 
 const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
   visible,
   onClose,
-  data,
+  dataSpace,
 }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalText, setModalText] = useState('Content of the modal');
+  const dispatch = useDispatch();
+  const { orgs } = useSelector((state: any) => state.orginfo);
 
-  console.log('data Modal', data);
+  useEffect(() => {
+    if (visible) {
+      console.log('orgs', orgs.profile);
+      queryOrgByIdForInvite({
+        orgId: dataSpace.id,
+        onSuccess: (data: any) => {
+          console.log('dataQuery', data);
+          // setOrg(data[0]);
+        },
+        dispatch,
+      });
+      console.log('data Modal', dataSpace);
+    }
+  }, [dataSpace.id, visible, orgs.profile]);
 
   const handleOk = () => {
     setModalText('The modal will be closed after two seconds');
@@ -36,7 +53,7 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
         onCancel={onClose}
         footer={null}
       >
-        <p className='font-bold text-xl'>{`Share "${data.title}" workspace`}</p>
+        <p className='font-bold text-xl'>{`Share "${dataSpace.title}" workspace`}</p>
       </Modal>
     </>
   );
