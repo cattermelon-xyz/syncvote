@@ -132,6 +132,7 @@ export const upsertWorkflowVersion = async ({
   }
   dispatch(finishLoading({}));
 };
+
 export const queryWorkflow = async ({
   orgId,
   onLoad,
@@ -250,6 +251,7 @@ export const queryWorkflowVersion = async ({
     onError(error);
   }
 };
+
 export const updateAWorkflowInfo = async ({
   info,
   dispatch,
@@ -313,6 +315,7 @@ export const updateAWorkflowInfo = async ({
     onError(error);
   }
 };
+
 export const updateAWorkflowTag = async ({
   workflow,
   newTags,
@@ -526,13 +529,13 @@ export const searchWorflow = async ({
   dispatch(finishLoading({}));
 };
 
-export const getWorkflowStatus = async ({
+export const getWorkflowByStatus = async ({
   status,
   dispatch,
   onSuccess,
   onError,
 }: {
-  status: any
+  status: any;
   dispatch: any;
   onSuccess: (data: any) => void;
   onError: (error: any) => void;
@@ -552,6 +555,100 @@ export const getWorkflowStatus = async ({
         (worfklow) => worfklow?.versions[0]?.status === status
       );
       onSuccess(workflowData);
+    }
+  }
+};
+
+export const insertNewEditor = async ({
+  props,
+  dispatch,
+  onSucess,
+  onError = (error: any) => {
+    console.log(error);
+  },
+}: {
+  props: any;
+  dispatch: any;
+  onSucess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  const { workflow_version_id: version_id, user_id: userId } = props;
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('workflow_version_editor')
+    .insert({
+      workflow_version_id: version_id,
+      user_id: userId,
+    })
+    .select();
+  dispatch(finishLoading({}));
+  if (error) {
+    onError(error);
+  } else {
+    onSucess(data);
+  }
+};
+
+export const getWorkflowFromEditor = async ({
+  userId,
+  dispatch,
+  onSuccess,
+  onError,
+}: {
+  userId: any;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('workflow_version_editor')
+    .select(
+      `*, 
+    workflow_version(
+      status,
+      id,
+      last_updated,
+      created_at,
+        workflow(*,
+          org(*)
+          )
+    )`
+    )
+    .eq('user_id', userId);
+
+  console.log(data);
+
+  dispatch(finishLoading({}));
+  if (error) {
+    onError(error);
+  } else {
+    if (data) {
+      let tmp = <any>[];
+      data.forEach((version: any) => {
+        const workflow = {
+          banner_url: version.workflow_version.workflow.banner_url,
+          icon_url: version.workflow_version.workflow.icon_url,
+          id: version.workflow_version.workflow.id,
+          org_title: version.workflow_version.workflow.org.title,
+          owner_org_id: version.workflow_version.workflow.owner_org_id,
+          preset_banner_url:
+            version.workflow_version.workflow.preset_banner_url,
+          preset_icon_url: version.workflow_version.workflow.preset_icon_url,
+          title: version.workflow_version.workflow.title,
+          version: [
+            {
+              created_at: version.workflow_version.created_at,
+              id: version.workflow_version.id,
+              last_updated: version.workflow_version.last_updated,
+              status: version.workflow_version.status,
+            },
+          ],
+        };
+        tmp.push(workflow);
+      });
+
+      onSuccess(tmp);
     }
   }
 };

@@ -3,7 +3,7 @@ import { L } from '@utils/locales/L';
 import { Input, Space, Tag } from 'antd';
 import SortButton from '@components/SortButton/SortButton';
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { getWorkflowStatus, searchWorflow } from '@middleware/data';
+import { getWorkflowByStatus, searchWorflow } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import { error } from 'console';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
@@ -56,7 +56,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setWorkflows }) => {
 
     // Check if input is empty
     if (e.target.value === '') {
-      await getWorkflowStatus({
+      await getWorkflowByStatus({
         status: 'PUBLIC_COMMUNITY',
         dispatch,
         onSuccess: (data: any) => {

@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Typography } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
-import { queryOrgsAndWorkflowForHome } from '@middleware/data';
+import {
+  getWorkflowFromEditor,
+  queryOrgsAndWorkflowForHome,
+} from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import SpaceCard from '@components/Card/SpaceCard';
 import ListItem from '../../components/ListItem/ListItem';
@@ -62,16 +65,31 @@ const MySpace: React.FC = () => {
       });
       if (orgs) {
         const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
-        console.log('adminOrgsData', adminOrgsData);
         setAdminOrgs(adminOrgsData);
+
         const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
           adminOrg.workflows.map((workflow: any) => ({
             ...workflow,
             org_title: adminOrg.title,
           }))
         );
+        console.log('Hehe:', allWorkflows);
 
+        // Querry from org
         setWorkflows(allWorkflows);
+
+        await getWorkflowFromEditor({
+          userId: user.id,
+          dispatch,
+          onSuccess: (data: any) => {
+            console.log('Editor', data);
+          },
+          onError: (error: any) => {
+            console.log(error);
+          },
+        });
+
+        // Querry workflow from workflow_version_editor
       }
       setLoading(false);
     };

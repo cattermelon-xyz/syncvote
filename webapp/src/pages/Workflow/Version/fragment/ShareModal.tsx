@@ -6,7 +6,11 @@ import {
   LoadingOutlined,
 } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
-import { isEmailExisted, queryVersionEditor } from '@middleware/data';
+import {
+  insertNewEditor,
+  isEmailExisted,
+  queryVersionEditor,
+} from '@middleware/data';
 import { IWorkflow } from '@types';
 import { createIdString } from '@utils/helpers';
 import {
@@ -20,6 +24,7 @@ import {
   TabsProps,
   Typography,
 } from 'antd';
+import { error } from 'console';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -30,13 +35,16 @@ type TabProps = {
 };
 
 const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
-  const [newInvitee, setNewInvitee] = useState('');
+  const [newInvitee, setNewInvitee] = useState({
+    email: '',
+    userId: null,
+  });
   const [invitees, setInvitees] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [emailExisted, setEmailExisted] = useState('');
   const dispatch = useDispatch();
+  const versionId = workflow?.workflow_version[0]?.id;
   useEffect(() => {
-    const versionId = workflow?.workflow_version[0]?.id;
     if (versionId) {
       queryVersionEditor({
         versionId: versionId,
@@ -55,15 +63,24 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
         <div className='w-full flex items-top justify-between'>
           <Input
             placeholder='Add someone'
-            value={newInvitee}
+            value={newInvitee.email}
             onChange={(e) => {
-              setNewInvitee(e.target.value);
+              setNewInvitee({ email: e.target.value, userId: null });
               setEmailExisted('');
             }}
             className='w-full flex-grow mr-2 flex'
             onBlur={async () => {
               setIsLoading(true);
-              const existed = await isEmailExisted({ email: newInvitee });
+              const { existed, userId } = await isEmailExisted({
+                email: newInvitee.email,
+              });
+              if (userId) {
+                setNewInvitee({
+                  email: newInvitee.email,
+                  userId: userId,
+                });
+              }
+
               setIsLoading(false);
               setEmailExisted(
                 existed
@@ -75,7 +92,27 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
           <Button
             type='default'
             className='text-violet-500 bg-violet-100'
-            disabled={newInvitee === '' || isLoading}
+            disabled={newInvitee.email === '' || isLoading}
+            onClick={async () => {
+              await insertNewEditor({
+                props: {
+                  workflow_version_id: versionId,
+                  user_id: newInvitee.userId,
+                },
+                dispatch,
+                onError: (error: any) => {
+                  console.log(error);
+                },
+                onSucess: (data: any) => {
+                  console.log(data);
+                },
+              });
+
+              setNewInvitee({
+                email: '',
+                userId: null,
+              });
+            }}
           >
             {isLoading ? <LoadingOutlined className='mr-1' /> : null}
             Invite
