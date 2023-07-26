@@ -2,7 +2,7 @@ import Logo from '@assets/icons/svg-icons/Logo';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 // import { sliceAddressToken } from '@utils/helpers';
 // import { AddressToken } from '@utils/mockData/addressToken';
-import { Button, Menu, MenuProps, Popover, Space } from 'antd';
+import { Button, Menu, MenuProps, Modal, Popover, Space } from 'antd';
 import {
   FacebookFilled,
   InstagramOutlined,
@@ -117,7 +117,27 @@ function PublicHeader(session: any) {
       </div>
     </div>
   );
-
+  const handleLogin = async () => {
+    dispatch(startLoading({}));
+    const redirectTo = window.location.href;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+        redirectTo,
+      },
+    });
+    dispatch(finishLoading({}));
+    if (error) {
+      Modal.error({
+        title: L('error'),
+        content: error.message || '',
+      });
+    }
+  };
   return (
     <Space
       direction='horizontal'
@@ -163,7 +183,7 @@ function PublicHeader(session: any) {
           </Popover>
         ) : (
           <Button
-            onClick={() => navigate('/login')}
+            onClick={handleLogin}
             style={{ marginLeft: 20 }}
             className='primary flex bg-[#FFF] text-[13px] gap-[10px] items-center border border-solid border-[#E3E3E2] rounded-[10px] cursor-pointer text-[#252422]'
           >

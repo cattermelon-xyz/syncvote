@@ -177,7 +177,7 @@ const Flow = () => {
           minZoom: 1,
         }}
       >
-        <Controls position='bottom-left' />
+        <Controls position='bottom-left' showInteractive={false} />
         <Background color='#aaa' variant={BackgroundVariant.Dots} />
         <Panel position='top-left'>
           <Space direction='vertical'>

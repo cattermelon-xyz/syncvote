@@ -95,7 +95,7 @@ export const explain = ({
             <span className='text-violet-500 mx-1'>
               {(pdata as IToken)?.address}
             </span>{' '}
-            token holders with a minimum of
+            token/nft holders with a minimum of
             <span className='text-violet-500 mx-1'>
               {(pdata as IToken)?.min}
             </span>{' '}

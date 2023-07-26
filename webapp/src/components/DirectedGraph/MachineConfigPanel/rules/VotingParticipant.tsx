@@ -55,7 +55,7 @@ const VotingPartipation = () => {
               label: (
                 <div className='flex items-center'>
                   <TbAtom className='mr-2' />
-                  Token holder
+                  Token/NFT holder
                 </div>
               ),
               value: 'token',

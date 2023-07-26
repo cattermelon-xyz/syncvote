@@ -153,6 +153,18 @@ export const EditVersion = () => {
     }
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
+  useEffect(() => {
+    const handleTabClose = (event: any) => {
+      event.preventDefault();
+      console.log('beforeunload event triggered');
+      return (event.returnValue = 'Are you sure you want to exit?');
+    };
+    window.addEventListener('beforeunload', handleTabClose);
+    return () => {
+      window.removeEventListener('beforeunload', handleTabClose);
+    };
+  }, []);
+
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
     changedData?: any | undefined

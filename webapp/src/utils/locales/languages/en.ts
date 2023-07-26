@@ -37,7 +37,7 @@ export const LANG: any = {
   governanceBlueprint:
     'You can go to governance to view the status of your blueprint, it will be published once approved',
   thisSettingAllowsYouToPassVotingAccessToSpecificTokenHolders:
-    'This setting allows you to pass voting access to specific token holders',
+    'This setting allows you to pass voting access to specific token/nft holders',
   chooseAnOption: 'Choose an option',
   allowedBy: 'Allowed by',
   createNewOrAddAnExistingOne: 'Create new or add an existing one',

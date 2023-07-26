@@ -9,26 +9,24 @@ type AllowedByTokenProps = {
 };
 
 const AllowedByToken = (props: AllowedByTokenProps) => {
-  const {
-    address, setAddress, min, setMin, editable,
-  } = props;
+  const { address, setAddress, min, setMin, editable } = props;
   return (
-    <Space direction="vertical" size="middle" className="w-full">
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="text-sm">Token address</div>
+    <Space direction='vertical' size='middle' className='w-full'>
+      <Space direction='vertical' size='small' className='w-full'>
+        <div className='text-sm'>Token/NFT address</div>
         <Input
-          placeholder="Token address"
-          className="w-full"
+          placeholder='Token/NFT address'
+          className='w-full'
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           disabled={!editable}
         />
       </Space>
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="text-sm">Minimum holding quantity (optional)</div>
+      <Space direction='vertical' size='small' className='w-full'>
+        <div className='text-sm'>Minimum holding quantity (optional)</div>
         <Input
-          type="number"
-          className="w-full"
+          type='number'
+          className='w-full'
           value={min}
           onChange={(e) => setMin(parseInt(e.target.value, 10))}
           disabled={!editable}

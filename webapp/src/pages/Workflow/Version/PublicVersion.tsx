@@ -42,6 +42,8 @@ import Banner from '@components/Banner/Banner';
 import Icon from '@components/Icon/Icon';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 import Google from '@assets/icons/svg-icons/Google';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { L } from '@utils/locales/L';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -128,6 +130,27 @@ export const PublicVersion = () => {
 
     fetchData();
   }, []);
+  const handleLogin = async () => {
+    dispatch(startLoading({}));
+    const redirectTo = window.location.href;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+        redirectTo,
+      },
+    });
+    dispatch(finishLoading({}));
+    if (error) {
+      Modal.error({
+        title: L('error'),
+        content: error.message || '',
+      });
+    }
+  };
 
   return (
     <>
@@ -148,7 +171,11 @@ export const PublicVersion = () => {
                       Create an account to leave comments and reactions on this
                       workflow.
                     </div>
-                    <Button type='default' className='flex items-center mr-4'>
+                    <Button
+                      type='default'
+                      className='flex items-center mr-4'
+                      onClick={handleLogin}
+                    >
                       <Google />
                       <div className='ml-1'>Continue with Google</div>
                     </Button>

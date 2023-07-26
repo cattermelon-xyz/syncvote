@@ -126,12 +126,12 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
                   disabled={!editable}
                 />
               </Space> */}
-              <Input.TextArea
-                defaultValue={selectedNode?.description}
-                onBlur={(e: any) => {
+              <TextEditor
+                value={selectedNode?.description}
+                setValue={(val: any) => {
                   const newNode = structuredClone(selectedNode);
                   if (newNode) {
-                    newNode.description = e.target.value;
+                    newNode.description = val;
                     onChange(newNode);
                   }
                 }}
