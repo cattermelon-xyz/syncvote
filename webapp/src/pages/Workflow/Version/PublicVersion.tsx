@@ -35,7 +35,6 @@ export const PublicVersion = () => {
   const versionId = extractIdFromIdString(versionIdString);
   const dispatch = useDispatch();
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
-  const navigate = useNavigate();
   const [web2IntegrationsState, setWeb2IntegrationsState] = useState<any>();
   const [version, setVersion] = useState<any>();
   const [workflow, setWorkflow] = useState<any>();
@@ -49,6 +48,7 @@ export const PublicVersion = () => {
   const [api, contextHolder] = notification.useNotification();
   const where = `${orgId}$/${workflowId}$/${versionId}$`;
   const [dataReaction, setDataReaction] = useState<any[]>([]);
+  const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
 
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
@@ -258,6 +258,9 @@ export const PublicVersion = () => {
                     </Popover>
 
                     <Button
+                      onClick={() => {
+                        setShouldDownloadImage(true);
+                      }}
                       className='w-11 h-9 flex items-center justify-center'
                       icon={<FiDownload className='w-5 h-5' />}
                     />
@@ -302,6 +305,8 @@ export const PublicVersion = () => {
 
                 <DirectedGraph
                   viewMode={GraphViewMode.VIEW_ONLY}
+                  shouldExportImage={shouldDownloadImage}
+                  setExportImage={setShouldDownloadImage}
                   data={version?.data || emptyStage}
                   selectedNodeId={selectedNodeId}
                   selectedLayoutId={
