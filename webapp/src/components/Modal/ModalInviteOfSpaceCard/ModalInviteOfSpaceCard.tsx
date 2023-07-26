@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'antd';
-import { queryOrgByIdForInvite } from '@middleware/data';
+// import { queryOrgByIdForInvite } from '@middleware/data';
 import { useDispatch, useSelector } from 'react-redux';
 
 interface ModalInviteOfSpaceCardProps {
@@ -19,20 +19,20 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
   const dispatch = useDispatch();
   const { orgs } = useSelector((state: any) => state.orginfo);
 
-  useEffect(() => {
-    if (visible) {
-      console.log('orgs', orgs.profile);
-      queryOrgByIdForInvite({
-        orgId: dataSpace.id,
-        onSuccess: (data: any) => {
-          console.log('dataQuery', data);
-          // setOrg(data[0]);
-        },
-        dispatch,
-      });
-      console.log('data Modal', dataSpace);
-    }
-  }, [dataSpace.id, visible, orgs.profile]);
+  // useEffect(() => {
+  //   if (visible) {
+  //     console.log('orgs', orgs.profile);
+  //     queryOrgByIdForInvite({
+  //       orgId: dataSpace.id,
+  //       onSuccess: (data: any) => {
+  //         console.log('dataQuery', data);
+  //         // setOrg(data[0]);
+  //       },
+  //       dispatch,
+  //     });
+  //     console.log('data Modal', dataSpace);
+  //   }
+  // }, [dataSpace.id, visible, orgs.profile]);
 
   const handleOk = () => {
     setModalText('The modal will be closed after two seconds');
