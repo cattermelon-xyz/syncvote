@@ -49,8 +49,7 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
                           tmp.markers.push(newMarker);
                         } else {
                           const idx = markers.findIndex(
-                            (marker: any) =>
-                              marker.title.backgroundColor === newMarker.color
+                            (marker: any) => marker.color === newMarker.color
                           );
                           if (idx === -1) {
                             markers.push(newMarker);
@@ -117,6 +116,11 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
           );
           if (idx !== -1) {
             markers[idx].title = label;
+          } else {
+            markers.push({
+              color: style?.title?.backgroundColor,
+              title: label,
+            });
           }
           onChangeLayout
             ? onChangeLayout({

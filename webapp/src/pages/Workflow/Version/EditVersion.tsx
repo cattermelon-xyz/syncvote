@@ -1,5 +1,6 @@
 import {
   BranchesOutlined,
+  CloseCircleOutlined,
   DownloadOutlined,
   SaveOutlined,
 } from '@ant-design/icons';
@@ -19,7 +20,7 @@ import {
 } from '@middleware/data';
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
-import { Button, Drawer, Modal, Skeleton, Space } from 'antd';
+import { Button, Drawer, Modal, Skeleton, Space, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -156,7 +157,6 @@ export const EditVersion = () => {
   useEffect(() => {
     const handleTabClose = (event: any) => {
       event.preventDefault();
-      console.log('beforeunload event triggered');
       return (event.returnValue = 'Are you sure you want to exit?');
     };
     window.addEventListener('beforeunload', handleTabClose);
@@ -349,6 +349,9 @@ export const EditVersion = () => {
       y: (-viewport.y + 250) / viewport.zoom,
     });
   };
+  const markers =
+    version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
+      ?.markers || [];
   return (
     <>
       <AuthContext.Consumer>
@@ -377,7 +380,79 @@ export const EditVersion = () => {
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
-                    navPanel={<></>}
+                    navPanel={
+                      <Space direction='vertical' className='ml-[48px]'>
+                        <div
+                          className='text-gray-400 font-bold'
+                          style={{ marginBottom: '0px' }}
+                        >
+                          Color legend
+                        </div>
+                        {markers.map((marker: any) => {
+                          return (
+                            <div
+                              className='flex gap-2 items-center'
+                              key={marker.color}
+                            >
+                              <div
+                                className='w-[16px] h-[16px]'
+                                style={{ backgroundColor: marker.color }}
+                              ></div>
+                              <Typography.Paragraph
+                                editable={{
+                                  onChange: (val) => {
+                                    markers[markers.indexOf(marker)].title =
+                                      val;
+                                    const selectedLayout =
+                                      version?.data?.cosmetic?.layouts.find(
+                                        (l: any) => l.id === selectedLayoutId
+                                      );
+                                    selectedLayout.markers = markers;
+                                    const cosmetic = changeCosmetic(
+                                      version?.data.cosmetic,
+                                      {
+                                        layouts: [selectedLayout],
+                                      }
+                                    );
+                                    setVersion({
+                                      ...version,
+                                      data: { ...version.data, cosmetic },
+                                    });
+                                    setDataHasChanged(true);
+                                  },
+                                }}
+                                style={{ marginBottom: '0px' }}
+                              >
+                                {marker.title}
+                              </Typography.Paragraph>
+
+                              <CloseCircleOutlined
+                                className='hover:text-red-500'
+                                onClick={() => {
+                                  markers.splice(markers.indexOf(marker), 1);
+                                  const selectedLayout =
+                                    version?.data?.cosmetic?.layouts.find(
+                                      (l: any) => l.id === selectedLayoutId
+                                    );
+                                  selectedLayout.markers = markers;
+                                  const cosmetic = changeCosmetic(
+                                    version?.data.cosmetic,
+                                    {
+                                      layouts: [selectedLayout],
+                                    }
+                                  );
+                                  setVersion({
+                                    ...version,
+                                    data: { ...version.data, cosmetic },
+                                  });
+                                  setDataHasChanged(true);
+                                }}
+                              />
+                            </div>
+                          );
+                        })}
+                      </Space>
+                    }
                     viewMode={viewMode}
                     data={version?.data || emptyStage}
                     selectedNodeId={selectedNodeId}
