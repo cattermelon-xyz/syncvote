@@ -193,10 +193,11 @@ const EditWorkflow = ({
                 }
               }}
             /> */}
-            <Input.TextArea
+            <TextEditor
               value={desc}
-              onChange={(e: any) => setDesc(e.target.value)}
-              style={{ height: '150px' }}
+              setValue={(val: any) => {
+                setDesc(val);
+              }}
               onBlur={async () => {
                 if (desc !== originalDesc) {
                   setOpen(false);

@@ -2,6 +2,8 @@ import {
   BranchesOutlined,
   CloseCircleOutlined,
   DownloadOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
   SaveOutlined,
 } from '@ant-design/icons';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
@@ -352,6 +354,7 @@ export const EditVersion = () => {
   const markers =
     version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
       ?.markers || [];
+  const [showColorLegend, setShowColorLegend] = useState(true);
   return (
     <>
       <AuthContext.Consumer>
@@ -381,28 +384,66 @@ export const EditVersion = () => {
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
                     navPanel={
-                      <Space direction='vertical' className='ml-[48px]'>
+                      <Space direction='vertical'>
                         <div
-                          className='text-gray-400 font-bold'
+                          className='text-gray-400 font-bold flex items-center gap-2'
                           style={{ marginBottom: '0px' }}
                         >
-                          Color legend
+                          <div>Color legend</div>
+                          <div
+                            className='hover:text-violet-500 cursor-pointer'
+                            onClick={() => setShowColorLegend(!showColorLegend)}
+                          >
+                            {showColorLegend ? (
+                              <EyeOutlined />
+                            ) : (
+                              <EyeInvisibleOutlined />
+                            )}
+                          </div>
                         </div>
-                        {markers.map((marker: any) => {
-                          return (
-                            <div
-                              className='flex gap-2 items-center'
-                              key={marker.color}
-                            >
+                        {showColorLegend &&
+                          markers.map((marker: any) => {
+                            return (
                               <div
-                                className='w-[16px] h-[16px]'
-                                style={{ backgroundColor: marker.color }}
-                              ></div>
-                              <Typography.Paragraph
-                                editable={{
-                                  onChange: (val) => {
-                                    markers[markers.indexOf(marker)].title =
-                                      val;
+                                className='flex gap-2 items-center'
+                                key={marker.color}
+                              >
+                                <div
+                                  className='w-[16px] h-[16px]'
+                                  style={{ backgroundColor: marker.color }}
+                                ></div>
+                                <Typography.Paragraph
+                                  editable={{
+                                    onChange: (val) => {
+                                      markers[markers.indexOf(marker)].title =
+                                        val;
+                                      const selectedLayout =
+                                        version?.data?.cosmetic?.layouts.find(
+                                          (l: any) => l.id === selectedLayoutId
+                                        );
+                                      selectedLayout.markers = markers;
+                                      const cosmetic = changeCosmetic(
+                                        version?.data.cosmetic,
+                                        {
+                                          layouts: [selectedLayout],
+                                        }
+                                      );
+                                      setVersion({
+                                        ...version,
+                                        data: { ...version.data, cosmetic },
+                                      });
+                                      setDataHasChanged(true);
+                                    },
+                                  }}
+                                  style={{ marginBottom: '0px' }}
+                                >
+                                  {marker.title}
+                                </Typography.Paragraph>
+
+                                <CloseCircleOutlined
+                                  className='hover:text-red-500'
+                                  onClick={() => {
+                                    markers.splice(markers.indexOf(marker), 1);
                                     const selectedLayout =
                                       version?.data?.cosmetic?.layouts.find(
                                         (l: any) => l.id === selectedLayoutId
@@ -419,38 +460,11 @@ export const EditVersion = () => {
                                       data: { ...version.data, cosmetic },
                                     });
                                     setDataHasChanged(true);
-                                  },
-                                }}
-                                style={{ marginBottom: '0px' }}
-                              >
-                                {marker.title}
-                              </Typography.Paragraph>
-
-                              <CloseCircleOutlined
-                                className='hover:text-red-500'
-                                onClick={() => {
-                                  markers.splice(markers.indexOf(marker), 1);
-                                  const selectedLayout =
-                                    version?.data?.cosmetic?.layouts.find(
-                                      (l: any) => l.id === selectedLayoutId
-                                    );
-                                  selectedLayout.markers = markers;
-                                  const cosmetic = changeCosmetic(
-                                    version?.data.cosmetic,
-                                    {
-                                      layouts: [selectedLayout],
-                                    }
-                                  );
-                                  setVersion({
-                                    ...version,
-                                    data: { ...version.data, cosmetic },
-                                  });
-                                  setDataHasChanged(true);
-                                }}
-                              />
-                            </div>
-                          );
-                        })}
+                                  }}
+                                />
+                              </div>
+                            );
+                          })}
                       </Space>
                     }
                     viewMode={viewMode}
