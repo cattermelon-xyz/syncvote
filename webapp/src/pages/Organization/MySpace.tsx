@@ -80,7 +80,7 @@ const MySpace: React.FC = () => {
           userId: user.id,
           dispatch,
           onSuccess: (data: any) => {
-            console.log('Editor', data);
+            // console.log('Editor', data);
           },
           onError: (error: any) => {
             console.log(error);

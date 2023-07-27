@@ -114,7 +114,7 @@ export const getImageUrl = ({
   isPreset: boolean;
   type: string;
 }): string => {
-  if (filePath.includes('https')) {
+  if (filePath && filePath.includes('https')) {
     return filePath;
   }
   if (filePath === null || filePath === 'null') {

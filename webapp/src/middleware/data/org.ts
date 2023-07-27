@@ -184,8 +184,8 @@ export const getDataOrgs = async ({
     )
   `
     )
-    .eq('user_id', userId)
-    // .range(start, end);
+    .eq('user_id', userId);
+  // .range(start, end);
 
   if (!error) {
     const tmp: any[] = [];
@@ -218,7 +218,7 @@ export const getDataOrgs = async ({
       const b_time = new Date(b.created_at).getTime();
       return b_time - a_time;
     });
-    dispatch(setOrgsInfo(tmp));
+    // dispatch(setOrgsInfo(tmp));
     dispatch(setLastFetch({}));
     onSuccess(tmp);
   } else {
@@ -259,12 +259,15 @@ export const queryOrgs = async ({
       preset_banner_url,
       org_size,
       org_type,
-      profile (
-        id,
-        email,
-        full_name,
-        icon_url,
-        preset_icon_url
+      user_org(
+        role,
+        profile (
+          id,
+          email,
+          full_name,
+          icon_url,
+          preset_icon_url
+        )
       ),
       workflows:workflow (
         id,
@@ -286,6 +289,7 @@ export const queryOrgs = async ({
     )
     .eq('user_id', userId);
   if (!error) {
+    console.log('data', data);
     const tmp: any[] = [];
     data.forEach((d: any) => {
       const org: any = d?.org || {
@@ -299,6 +303,35 @@ export const queryOrgs = async ({
       const presetBanner = org?.preset_banner_url
         ? `preset:${org.preset_banner_url}`
         : org.preset_banner_url;
+
+      const profiles =
+        org.user_org?.map((user: any) => {
+          const presetIconProfile = user.profile?.preset_icon_url
+            ? `preset:${user.profile.preset_icon_url}`
+            : user.profile.preset_icon_url;
+
+          return {
+            id: user.profile.id,
+            email: user.profile.email,
+            full_name: user.profile.full_name,
+            avatar_url: user.profile.icon_url
+              ? user.profile.icon_url
+              : presetIconProfile,
+            about_me: user.profile.about_me,
+            role: user.role,
+          };
+        }) || [];
+
+      profiles.sort((a: any, b: any) => {
+        if (a.role === 'ADMIN' && b.role !== 'ADMIN') {
+          return -1;
+        } else if (b.role === 'ADMIN' && a.role !== 'ADMIN') {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
       tmp.push({
         id: org?.id,
         role: d.role,
@@ -308,7 +341,7 @@ export const queryOrgs = async ({
         banner_url: org.banner_url ? org.banner_url : presetBanner,
         org_size: org.org_size,
         org_type: org.org_type,
-        profile: org.profile || [],
+        profile: profiles,
         workflows: org.workflows || [],
       });
     });
@@ -463,7 +496,7 @@ export const queryOrgByOrgId = async ({
         profile: org.profile || [],
       });
     });
-    dispatch(setOrgsInfo(tmp));
+    // dispatch(setOrgsInfo(tmp));
     dispatch(setLastFetch({}));
     onSuccess(data);
   } else {
