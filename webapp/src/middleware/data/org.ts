@@ -4,7 +4,9 @@ import {
   changeOrgInfo,
   setOrgsInfo,
   setLastFetch,
+  addUserToOrg
 } from '@redux/reducers/orginfo.reducer';
+
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -501,6 +503,47 @@ export const queryOrgByOrgId = async ({
     onSuccess(data);
   } else {
     onError(error);
+  }
+  dispatch(finishLoading({}));
+};
+
+export const addMemberToOrg = async ({
+  userOrgInfo,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
+}: {
+  userOrgInfo: any;
+  dispatch: any;
+  onSuccess: () => void;
+  onError?: (error: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { user_id, org_id, email, full_name, role, avatar_url } = userOrgInfo;
+  const infoMemberSupabase = {
+    org_id: org_id,
+    user_id: user_id,
+    role: role,
+  };
+  const { data, error } = await supabase
+    .from('user_org')
+    .insert(infoMemberSupabase);
+  if (error) {
+    onError(error);
+  } else {
+    console.log('data user', data);
+
+    const infoMember = {
+      id: user_id,
+      email: email,
+      full_name: full_name,
+      avatar_url: avatar_url,
+      role: role,
+    };
+    dispatch(addUserToOrg({ orgId: org_id, user: infoMember }));
+    onSuccess();
   }
   dispatch(finishLoading({}));
 };

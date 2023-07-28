@@ -18,6 +18,7 @@ export interface IProfile {
   full_name: string;
   avatar_url: string;
   about_me: string;
+  role: string;
 }
 
 export interface IMember {
