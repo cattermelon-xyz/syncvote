@@ -291,7 +291,6 @@ export const queryOrgs = async ({
     )
     .eq('user_id', userId);
   if (!error) {
-    console.log('data', data);
     const tmp: any[] = [];
     data.forEach((d: any) => {
       const org: any = d?.org || {
@@ -533,7 +532,6 @@ export const addMemberToOrg = async ({
   if (error) {
     onError(error);
   } else {
-    console.log('data user', data);
 
     const infoMember = {
       id: user_id,

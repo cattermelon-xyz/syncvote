@@ -41,9 +41,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
     }
   }, [dataSpace.id, visible, org]);
 
-  useEffect(() => {
-    console.log('usersInOrg', usersInOrg);
-  }, [usersInOrg]);
 
   const handleInvite = async () => {
     setIsLoading(true);
@@ -53,7 +50,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
       dispatch,
       onSuccess: (data: any) => {
         if (data?.length > 0) {
-          console.log('data member when invite', data);
           const presetIcon = data[0]?.preset_icon_url
             ? `preset:${data[0].preset_icon_url}`
             : data[0].preset_icon_url;
@@ -131,8 +127,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
   };
 
   const handleRemoveMember = (orgId: number, userId: string) => {
-    console.log('orgId', orgId);
-    console.log('userId', userId);
 
     removeMemberOfOrg({
       orgId,
