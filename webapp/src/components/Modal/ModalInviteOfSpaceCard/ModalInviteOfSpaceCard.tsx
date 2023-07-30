@@ -6,6 +6,7 @@ import {
   queryUserByEmail,
   inviteExistingMember,
   inviteUserByEmail,
+  removeMemberOfOrg,
 } from '@middleware/data';
 import Icon from '@components/Icon/Icon';
 import { IProfile } from '@types';
@@ -115,7 +116,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
 
   const handleOk = () => {
     setModalText('The modal will be closed after two seconds');
-    console.log('oke em');
     setConfirmLoading(true);
     setTimeout(() => {
       onClose();
@@ -130,22 +130,28 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
     unsecuredCopyToClipboard(fullURL);
   };
 
-  const handleRemove = () => {};
+  const handleRemoveMember = (orgId: number, userId: string) => {
+    console.log('orgId', orgId);
+    console.log('userId', userId);
 
-  const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: <p className='text-base'>Editor</p>,
-    },
-    {
-      key: '3',
-      label: (
-        <p className='text-base' onClick={handleRemove}>
-          Remove
-        </p>
-      ),
-    },
-  ];
+    removeMemberOfOrg({
+      orgId,
+      userId,
+      dispatch,
+      onSuccess: () => {
+        Modal.success({
+          title: 'Success',
+          content: 'remove user successfully',
+        });
+      },
+      onError: () => {
+        Modal.error({
+          title: 'Error',
+          content: 'Cannot remove user',
+        });
+      },
+    });
+  };
 
   return (
     <>
@@ -198,32 +204,53 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
               className='overflow-y-auto max-h-[194px] w-full '
             >
               {usersInOrg &&
-                usersInOrg.map((userInfo, index) => (
-                  <div
-                    className='flex justify-between items-center'
-                    key={index}
-                  >
-                    <Space size='small'>
-                      <Icon iconUrl={userInfo?.avatar_url} size='large' />
-                      <Space direction='vertical' size='small'>
-                        <p>{userInfo?.full_name}</p>
-                        <p className='text-gray-500'>{userInfo?.email}</p>
+                usersInOrg.map((userInfo, index) => {
+                  const items: MenuProps['items'] = [
+                    {
+                      key: '1',
+                      label: <p className='text-base'>Editor</p>,
+                    },
+                    {
+                      key: '3',
+                      label: (
+                        <p
+                          className='text-base'
+                          onClick={() =>
+                            handleRemoveMember(dataSpace.id, userInfo.id)
+                          }
+                        >
+                          Remove
+                        </p>
+                      ),
+                    },
+                  ];
+                  return (
+                    <div
+                      className='flex justify-between items-center'
+                      key={index}
+                    >
+                      <Space size='small'>
+                        <Icon iconUrl={userInfo?.avatar_url} size='large' />
+                        <Space direction='vertical' size='small'>
+                          <p>{userInfo?.full_name}</p>
+                          <p className='text-gray-500'>{userInfo?.email}</p>
+                        </Space>
                       </Space>
-                    </Space>
-                    {userInfo?.role === 'ADMIN' ? (
-                      <p className='text-base text-gray-500 mr-1'>Owner</p>
-                    ) : (
-                      <Dropdown menu={{ items }}>
-                        <a onClick={(e) => e.preventDefault()}>
-                          <Space className='mr-1'>
-                            <p className='text-base text-gray-500'>Editor</p>
-                            <DownOutlined className='text-base text-gray-500' />
-                          </Space>
-                        </a>
-                      </Dropdown>
-                    )}
-                  </div>
-                ))}
+                      {userInfo?.role === 'ADMIN' ? (
+                        <p className='text-base text-gray-500 mr-1'>Owner</p>
+                      ) : (
+                        <Dropdown menu={{ items }} trigger={['click']}>
+                          <a onClick={(e) => e.preventDefault()}>
+                            <Space className='mr-1'>
+                              <p className='text-base text-gray-500'>Editor</p>
+                              <DownOutlined className='text-base text-gray-500' />
+                            </Space>
+                          </a>
+                        </Dropdown>
+                      )}
+                    </div>
+                  );
+                })}
             </Space>
           </Space>
           <Button

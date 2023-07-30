@@ -4,9 +4,9 @@ import {
   changeOrgInfo,
   setOrgsInfo,
   setLastFetch,
-  addUserToOrg
+  addUserToOrg,
+  removeUserOfOrg
 } from '@redux/reducers/orginfo.reducer';
-
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -546,4 +546,32 @@ export const addMemberToOrg = async ({
     onSuccess();
   }
   dispatch(finishLoading({}));
+};
+
+export const removeMemberOfOrg = async ({
+  orgId,
+  userId,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
+}: {
+  orgId: any;
+  userId: any;
+  dispatch: any;
+  onSuccess: () => void;
+  onError?: (error: any) => void;
+}) => {
+  const { error } = await supabase
+    .from('user_org')
+    .delete()
+    .eq('org_id', orgId)
+    .eq('user_id', userId);
+  if (error) {
+    onError(error);
+  } else {
+    dispatch(removeUserOfOrg({orgId: orgId, userId: userId}))
+    onSuccess();
+  }
 };
