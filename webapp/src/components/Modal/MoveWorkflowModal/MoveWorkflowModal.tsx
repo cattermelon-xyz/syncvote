@@ -1,30 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
+import { Button, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { useSelector, useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { getDataOrgs } from '@middleware/data';
-import { PlusOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
-import { useNavigate } from 'react-router-dom';
-import { createIdString } from '@utils/helpers';
 import './create-new.scss';
 
-interface CreateWorkflowModalProps {
+interface MoveWorkflowModalProps {
   open: boolean;
   onClose: () => void;
-  setOpenCreateWorkspaceModal: () => void;
+  workflow: any;
+  dispatch: any;
+  openMoveToModal: (orgTo: any) => void;
 }
 
-const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
+const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
   open,
   onClose,
-  setOpenCreateWorkspaceModal,
+  workflow,
+  dispatch,
+  openMoveToModal,
 }) => {
-  const navigate = useNavigate();
-  const { user } = useSelector((state: any) => state.orginfo);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const dispatch = useDispatch();
   const [dataOrgs, setDataOrgs] = useState<any>([]);
+  const { user } = useSelector((state: any) => state.orginfo);
+
+  const handleCancel = () => {
+    onClose();
+  };
+
+  const handleOk = async () => {
+    const org = dataOrgs.find((org: any) => org.id === value);
+    openMoveToModal(org);
+    onClose();
+  };
 
   const loadWorkflowData = async () => {
     if (user?.id !== null) {
@@ -35,21 +43,8 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
           setDataOrgs(data);
         },
       });
-
     }
   };
-
-  const handleOk = async () => {
-    const org = dataOrgs.find((org: any) => org.id === value);
-    const orgIdString = createIdString(`${org.title}`, `${org.id}`);
-    navigate(`${orgIdString}/new-workflow/`);
-  };
-
-  const handleCancel = () => {
-    setValue(null);
-    onClose();
-  };
-
   const [value, setValue] = useState(null);
   const [hovered, setHovered] = useState(null);
 
@@ -60,22 +55,34 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   useEffect(() => {
     loadWorkflowData();
   }, [user]);
-
   return (
     <Modal
-      title={L('createANewWorkflow')}
-      open={open}
+      title={`${L('move')} "${workflow.title}"`}
       onOk={handleOk}
-      confirmLoading={confirmLoading}
+      open={open}
       onCancel={handleCancel}
-      okText={L('createANewWorkflow')}
+      okText={L('move')}
       okButtonProps={{ disabled: value === null }}
-      cancelButtonProps={{ style: { display: 'none' } }}
-      className='flex-col create-new'
+      className='create-new'
     >
-      <Space className='flex'>
-        <div style={{ color: '#575655' }} className='text-sm not-italic	mb-3'>
-          Select a workspace to contain your new workflow{' '}
+      <Space className='flex pb-3 pt-1'>
+        <Space style={{ color: '#575655' }} className='text-sm not-italic'>
+          Current location
+        </Space>
+        <Space className='bg-[#F4F0FA] rounded-lg'>
+          <div className='flex mx-3 my-2'>
+            <Icon
+              iconUrl={workflow.icon_url ? workflow.icon_url : ''}
+              size='medium'
+            />
+            <div className='pl-1 text-[#6200EE]'>{workflow.title}</div>
+          </div>
+        </Space>
+      </Space>
+
+      <Space>
+        <div style={{ color: '#575655' }} className='text-sm not-italic'>
+          <div className='px-3'>All locations</div>
         </div>
       </Space>
 
@@ -89,7 +96,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
               onMouseEnter={() => setHovered(index)}
               onMouseLeave={() => setHovered(null)}
             >
-              {hovered === index || org.id === value ? (
+              {hovered === index || org?.id === value ? (
                 <Space className='p-3'>
                   <Radio value={org.id} className='w-6 h-6' />
                   <div className='text-base'>{org?.title}</div>
@@ -107,14 +114,8 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
           ))}
         </Radio.Group>
       </Space>
-
-      <Space className='flex'>
-        <a className='p-4' style={{ color: '#6d28d9' }} onClick={setOpenCreateWorkspaceModal}>
-          <PlusOutlined /> {L('createANewSpace')}
-        </a>
-      </Space>
     </Modal>
   );
 };
 
-export default CreateWorkflowModal;
+export default MoveWorkflowModal;

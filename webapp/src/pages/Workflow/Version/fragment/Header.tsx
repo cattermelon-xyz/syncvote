@@ -126,9 +126,10 @@ function Header({
       },
     });
   };
+
   const handleDeleteWorkflow = async () => {
     deleteAWorkflow({
-      workflowId: workflow.id,
+      workflow: workflow,
       dispatch,
       onSuccess: () => {
         Modal.success({

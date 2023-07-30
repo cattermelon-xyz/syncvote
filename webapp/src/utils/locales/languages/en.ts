@@ -89,6 +89,7 @@ export const LANG: any = {
   publish: 'Publish',
   thisFieldIsRequiredPleaseFillIn: 'This field is required. Please fill in',
   duplicateNameTag: 'Duplicate name tag, please re-enter',
+  duplicate: 'Duplicate',
   allOptionsName:
     'All options name of all voting methods have to be different to be valid',
   maximumInputLengthIs255Characters: 'Maximum input length is 255 characters.',
@@ -219,6 +220,7 @@ export const LANG: any = {
   labelOfTheApprovedOptionS: 'Label of the approved option(s)',
   labelOfTheRejectedOptionS: 'Label of the rejected option(s)',
   remove: 'Remove',
+  move: 'Move',
   linkDatasource: 'Link datasource',
   createMultipleMultiLinkedProposals: 'Create multiple',
   reviewCheckpoints: 'Review checkpoints',
@@ -255,6 +257,7 @@ export const LANG: any = {
   membersInThoseRoles: 'members in those roles',
   noMemberInThoseRoles: 'No member in those roles',
   delete: 'Delete',
+  deleteForever: 'Delete Forever',
   thisCheckpointHasNotBeenSetUp: 'This checkpoint has not been set-up.',
   thisRouteHasNotBeenSetUp: 'This route has not been set-up.',
   pleaseEnterTheValue: 'Please enter the value',

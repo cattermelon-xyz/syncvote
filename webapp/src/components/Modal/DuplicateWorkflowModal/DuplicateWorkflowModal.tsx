@@ -1,30 +1,37 @@
-import React, { useEffect, useState } from 'react';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { useSelector, useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { getDataOrgs } from '@middleware/data';
-import { PlusOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
-import { useNavigate } from 'react-router-dom';
-import { createIdString } from '@utils/helpers';
 import './create-new.scss';
+import { PlusOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
-interface CreateWorkflowModalProps {
+interface DuplicateWorkflowModalProps {
   open: boolean;
   onClose: () => void;
-  setOpenCreateWorkspaceModal: () => void;
+  workflow: any;
+  dispatch: any;
 }
 
-const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
+const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
   open,
   onClose,
-  setOpenCreateWorkspaceModal,
+  workflow,
+  dispatch,
 }) => {
   const navigate = useNavigate();
-  const { user } = useSelector((state: any) => state.orginfo);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const dispatch = useDispatch();
   const [dataOrgs, setDataOrgs] = useState<any>([]);
+  const { user } = useSelector((state: any) => state.orginfo);
+
+  const handleCancel = () => {
+    onClose();
+  };
+
+  const handleOk = async () => {
+    onClose();
+  };
 
   const loadWorkflowData = async () => {
     if (user?.id !== null) {
@@ -35,21 +42,8 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
           setDataOrgs(data);
         },
       });
-
     }
   };
-
-  const handleOk = async () => {
-    const org = dataOrgs.find((org: any) => org.id === value);
-    const orgIdString = createIdString(`${org.title}`, `${org.id}`);
-    navigate(`${orgIdString}/new-workflow/`);
-  };
-
-  const handleCancel = () => {
-    setValue(null);
-    onClose();
-  };
-
   const [value, setValue] = useState(null);
   const [hovered, setHovered] = useState(null);
 
@@ -63,15 +57,14 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 
   return (
     <Modal
-      title={L('createANewWorkflow')}
-      open={open}
+      title={`${L('duplicate')} "${workflow.title}"`}
       onOk={handleOk}
-      confirmLoading={confirmLoading}
+      open={open}
       onCancel={handleCancel}
-      okText={L('createANewWorkflow')}
+      okText={L('duplicate')}
       okButtonProps={{ disabled: value === null }}
       cancelButtonProps={{ style: { display: 'none' } }}
-      className='flex-col create-new'
+      className='create-new'
     >
       <Space className='flex'>
         <div style={{ color: '#575655' }} className='text-sm not-italic	mb-3'>
@@ -109,7 +102,13 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       </Space>
 
       <Space className='flex'>
-        <a className='p-4' style={{ color: '#6d28d9' }} onClick={setOpenCreateWorkspaceModal}>
+        <a
+          className='p-4'
+          style={{ color: '#6d28d9' }}
+          onClick={() => {
+            navigate('/?action=new-workspace');
+          }}
+        >
           <PlusOutlined /> {L('createANewSpace')}
         </a>
       </Space>
@@ -117,4 +116,4 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   );
 };
 
-export default CreateWorkflowModal;
+export default DuplicateWorkflowModal;

@@ -24,6 +24,7 @@ interface DataItem {
 }
 
 const MySpace: React.FC = () => {
+  const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.orginfo);
   const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
   const [workflows, setWorkflows] = useState<DataItem[]>([]);
@@ -53,8 +54,6 @@ const MySpace: React.FC = () => {
     sortWorkflowOptions
   );
 
-  const dispatch = useDispatch();
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -76,16 +75,16 @@ const MySpace: React.FC = () => {
         // Querry from org
         setWorkflows(allWorkflows);
 
-        await getWorkflowFromEditor({
-          userId: user.id,
-          dispatch,
-          onSuccess: (data: any) => {
-            console.log('Editor', data);
-          },
-          onError: (error: any) => {
-            console.log(error);
-          },
-        });
+        // await getWorkflowFromEditor({
+        //   userId: user.id,
+        //   dispatch,
+        //   onSuccess: (data: any) => {
+        //     console.log('Editor', data);
+        //   },
+        //   onError: (error: any) => {
+        //     console.log(error);
+        //   },
+        // });
 
         // Querry workflow from workflow_version_editor
       }
@@ -126,7 +125,11 @@ const MySpace: React.FC = () => {
             items={
               filterWorkflowByOptions &&
               filterWorkflowByOptions.map((workflow, index) => (
-                <WorkflowCard key={index} dataWorkflow={workflow} />
+                <WorkflowCard
+                  key={index}
+                  dataWorkflow={workflow}
+                  dispatch={dispatch}
+                />
               ))
             }
             columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}

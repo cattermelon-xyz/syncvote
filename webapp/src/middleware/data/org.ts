@@ -133,8 +133,6 @@ export const upsertAnOrg = async ({
 
 export const getDataOrgs = async ({
   userId,
-  offset,
-  limit,
   dispatch,
   onSuccess,
   onError = (error) => {
@@ -142,14 +140,10 @@ export const getDataOrgs = async ({
   },
 }: {
   userId: any;
-  offset: any;
-  limit: any;
   dispatch: any;
   onSuccess: (data: any) => void;
   onError?: (data: any) => void;
 }) => {
-  const start = offset;
-  const end = offset + limit - 1;
   dispatch(startLoading({}));
   const { data, error } = await supabase
     .from('user_org')
@@ -184,8 +178,7 @@ export const getDataOrgs = async ({
     )
   `
     )
-    .eq('user_id', userId)
-    // .range(start, end);
+    .eq('user_id', userId);
 
   if (!error) {
     const tmp: any[] = [];

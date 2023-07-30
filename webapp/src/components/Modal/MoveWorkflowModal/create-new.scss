@@ -1,0 +1,25 @@
+.create-new {
+  .ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
+    height: 24px !important;
+    width: 24px !important;
+  }
+
+  .ant-radio-wrapper .ant-radio .ant-radio-inner {
+    height: 24px !important;
+    width: 24px !important;
+  }
+
+  .ant-modal-footer .ant-btn[disabled] {
+    color: #bda5e3 !important; /* faded purple */
+    background-color: #f4f0fa !important;
+    border-color: #f4f0fa !important;
+  }
+
+  .radio:hover {
+    background-color: #f6f6f6; /* Change to your desired color */
+  }
+
+  .ant-modal-title {
+    font-size: 20px; /* Replace with your desired font size */
+  }
+}

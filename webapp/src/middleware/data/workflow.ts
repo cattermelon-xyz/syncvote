@@ -316,6 +316,34 @@ export const updateAWorkflowInfo = async ({
   }
 };
 
+export const changeAWorkflowOrg = async ({
+  orgId,
+  workflow,
+  dispatch,
+  onSuccess = () => {},
+  onError = () => {},
+}: {
+  orgId: any;
+  workflow: any;
+  dispatch: any;
+  onSuccess?: (data: any) => void;
+  onError?: (data: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('workflow')
+    .update({ owner_org_id: orgId })
+    .eq('id', workflow?.id)
+    .select('*');
+
+  dispatch(finishLoading({}));
+  if (data) {
+    onSuccess(data);
+  } else {
+    onError(error);
+  }
+};
+
 export const updateAWorkflowTag = async ({
   workflow,
   newTags,
@@ -372,32 +400,54 @@ export const updateAWorkflowTag = async ({
 };
 
 export const deleteAWorkflow = async ({
-  workflowId,
+  workflow,
   dispatch,
   onSuccess,
-  onError = () => {},
+  onError = (error: any) => {
+    console.log(error);
+  },
 }: {
-  workflowId: number;
+  workflow: any;
   dispatch: any;
   onSuccess: (data: any) => void;
   onError?: (data: any) => void;
 }) => {
   dispatch(startLoading({}));
+  await supabase
+    .from('workflow_version_history')
+    .delete()
+    .eq('workflow_version_id', workflow?.versions[0].id);
 
-  await supabase.from('workflow').delete().eq('id', workflowId);
+  await supabase
+    .from('workflow_version_editor')
+    .delete()
+    .eq('workflow_version_id', workflow?.versions[0].id);
+
   const { data, error } = await supabase
-    .from('workflow')
-    .select('id')
-    .eq('id', workflowId);
-  dispatch(finishLoading({}));
-  if (error || (data && data.length === 0)) {
-    dispatch(deleteWorkflow({ id: workflowId }));
-    onSuccess(data);
-  } else {
-    onError({
-      message: 'Failed to delete workflow',
-    });
+    .from('workflow_version')
+    .delete()
+    .eq('workflow_id', workflow.id);
+
+  if (error) {
+    console.log(error);
   }
+
+  await supabase.from('workflow').delete().eq('id', workflow.id);
+  dispatch(finishLoading({}));
+
+  // const { data, error } = await supabase
+  //   .from('workflow')
+  //   .select('id')
+  //   .eq('id', workflowId);
+  // dispatch(finishLoading({}));
+  // if (error || (data && data.length === 0)) {
+  //   dispatch(deleteWorkflow({ id: workflowId }));
+  //   onSuccess(data);
+  // } else {
+  //   onError({
+  //     message: 'Failed to delete workflow',
+  //   });
+  // }
 };
 
 export const deleteAWorkflowVersion = async ({
