@@ -77,6 +77,14 @@ const orgInfoSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
     },
+    deleteOrgInfo: (state, action) => {
+      const index = state.orgs.findIndex(
+        (org: IOrgInfo) => org.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.orgs.splice(index, 1);
+      }
+    },
     reset: (state, action) => {
       state.orgs = [];
       state.lastFetch = -1;
@@ -102,5 +110,6 @@ export const {
   addUserToOrg,
   changeWorkflowInOrg,
   deleteWorkflowInOrg,
+  deleteOrgInfo,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;

@@ -42,6 +42,9 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
     setvmDrawerVisbibility(false);
   };
   const machine: any = getVoteMachine(selectedNode?.vote_machine_type || '');
+  const [votingLocation, setVotingLocation] = useState(
+    selectedNode?.votingLocation || 'Discorse or Forum'
+  );
   return (
     <>
       <Drawer
@@ -94,17 +97,20 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
           <Space direction='vertical' size='middle' className='w-full'>
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-gray-400'>Voting location</div>
-              <Input
-                value={selectedNode?.votingLocation}
-                onChange={(e) => {
-                  const val = e.target.value || ' ';
-                  const newNode = structuredClone(selectedNode);
-                  if (newNode) {
-                    newNode.votingLocation = val;
-                    onChange(newNode);
+              <TextEditor
+                value={votingLocation}
+                setValue={(val: any) => {
+                  setVotingLocation(val);
+                }}
+                onBlur={async () => {
+                  if (votingLocation !== selectedNode?.votingLocation) {
+                    const newNode = structuredClone(selectedNode);
+                    if (newNode) {
+                      newNode.votingLocation = votingLocation;
+                      onChange(newNode);
+                    }
                   }
                 }}
-                placeholder='Discourse Forum'
               />
             </Space>
             <Space direction='vertical' size='small' className='w-full'>

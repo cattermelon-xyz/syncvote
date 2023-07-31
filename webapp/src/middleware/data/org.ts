@@ -4,6 +4,7 @@ import {
   changeOrgInfo,
   setOrgsInfo,
   setLastFetch,
+  deleteOrgInfo,
 } from '@redux/reducers/orginfo.reducer';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -488,4 +489,32 @@ export const queryOrgByOrgId = async ({
     onError(error);
   }
   dispatch(finishLoading({}));
+};
+
+export const deleteOrg = async ({
+  orgId,
+  dispatch,
+  onSuccess,
+  onError = () => {},
+}: {
+  orgId: number;
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  await supabase.from('org').delete().eq('id', orgId);
+  const { data, error } = await supabase
+    .from('org')
+    .select('id')
+    .eq('id', orgId);
+  dispatch(finishLoading({}));
+  if (error || (data && data.length === 0)) {
+    dispatch(deleteOrgInfo({ id: orgId }));
+    onSuccess(data);
+  } else {
+    onError({
+      message: 'Failed to delete workspace',
+    });
+  }
 };

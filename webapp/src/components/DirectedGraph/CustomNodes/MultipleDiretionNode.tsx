@@ -143,7 +143,7 @@ const Node = memo(
               {votingLocation && votingLocation !== ' ' ? (
                 <div className='flex text-ellipsis items-center px-2'>
                   <LuMapPin className='mr-2' />
-                  {votingLocation}
+                  {parse(votingLocation)}
                 </div>
               ) : null}
             </div>

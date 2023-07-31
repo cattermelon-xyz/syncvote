@@ -37,6 +37,8 @@ export const getInitialData = () => {
     max: 0,
     includedAbstain: true,
     token: '',
+    delays: [],
+    delayUnits: [],
   };
   return data;
 };
@@ -60,4 +62,15 @@ export const validate = ({
     isValid,
     message,
   };
+};
+
+const displayDelayDuration = (duration: moment.Duration) => {
+  const years = duration.years() === 0 ? '' : `${duration.years()} years `;
+  const months = duration.months() === 0 ? '' : `${duration.months()} months `;
+  const days = duration.days() === 0 ? '' : `${duration.days()} days `;
+  const hours = duration.hours() === 0 ? '' : `${duration.hours()} hours `;
+  const minutes =
+    duration.minutes() === 0 ? '' : `${duration.minutes()} minutes `;
+  const delay = years + months + days + hours + minutes;
+  return delay ? 'Delay ' + delay : 'No delay';
 };

@@ -106,32 +106,16 @@ const BluePrint = () => {
   return (
     <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
       <EditOrg
+        orgId={data?.id}
         isOpen={showEditOrg}
         onClose={() => setShowEditOrg(false)}
         title={data?.title}
         desc={data?.desc}
-        onSave={(title, desc) => {
-          upsertAnOrg({
-            org: {
-              id: data?.id,
-              title: title,
-              desc: desc,
-            },
-            dispatch: dispatch,
-            onLoad: () => {
-              Modal.success({
-                title: 'Saved!',
-                content: 'Your changes have been saved.',
-              });
-            },
-            onError: () => {
-              Modal.error({
-                title: 'Error',
-                content: 'Cannot save your changes.',
-              });
-            },
-          });
+        onSaved={() => {
           setShowEditOrg(false);
+        }}
+        onDeleted={() => {
+          navigate('/');
         }}
         profile={[]}
       />
@@ -162,7 +146,9 @@ const BluePrint = () => {
           )}
           <div
             className='text-3xl font-semibold text-[#252422] flex items-center hover:text-violet-500 cursor-pointer'
-            onClick={() => setShowEditOrg(true)}
+            onClick={() => {
+              data?.role === 'ADMIN' ? setShowEditOrg(true) : null;
+            }}
             title={
               data?.role === 'ADMIN' ? 'You are an ADMIN' : 'You are a Member'
             }

@@ -1,23 +1,38 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Drawer, Input, Space, Tag } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Drawer,
+  Input,
+  Modal,
+  Popconfirm,
+  Popover,
+  Space,
+  Tag,
+} from 'antd';
 import { IProfile } from '@types';
 import { useEffect, useState } from 'react';
 import InviteMember from './InviteMember';
+import { deleteOrg, upsertAnOrg } from '@middleware/data';
+import { useDispatch } from 'react-redux';
 
 const EditOrg = ({
   isOpen = false,
   onClose,
+  orgId,
   title,
   desc,
   profile,
-  onSave,
+  onSaved,
+  onDeleted,
 }: {
   isOpen?: boolean;
   onClose: () => void;
+  orgId: number;
   title: string;
   desc: string;
   profile: IProfile[];
-  onSave: (title: string, desc: string) => void;
+  onSaved: () => void;
+  onDeleted: () => void;
 }) => {
   const [orgTitle, setOrgTitle] = useState(title);
   const [orgDesc, setOrgDesc] = useState(desc);
@@ -26,6 +41,7 @@ const EditOrg = ({
     setOrgTitle(title);
     setOrgDesc(desc);
   }, [title, desc]);
+  const dispatch = useDispatch();
   return (
     <Drawer
       open={isOpen}
@@ -78,9 +94,66 @@ const EditOrg = ({
             ))}
           </Space>
         ) : null}
-        <Button type='default' onClick={() => onSave(orgTitle, orgDesc)}>
-          Save
-        </Button>
+        <div className='flex justify-between items-center'>
+          <Button
+            type='default'
+            onClick={() => {
+              upsertAnOrg({
+                org: {
+                  id: orgId,
+                  title: title,
+                  desc: desc,
+                },
+                dispatch,
+                onLoad: () => {
+                  Modal.success({
+                    title: 'Saved!',
+                    content: 'Your changes have been saved.',
+                  });
+                  onSaved();
+                },
+                onError: () => {
+                  Modal.error({
+                    title: 'Error',
+                    content: 'Cannot save your changes.',
+                  });
+                  onSaved();
+                },
+              });
+            }}
+          >
+            Save
+          </Button>
+          <Popconfirm
+            title='Delete workspace'
+            description='Are you sure to delete this workspace and all of its content?'
+            onConfirm={() => {
+              deleteOrg({
+                orgId,
+                dispatch,
+                onSuccess: () => {
+                  Modal.info({
+                    title: 'Deleted!',
+                    content: 'Your workspace has been deleted.',
+                    onOk: () => {
+                      onDeleted();
+                    },
+                  });
+                },
+                onError: () => {
+                  Modal.error({
+                    title: 'Error',
+                    content: 'Cannot delete this workspace.',
+                  });
+                },
+              });
+            }}
+          >
+            <Button type='default' icon={<DeleteOutlined />} danger>
+              Delete
+            </Button>
+          </Popconfirm>
+        </div>
       </Space>
       <InviteMember
         visible={shouldShowInviteMember}

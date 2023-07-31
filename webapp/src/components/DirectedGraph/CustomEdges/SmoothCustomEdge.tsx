@@ -5,6 +5,7 @@ import {
   EdgeProps,
   getSmoothStepPath,
 } from 'reactflow';
+import { inflateRaw } from 'zlib';
 
 interface CustomProps extends EdgeProps {}
 
@@ -39,7 +40,6 @@ const Path = memo((props: CustomProps) => {
   const path = smoothOpts[0];
   const labelX = smoothOpts[1];
   const labelY = smoothOpts[2];
-  
   return (
     <>
       <BaseEdge path={path} markerEnd={markerEnd} style={style} />\{' '}

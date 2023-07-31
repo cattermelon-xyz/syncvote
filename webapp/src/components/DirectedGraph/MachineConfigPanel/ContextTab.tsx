@@ -8,7 +8,6 @@ import {
 } from '@ant-design/icons';
 import { validateWorkflow, validateMission } from '@middleware/logic';
 import parse from 'html-react-parser';
-import TextEditor from '@components/Editor/TextEditor';
 import { getVoteMachine } from '../voteMachine';
 import { Markers } from '../markers';
 import { useContext } from 'react';

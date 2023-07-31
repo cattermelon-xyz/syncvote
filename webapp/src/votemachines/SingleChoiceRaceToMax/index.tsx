@@ -75,7 +75,7 @@ export const explain = ({
   const renderParticipation = (participation: IParticipant | undefined) => {
     let rs = null;
     if (!participation || (participation.type && !participation.data)) {
-      rs = <span className='text-red-500'>Missing participation setup</span>;
+      rs = <div className='text-red-500'>Missing participation setup</div>;
     } else {
       const { type, data: pdata } = participation;
       if (type === 'identity') {

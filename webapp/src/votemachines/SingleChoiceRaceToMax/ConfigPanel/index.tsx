@@ -12,6 +12,7 @@ import NewOptionDrawer from './NewOptionDrawer';
 import { PlusOutlined } from '@ant-design/icons';
 import '../styles.scss';
 import CollapsiblePanel from '@components/DirectedGraph/MachineConfigPanel/fragments/CollapsiblePanel';
+import { IOption, DelayUnit } from '../interface';
 
 /**
  *
@@ -27,6 +28,8 @@ const ConfigPanel = ({
     max: 0,
     token: '', // spl token
     options: [],
+    delayUnits: [], // 1 byte (8) to decide the unit (minute, hour, day, week, month, year)
+    delays: [], // 2 bytes (65,536) for the actual value
     includedAbstain: false,
   },
   viewMode,
@@ -35,6 +38,9 @@ const ConfigPanel = ({
   allNodes = [], //eslint-disable-line
 }: IVoteMachineConfigProps) => {
   const { max, token, options, includedAbstain } = data;
+  const delays = data.delays || Array(options?.length).fill(0);
+  const delayUnits =
+    data.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
   let tmpMaxStr = '0';
   if (max) {
     tmpMaxStr = max < 1 ? `${max * 100}%` : `${max}`;
@@ -47,9 +53,11 @@ const ConfigPanel = ({
       posibleOptions.push(child);
     }
   });
-  const [newOption, setNewOption] = useState({
+  const [newOption, setNewOption] = useState<IOption>({
     id: '',
     title: '',
+    delay: 0,
+    delayUnit: DelayUnit.MINUTE,
   });
   const [countedBy, setCountedBy] = useState(token ? 'token' : 'count');
   const addNewOptionHandler = (newOptionData: any) => {
@@ -59,6 +67,8 @@ const ConfigPanel = ({
       onChange({
         data: {
           options: [...opts, newOptionData.title],
+          delays: [...delays, newOptionData.delay],
+          delayUnits: [...delayUnits, newOptionData.delayUnit],
         },
         children: [...chds, newOptionData.id],
       });
@@ -68,6 +78,11 @@ const ConfigPanel = ({
     onChange({
       data: {
         options: [...options.slice(0, index), ...options.slice(index + 1)],
+        delays: [...delays.slice(0, index), ...delays.slice(index + 1)],
+        delayUnits: [
+          ...delayUnits.slice(0, index),
+          ...delayUnits.slice(index + 1),
+        ],
       },
       children: [...children.slice(0, index), ...children.slice(index + 1)],
     });
@@ -75,11 +90,17 @@ const ConfigPanel = ({
   const changeOptionHandler = (value: any, index: number) => {
     const newData = { ...data };
     const newOptions = [...options];
-    newOptions[index] = value;
+    const newDelays = [...delays];
+    const newDelayUnits = [...delayUnits];
+    newOptions[index] = value.id;
+    newDelays[index] = value.delay;
+    newDelayUnits[index] = value.delayUnit;
     onChange({
       data: {
         ...newData,
         options: newOptions,
+        delays: newDelays,
+        delayUnits: newDelayUnits,
       },
     });
   };
@@ -115,12 +136,17 @@ const ConfigPanel = ({
       },
     });
   };
-  const addAndDeleteOptionHandler = (newOptionData: any, oldIndex: number) => {
+  const replaceOption = (newOptionData: any, oldIndex: number) => {
     if (newOptionData.id && newOptionData.title) {
       const newData = {
         options: [
           ...options.slice(0, oldIndex),
           ...options.slice(oldIndex + 1),
+        ],
+        delays: [...delays.slice(0, oldIndex), ...delays.slice(oldIndex + 1)],
+        delayUnits: [
+          ...delayUnits.slice(0, oldIndex),
+          ...delayUnits.slice(oldIndex + 1),
         ],
       };
       const newChildren = [
@@ -128,10 +154,14 @@ const ConfigPanel = ({
         ...children.slice(oldIndex + 1),
       ];
       const opts = options ? [...newData.options] : [];
+      const dlys = delays ? [...newData.delays] : [];
+      const dlUys = delayUnits ? [...newData.delayUnits] : [];
       const chds = children ? [...newChildren] : [];
       onChange({
         data: {
           options: [...opts, newOptionData.title],
+          delays: [...dlys, newOptionData.delay],
+          delayUnits: [...dlUys, newOptionData.delayUnit],
         },
         children: [...chds, newOptionData.id],
       });
@@ -243,7 +273,9 @@ const ConfigPanel = ({
                     viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
                     viewMode === GraphViewMode.EDIT_MISSION
                   }
-                  addAndDeleteOptionHandler={addAndDeleteOptionHandler}
+                  replaceOption={replaceOption}
+                  delay={delays[index] || 0}
+                  delayUnit={delayUnits[index] || 0}
                 />
               );
             })}
