@@ -17,6 +17,7 @@ const initialState: {
     full_name: '',
     avatar_url: '',
     about_me: '',
+    role: '',
   },
 };
 
@@ -56,6 +57,20 @@ const orgInfoSlice = createSlice({
         state.orgs[orgIndex].profile.push(user);
       }
     },
+    removeUserOfOrg: (state, action) => {
+      const { orgId, userId } = action.payload;
+      const orgIndex = state.orgs.findIndex(
+        (org: IOrgInfo) => org.id === orgId
+      );
+      if (orgIndex !== -1) {
+        const userIndex = state.orgs[orgIndex].profile.findIndex(
+          (user) => user.id === userId
+        );
+        if (userIndex !== -1) {
+          state.orgs[orgIndex].profile.splice(userIndex, 1);
+        }
+      }
+    },
   },
 });
 
@@ -66,5 +81,6 @@ export const {
   reset,
   setUser,
   addUserToOrg,
+  removeUserOfOrg,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;
