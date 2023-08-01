@@ -9,7 +9,7 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import ModalInviteOfSpaceCard from '@components/Modal/ModalInviteOfSpaceCard/ModalInviteOfSpaceCard';
+import ModalInviteOfSpaceCard from '@pages/Organization/fragments/ModalInviteOfSpaceCard';
 
 interface SpaceCardProps {
   dataSpace: any;
