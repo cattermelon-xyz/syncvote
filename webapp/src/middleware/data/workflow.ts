@@ -8,6 +8,10 @@ import {
   deleteWorkflow,
   deleteWorkflowVersion,
 } from '@redux/reducers/workflow.reducer';
+import {
+  changeWorkflowOrg,
+  changeWorkflowInfo,
+} from '@redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { subtractArray } from '@utils/helpers';
@@ -309,6 +313,7 @@ export const updateAWorkflowInfo = async ({
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
     });
+    dispatch(changeWorkflowInfo({ workflow: newData[0] }));
     dispatch(changeWorkflow(newData[0]));
     onSuccess(newData);
   } else {
@@ -330,18 +335,32 @@ export const changeAWorkflowOrg = async ({
   onError?: (data: any) => void;
 }) => {
   dispatch(startLoading({}));
+  const orgIdFrom = workflow?.owner_org_id;
+
   const { data, error } = await supabase
     .from('workflow')
     .update({ owner_org_id: orgId })
-    .eq('id', workflow?.id)
-    .select('*');
+    .eq('id', workflow?.id).select(`id,
+          title,
+          owner_org_id,
+          icon_url,
+          banner_url,
+          preset_icon_url,
+          preset_banner_url,
+          versions: workflow_version(
+            id, 
+            status,
+            created_at,
+            last_updated
+          )`);
 
-  dispatch(finishLoading({}));
   if (data) {
+    dispatch(changeWorkflowOrg({ orgIdFrom: orgIdFrom, workflow: data[0] }));
     onSuccess(data);
   } else {
     onError(error);
   }
+  dispatch(finishLoading({}));
 };
 
 export const updateAWorkflowTag = async ({

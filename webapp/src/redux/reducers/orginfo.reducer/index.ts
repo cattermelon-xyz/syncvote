@@ -57,11 +57,51 @@ const orgInfoSlice = createSlice({
         state.orgs[orgIndex].profile.push(user);
       }
     },
+    changeWorkflowOrg: (state, action) => {
+      const { orgIdFrom, workflow } = action.payload;
+
+      const orgIndexFrom = state.orgs.findIndex(
+        (org: any) => org.id === orgIdFrom
+      );
+
+      const orgIndexTo = state.orgs.findIndex(
+        (org: any) => org.id === workflow.owner_org_id
+      );
+
+      // Remove workflow from previous org
+      if (orgIndexFrom !== -1) {
+        state.orgs[orgIndexFrom].workflows = state.orgs[
+          orgIndexFrom
+        ].workflows.filter((wf: any) => wf.id !== workflow.id);
+      }
+
+      // Add workflow from next org
+      if (orgIndexTo !== -1) {
+        state.orgs[orgIndexTo].workflows.push(workflow);
+      }
+    },
+    changeWorkflowInfo: (state, action) => {
+      const { workflow } = action.payload;
+      const orgIndex = state.orgs.findIndex(
+        (org: IOrgInfo) => org.id === workflow.owner_org_id
+      );
+
+      if (orgIndex !== -1) {
+        const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
+          (wf: any) => (wf.id = workflow.id)
+        );
+        if (worfklowIndex !== -1) {
+          state.orgs[orgIndex].workflows[worfklowIndex] = workflow;
+        }
+      }
+    },
+
     removeUserOfOrg: (state, action) => {
       const { orgId, userId } = action.payload;
       const orgIndex = state.orgs.findIndex(
         (org: IOrgInfo) => org.id === orgId
       );
+
       if (orgIndex !== -1) {
         const userIndex = state.orgs[orgIndex].profile.findIndex(
           (user) => user.id === userId
@@ -82,5 +122,7 @@ export const {
   setUser,
   addUserToOrg,
   removeUserOfOrg,
+  changeWorkflowOrg,
+  changeWorkflowInfo,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;

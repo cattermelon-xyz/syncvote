@@ -35,7 +35,6 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
           setDataOrgs(data);
         },
       });
-
     }
   };
 
@@ -83,11 +82,22 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
         <Radio.Group onChange={onChange} value={value} className='w-full'>
           {dataOrgs.map((org: any, index: any) => (
             <div
-              className='flex h-12 items-center radio'
+              className='flex h-12 items-center radio cursor-pointer'
               key={index}
               style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
               onMouseEnter={() => setHovered(index)}
               onMouseLeave={() => setHovered(null)}
+              onClick={() => {
+                if (value) {
+                  if (value === org?.id) {
+                    setValue(null);
+                  } else {
+                    setValue(org?.id);
+                  }
+                } else {
+                  setValue(org?.id);
+                }
+              }}
             >
               {hovered === index || org.id === value ? (
                 <Space className='p-3'>
@@ -109,7 +119,11 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       </Space>
 
       <Space className='flex'>
-        <a className='p-4' style={{ color: '#6d28d9' }} onClick={setOpenCreateWorkspaceModal}>
+        <a
+          className='p-4'
+          style={{ color: '#6d28d9' }}
+          onClick={setOpenCreateWorkspaceModal}
+        >
           <PlusOutlined /> {L('createANewSpace')}
         </a>
       </Space>

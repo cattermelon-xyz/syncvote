@@ -8,27 +8,28 @@ import {
   EditOutlined,
   EllipsisOutlined,
   EyeOutlined,
+  ImportOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
 import { createIdString, getImageUrl } from '@utils/helpers';
 import Banner from '@components/Banner/Banner';
-import ChangeNameWorkflowModal from '../Modal/ChangeNameWorkflowModal/ChangeNameWorkflowModal';
-import DeleteWorkflowModal from '../Modal/DeleteWorkflowModal/DeleteWorkflowModal';
-import DuplicateWorkflowModal from '../Modal/DuplicateWorkflowModal/DuplicateWorkflowModal';
-import MoveWorkflowModal from '@components/Modal/MoveWorkflowModal/MoveWorkflowModal';
-import MoveToWorkflowModal from '@components/Modal/MoveWorkflowModal/MoveToWorkflowModal';
+import ChangeNameWorkflowModal from '../../pages/Workflow/fragments/ChangeNameWorkflowModal';
+import DeleteWorkflowModal from '../../pages/Workflow/fragments/DeleteWorkflowModal';
+import DuplicateWorkflowModal from '../../pages/Workflow/fragments/DuplicateWorkflowModal';
+import MoveWorkflowModal from '../../pages/Workflow/fragments/MoveWorkflowModal';
+import MoveToWorkflowModal from '../../pages/Workflow/fragments/MoveToWorkflowModal';
+import { useDispatch } from 'react-redux';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
   isListHome?: boolean;
-  dispatch: any;
 }
 
 const WorkflowCard: React.FC<WorkflowCardProps> = ({
   dataWorkflow,
   isListHome,
-  dispatch,
 }) => {
+  const dispatch = useDispatch();
   const [openModalChangeName, setOpenModalChangeName] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalDuplicate, setOpenModalDuplicate] = useState(false);
@@ -49,13 +50,14 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       <div className='flex-col'>
         <div
           className='h-9 flex items-center hover:bg-gray-100'
-          onClick={() => {
+          onClick={(e: any) => {
+            e.stopPropagation();
             setOpenModalMove(true);
             setIsPopoverVisible(false);
           }}
         >
           <div className='px-2'>
-            <EyeOutlined /> Move to...
+            <ImportOutlined /> Move to...
           </div>
         </div>
         <div className='h-9 flex items-center hover:bg-gray-100'>
@@ -66,7 +68,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         <div
           className='h-9 flex items-center hover:bg-gray-100'
           style={{ borderBottom: '1px solid #E3E3E2' }}
-          onClick={() => {
+          onClick={(e: any) => {
+            e.stopPropagation();
             setOpenModalChangeName(true);
             setIsPopoverVisible(false);
           }}
@@ -80,7 +83,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       <div
         className='h-9 flex items-center hover:bg-gray-100'
         style={{ borderBottom: '1px solid #E3E3E2' }}
-        onClick={() => {
+        onClick={(e: any) => {
+          e.stopPropagation();
           setOpenModalDuplicate(true);
           setIsPopoverVisible(false);
         }}
@@ -92,7 +96,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
       <div
         className='h-9 flex items-center hover:bg-gray-100'
-        onClick={() => {
+        onClick={(e: any) => {
+          e.stopPropagation();
           setOpenModalDelete(true);
           setIsPopoverVisible(false);
         }}
@@ -164,29 +169,29 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         hoverable={true}
         style={{ position: 'relative' }}
         className='w-[256px] h-[176px] relative rounded-xl'
-        // onClick={() => {
-        //   if (isListHome) {
-        //     navigate(
-        //       `/public/${createIdString(
-        //         dataWorkflow?.infoOrg.title,
-        //         dataWorkflow?.owner_org_id.toString()
-        //       )}/${createIdString(
-        //         dataWorkflow?.title,
-        //         dataWorkflow?.id
-        //       )}/${dataWorkflow?.versions[0].id.toString()}`
-        //     );
-        //   } else {
-        //     navigate(
-        //       `/${createIdString(
-        //         dataWorkflow?.org_title,
-        //         dataWorkflow?.owner_org_id.toString()
-        //       )}/${createIdString(
-        //         dataWorkflow?.title,
-        //         dataWorkflow?.id
-        //       )}/${dataWorkflow?.versions[0].id.toString()}`
-        //     );
-        //   }
-        // }}
+        onClick={() => {
+          if (isListHome) {
+            navigate(
+              `/public/${createIdString(
+                dataWorkflow?.infoOrg.title,
+                dataWorkflow?.owner_org_id.toString()
+              )}/${createIdString(
+                dataWorkflow?.title,
+                dataWorkflow?.id
+              )}/${dataWorkflow?.versions[0].id.toString()}`
+            );
+          } else {
+            navigate(
+              `/${createIdString(
+                dataWorkflow?.org_title,
+                dataWorkflow?.owner_org_id.toString()
+              )}/${createIdString(
+                dataWorkflow?.title,
+                dataWorkflow?.id
+              )}/${dataWorkflow?.versions[0].id.toString()}`
+            );
+          }
+        }}
       >
         {
           <Banner
@@ -265,9 +270,9 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
               trigger='click'
             >
               <div
-              // onClick={(e) => {
-              //   e.stopPropagation();
-              // }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
                 <EllipsisOutlined
                   style={{ fontSize: '16px', color: '#000000' }}

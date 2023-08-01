@@ -25,7 +25,7 @@ interface DataItem {
 
 const MySpace: React.FC = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.orginfo);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
   const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
   const [workflows, setWorkflows] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -57,11 +57,12 @@ const MySpace: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const orgs = await queryOrgsAndWorkflowForHome({
-        userId: user.id,
-        onSuccess: () => {},
-        dispatch,
-      });
+      // const orgs = await queryOrgsAndWorkflowForHome({
+      //   userId: user.id,
+      //   onSuccess: () => {},
+      //   dispatch,
+      // });
+      // console.log('Org 2', orgs);
       if (orgs) {
         const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
         setAdminOrgs(adminOrgsData);
@@ -94,7 +95,7 @@ const MySpace: React.FC = () => {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user, orgs]);
 
   return (
     <div className='w-[800px] flex flex-col'>
@@ -125,11 +126,7 @@ const MySpace: React.FC = () => {
             items={
               filterWorkflowByOptions &&
               filterWorkflowByOptions.map((workflow, index) => (
-                <WorkflowCard
-                  key={index}
-                  dataWorkflow={workflow}
-                  dispatch={dispatch}
-                />
+                <WorkflowCard key={index} dataWorkflow={workflow} />
               ))
             }
             columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}

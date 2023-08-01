@@ -40,7 +40,10 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
         userId: user?.id,
         dispatch: dispatch,
         onSuccess: (data: any) => {
-          setDataOrgs(data);
+          const dataOrgs = data.filter(
+            (org: any) => org.id !== workflow.owner_org_id
+          );
+          setDataOrgs(dataOrgs);
         },
       });
     }
@@ -90,11 +93,22 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
         <Radio.Group onChange={onChange} value={value} className='w-full'>
           {dataOrgs.map((org: any, index: any) => (
             <div
-              className='flex h-12 items-center radio'
+              className='flex h-12 items-center radio cursor-pointer'
               key={index}
               style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
               onMouseEnter={() => setHovered(index)}
               onMouseLeave={() => setHovered(null)}
+              onClick={() => {
+                if (value) {
+                  if (value === org?.id) {
+                    setValue(null);
+                  } else {
+                    setValue(org?.id);
+                  }
+                } else {
+                  setValue(org?.id);
+                }
+              }}
             >
               {hovered === index || org?.id === value ? (
                 <Space className='p-3'>

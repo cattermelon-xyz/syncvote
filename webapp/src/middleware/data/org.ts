@@ -326,6 +326,23 @@ export const queryOrgs = async ({
         }
       });
 
+      const workflows = org?.workflows?.map((workflow: any) => {
+        const workflowPresetIcon = workflow?.preset_icon_url
+          ? `preset:${workflow.preset_icon_url}`
+          : workflow.preset_icon_url;
+        const workflowPresetBanner = workflow?.preset_banner_url
+          ? `preset:${workflow.preset_banner_url}`
+          : workflow.preset_banner_url;
+
+        return {
+          ...workflow,
+          icon_url: workflow.icon_url ? workflow.icon_url : workflowPresetIcon,
+          banner_url: workflow.banner_url
+            ? workflow.banner_url
+            : workflowPresetBanner,
+        };
+      });
+
       tmp.push({
         id: org?.id,
         role: d.role,
@@ -336,7 +353,8 @@ export const queryOrgs = async ({
         org_size: org.org_size,
         org_type: org.org_type,
         profile: profiles,
-        workflows: org.workflows || [],
+        // workflows: org.workflows || [],
+        workflows: workflows || [],
       });
     });
     dispatch(setOrgsInfo(tmp));
