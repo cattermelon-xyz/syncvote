@@ -69,6 +69,7 @@ const Home: React.FC = () => {
                 filterWorkflowByOptions &&
                 filterWorkflowByOptions?.map((workflow, index) => (
                   <WorkflowCard
+                    dispatch={dispatch}
                     key={workflow?.id + index}
                     dataWorkflow={workflow}
                     isListHome={true}
