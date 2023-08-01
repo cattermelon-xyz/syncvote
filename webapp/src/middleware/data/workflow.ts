@@ -5,12 +5,13 @@ import {
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
-  deleteWorkflow,
+  // deleteWorkflow,
   deleteWorkflowVersion,
 } from '@redux/reducers/workflow.reducer';
 import {
   changeWorkflowOrg,
   changeWorkflowInfo,
+  deleteWorkflow,
 } from '@redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
@@ -431,37 +432,22 @@ export const deleteAWorkflow = async ({
   onSuccess: (data: any) => void;
   onError?: (data: any) => void;
 }) => {
-  dispatch(startLoading({}));
-  await supabase
-    .from('workflow_version_history')
-    .delete()
-    .eq('workflow_version_id', workflow?.versions[0].id);
-
-  await supabase
-    .from('workflow_version_editor')
-    .delete()
-    .eq('workflow_version_id', workflow?.versions[0].id);
-
   const { data, error } = await supabase
-    .from('workflow_version')
+    .from('workflow')
     .delete()
-    .eq('workflow_id', workflow.id);
-
-  if (error) {
-    console.log(error);
-  }
-
-  await supabase.from('workflow').delete().eq('id', workflow.id);
+    .eq('id', workflow.id);
   dispatch(finishLoading({}));
-
-  // const { data, error } = await supabase
-  //   .from('workflow')
-  //   .select('id')
-  //   .eq('id', workflowId);
-  // dispatch(finishLoading({}));
-  // if (error || (data && data.length === 0)) {
-  //   dispatch(deleteWorkflow({ id: workflowId }));
-  //   onSuccess(data);
+  if (!error) {
+    dispatch(deleteWorkflow({ workflow: workflow }));
+    onSuccess(data);
+  } else {
+    onError(error);
+  }
+  // if (!error) {
+  //   if (data) {
+  //     dispatch(deleteWorkflow({ workflow: workflow }));
+  //     onSuccess(data);
+  //   }
   // } else {
   //   onError({
   //     message: 'Failed to delete workflow',
