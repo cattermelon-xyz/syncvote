@@ -11,7 +11,7 @@ import {
 import CreateSpaceModal from './CreateSpaceModal';
 import CreateWorkflowModal from './CreateWorkflowModal';
 import { Button, Dropdown, MenuProps, Space } from 'antd';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { current } from '@reduxjs/toolkit';
 
@@ -106,9 +106,22 @@ const VerticalNav = () => {
       destinationUrl: '/',
     },
   ];
+
   const selectedNav = navs.find((nav) => nav.destinationUrl === current) || {
     destinationUrl: '',
   };
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const action = queryParams.get('action');
+  useEffect(() => {
+    if (action === 'new-workflow') {
+      setOpenModalCreateWorkflow(true);
+    } else if (action === 'new-workspace') {
+      setOpenModalCreateWorkspace(true);
+    }
+  }, []);
+
   return (
     <>
       <CreateSpaceModal

@@ -8,7 +8,7 @@ import {
   queryWorkflowVersion,
 } from '@middleware/data';
 import { extractIdFromIdString } from '@utils/helpers';
-import { Button, Layout, Space, notification, Skeleton } from 'antd';
+import { Button, Layout, Space, notification, Skeleton, Popover } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -35,7 +35,6 @@ export const PublicVersion = () => {
   const versionId = extractIdFromIdString(versionIdString);
   const dispatch = useDispatch();
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
-  const navigate = useNavigate();
   const [web2IntegrationsState, setWeb2IntegrationsState] = useState<any>();
   const [version, setVersion] = useState<any>();
   const [workflow, setWorkflow] = useState<any>();
@@ -49,6 +48,7 @@ export const PublicVersion = () => {
   const [api, contextHolder] = notification.useNotification();
   const where = `${orgId}$/${workflowId}$/${versionId}$`;
   const [dataReaction, setDataReaction] = useState<any[]>([]);
+  const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
 
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
@@ -65,6 +65,24 @@ export const PublicVersion = () => {
   const fetchData = async () => {
     const data = await getDataReactionCount({ where, dispatch });
     setDataReaction(data);
+  };
+  const urlToCopy = window.location.href;
+
+  const [visible, setVisible] = useState(false);
+
+  const handleClick = async () => {
+    if (!navigator.clipboard) {
+      // Clipboard API not available
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(urlToCopy);
+      console.log('Link copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy link: ', err);
+    }
+    setVisible(true);
+    setTimeout(() => setVisible(false), 1000); // Tắt Popover sau 1 giây
   };
 
   useEffect(() => {
@@ -226,11 +244,23 @@ export const PublicVersion = () => {
                       }}
                       icon={<MdChatBubbleOutline className='w-5 h-5' />}
                     />
+                    <Popover
+                      placement='bottomRight'
+                      content={'Copied'}
+                      trigger='click'
+                      visible={visible}
+                    >
+                      <Button
+                        onClick={handleClick}
+                        className='w-11 h-9 flex items-center justify-center'
+                        icon={<FiLink className='w-5 h-5' />}
+                      />
+                    </Popover>
+
                     <Button
-                      className='w-11 h-9 flex items-center justify-center'
-                      icon={<FiLink className='w-5 h-5' />}
-                    />
-                    <Button
+                      onClick={() => {
+                        setShouldDownloadImage(true);
+                      }}
                       className='w-11 h-9 flex items-center justify-center'
                       icon={<FiDownload className='w-5 h-5' />}
                     />
@@ -275,6 +305,8 @@ export const PublicVersion = () => {
 
                 <DirectedGraph
                   viewMode={GraphViewMode.VIEW_ONLY}
+                  shouldExportImage={shouldDownloadImage}
+                  setExportImage={setShouldDownloadImage}
                   data={version?.data || emptyStage}
                   selectedNodeId={selectedNodeId}
                   selectedLayoutId={
