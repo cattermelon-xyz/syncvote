@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
-import { getDataOrgs } from '@middleware/data';
+import { getDataOrgs, insertWorkflowAndVersion } from '@middleware/data';
 import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
@@ -39,9 +39,31 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   };
 
   const handleOk = async () => {
+    // const org = dataOrgs.find((org: any) => org.id === value);
+    // const orgIdString = createIdString(`${org.title}`, `${org.id}`);
+    // navigate(`${orgIdString}/new-workflow/`);
     const org = dataOrgs.find((org: any) => org.id === value);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
-    navigate(`${orgIdString}/new-workflow/`);
+    // navigate(`${orgIdString}/new-workflow/`);
+    const props = {
+      title: 'Untitled Workflow',
+      desc: '',
+      owner_org_id: org.id,
+      emptyStage: emptyStage,
+      iconÏÏÏUrl: 'preset:' + randomIcon(),
+      authority: user.id,
+    };
+    onClose();
+    insertWorkflowAndVersion({
+      dispatch: dispatch,
+      props: props,
+      onError: (error) => {
+        Modal.error({ content: error.message });
+      },
+      onSuccess: (versions, insertedId) => {
+        navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      },
+    });
   };
 
   const handleCancel = () => {
