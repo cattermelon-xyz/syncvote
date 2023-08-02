@@ -5,10 +5,20 @@ import {
   SaveOutlined,
   RestOutlined,
 } from '@ant-design/icons';
-import { Space, Button, Input, Select, Drawer, TimePicker } from 'antd';
+import {
+  Space,
+  Button,
+  Input,
+  Select,
+  Drawer,
+  TimePicker,
+  Popover,
+} from 'antd';
 import moment from 'moment';
 import { useState } from 'react';
 import { displayDelayDuration } from '../interface';
+import parse from 'html-react-parser';
+import TextEditor from '@components/Editor/TextEditor';
 export const Option = ({
   index,
   currentNode,
@@ -20,6 +30,7 @@ export const Option = ({
   replaceOption,
   delay,
   delayUnit,
+  delayNote,
 }: {
   index: number;
   currentNode: any;
@@ -31,6 +42,7 @@ export const Option = ({
   replaceOption: (newOptionData: any, index: number) => void;
   delay: number;
   delayUnit: 'year' | 'month' | 'week' | 'hour' | 'minute';
+  delayNote: string;
 }) => {
   const [label, setLabel] = useState(option);
   const [showEditDelay, setShowEditDelay] = useState(false);
@@ -38,9 +50,11 @@ export const Option = ({
   const [newDelayUnit, setNewDelayUnit] = useState(
     delayUnit ? delayUnit : 'minute'
   );
+  const [newDelayNote, setNewDelayNote] = useState(delayNote ? delayNote : '');
   const reset = () => {
     setNewDelay(delay);
     setNewDelayUnit(delayUnit ? delayUnit : 'minute');
+    setNewDelayNote(delayNote ? delayNote : '');
   };
   return (
     <>
@@ -50,12 +64,12 @@ export const Option = ({
           setShowEditDelay(false);
           reset();
         }}
-        title='Set Delay'
+        title='Set Timelock'
       >
         <Space direction='vertical' size='large' className='w-full'>
-          <span className='text-violet-500'>
+          <div className='text-violet-500'>
             {displayDelayDuration(moment.duration(newDelay, newDelayUnit))}
-          </span>
+          </div>
           <Space.Compact className='w-full'>
             <Input
               value={newDelay}
@@ -85,6 +99,12 @@ export const Option = ({
               }}
             />
           </Space.Compact>
+          <TextEditor
+            value={newDelayNote}
+            setValue={(val: string) => {
+              setNewDelayNote(val);
+            }}
+          />
           <div className='flex justify-between items-center'>
             <Button icon={<RestOutlined />} onClick={reset}>
               Reset
@@ -97,6 +117,7 @@ export const Option = ({
                     id: label,
                     delay: newDelay,
                     delayUnit: newDelayUnit,
+                    delayNote: newDelayNote,
                   },
                   index
                 );
@@ -125,17 +146,19 @@ export const Option = ({
             className='w-6/12 flex pt-1 justify-between items-center'
           >
             <span className='text-gray-400 pl-6'>Navigate to</span>
-            <span
-              className='text-violet-400 flex items-center gap-1 cursor-pointer'
-              onClick={() => setShowEditDelay(true)}
-            >
-              <ClockCircleOutlined />
-              <span>
-                {`${displayDelayDuration(
-                  moment.duration(delay, delayUnit ? delayUnit : 'minute')
-                )}`}
+            <Popover content={parse(delayNote ? delayNote : 'No note')}>
+              <span
+                className='text-violet-400 flex items-center gap-1 cursor-pointer'
+                onClick={() => setShowEditDelay(true)}
+              >
+                <ClockCircleOutlined />
+                <span>
+                  {`${displayDelayDuration(
+                    moment.duration(delay, delayUnit ? delayUnit : 'minute')
+                  )}`}
+                </span>
               </span>
-            </span>
+            </Popover>
           </Space>
         </div>
         <div className='w-full flex justify-between'>

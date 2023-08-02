@@ -6,6 +6,7 @@ export interface IData {
   includedAbstain: boolean;
   delays: number[];
   delayUnits: DelayUnit[];
+  delayNotes: string[];
 }
 
 export enum DelayUnit {
@@ -22,6 +23,7 @@ export interface IOption {
   title: string;
   delay: number;
   delayUnit: DelayUnit;
+  delayNote: string;
 }
 
 export const displayDelayDuration = (duration: moment.Duration) => {
@@ -32,5 +34,5 @@ export const displayDelayDuration = (duration: moment.Duration) => {
   const minutes =
     duration.minutes() === 0 ? '' : `${duration.minutes()} minutes `;
   const delay = years + months + days + hours + minutes;
-  return delay ? 'Delay ' + delay : 'No delay';
+  return delay ? 'Timelock ' + delay : 'No timelock';
 };

@@ -3,6 +3,8 @@ import { Drawer, Space, Input, Select, Button } from 'antd';
 import { DelayUnit, IOption, displayDelayDuration } from '../interface';
 import { delay } from '@reduxjs/toolkit/dist/utils';
 import moment from 'moment';
+import TextEditor from '@components/Editor/TextEditor';
+import { useEffect, useState } from 'react';
 
 type NewOptionDrawerProps = {
   showAddOptionDrawer: boolean;
@@ -22,6 +24,9 @@ const NewOptionDrawer = (props: NewOptionDrawerProps) => {
     posibleOptions,
     addNewOptionHandler,
   } = props;
+  const [newDelayNote, setNewDelayNote] = useState(
+    newOption.delayNote ? newOption.delayNote : ''
+  );
   return (
     <Drawer
       open={showAddOptionDrawer}
@@ -74,69 +79,94 @@ const NewOptionDrawer = (props: NewOptionDrawerProps) => {
             )}
           </div>
         </div>
-
-        <div className='w-full flex justify-between items-center'>
-          <div>Delay value</div>
-          <Input
-            type='number'
-            className='flex '
-            value={newOption.delay}
-            style={{ width: '200px' }}
-            onChange={(e) => {
-              const num =
-                parseInt(e.target.value) > 65535
-                  ? 65535
-                  : parseInt(e.target.value) || 0;
-              setNewOption({
-                ...newOption,
-                delay: num,
-              });
-            }}
-          />
-        </div>
-        <div className='w-full flex justify-between items-center'>
-          <div>Delay unit</div>
-          <Select
-            style={{ width: '200px' }}
-            value={newOption.delayUnit}
-            onChange={(value) => {
-              setNewOption({ ...newOption, delayUnit: value });
-            }}
-            options={[
-              {
-                value: DelayUnit.YEAR,
-                label: 'Year',
-              },
-              {
-                value: DelayUnit.MONTH,
-                label: 'Month',
-              },
-              {
-                value: DelayUnit.WEEK,
-                label: 'Week',
-              },
-              {
-                value: DelayUnit.DAY,
-                label: 'Day',
-              },
-              {
-                value: DelayUnit.MINUTE,
-                label: 'Minute',
-              },
-            ]}
-          />
-        </div>
+        <Space direction='vertical' size='small' className='flex w-full'>
+          <div className='w-full flex justify-between items-center'>
+            <div>Timelock value</div>
+            <Input
+              type='number'
+              className='flex '
+              value={newOption.delay}
+              style={{ width: '200px' }}
+              onChange={(e) => {
+                const num =
+                  parseInt(e.target.value) > 65535
+                    ? 65535
+                    : parseInt(e.target.value) || 0;
+                setNewOption({
+                  ...newOption,
+                  delay: num,
+                });
+              }}
+            />
+          </div>
+          <div className='w-full flex justify-between items-center'>
+            <div>Timelock unit</div>
+            <Select
+              style={{ width: '200px' }}
+              value={newOption.delayUnit}
+              onChange={(value) => {
+                setNewOption({ ...newOption, delayUnit: value });
+              }}
+              options={[
+                {
+                  value: DelayUnit.YEAR,
+                  label: 'Year',
+                },
+                {
+                  value: DelayUnit.MONTH,
+                  label: 'Month',
+                },
+                {
+                  value: DelayUnit.WEEK,
+                  label: 'Week',
+                },
+                {
+                  value: DelayUnit.DAY,
+                  label: 'Day',
+                },
+                {
+                  value: DelayUnit.MINUTE,
+                  label: 'Minute',
+                },
+              ]}
+            />
+          </div>
+          <Space className='w-full' direction='vertical' size='small'>
+            <div>Timelock Note</div>
+            <div>
+              <TextEditor
+                value={newDelayNote}
+                setValue={(val: any) => {
+                  setNewDelayNote(val);
+                }}
+                onBlur={async () => {
+                  if (newDelayNote !== newOption.delayNote) {
+                    setNewOption({
+                      ...newOption,
+                      delayNote: newDelayNote,
+                    });
+                  }
+                }}
+              />
+            </div>
+          </Space>
+        </Space>
         <Button
           type='default'
           className='inline-flex items-center text-center justify-center w-full mt-4'
           icon={<PlusCircleOutlined />}
           onClick={() => {
-            addNewOptionHandler(newOption);
+            addNewOptionHandler({
+              ...newOption,
+              delayNote: structuredClone(newDelayNote),
+            });
+            setNewDelayNote('');
             setNewOption({
               id: '',
               title: '',
               delay: 0,
               delayUnit: DelayUnit.MINUTE,
+              delayNote: '',
             });
             setShowNewOptionDrawer(false);
           }}

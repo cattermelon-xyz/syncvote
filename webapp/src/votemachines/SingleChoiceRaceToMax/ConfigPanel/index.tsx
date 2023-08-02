@@ -30,6 +30,7 @@ const ConfigPanel = ({
     options: [],
     delayUnits: [], // 1 byte (8) to decide the unit (minute, hour, day, week, month, year)
     delays: [], // 2 bytes (65,536) for the actual value
+    delayNotes: [], // do not comit this data to blockchain
     includedAbstain: false,
   },
   viewMode,
@@ -41,6 +42,7 @@ const ConfigPanel = ({
   const delays = data.delays || Array(options?.length).fill(0);
   const delayUnits =
     data.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
+  const delayNotes = data.delayNotes || Array(options?.length).fill('');
   let tmpMaxStr = '0';
   if (max) {
     tmpMaxStr = max < 1 ? `${max * 100}%` : `${max}`;
@@ -58,6 +60,7 @@ const ConfigPanel = ({
     title: '',
     delay: 0,
     delayUnit: DelayUnit.MINUTE,
+    delayNote: '',
   });
   const [countedBy, setCountedBy] = useState(token ? 'token' : 'count');
   const addNewOptionHandler = (newOptionData: any) => {
@@ -69,6 +72,7 @@ const ConfigPanel = ({
           options: [...opts, newOptionData.title],
           delays: [...delays, newOptionData.delay],
           delayUnits: [...delayUnits, newOptionData.delayUnit],
+          delayNotes: [...delayNotes, newOptionData.delayNote],
         },
         children: [...chds, newOptionData.id],
       });
@@ -83,6 +87,10 @@ const ConfigPanel = ({
           ...delayUnits.slice(0, index),
           ...delayUnits.slice(index + 1),
         ],
+        delayNotes: [
+          ...delayNotes.slice(0, index),
+          ...delayNotes.slice(index + 1),
+        ],
       },
       children: [...children.slice(0, index), ...children.slice(index + 1)],
     });
@@ -92,15 +100,18 @@ const ConfigPanel = ({
     const newOptions = [...options];
     const newDelays = [...delays];
     const newDelayUnits = [...delayUnits];
+    const newDelayNotes = [...delayNotes];
     newOptions[index] = value.id;
     newDelays[index] = value.delay;
     newDelayUnits[index] = value.delayUnit;
+    newDelayNotes[index] = value.delayNote;
     onChange({
       data: {
         ...newData,
         options: newOptions,
         delays: newDelays,
         delayUnits: newDelayUnits,
+        delayNotes: newDelayNotes,
       },
     });
   };
@@ -148,6 +159,10 @@ const ConfigPanel = ({
           ...delayUnits.slice(0, oldIndex),
           ...delayUnits.slice(oldIndex + 1),
         ],
+        delayNotes: [
+          ...delayNotes.slice(0, oldIndex),
+          ...delayNotes.slice(oldIndex + 1),
+        ],
       };
       const newChildren = [
         ...children.slice(0, oldIndex),
@@ -156,12 +171,14 @@ const ConfigPanel = ({
       const opts = options ? [...newData.options] : [];
       const dlys = delays ? [...newData.delays] : [];
       const dlUys = delayUnits ? [...newData.delayUnits] : [];
+      const dlNts = delayNotes ? [...newData.delayNotes] : [];
       const chds = children ? [...newChildren] : [];
       onChange({
         data: {
           options: [...opts, newOptionData.title],
           delays: [...dlys, newOptionData.delay],
           delayUnits: [...dlUys, newOptionData.delayUnit],
+          delayNotes: [...dlNts, newOptionData.delayNote],
         },
         children: [...chds, newOptionData.id],
       });
@@ -276,6 +293,7 @@ const ConfigPanel = ({
                   replaceOption={replaceOption}
                   delay={delays[index] || 0}
                   delayUnit={delayUnits[index] || 0}
+                  delayNote={delayNotes[index] || ''}
                 />
               );
             })}
