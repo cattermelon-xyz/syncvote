@@ -13,6 +13,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import '../styles.scss';
 import CollapsiblePanel from '@components/DirectedGraph/MachineConfigPanel/fragments/CollapsiblePanel';
 import { IOption, DelayUnit } from '../interface';
+import TextEditor from '@components/Editor/TextEditor';
 
 /**
  *
@@ -32,6 +33,7 @@ const ConfigPanel = ({
     delays: [], // 2 bytes (65,536) for the actual value
     delayNotes: [], // do not comit this data to blockchain
     includedAbstain: false,
+    resultDescription: '',
   },
   viewMode,
   onChange = (data: ICheckPoint) => {},
@@ -43,6 +45,9 @@ const ConfigPanel = ({
   const delayUnits =
     data.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
   const delayNotes = data.delayNotes || Array(options?.length).fill('');
+  const [newResultDescription, setNewResultDescription] = useState(
+    data.resultDescription || ''
+  );
   let tmpMaxStr = '0';
   if (max) {
     tmpMaxStr = max < 1 ? `${max * 100}%` : `${max}`;
@@ -349,6 +354,23 @@ const ConfigPanel = ({
             token={token}
             changeTokenHandler={changeTokenHandler}
           />
+          <Space direction='vertical' size='small' className='flex w-full pt-2'>
+            <div className='text-sm text-slate-600'>Calculation rules</div>
+            <TextEditor
+              value={newResultDescription}
+              setValue={(val: any) => {
+                setNewResultDescription(val);
+              }}
+              onBlur={async () => {
+                onChange({
+                  data: {
+                    ...data,
+                    resultDescription: newResultDescription,
+                  },
+                });
+              }}
+            />
+          </Space>
         </>
       </CollapsiblePanel>
     </Space>

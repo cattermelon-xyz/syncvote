@@ -7,6 +7,7 @@ export interface IData {
   delays: number[];
   delayUnits: DelayUnit[];
   delayNotes: string[];
+  resultDescription: string;
 }
 
 export enum DelayUnit {

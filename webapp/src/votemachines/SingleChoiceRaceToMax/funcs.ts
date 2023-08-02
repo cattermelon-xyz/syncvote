@@ -40,6 +40,7 @@ export const getInitialData = () => {
     delays: [],
     delayUnits: [],
     delayNotes: [],
+    resultDescription: '',
   };
   return data;
 };
