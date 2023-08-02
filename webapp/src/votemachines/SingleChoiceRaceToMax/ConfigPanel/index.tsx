@@ -1,4 +1,14 @@
-import { Tag, Space, Switch, Button, Divider, Alert, Input } from 'antd';
+import {
+  Tag,
+  Space,
+  Switch,
+  Button,
+  Divider,
+  Alert,
+  Input,
+  Drawer,
+  Modal,
+} from 'antd';
 import { useState } from 'react';
 import {
   GraphViewMode,
@@ -9,7 +19,13 @@ import { Option } from './option';
 import VotingResult from './VotingResult';
 import VotingCondition from './VotingCondition';
 import NewOptionDrawer from './NewOptionDrawer';
-import { PlusOutlined } from '@ant-design/icons';
+import {
+  CommentOutlined,
+  EditOutlined,
+  MessageOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
+import parse from 'html-react-parser';
 import '../styles.scss';
 import CollapsiblePanel from '@components/DirectedGraph/MachineConfigPanel/fragments/CollapsiblePanel';
 import { IOption, DelayUnit } from '../interface';
@@ -68,6 +84,7 @@ const ConfigPanel = ({
     delayNote: '',
   });
   const [countedBy, setCountedBy] = useState(token ? 'token' : 'count');
+  const [showSideNote, setShowSideNote] = useState(false); //eslint-disable-line
   const addNewOptionHandler = (newOptionData: any) => {
     if (newOptionData.id && newOptionData.title) {
       const opts = options ? [...options] : [];
@@ -247,133 +264,176 @@ const ConfigPanel = ({
     return rs;
   };
   return (
-    <Space direction='vertical' size='large' className='w-full single-choice'>
-      {/* <Space direction="vertical" size="small" className="w-full">
+    <>
+      <Modal
+        title='Side note'
+        open={showSideNote}
+        onCancel={() => setShowSideNote(false)}
+        onOk={async () => {
+          onChange({
+            data: {
+              ...data,
+              resultDescription: newResultDescription,
+            },
+          });
+          setShowSideNote(false);
+        }}
+      >
+        <TextEditor
+          value={newResultDescription}
+          setValue={(val: any) => {
+            setNewResultDescription(val);
+          }}
+        />
+      </Modal>
+      <Space direction='vertical' size='large' className='w-full single-choice'>
+        {/* <Space direction="vertical" size="small" className="w-full">
         <div className="bg-slate-100 p-2 w-full">
           <span className="mr-0.5">Everyone choose ONE option until one option reach</span>
           {getMaxText()}
         </div>
       </Space> */}
-      <CollapsiblePanel title='Options & navigation'>
-        <>
-          <Space
-            direction='horizontal'
-            size='small'
-            className='w-full flex items-center justify-between bg-zinc-100 px-4 py-2 rounded-lg'
-          >
-            <span>Enable abstain options</span>
-            <Space direction='horizontal' size='small'>
-              Yes
-              <Switch
-                checked={includedAbstain}
-                onChange={changeAbstainHandler}
-              />
-            </Space>
-          </Space>
-          <hr className='my-2' />
-          <Alert
-            type='success'
-            message='Set up logic for your workflow'
-            description='If option X wins then workflow will navigage to Y checkpoint'
-            closable
-          />
-          <Space direction='vertical' size='small' className='w-full'>
-            {options?.map((option: string, index: number) => {
-              const currentNode = allNodes.find(
-                (node) => node.id === children[index]
-              );
-              return (
-                <Option
-                  key={option}
-                  index={index}
-                  option={option}
-                  currentNode={currentNode}
-                  changeOptionHandler={changeOptionHandler}
-                  deleteOptionHandler={deleteOptionHandler}
-                  possibleOptions={posibleOptions}
-                  editable={
-                    viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
-                    viewMode === GraphViewMode.EDIT_MISSION
-                  }
-                  replaceOption={replaceOption}
-                  delay={delays[index] || 0}
-                  delayUnit={delayUnits[index] || 0}
-                  delayNote={delayNotes[index] || ''}
+        <CollapsiblePanel title='Options & navigation'>
+          <>
+            <Space
+              direction='horizontal'
+              size='small'
+              className='w-full flex items-center justify-between bg-zinc-100 px-4 py-2 rounded-lg'
+            >
+              <span>Enable abstain options</span>
+              <Space direction='horizontal' size='small'>
+                Yes
+                <Switch
+                  checked={includedAbstain}
+                  onChange={changeAbstainHandler}
                 />
-              );
-            })}
-            {includedAbstain ? (
-              <Space
-                direction='vertical'
-                className='w-full flex justify-between'
-              >
-                <span className='text-gray-400'>
-                  Option {options?.length + 1}
-                </span>
-                <Input className='w-full' value='Abstain' disabled />
               </Space>
-            ) : null}
-          </Space>
-          <Button
-            type='link'
-            icon={<PlusOutlined />}
-            className='w-full flex items-center justify-start pl-0'
-            onClick={() => setShowNewOptionDrawer(true)}
-            disabled={
-              !(
+            </Space>
+            <hr className='my-2' />
+            <Alert
+              type='success'
+              message='Set up logic for your workflow'
+              description='If option X wins then workflow will navigage to Y checkpoint'
+              closable
+            />
+            <Space direction='vertical' size='small' className='w-full'>
+              {options?.map((option: string, index: number) => {
+                const currentNode = allNodes.find(
+                  (node) => node.id === children[index]
+                );
+                return (
+                  <Option
+                    key={option}
+                    index={index}
+                    option={option}
+                    currentNode={currentNode}
+                    changeOptionHandler={changeOptionHandler}
+                    deleteOptionHandler={deleteOptionHandler}
+                    possibleOptions={posibleOptions}
+                    editable={
+                      viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
+                      viewMode === GraphViewMode.EDIT_MISSION
+                    }
+                    replaceOption={replaceOption}
+                    delay={delays[index] || 0}
+                    delayUnit={delayUnits[index] || 0}
+                    delayNote={delayNotes[index] || ''}
+                  />
+                );
+              })}
+              {includedAbstain ? (
+                <Space
+                  direction='vertical'
+                  className='w-full flex justify-between'
+                >
+                  <span className='text-gray-400'>
+                    Option {options?.length + 1}
+                  </span>
+                  <Input className='w-full' value='Abstain' disabled />
+                </Space>
+              ) : null}
+            </Space>
+            <Button
+              type='link'
+              icon={<PlusOutlined />}
+              className='w-full flex items-center justify-start pl-0'
+              onClick={() => setShowNewOptionDrawer(true)}
+              disabled={
+                !(
+                  viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
+                  viewMode === GraphViewMode.EDIT_MISSION
+                )
+              }
+            >
+              Add a new option & navigation
+            </Button>
+            <NewOptionDrawer
+              showAddOptionDrawer={showAddOptionDrawer}
+              setShowNewOptionDrawer={setShowNewOptionDrawer}
+              newOption={newOption}
+              setNewOption={setNewOption}
+              posibleOptions={posibleOptions}
+              addNewOptionHandler={addNewOptionHandler}
+            />
+          </>
+        </CollapsiblePanel>
+        <CollapsiblePanel title='Result calculation'>
+          <>
+            <VotingResult countedBy={countedBy} setCountedBy={setCountedBy} />
+            <VotingCondition
+              getThresholdText={getThresholdText}
+              maxStr={maxStr}
+              editable={
                 viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
                 viewMode === GraphViewMode.EDIT_MISSION
-              )
-            }
-          >
-            Add a new option & navigation
-          </Button>
-          <NewOptionDrawer
-            showAddOptionDrawer={showAddOptionDrawer}
-            setShowNewOptionDrawer={setShowNewOptionDrawer}
-            newOption={newOption}
-            setNewOption={setNewOption}
-            posibleOptions={posibleOptions}
-            addNewOptionHandler={addNewOptionHandler}
-          />
-        </>
-      </CollapsiblePanel>
-      <CollapsiblePanel title='Result calculation'>
-        <>
-          <VotingResult countedBy={countedBy} setCountedBy={setCountedBy} />
-          <VotingCondition
-            getThresholdText={getThresholdText}
-            maxStr={maxStr}
-            editable={
-              viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
-              viewMode === GraphViewMode.EDIT_MISSION
-            }
-            setMaxStr={setMaxStr}
-            changeMaxHandler={changeMaxHandler}
-            countedBy={countedBy}
-            token={token}
-            changeTokenHandler={changeTokenHandler}
-          />
-          <Space direction='vertical' size='small' className='flex w-full pt-2'>
-            <div className='text-sm text-slate-600'>Calculation rules</div>
-            <TextEditor
-              value={newResultDescription}
-              setValue={(val: any) => {
-                setNewResultDescription(val);
-              }}
-              onBlur={async () => {
-                onChange({
-                  data: {
-                    ...data,
-                    resultDescription: newResultDescription,
-                  },
-                });
-              }}
+              }
+              setMaxStr={setMaxStr}
+              changeMaxHandler={changeMaxHandler}
+              countedBy={countedBy}
+              token={token}
+              changeTokenHandler={changeTokenHandler}
             />
-          </Space>
-        </>
-      </CollapsiblePanel>
-    </Space>
+            <Space
+              direction='vertical'
+              size='small'
+              className='flex w-full pt-2'
+            >
+              {!data.resultDescription ? (
+                <Button
+                  icon={<CommentOutlined />}
+                  onClick={() => setShowSideNote(true)}
+                >
+                  Add side note
+                </Button>
+              ) : (
+                <Space
+                  direction='vertical'
+                  className='w-full border border-zinc-300 border-solid rounded-lg p-2'
+                  size='middle'
+                >
+                  <Space
+                    direction='horizontal'
+                    className='w-full justify-between'
+                  >
+                    <div>
+                      <MessageOutlined className='mr-1' />
+                      Sidenote
+                    </div>
+                    <Button
+                      type='text'
+                      icon={<EditOutlined />}
+                      className='hover:text-violet-500'
+                      onClick={() => setShowSideNote(true)}
+                    />
+                  </Space>
+                  {parse(data.resultDescription)}
+                </Space>
+              )}
+            </Space>
+          </>
+        </CollapsiblePanel>
+      </Space>
+    </>
   );
 };
 

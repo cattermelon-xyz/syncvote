@@ -1,6 +1,10 @@
-import { Space, Drawer, Tabs, Collapse, Input } from 'antd';
+import { Space, Drawer, Tabs, Collapse, Input, Modal, Button } from 'antd';
 import { useContext, useState } from 'react';
-import { EditOutlined } from '@ant-design/icons';
+import {
+  CommentOutlined,
+  EditOutlined,
+  MessageOutlined,
+} from '@ant-design/icons';
 import { GraphViewMode, ICheckPoint, IVoteMachine } from '../../../types';
 import ChooseVoteMachine from './ChooseVoteMachine';
 import VotingPartipation from './rules/VotingParticipant';
@@ -10,6 +14,7 @@ import { GraphPanelContext } from '../context';
 import CollapsiblePanel from './fragments/CollapsiblePanel';
 import TextEditor from '@components/Editor/TextEditor';
 import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
+import parse from 'html-react-parser';
 
 const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
   const { data, selectedNodeId, onChange, viewMode } =
@@ -45,8 +50,32 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
   const [votingLocation, setVotingLocation] = useState(
     selectedNode?.votingLocation || 'Discorse or Forum'
   );
+  const [showParticipationSideNote, setshowParticipationSideNote] =
+    useState(false);
+  const [newParticipationDescription, setNewParticipationDescription] =
+    useState(selectedNode?.participationDescription || '');
   return (
     <>
+      <Modal
+        open={showParticipationSideNote}
+        onCancel={() => setshowParticipationSideNote(false)}
+        onOk={() => {
+          const newNode = structuredClone(selectedNode);
+          if (newNode) {
+            newNode.participationDescription = newParticipationDescription;
+            onChange(newNode);
+          }
+          setshowParticipationSideNote(false);
+        }}
+        title='Set sidenote'
+      >
+        <TextEditor
+          value={newParticipationDescription}
+          setValue={(val: any) => {
+            setNewParticipationDescription(val);
+          }}
+        />
+      </Modal>
       <Drawer
         open={vmDrawerVisbibility}
         onClose={() => {
@@ -60,7 +89,43 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
         />
       </Drawer>
       <Space className='w-full pb-4' direction='vertical' size='large'>
-        {!selectedNode?.isEnd ? <VotingPartipation /> : null}
+        {!selectedNode?.isEnd ? (
+          <CollapsiblePanel title='Participants'>
+            <VotingPartipation />
+            {!selectedNode?.participationDescription ? (
+              <Button
+                icon={<CommentOutlined />}
+                onClick={() => setshowParticipationSideNote(true)}
+                className='mt-4'
+              >
+                Add side note
+              </Button>
+            ) : (
+              <Space
+                direction='vertical'
+                className='w-full border border-zinc-300 border-solid rounded-lg p-2 mt-4'
+                size='middle'
+              >
+                <Space
+                  direction='horizontal'
+                  className='w-full justify-between'
+                >
+                  <div>
+                    <MessageOutlined className='mr-1' />
+                    Sidenote
+                  </div>
+                  <Button
+                    type='text'
+                    icon={<EditOutlined />}
+                    className='hover:text-violet-500'
+                    onClick={() => setshowParticipationSideNote(true)}
+                  />
+                </Space>
+                {parse(selectedNode?.participationDescription)}
+              </Space>
+            )}
+          </CollapsiblePanel>
+        ) : null}
         <CollapsiblePanel title='Voting method'>
           <>
             {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION &&

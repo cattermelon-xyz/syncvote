@@ -12,6 +12,7 @@ export interface ICheckPoint {
   locked?: any;
   triggers?: any[];
   participation?: IParticipant;
+  participationDescription?: string;
 }
 
 // TODO: add version

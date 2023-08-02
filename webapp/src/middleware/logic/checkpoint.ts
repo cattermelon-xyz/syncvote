@@ -60,6 +60,10 @@ export const changeVersion = ({
     newData.checkpoints[index].participation =
       changedCheckPointData.participation;
   }
+  if (changedCheckPointData.participationDescription) {
+    newData.checkpoints[index].participationDescription =
+      changedCheckPointData.participationDescription;
+  }
   return newData;
 };
 
