@@ -672,8 +672,6 @@ export const getWorkflowFromEditor = async ({
     )
     .eq('user_id', userId);
 
-  console.log(data);
-
   dispatch(finishLoading({}));
   if (error) {
     onError(error);

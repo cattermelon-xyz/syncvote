@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Avatar, Card, Popover, Space } from 'antd';
+import { Avatar, Card, Modal, Popover, Space } from 'antd';
 import './AntCard.css';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -19,6 +19,8 @@ import DuplicateWorkflowModal from '../../pages/Workflow/fragments/DuplicateWork
 import MoveWorkflowModal from '../../pages/Workflow/fragments/MoveWorkflowModal';
 import MoveToWorkflowModal from '../../pages/Workflow/fragments/MoveToWorkflowModal';
 import { useDispatch } from 'react-redux';
+import ShareModal from '@pages/Workflow/Version/fragment/ShareModal';
+import { upsertWorkflowVersion } from '@middleware/data';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
@@ -37,6 +39,9 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   const [openModalMoveTo, setOpenModalMoveTo] = useState(false);
   const [isPopoverVisible, setIsPopoverVisible] = useState(true);
   const [orgTo, setOrgTo] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const navigate = useNavigate();
   const PopoverContent: React.FC = () => (
     <div className='cursor-pointer w-[196px]'>
       <div
@@ -60,7 +65,14 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
             <ImportOutlined /> Move to...
           </div>
         </div>
-        <div className='h-9 flex items-center hover:bg-gray-100'>
+        <div
+          className='h-9 flex items-center hover:bg-gray-100'
+          onClick={(e: any) => {
+            e.stopPropagation();
+            setShowShareModal(true);
+            setIsPopoverVisible(false);
+          }}
+        >
           <div className='px-2'>
             <ShareAltOutlined /> Invite
           </div>
@@ -109,9 +121,52 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
     </div>
   );
 
-  const navigate = useNavigate();
+  const handleWorkflowStatusChanged = async ({
+    versionId,
+    status,
+    onSuccess,
+    onError,
+  }: {
+    versionId: number;
+    status: string;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+  }) => {
+    const workflowId = dataWorkflow.id;
+    const workflowVersion = {
+      versionId,
+      workflowId,
+      status,
+    };
+    await upsertWorkflowVersion({
+      dispatch,
+      mode: 'info',
+      workflowVersion,
+      onSuccess: (data) => {
+        onSuccess(data);
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: 'Failed to update workflow status',
+        });
+        onError(error);
+      },
+    });
+  };
+  let workflow = dataWorkflow;
+  workflow.workflow_version = dataWorkflow.versions;
   return (
     <>
+      <ShareModal
+        workflow={workflow}
+        showShareModal={showShareModal}
+        setShowShareModal={setShowShareModal}
+        handleWorkflowStatusChanged={handleWorkflowStatusChanged}
+        onClose={() => {
+          setIsPopoverVisible(true);
+        }}
+      />
       <MoveToWorkflowModal
         open={openModalMoveTo}
         onClose={() => {
