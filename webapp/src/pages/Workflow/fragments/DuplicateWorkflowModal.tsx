@@ -1,12 +1,13 @@
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
-import { getDataOrgs } from '@middleware/data';
+import { getDataOrgs, insertWorkflowAndVersion } from '@middleware/data';
 import { useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import './create-new.scss';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { createIdString, randomIcon } from '@utils/helpers';
 
 interface DuplicateWorkflowModalProps {
   open: boolean;
@@ -30,6 +31,26 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
   };
 
   const handleOk = async () => {
+    const org = dataOrgs.find((org: any) => org.id === value);
+    const orgIdString = createIdString(`${org.title}`, `${org.id}`);
+    const props = {
+      title: workflow?.title,
+      desc: workflow?.desc,
+      owner_org_id: value,
+      emptyStage: workflow?.versions[0]?.data,
+      iconUrl: workflow.icon_url,
+      authority: user.id,
+    };
+    insertWorkflowAndVersion({
+      dispatch: dispatch,
+      props: props,
+      onError: (error) => {
+        Modal.error({ content: error.message });
+      },
+      onSuccess: (versions, insertedId) => {
+        navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      },
+    });
     onClose();
   };
 

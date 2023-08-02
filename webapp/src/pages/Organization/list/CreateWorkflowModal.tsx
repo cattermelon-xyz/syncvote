@@ -7,7 +7,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
-import './create-new.scss'
+import './create-new.scss';
 
 interface CreateWorkflowModalProps {
   open: boolean;
@@ -32,8 +32,6 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
     if (user?.id !== null) {
       await getDataOrgs({
         userId: user?.id,
-        offset: offset,
-        limit: limit,
         dispatch: dispatch,
         onSuccess: (data: any) => {
           setDataOrgs(data);

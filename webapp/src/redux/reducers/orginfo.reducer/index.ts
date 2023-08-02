@@ -57,6 +57,17 @@ const orgInfoSlice = createSlice({
         state.orgs[orgIndex].profile.push(user);
       }
     },
+    addWorkflowToOrg: (state, action) => {
+      console.log('Add workflow to Org');
+      const { workflow } = action.payload;
+      console.log(workflow);
+      const orgIndex = state.orgs.findIndex(
+        (org: any) => org.id === workflow.owner_org_id
+      );
+      if (orgIndex !== -1) {
+        state.orgs[orgIndex].workflows.push(workflow);
+      }
+    },
     changeWorkflowOrg: (state, action) => {
       const { orgIdFrom, workflow } = action.payload;
 
@@ -145,5 +156,6 @@ export const {
   changeWorkflowOrg,
   changeWorkflowInfo,
   deleteWorkflow,
+  addWorkflowToOrg,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;

@@ -6,8 +6,9 @@ import { getDataOrgs, insertWorkflowAndVersion } from '@middleware/data';
 import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from '@utils/helpers';
+import { createIdString, randomIcon } from '@utils/helpers';
 import './create-new.scss';
+import { emptyStage } from '@components/DirectedGraph';
 
 interface CreateWorkflowModalProps {
   open: boolean;
@@ -39,18 +40,14 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   };
 
   const handleOk = async () => {
-    // const org = dataOrgs.find((org: any) => org.id === value);
-    // const orgIdString = createIdString(`${org.title}`, `${org.id}`);
-    // navigate(`${orgIdString}/new-workflow/`);
     const org = dataOrgs.find((org: any) => org.id === value);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
-    // navigate(`${orgIdString}/new-workflow/`);
     const props = {
       title: 'Untitled Workflow',
       desc: '',
       owner_org_id: org.id,
       emptyStage: emptyStage,
-      iconÏÏÏUrl: 'preset:' + randomIcon(),
+      iconUrl: 'preset:' + randomIcon(),
       authority: user.id,
     };
     onClose();

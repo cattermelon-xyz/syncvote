@@ -40,7 +40,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   const [isPopoverVisible, setIsPopoverVisible] = useState(true);
   const [orgTo, setOrgTo] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
-
   const navigate = useNavigate();
   const PopoverContent: React.FC = () => (
     <div className='cursor-pointer w-[196px]'>
@@ -154,8 +153,10 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       },
     });
   };
+  
   let workflow = dataWorkflow;
   workflow.workflow_version = dataWorkflow.versions;
+
   return (
     <>
       <ShareModal

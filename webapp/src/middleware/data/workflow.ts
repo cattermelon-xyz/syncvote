@@ -12,6 +12,7 @@ import {
   changeWorkflowOrg,
   changeWorkflowInfo,
   deleteWorkflow,
+  addWorkflowToOrg,
 } from '@redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
@@ -81,7 +82,22 @@ export const insertWorkflowAndVersion = async ({
       })
     );
     dispatch(finishLoading({}));
-    if (!error && versions) onSuccess(versions, insertedId);
+    if (!error && versions) {
+      onSuccess(versions, insertedId);
+      dispatch(
+        addWorkflowToOrg({
+          workflow: {
+            id: insertedId,
+            title,
+            desc,
+            icon_url: iconUrl,
+            banner_url: '',
+            owner_org_id: orgId,
+            workflow_version: !err ? versions : [],
+          },
+        })
+      );
+    }
   }
   if (error) {
     onError(error);
