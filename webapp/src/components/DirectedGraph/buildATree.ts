@@ -134,6 +134,7 @@ const buildEdge = ({
       color: style.stroke || '#000',
     },
     labelStyle,
+    data: source.data.raw,
   };
 };
 

@@ -173,3 +173,12 @@ export interface IConfigPanel {
   onClose: () => void;
   onChangeLayout: (data: IWorkflowVersionLayout) => void;
 }
+
+export enum DelayUnit {
+  MINUTE = 'minute',
+  HOUR = 'hour',
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}

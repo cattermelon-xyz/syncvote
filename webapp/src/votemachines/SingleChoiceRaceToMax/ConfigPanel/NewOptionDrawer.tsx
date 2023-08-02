@@ -1,10 +1,12 @@
 import { ArrowRightOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Drawer, Space, Input, Select, Button } from 'antd';
-import { DelayUnit, IOption, displayDelayDuration } from '../interface';
+import { IOption } from '../interface';
 import { delay } from '@reduxjs/toolkit/dist/utils';
 import moment from 'moment';
 import TextEditor from '@components/Editor/TextEditor';
 import { useEffect, useState } from 'react';
+import { DelayUnit } from '@components/DirectedGraph/interface';
+import { displayDelayDuration } from '@components/DirectedGraph/utils';
 
 type NewOptionDrawerProps = {
   showAddOptionDrawer: boolean;

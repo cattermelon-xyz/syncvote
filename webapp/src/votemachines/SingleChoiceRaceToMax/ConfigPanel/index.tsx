@@ -16,6 +16,7 @@ import {
   IVoteMachineConfigProps,
 } from '../../../types';
 import { Option } from './option';
+import { DelayUnit } from '@components/DirectedGraph/interface';
 import VotingResult from './VotingResult';
 import VotingCondition from './VotingCondition';
 import NewOptionDrawer from './NewOptionDrawer';
@@ -28,7 +29,7 @@ import {
 import parse from 'html-react-parser';
 import '../styles.scss';
 import CollapsiblePanel from '@components/DirectedGraph/MachineConfigPanel/fragments/CollapsiblePanel';
-import { IOption, DelayUnit } from '../interface';
+import { IOption } from '../interface';
 import TextEditor from '@components/Editor/TextEditor';
 
 /**

@@ -16,7 +16,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { useState } from 'react';
-import { displayDelayDuration } from '../interface';
+import { displayDelayDuration } from '@components/DirectedGraph/utils';
 import parse from 'html-react-parser';
 import TextEditor from '@components/Editor/TextEditor';
 export const Option = ({
@@ -151,11 +151,10 @@ export const Option = ({
                 className='text-violet-400 flex items-center gap-1 cursor-pointer'
                 onClick={() => setShowEditDelay(true)}
               >
-                <ClockCircleOutlined />
                 <span>
-                  {`${displayDelayDuration(
+                  {displayDelayDuration(
                     moment.duration(delay, delayUnit ? delayUnit : 'minute')
-                  )}`}
+                  )}
                 </span>
               </span>
             </Popover>
