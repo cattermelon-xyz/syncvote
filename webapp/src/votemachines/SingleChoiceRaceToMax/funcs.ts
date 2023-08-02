@@ -39,6 +39,7 @@ export const getInitialData = () => {
     token: '',
     delays: [],
     delayUnits: [],
+    delayNotes: [],
   };
   return data;
 };
