@@ -24,7 +24,7 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { FiCalendar, FiHome, FiLink, FiUser, FiDownload } from 'react-icons/fi';
 import { MdChatBubbleOutline } from 'react-icons/md';
 import { LuPaintbrush } from 'react-icons/lu';
@@ -75,6 +75,8 @@ export const PublicVersion = () => {
     setSession(_session);
     setShowRegisterInvitation(_session?.user?.user_metadata ? false : true);
   };
+  const [searchParams, setSearchParams] = useSearchParams();
+  const diagramFullScreen = searchParams.get('view') === 'full' ? true : false;
 
   const worflowInfo = {
     workflow: workflow?.title,
@@ -164,7 +166,11 @@ export const PublicVersion = () => {
         {version?.status === 'PUBLISHED' ||
         version?.status === 'PUBLIC_COMMUNITY' ? (
           <>
-            <div className='w-full relative '>
+            <div
+              className={`w-full relative ${
+                diagramFullScreen ? 'hidden' : null
+              }`}
+            >
               {showRegisterInvitation ? (
                 <div className='absolute w-full h-full flex items-center justify-center z-50'>
                   <div className='flex items-center flex-row p-4 bg-white rounded-lg'>

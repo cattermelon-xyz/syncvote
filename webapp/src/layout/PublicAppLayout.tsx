@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from './fragments/Header';
 import { AuthContext } from '@layout/context/AuthContext';
 import PublicHeader from './fragments/PublicHeader';
@@ -8,20 +8,33 @@ type Props = {
 };
 
 const PublicAppLayout = ({ children }: Props): JSX.Element => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const diagramFullScreen = searchParams.get('view') === 'full' ? true : false;
   return (
     <>
       <AuthContext.Consumer>
-        {({ session }) => (
-          <div className="w-full bg-slate-100 h-screen">
-            <PublicHeader session={session} />
-            <div
-              className={`w-full flex justify-center`}
-              style={{ height: 'calc(100% - 80px)' }}
-            >
-              {children}
+        {({ session }) =>
+          !diagramFullScreen ? (
+            <div className='w-full bg-slate-100 h-screen'>
+              <PublicHeader session={session} />
+              <div
+                className={`w-full flex justify-center`}
+                style={{ height: 'calc(100% - 80px)' }}
+              >
+                {children}
+              </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className='w-full bg-slate-100 h-screen'>
+              <div
+                className={`w-full flex justify-center`}
+                style={{ height: 'calc(100% - 0px)' }}
+              >
+                {children}
+              </div>
+            </div>
+          )
+        }
       </AuthContext.Consumer>
     </>
   );
