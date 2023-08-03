@@ -60,6 +60,7 @@ export const PublicVersion = () => {
   const [profile, setProfile] = useState<any>();
   const [session, setSession] = useState<Session | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [rightSiderStatus, setRSiderStatus] = useState('closed');
   const [api, contextHolder] = notification.useNotification();
@@ -86,6 +87,10 @@ export const PublicVersion = () => {
   const fetchData = async () => {
     const data = await getDataReactionCount({ where, dispatch });
     setDataReaction(data);
+  };
+  const onEdgeClick = (e: any, edge: any) => {
+    // TODO: move this to IGraph interface to drill selectedEdge into children components
+    setSelectedEdgeId(edge.id);
   };
 
   useEffect(() => {
@@ -303,16 +308,18 @@ export const PublicVersion = () => {
                   viewMode={GraphViewMode.VIEW_ONLY}
                   data={version?.data || emptyStage}
                   selectedNodeId={selectedNodeId}
+                  selectedEdgeId={selectedEdgeId}
+                  onEdgeClick={onEdgeClick}
+                  onConfigPanelClose={() => setSelectedNodeId('')}
                   selectedLayoutId={
                     version?.data?.cosmetic?.defaultLayout?.horizontal
                   }
+                  onConfigEdgePanelClose={() => setSelectedEdgeId('')}
                   setExportImage={setDownloadImageStatus}
                   shouldExportImage={downloadImageStatus}
                   onChange={(newData) => {}}
                   onChangeLayout={(newData) => {}}
                   onDeleteNode={(nodeId) => {}}
-                  onConfigEdgePanelClose={() => {}}
-                  onConfigPanelClose={() => setSelectedNodeId('')}
                   onNodeChanged={(changedNodes) => {
                     const newData = structuredClone(version?.data);
                     newData?.checkpoints?.forEach((v: any, index: number) => {

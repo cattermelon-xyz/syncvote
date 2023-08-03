@@ -5,11 +5,6 @@ import {
   EdgeProps,
   getSmoothStepPath,
 } from 'reactflow';
-import { DelayUnit } from '../interface';
-import { displayDelayDuration } from '../utils';
-import moment from 'moment';
-import { Popover } from 'antd';
-import parse from 'html-react-parser';
 import EdgeLabel from './fragments/EdgeLabel';
 
 // strokeWidth: 2,

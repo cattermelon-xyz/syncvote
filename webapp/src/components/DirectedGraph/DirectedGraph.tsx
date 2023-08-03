@@ -76,14 +76,25 @@ const Flow = () => {
     }, []),
   });
   useEffect(() => {
-    const obj: any = buildATree({ data, selectedNodeId, selectedLayoutId });
+    const obj: any = buildATree({
+      data,
+      selectedNodeId,
+      selectedLayoutId,
+      selectedEdgeId,
+    });
     setNodes(obj.nodes);
     setEdges(obj.edges);
     if (shouldExportImage) {
       selfDownloadImage({ imageWidth: 1344, imageHeight: 768 });
       setExportImage ? setExportImage(false) : null;
     }
-  }, [data, selectedNodeId, selectedLayoutId, shouldExportImage]);
+  }, [
+    data,
+    selectedNodeId,
+    selectedLayoutId,
+    shouldExportImage,
+    selectedEdgeId,
+  ]);
   const proOptions = {
     hideAttribution: true,
   };

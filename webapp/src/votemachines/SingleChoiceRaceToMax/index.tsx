@@ -9,6 +9,7 @@ import {
   IVoteMachine,
   IVoteMachineGetLabelProps,
 } from '../../types';
+import parse from 'html-react-parser';
 import {
   getProgramAddress as gpa,
   getName as gn,
@@ -19,6 +20,74 @@ import {
 } from './funcs';
 import cf from './ConfigPanel';
 import { IData } from './interface';
+
+const displayDuration = (duration: moment.Duration) => {
+  const years =
+    duration.years() === 0
+      ? ''
+      : `${duration.years()} ${duration.years() > 1 ? 'years' : 'year'} `;
+  const months =
+    duration.months() === 0
+      ? ''
+      : `${duration.months()} ${duration.months() > 1 ? 'months' : 'month'} `;
+  const days =
+    duration.days() === 0
+      ? ''
+      : `${duration.days()} ${duration.days() > 1 ? 'days' : 'day'} `;
+  const hours =
+    duration.hours() === 0
+      ? ''
+      : `${duration.hours()} ${duration.hours() > 1 ? 'hours' : 'hour'} `;
+  const minutes =
+    duration.minutes() === 0
+      ? ''
+      : `${duration.minutes()} ${
+          duration.minutes() > 1 ? 'minutes' : 'minute'
+        } `;
+  const seconds =
+    duration.seconds() === 0
+      ? ''
+      : `${duration.seconds()} ${
+          duration.seconds() > 1 ? 'seconds' : 'second'
+        } `;
+  const drt = years + months + days + hours + minutes + seconds;
+  return drt ? drt : '0 seconds';
+};
+
+const displayAddress = (address: string | undefined) => {
+  if (!address) {
+    return '';
+  }
+  const chain = address.split('.')[0] || '';
+  const tokenName = address.split('.')[1] || '';
+  const tokenAddress = address
+    .replace(`${chain}.`, '')
+    .replace(`${tokenName}.`, '');
+  let explorer = tokenAddress;
+  switch (chain) {
+    case 'sol':
+      explorer = 'https://explorer.solana.com/address/' + explorer;
+      break;
+    case 'eth':
+      explorer = 'https://etherscan.io/address/' + explorer;
+      break;
+    case 'bsc':
+      explorer = 'https://bscscan.com/address/' + explorer;
+      break;
+  }
+  if (tokenName) {
+    return (
+      <a href={explorer} target='_blank' title={tokenAddress}>
+        {tokenName}
+      </a>
+    );
+  }
+  return tokenAddress;
+};
+
+const isRTE = (str: string | undefined) => {
+  return str && str !== '<p></p>' && str !== '<p><br></p>';
+};
 
 export const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
@@ -71,7 +140,9 @@ export const explain = ({
     return <></>;
   }
   const noOfOptions = checkpoint.children ? checkpoint.children.length : 0;
-  const { participation } = checkpoint;
+  const { participation, participationDescription } = checkpoint;
+  const resultDescription = checkpoint.data?.resultDescription || '';
+  const votingLocation = checkpoint.votingLocation || '';
   const renderParticipation = (participation: IParticipant | undefined) => {
     let rs = null;
     if (!participation || (participation.type && !participation.data)) {
@@ -93,7 +164,7 @@ export const explain = ({
           <span className='mr-1'>
             Only
             <span className='text-violet-500 mx-1'>
-              {(pdata as IToken)?.address}
+              {displayAddress((pdata as IToken)?.address)}
             </span>{' '}
             token/nft holders with a minimum of
             <span className='text-violet-500 mx-1'>
@@ -110,8 +181,7 @@ export const explain = ({
     <div className='block'>
       The voting duration for this checkpoint is set for
       <span className='text-violet-500 mx-1'>
-        apprx.&nbsp;
-        {moment.duration((checkpoint?.duration || 0) * 1000).humanize()}
+        {displayDuration(moment.duration((checkpoint?.duration || 0) * 1000))}
       </span>{' '}
       from the active time.
       {/* <div>
@@ -122,21 +192,42 @@ export const explain = ({
       </div> */}
       <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
       {renderParticipation(participation)}
-      Each of them can vote ONE option from a list of
-      <span className='text-violet-500 mx-1'>{noOfOptions}</span>
-      options.
-      {data.includedAbstain
-        ? ' User can also choose to abstain from voting.'
-        : ''}
+      {isRTE(participationDescription) ? (
+        <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
+          {parse(participationDescription || '')}
+        </div>
+      ) : null}
+      <div className='mt-2'>
+        Each of them can vote ONE option from a list of
+        <span className='text-violet-500 mx-1'>{noOfOptions}</span>
+        options.
+        {data.includedAbstain
+          ? ' User can also choose to abstain from voting.'
+          : ''}
+      </div>
       {/* Only user with ... can vote. */}
       <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
-      Winning option is the option that receive the highest number of votes and
-      reach a minimum of{' '}
-      <span className='text-violet-500 mx-1'>
-        {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
-        {!data.token ? 'votes' : ` voted token ${data.token}`}
-      </span>
-      made by participants.
+      <div className='mb-2'>
+        Winning option is the option that receive the highest number of votes
+        and reach a minimum of{' '}
+        <span className='text-violet-500 mx-1'>
+          {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
+          {!data.token ? 'votes' : ` voted token ${data.token}`}
+        </span>
+        made by participants.
+      </div>
+      {isRTE(resultDescription) ? (
+        <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
+          {parse(resultDescription)}
+        </div>
+      ) : null}
+      {isRTE(votingLocation) ? (
+        <div>
+          <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+          <div className='text-zinc-500'>Voting happens at</div>
+          {parse(votingLocation)}
+        </div>
+      ) : null}
     </div>
   );
   return p1;

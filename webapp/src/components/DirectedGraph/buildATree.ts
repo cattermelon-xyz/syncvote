@@ -58,7 +58,7 @@ function calcAngle(cx: number, cy: number, ex: number, ey: number) {
   return theta;
 }
 
-const SELECTED_COLOR = '#caf0f8';
+const SELECTED_COLOR = '#5D23BB';
 
 const SELECTED_NODE_STYLE = {
   backgroundColor: SELECTED_COLOR,
@@ -66,21 +66,25 @@ const SELECTED_NODE_STYLE = {
 
 const SELECTED_EDGE_STYLE = {
   stroke: SELECTED_COLOR,
-  strokeWidth: 5,
+  strokeWidth: 2,
 };
 
 const buildEdge = ({
+  selectedEdgeId,
   source,
   target,
   label,
   style = {},
   labelStyle = {},
+  animated = false,
 }: {
+  selectedEdgeId: string | undefined;
   source: any;
   target: any;
   label: JSX.Element;
   style?: any;
   labelStyle?: any;
+  animated: boolean;
 }) => {
   const sourcePos = getCenterPos({
     node: source,
@@ -120,6 +124,7 @@ const buildEdge = ({
     type = SmoothCustomEdge.getTypeName();
   }
   // console.log(`${source.id}->${target.id}`, sourceHandle, targetHandle,'; angle: ',angle);
+  console.log('selectedSdgeId: ', selectedEdgeId);
   return {
     id: `${source.id}-${target.id}`,
     source: source.id,
@@ -129,6 +134,7 @@ const buildEdge = ({
     targetHandle,
     style,
     type,
+    animated: selectedEdgeId === `${source.id}-${target.id}` ? true : animated,
     markerEnd: {
       type: MarkerType.Arrow,
       color: style.stroke || '#000',
@@ -142,10 +148,12 @@ export const buildATree = ({
   data,
   selectedNodeId,
   selectedLayoutId,
+  selectedEdgeId,
 }: {
   data: IWorkflowVersionData;
   selectedNodeId: string | undefined;
   selectedLayoutId: string | undefined;
+  selectedEdgeId: string | undefined;
 }) => {
   const checkpoints: Array<any> = [];
   let newData = { ...data };
@@ -210,13 +218,15 @@ export const buildATree = ({
         );
         let edgeStyle = { ...edgeFromLayout?.style };
         let edgeLableStyle = { ...edgeFromLayout?.labelStyle };
-
+        let animated = false;
         if (selectedNodeId && sourceId === selectedNodeId) {
           edgeStyle = SELECTED_EDGE_STYLE;
+          animated = true;
         } else if (node.edgeStyle) {
           edgeStyle = node.edgeStyle;
         }
         const newEdge = buildEdge({
+          selectedEdgeId,
           source: nodes.find((_node) => _node.id === sourceId),
           target: nodes.find((_node) => _node.id === childId),
           label: buildLabel({
@@ -226,6 +236,7 @@ export const buildATree = ({
           }),
           style: edgeStyle,
           labelStyle: edgeLableStyle,
+          animated,
         });
         // return the newEdge
         edges.push(newEdge);

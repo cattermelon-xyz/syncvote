@@ -47,8 +47,8 @@ const Node = memo(
     const description = data.raw?.description || '';
     const duration = data.raw?.duration * 1000 || 0;
     const selected = data.selected
-      ? 'border-2 border-violet-500'
-      : 'border border-slate-700 ';
+      ? 'border-2 border-violet-500 border-dashed'
+      : 'border border-slate-700 border-solid';
     const style = data.style;
     const votingLocation = data.raw?.votingLocation || '';
     let threshold = data.raw?.data?.max || 0;
@@ -115,7 +115,7 @@ const Node = memo(
           isConnectable={isConnectable}
         />
         <div
-          className={`rounded-md text-base border-solid ${selected} ${
+          className={`rounded-md text-base hover:opacity-30 ${selected} ${
             data.isEnd ? 'bg-zinc-700 text-white' : ''
           }`}
         >
