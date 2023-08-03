@@ -25,6 +25,7 @@ import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
 import AccountSetting from '@pages/Account/pages/AccountSetting';
 import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
+import NotFound404 from '@pages/NotFound404';
 
 const AppRoutes = () => (
   <BrowserRouter basename='/'>
@@ -78,6 +79,7 @@ const AppRoutes = () => (
             />
             <Route path=':versionIdString' element={<EditVersion />} />
           </Route>
+          <Route path='*' element={<NotFound404 />} />
         </Route>
       </Route>
 
@@ -96,6 +98,12 @@ const AppRoutes = () => (
         <Route path=':orgIdString'>
           <Route index element={<BluePrint />} />
         </Route>
+      </Route>
+      <Route
+        path='*'
+        element={<App layout={PublicAppLayout} requiredLogin={false} />}
+      >
+        <Route index element={<NotFound404 />} />
       </Route>
     </Routes>
   </BrowserRouter>

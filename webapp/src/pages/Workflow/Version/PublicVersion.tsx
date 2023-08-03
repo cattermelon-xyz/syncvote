@@ -46,6 +46,7 @@ import Google from '@assets/icons/svg-icons/Google';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
+import NotFound404 from '@pages/NotFound404';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();

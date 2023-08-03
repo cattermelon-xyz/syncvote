@@ -34,6 +34,8 @@ import {
 } from '@types';
 import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
+import NotFound404 from '@pages/NotFound404';
+import { error } from 'console';
 
 const extractVersion = ({
   workflows,
@@ -79,6 +81,7 @@ const extractVersion = ({
 
 export const EditVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
+  const [loading, setLoading] = useState(true);
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
   const versionId = extractIdFromIdString(versionIdString);
@@ -147,11 +150,16 @@ export const EditVersion = () => {
         dispatch,
         onLoad: (wfList: any) => {
           extractWorkflowFromList(wfList);
+          setLoading(false);
+        },
+        onError: () => {
+          setLoading(false);
         },
       });
     } else {
       extractWorkflowFromList(workflows);
       setWeb2IntegrationsState(web2Integrations);
+      setLoading(false);
     }
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
@@ -164,7 +172,7 @@ export const EditVersion = () => {
     return () => {
       window.removeEventListener('beforeunload', handleTabClose);
     };
-  }, []);
+  }, [workflows]);
 
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
@@ -354,6 +362,8 @@ export const EditVersion = () => {
     version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
       ?.markers || [];
   const [showColorLegend, setShowColorLegend] = useState(true);
+  console.log('loading: ', loading);
+  console.log('version: ', version);
   return (
     <>
       <AuthContext.Consumer>
@@ -374,9 +384,13 @@ export const EditVersion = () => {
               style={{ height: 'calc(100% - 80px)' }}
             >
               {versionId && !version?.data ? (
-                <div className='w-full h-full'>
-                  <Skeleton className='p-16' />
-                </div>
+                loading === true ? (
+                  <div className='w-full h-full'>
+                    <Skeleton className='p-16' />
+                  </div>
+                ) : (
+                  <NotFound404 />
+                )
               ) : (
                 <div className='w-full h-full'>
                   <DirectedGraph
