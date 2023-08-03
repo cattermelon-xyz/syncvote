@@ -34,7 +34,6 @@ import {
 } from '@types';
 import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
-import EditWorkflow from '../BluePrint/fragment/EditWorkflow';
 
 const extractVersion = ({
   workflows,

@@ -163,7 +163,6 @@ export const PublicVersion = () => {
       });
     }
   };
-  console.log('created: ', workflow?.created_at);
   return (
     <>
       {contextHolder}
