@@ -1,4 +1,4 @@
-import { Modal, Image, Divider } from 'antd';
+import { Modal, Image, Divider, Empty } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
 import { createIdString } from '@utils/helpers';
@@ -46,7 +46,7 @@ const PreviewWorkflowModal: React.FC<PreviewWorkflowModalProps> = ({
       okButtonProps={{ style: { background: '#F4F0FA', color: '#6200EE' } }}
     >
       {workflow?.workflow_version[0].preview_image_url === null ? (
-        <div></div>
+        <Empty></Empty>
       ) : (
         <div style={{ border: '1px solid #E3E3E2' }}>
           <Image
