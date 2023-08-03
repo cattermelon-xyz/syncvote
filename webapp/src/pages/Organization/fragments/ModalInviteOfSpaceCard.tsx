@@ -28,7 +28,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
 }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [email, setEmail] = useState("");
-  const [modalText, setModalText] = useState("Content of the modal");
   const [usersInOrg, setUsersInOrg] = useState<IProfile[]>();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -110,15 +109,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
         });
       },
     });
-  };
-
-  const handleOk = () => {
-    setModalText("The modal will be closed after two seconds");
-    setConfirmLoading(true);
-    setTimeout(() => {
-      onClose();
-      setConfirmLoading(false);
-    }, 2000);
   };
 
   const handleCopyLink = () => {

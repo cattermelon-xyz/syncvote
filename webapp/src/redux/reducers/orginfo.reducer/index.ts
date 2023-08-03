@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-len */
 /* eslint-disable no-param-reassign */
-import { createSlice } from '@reduxjs/toolkit';
-import { IOrgInfo, IProfile } from './interface';
+import { createSlice } from "@reduxjs/toolkit";
+import { IOrgInfo, IProfile } from "./interface";
 
 const initialState: {
   orgs: IOrgInfo[];
@@ -12,17 +12,17 @@ const initialState: {
   orgs: [],
   lastFetch: -1,
   user: {
-    id: '',
-    email: '',
-    full_name: '',
-    avatar_url: '',
-    about_me: '',
-    role: '',
+    id: "",
+    email: "",
+    full_name: "",
+    avatar_url: "",
+    about_me: "",
+    role: "",
   },
 };
 
 const orgInfoSlice = createSlice({
-  name: 'orginfo',
+  name: "orginfo",
   initialState,
   reducers: {
     setLastFetch: (state, action) => {
@@ -47,6 +47,14 @@ const orgInfoSlice = createSlice({
     reset: (state, action) => {
       state.orgs = [];
       state.lastFetch = -1;
+    },
+    deleteOrgInfo: (state, action) => {
+      const index = state.orgs.findIndex(
+        (org: IOrgInfo) => org.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.orgs.splice(index, 1);
+      }
     },
     addUserToOrg: (state, action) => {
       const { orgId, user } = action.payload;
@@ -145,5 +153,6 @@ export const {
   changeWorkflowOrg,
   changeWorkflowInfo,
   deleteWorkflow,
+  deleteOrgInfo,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;
