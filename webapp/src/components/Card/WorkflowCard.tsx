@@ -21,6 +21,7 @@ import MoveToWorkflowModal from '../../pages/Workflow/fragments/MoveToWorkflowMo
 import { useDispatch } from 'react-redux';
 import ShareModal from '@pages/Workflow/Version/fragment/ShareModal';
 import { upsertWorkflowVersion } from '@middleware/data';
+import PreviewWorkflowModal from '@pages/Workflow/fragments/PreviewWorkflowModal';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
@@ -34,6 +35,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   const dispatch = useDispatch();
   const [openModalChangeName, setOpenModalChangeName] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [openModalPreview, setOpenModalPreview] = useState(false);
   const [openModalDuplicate, setOpenModalDuplicate] = useState(false);
   const [openModalMove, setOpenModalMove] = useState(false);
   const [openModalMoveTo, setOpenModalMoveTo] = useState(false);
@@ -46,6 +48,11 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       <div
         style={{ borderBottom: '1px solid #E3E3E2' }}
         className='h-9 flex items-center hover:bg-gray-100'
+        onClick={(e: any) => {
+          e.stopPropagation();
+          setOpenModalPreview (true);
+          setIsPopoverVisible(false);
+        }}
       >
         <div className='px-2'>
           <EyeOutlined /> Preview
@@ -153,12 +160,21 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       },
     });
   };
-  
+
   let workflow = dataWorkflow;
   workflow.workflow_version = dataWorkflow.versions;
 
   return (
     <>
+      <PreviewWorkflowModal
+        open={openModalPreview}
+        onClose={() => {
+          setOpenModalPreview(false);
+          setIsPopoverVisible(true);
+        }}
+        workflow={dataWorkflow}
+        dispatch={dispatch}
+      />
       <ShareModal
         workflow={workflow}
         showShareModal={showShareModal}

@@ -276,6 +276,7 @@ export const queryOrgs = async ({
         versions: workflow_version(
           id, 
           data,
+          preview_image_url,
           status,
           created_at,
           last_updated

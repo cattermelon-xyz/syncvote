@@ -82,7 +82,18 @@ export const insertWorkflowAndVersion = async ({
       })
     );
     dispatch(finishLoading({}));
+
     if (!error && versions) {
+      const image_name = `${data[0].id}_${versions[0].id}`;
+      
+      const { data: d, error: e } = await supabase
+        .from('workflow_version')
+        .update({
+          preview_image_url: `https://uafmqopjujmosmilsefw.supabase.co/storage/v1/object/public/preview_image/${image_name}.jpg`,
+        })
+        .eq('id', versions[0].id)
+        .select();
+
       onSuccess(versions, insertedId);
       dispatch(
         addWorkflowToOrg({
@@ -135,7 +146,6 @@ export const upsertWorkflowVersion = async ({
   };
   if (!mode || mode === 'data') {
     toUpsert.data = versionData;
-    toUpsert.preview_image_url = 'Hehe';
   }
   if (!mode || mode === 'info') {
     version ? (toUpsert.version = version) : null;

@@ -4,6 +4,7 @@ import {
   SaveOutlined,
 } from '@ant-design/icons';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
+import _ from 'lodash';
 import {
   DirectedGraph,
   defaultLayout,
@@ -89,6 +90,7 @@ export const EditVersion = () => {
     workflowId,
     versionId,
   });
+
   const { web2Integrations } = useSelector((state: any) => state.integration);
   const [version, setVersion] = useState<any>(extractedVersion);
   const [web2IntegrationsState, setWeb2IntegrationsState] =
@@ -101,6 +103,7 @@ export const EditVersion = () => {
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
   );
+  const [uploadImage, setUploadImage] = useState(false);
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
@@ -112,6 +115,11 @@ export const EditVersion = () => {
       versionId,
     });
     setVersion(extractedVersion);
+
+    if (_.isEqual(version.data, emptyStage)) {
+      setUploadImage(true);
+    }
+
     setSelectedLayoutId(
       extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal || 'default'
     );
@@ -140,11 +148,12 @@ export const EditVersion = () => {
     }
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
-  
+
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
     changedData?: any | undefined
   ) => {
+    setUploadImage(true);
     const versionToSave = changedData || version;
     await upsertWorkflowVersion({
       dispatch,
@@ -351,6 +360,8 @@ export const EditVersion = () => {
               ) : (
                 <div className='w-full h-full'>
                   <DirectedGraph
+                    shouldUploadImage={uploadImage}
+                    setUploadImage={setUploadImage}
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
                     navPanel={<></>}
