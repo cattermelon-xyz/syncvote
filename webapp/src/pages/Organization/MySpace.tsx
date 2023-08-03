@@ -12,7 +12,8 @@ import { useFilteredData } from '@utils/hooks/useFilteredData';
 import CreateSpaceModal from '@components/CreateNewDialog/CreateSpaceModal';
 import CreateWorkflowModal from '@components/CreateNewDialog/CreateWorkflowModal';
 import { FileOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 
 interface SortProps {
   by: string;
@@ -61,7 +62,7 @@ const MySpace: React.FC = () => {
   );
 
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -79,10 +80,13 @@ const MySpace: React.FC = () => {
             org_title: adminOrg.title,
           }))
         );
-
         setWorkflows(allWorkflows);
       }
       setLoading(false);
+      const url = PublicPageRedirect.getRedirectUrl();
+      if (url) {
+        navigate(url);
+      }
     };
 
     if (user) {

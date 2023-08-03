@@ -13,6 +13,7 @@ import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { Button, Modal } from 'antd';
 import { listConnectWallet, listOptionsConnectWallet } from './connectWallet';
 import loginBanner from '../../assets/images/loginBanner1.png';
+import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -30,6 +31,7 @@ function Login() {
 
   const dispatch = useDispatch();
   const handleLogin = async () => {
+    PublicPageRedirect.confirm();
     dispatch(startLoading({}));
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

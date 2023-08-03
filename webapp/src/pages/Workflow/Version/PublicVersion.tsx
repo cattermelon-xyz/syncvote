@@ -21,6 +21,7 @@ import {
   Skeleton,
   Empty,
   Modal,
+  Result,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -44,6 +45,7 @@ import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 import Google from '@assets/icons/svg-icons/Google';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
+import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -77,6 +79,9 @@ export const PublicVersion = () => {
   };
   const [searchParams, setSearchParams] = useSearchParams();
   const diagramFullScreen = searchParams.get('view') === 'full' ? true : false;
+  PublicPageRedirect.attempt(
+    `/public/${orgIdString}/${workflowIdString}/${versionIdString}`
+  );
 
   const worflowInfo = {
     workflow: workflow?.title,
@@ -130,7 +135,6 @@ export const PublicVersion = () => {
       },
       dispatch,
     });
-
     supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
       await handleSession(_session);
     });
@@ -139,7 +143,8 @@ export const PublicVersion = () => {
   }, []);
   const handleLogin = async () => {
     dispatch(startLoading({}));
-    const redirectTo = window.location.href;
+    PublicPageRedirect.confirm();
+    const redirectTo = import.meta.env.VITE_BASE_URL;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -158,13 +163,15 @@ export const PublicVersion = () => {
       });
     }
   };
-
+  console.log('created: ', workflow?.created_at);
   return (
     <>
       {contextHolder}
       <Layout>
         {version?.status === 'PUBLISHED' ||
-        version?.status === 'PUBLIC_COMMUNITY' ? (
+        version?.status === 'PUBLIC_COMMUNITY' ||
+        (version?.status === 'DRAFT' &&
+          session?.user?.id === workflow?.authority) ? (
           <>
             <div
               className={`w-full relative ${
@@ -466,6 +473,29 @@ export const PublicVersion = () => {
               </Sider>
             </Layout>
           </>
+        ) : workflow?.created_at ? (
+          <div className='w-full items-center text-center pt-20'>
+            <Result
+              status='403'
+              title='Missing permission'
+              subTitle={
+                <div>
+                  <p>
+                    Sorry, this page is not published and your are not owner.
+                  </p>
+                  <p>Please contact owner of this page.</p>
+                </div>
+              }
+              extra={
+                <Button
+                  type='primary'
+                  onClick={() => window.open(import.meta.env.VITE_BASE_URL)}
+                >
+                  Back Home
+                </Button>
+              }
+            />
+          </div>
         ) : (
           <Skeleton />
         )}

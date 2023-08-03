@@ -56,7 +56,7 @@ function Header({
 }: HeaderProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { orgIdString, workflowIdString } = useParams();
+  const { orgIdString, workflowIdString, versionIdString } = useParams();
   const workflowId = extractIdFromIdString(workflowIdString);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const handleClearStore = () => {};
@@ -253,10 +253,14 @@ function Header({
               } `}
               icon={<EyeOutlined />}
               onClick={() => {
-                setViewMode(
-                  viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
-                    ? GraphViewMode.VIEW_ONLY
-                    : GraphViewMode.EDIT_WORKFLOW_VERSION
+                // setViewMode(
+                //   viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                //     ? GraphViewMode.VIEW_ONLY
+                //     : GraphViewMode.EDIT_WORKFLOW_VERSION
+                // );
+                window.open(
+                  `/public/${orgIdString}/${workflowIdString}/${versionIdString}`,
+                  '_blank'
                 );
               }}
             >

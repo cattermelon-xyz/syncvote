@@ -124,7 +124,6 @@ const buildEdge = ({
     type = SmoothCustomEdge.getTypeName();
   }
   // console.log(`${source.id}->${target.id}`, sourceHandle, targetHandle,'; angle: ',angle);
-  console.log('selectedSdgeId: ', selectedEdgeId);
   return {
     id: `${source.id}-${target.id}`,
     source: source.id,
