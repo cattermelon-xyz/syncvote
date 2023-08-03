@@ -9,7 +9,7 @@ self.onmessage = (message) => {
 
 const sleep = (milliseconds: number) => {
   const date = Date.now();
-  let currentDate = null;
+  let currentDate;
   do {
     currentDate = Date.now();
   } while (currentDate - date < milliseconds);
