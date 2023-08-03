@@ -26,6 +26,7 @@ import QuickStartDialog from './QuickStartDialog';
 import { GraphContext } from './context';
 import EdgeConfigPanel from './EdgeConfigPanel';
 import { renderVoteMachineConfigPanel } from './renderVoteMachineConfigPanel';
+import { supabase } from '@utils/supabaseClient';
 
 const nodeTypes = { ...MultipleDirectNode.getType() };
 const edgeTypes = {
@@ -33,6 +34,29 @@ const edgeTypes = {
   ...BezierCustomEdge.getType(),
   ...SmoothCustomEdge.getType(),
 };
+async function uploadImageToSupabase(dataUrl: string) {
+  // Chuyển đổi Data URL thành Blob
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
+
+  // Chuyển Blob thành đối tượng File
+  const avatarFile = new File([blob], 'reactflow.png', { type: 'image/png' });
+
+  // Tải file lên Supabase
+  const { data, error } = await supabase.storage
+    .from('preview_image') // Tên bucket của bạn
+    .upload('reactflow.png', avatarFile, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+  if (error) {
+    console.error('Upload error: ', error);
+  } else {
+    console.log('Upload successful!');
+  }
+}
+
 function downloadImage(dataUrl: any) {
   const a = document.createElement('a');
 
@@ -94,6 +118,39 @@ const Flow = () => {
   const selectedEdge = edges?.find((edge: any) => edge.id === selectedEdgeId);
 
   const { getNodes } = useReactFlow();
+  
+  const selfUploadImage = ({
+    imageWidth = 1344,
+    imageHeight = 768,
+  }: {
+    imageWidth?: number;
+    imageHeight?: number;
+  }) => {
+    // we calculate a transform for the nodes so that all nodes are visible
+    // we then overwrite the transform of the `.react-flow__viewport` element
+    // with the style option of the html-to-image library
+    const nodesBounds = getRectOfNodes(getNodes());
+    const transform = getTransformForBounds(
+      nodesBounds,
+      imageWidth,
+      imageHeight,
+      0.4,
+      10
+    );
+
+    toPng(document.querySelector('.react-flow__viewport') as HTMLElement, {
+      backgroundColor: '#fff',
+      width: imageWidth,
+      height: imageHeight,
+      skipAutoScale: true,
+      style: {
+        width: imageWidth + 'px',
+        height: imageHeight + 'px',
+        transform: `translate(${transform[0]}px, ${transform[1]}px) scale(${transform[2]})`,
+      },
+    }).then(uploadImageToSupabase);
+  };
+
   const selfDownloadImage = ({
     imageWidth = 1344,
     imageHeight = 768,

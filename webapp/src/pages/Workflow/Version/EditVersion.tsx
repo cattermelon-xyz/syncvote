@@ -140,6 +140,7 @@ export const EditVersion = () => {
     }
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
+  
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
     changedData?: any | undefined

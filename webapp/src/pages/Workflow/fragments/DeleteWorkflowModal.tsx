@@ -13,7 +13,7 @@ const DeleteWorkflowModal: React.FC<DeleteWorkflowModalProps> = ({
   open,
   onClose,
   workflow,
-  dispatch,
+  dispatch, 
 }) => {
   const handleCancel = () => {
     onClose();

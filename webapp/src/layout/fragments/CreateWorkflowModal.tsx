@@ -22,25 +22,12 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   setOpenCreateWorkspaceModal,
 }) => {
   const navigate = useNavigate();
-  const { user } = useSelector((state: any) => state.orginfo);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const dispatch = useDispatch();
-  const [dataOrgs, setDataOrgs] = useState<any>([]);
-
-  const loadWorkflowData = async () => {
-    if (user?.id !== null) {
-      await getDataOrgs({
-        userId: user?.id,
-        dispatch: dispatch,
-        onSuccess: (data: any) => {
-          setDataOrgs(data);
-        },
-      });
-    }
-  };
 
   const handleOk = async () => {
-    const org = dataOrgs.find((org: any) => org.id === value);
+    const org = orgs.find((org: any) => org.id === value);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
     const props = {
       title: 'Untitled Workflow',
@@ -75,9 +62,9 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
     setValue(e.target.value);
   };
 
-  useEffect(() => {
-    loadWorkflowData();
-  }, [user]);
+  // useEffect(() => {
+  //   loadWorkflowData();
+  // }, [user]);
 
   return (
     <Modal
@@ -99,7 +86,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 
       <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {dataOrgs.map((org: any, index: any) => (
+          {orgs.map((org: any, index: any) => (
             <div
               className='flex h-12 items-center radio cursor-pointer'
               key={index}

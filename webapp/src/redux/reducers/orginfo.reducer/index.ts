@@ -118,6 +118,7 @@ const orgInfoSlice = createSlice({
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
           (wf: any) => (wf.id = workflow.id)
         );
+        console.log(worfklowIndex);
 
         if (worfklowIndex !== -1) {
           state.orgs[orgIndex].workflows = state.orgs[

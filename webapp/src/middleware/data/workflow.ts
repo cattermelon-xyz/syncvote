@@ -135,6 +135,7 @@ export const upsertWorkflowVersion = async ({
   };
   if (!mode || mode === 'data') {
     toUpsert.data = versionData;
+    toUpsert.preview_image_url = 'Hehe';
   }
   if (!mode || mode === 'info') {
     version ? (toUpsert.version = version) : null;
