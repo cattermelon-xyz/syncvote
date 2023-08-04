@@ -85,7 +85,7 @@ export const insertWorkflowAndVersion = async ({
 
     if (!error && versions) {
       const image_name = `${data[0].id}_${versions[0].id}`;
-      
+
       const { data: d, error: e } = await supabase
         .from('workflow_version')
         .update({
@@ -324,8 +324,14 @@ export const updateAWorkflowInfo = async ({
   const { data, error } = await supabase
     .from('workflow')
     .update(toUpdate)
-    .eq('id', id)
-    .select('*');
+    .eq('id', id).select(`*, versions: workflow_version(
+      id, 
+      data,
+      preview_image_url,
+      status,
+      created_at,
+      last_updated
+    )`);
   dispatch(finishLoading({}));
   if (data) {
     const newData = structuredClone(data);
@@ -341,6 +347,7 @@ export const updateAWorkflowInfo = async ({
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
     });
+    console.log('New data', newData[0]);
     dispatch(changeWorkflowInfo({ workflow: newData[0] }));
     dispatch(changeWorkflow(newData[0]));
     onSuccess(newData);

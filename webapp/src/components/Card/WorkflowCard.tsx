@@ -50,7 +50,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         className='h-9 flex items-center hover:bg-gray-100'
         onClick={(e: any) => {
           e.stopPropagation();
-          setOpenModalPreview (true);
+          setOpenModalPreview(true);
           setIsPopoverVisible(false);
         }}
       >
@@ -173,7 +173,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
       />
       <ShareModal
         workflow={workflow}

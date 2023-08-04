@@ -249,9 +249,11 @@ const Flow = () => {
         onEdgeClick={onEdgeClick}
         fitView={true}
         fitViewOptions={{
-          padding: 0,
+          padding: 1,
           includeHiddenNodes: true,
           duration: 1000,
+          maxZoom: 4,
+          minZoom: 0.7,
         }}
       >
         <Controls position='bottom-left' />
