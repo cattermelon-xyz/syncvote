@@ -35,7 +35,7 @@ import {
 import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
 import NotFound404 from '@pages/NotFound404';
-import { error } from 'console';
+import Debug from '@components/Debug/Debug';
 
 const extractVersion = ({
   workflows,
@@ -122,45 +122,56 @@ export const EditVersion = () => {
     );
     setDataHasChanged(false);
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
+    return extractedVersion.data ? true : false;
   };
-  const autoSaveWorker: Worker = useMemo(
-    () => new Worker(new URL('/workers/AutoSave.ts', import.meta.url)),
-    []
-  );
-  autoSaveWorker.onmessage = (e) => {
-    if (dataHasChanged) {
-      // handleSave('data');
-      console.log('try auto save');
-      autoSaveWorker.postMessage(null);
-    }
+  // const autoSaveWorker: Worker = useMemo(
+  //   () => new Worker(new URL('/workers/AutoSave.ts', import.meta.url)),
+  //   []
+  // );
+  // autoSaveWorker.onmessage = (e) => {
+  //   if (dataHasChanged) {
+  //     handleSave('data');
+  //     console.log('try auto save');
+  //     autoSaveWorker.postMessage(null);
+  //   }
+  // };
+  // useEffect(() => {
+  //   autoSaveWorker.postMessage(null);
+  // }, [dataHasChanged]);
+  const fetchDataFromServer = () => {
+    setLoading(true);
+    queryWeb2Integration({
+      orgId,
+      dispatch,
+      onLoad: (data: any) => {
+        setWeb2IntegrationsState(data);
+      },
+    });
+    queryWorkflow({
+      orgId,
+      dispatch,
+      onLoad: (wfList: any) => {
+        extractWorkflowFromList(wfList);
+        setLoading(false);
+      },
+      onError: (error: any) => {
+        Modal.error({
+          title: 'Error',
+          content: error.message,
+        });
+        setLoading(false);
+      },
+    });
   };
-  useEffect(() => {
-    autoSaveWorker.postMessage(null);
-  }, [dataHasChanged]);
   useEffect(() => {
     if (!shouldUseCachedData(lastFetch)) {
-      queryWeb2Integration({
-        orgId,
-        dispatch,
-        onLoad: (data: any) => {
-          setWeb2IntegrationsState(data);
-        },
-      });
-      queryWorkflow({
-        orgId,
-        dispatch,
-        onLoad: (wfList: any) => {
-          extractWorkflowFromList(wfList);
-          setLoading(false);
-        },
-        onError: () => {
-          setLoading(false);
-        },
-      });
+      fetchDataFromServer();
     } else {
-      extractWorkflowFromList(workflows);
+      const isDataInRedux = extractWorkflowFromList(workflows);
+      if (!isDataInRedux) {
+        fetchDataFromServer();
+      }
       setWeb2IntegrationsState(web2Integrations);
-      setLoading(false);
     }
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
@@ -363,13 +374,22 @@ export const EditVersion = () => {
     version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
       ?.markers || [];
   const [showColorLegend, setShowColorLegend] = useState(true);
-  console.log('loading: ', loading);
-  console.log('version: ', version);
   return (
     <>
       <AuthContext.Consumer>
         {({ session }) => (
           <div className='w-full bg-slate-100 h-screen'>
+            <Debug>
+              <div>{loading ? 'loading is true' : 'loading is false'}</div>
+              <div className='block'>
+                {version ? 'version is TRUE' : 'version is FALSE'}
+              </div>
+              {version
+                ? version.data
+                  ? 'version.data is TRUE'
+                  : 'version.data is FALSE'
+                : null}
+            </Debug>
             <Header
               session={session}
               workflow={workflow}
