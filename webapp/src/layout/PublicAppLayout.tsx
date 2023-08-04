@@ -15,7 +15,7 @@ const PublicAppLayout = ({ children }: Props): JSX.Element => {
       <AuthContext.Consumer>
         {({ session }) =>
           !diagramFullScreen ? (
-            <div className='w-full bg-slate-100 h-screen'>
+            <div className='w-full bg-slate-100 h-[calc(100dvh)]'>
               <PublicHeader session={session} />
               <div
                 className={`w-full flex justify-center`}
@@ -25,7 +25,7 @@ const PublicAppLayout = ({ children }: Props): JSX.Element => {
               </div>
             </div>
           ) : (
-            <div className='w-full bg-slate-100 h-screen'>
+            <div className='w-full bg-slate-100 h-[calc(100dvh)]'>
               <div
                 className={`w-full flex justify-center`}
                 style={{ height: 'calc(100% - 0px)' }}
