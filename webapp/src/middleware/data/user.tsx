@@ -1,12 +1,13 @@
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { supabase } from '@utils/supabaseClient';
-import { setUser } from '@redux/reducers/orginfo.reducer';
+import { setUser, addUserToOrg } from '@redux/reducers/orginfo.reducer';
 import { addMemberToOrg } from './org';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const inviteUserByEmail = async ({
   email,
+  orgId,
   dispatch,
   onSuccess,
   onError = (e: any) => {
@@ -14,6 +15,7 @@ export const inviteUserByEmail = async ({
   },
 }: {
   email: string;
+  orgId: number;
   dispatch: any;
   onSuccess: (data: any) => void;
   onError?: (error: any) => void;
@@ -32,10 +34,20 @@ export const inviteUserByEmail = async ({
       },
       body: JSON.stringify({
         email,
+        orgId,
       }),
     });
     const result = await response.json();
-    if (result.status === 200) {
+
+    if (result.user) {
+      const infoMember = {
+        id: result.user.id,
+        email: email,
+        full_name: null,
+        avatar_url: null,
+        role: 'MEMBER',
+      };
+      dispatch(addUserToOrg({ orgId: orgId, user: infoMember }));
       onSuccess(result);
     } else {
       onError(new Error('Cannot invite user'));
@@ -145,13 +157,11 @@ export const updateUserProfile = async ({
     );
     newUserProfile.icon_url = '';
   }
-  console.log('debug1');
   const { error } = await supabase
     .from('profile')
     .update(newUserProfile)
     .eq('id', newUserProfile.id);
   if (!error) {
-    console.log('debug2');
     onSuccess();
   } else {
     onError(error);

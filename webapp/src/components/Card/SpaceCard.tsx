@@ -10,6 +10,9 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import ModalInviteOfSpaceCard from '@pages/Organization/fragments/ModalInviteOfSpaceCard';
+import ModalDeleteSpace from '@pages/Organization/fragments/ModalDeleteSpace';
+import ModalChangeWorkSpace from '@pages/Organization/fragments/ModalChangeWorkSpace';
+import { useLocation } from 'react-router-dom';
 
 interface SpaceCardProps {
   dataSpace: any;
@@ -17,6 +20,9 @@ interface SpaceCardProps {
 }
 
 const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
+  const location = useLocation();
+  const isSharedWorkspacesRoute = location.pathname === '/shared-workspaces';
+
   const actions = [
     {
       icon: <ShareAltOutlined />,
@@ -26,36 +32,52 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
         setIsPopoverVisible(false);
         setIsInviteModalVisible(true);
       },
+      visible: !isSharedWorkspacesRoute,
     },
     {
       icon: <EditOutlined />,
       text: 'Change info',
       action: (e: any) => {
         e.stopPropagation();
+        setIsPopoverVisible(false);
+        setIsChangeInfoModalVisible(true);
       },
+      visible: true,
     },
     {
       icon: <DeleteOutlined />,
       text: 'Delete',
       action: (e: any) => {
         e.stopPropagation();
+        setIsPopoverVisible(false);
+        setIsDeleteModalVisible(true);
       },
+      visible: !isSharedWorkspacesRoute,
     },
   ];
 
   const PopoverContent: React.FC = () => (
     <Space direction='vertical' size='middle' className='w-[196px]'>
-      {actions.map(({ icon, text, action }, index) => (
-        <div key={index} className='flex gap-2 cursor-pointer' onClick={action}>
-          {icon}
-          {text}
-        </div>
-      ))}
+      {actions.map(({ icon, text, action, visible }, index) =>
+        visible ? (
+          <div
+            key={index}
+            className='flex gap-2 cursor-pointer'
+            onClick={action}
+          >
+            {icon}
+            {text}
+          </div>
+        ) : null
+      )}
     </Space>
   );
 
   const [isPopoverVisible, setIsPopoverVisible] = useState(true);
   const [isInviteModalVisible, setIsInviteModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isChangeInfoModalVisible, setIsChangeInfoModalVisible] =
+    useState(false);
   const navigate = useNavigate();
 
   return (
@@ -127,6 +149,22 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
         visible={isInviteModalVisible}
         onClose={() => {
           setIsInviteModalVisible(false);
+          setIsPopoverVisible(true);
+        }}
+        dataSpace={dataSpace}
+      />
+      <ModalDeleteSpace
+        visible={isDeleteModalVisible}
+        onClose={() => {
+          setIsDeleteModalVisible(false);
+          setIsPopoverVisible(true);
+        }}
+        dataSpace={dataSpace}
+      />
+      <ModalChangeWorkSpace
+        visible={isChangeInfoModalVisible}
+        onClose={() => {
+          setIsChangeInfoModalVisible(false);
           setIsPopoverVisible(true);
         }}
         dataSpace={dataSpace}

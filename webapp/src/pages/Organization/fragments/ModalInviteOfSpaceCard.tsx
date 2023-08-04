@@ -28,7 +28,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
 }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [email, setEmail] = useState('');
-  const [modalText, setModalText] = useState('Content of the modal');
   const [usersInOrg, setUsersInOrg] = useState<IProfile[]>();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +39,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
       setUsersInOrg(org.profile);
     }
   }, [dataSpace.id, visible, org]);
-
 
   const handleInvite = async () => {
     setIsLoading(true);
@@ -67,6 +65,7 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
             dispatch,
             onSuccess: () => {
               setIsLoading(false);
+              setEmail('');
               Modal.success({
                 title: 'Success',
                 content: 'Invite user successfully',
@@ -83,9 +82,11 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
         } else {
           inviteUserByEmail({
             email,
+            orgId: dataSpace.id,
             dispatch,
             onSuccess: () => {
               setIsLoading(false);
+              setEmail('');
               Modal.success({
                 title: 'Success',
                 content: 'Invite user successfully',
@@ -110,15 +111,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
     });
   };
 
-  const handleOk = () => {
-    setModalText('The modal will be closed after two seconds');
-    setConfirmLoading(true);
-    setTimeout(() => {
-      onClose();
-      setConfirmLoading(false);
-    }, 2000);
-  };
-
   const handleCopyLink = () => {
     const baseURL = window.location.origin;
     const idString = createIdString(dataSpace.title, dataSpace.id.toString());
@@ -127,7 +119,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
   };
 
   const handleRemoveMember = (orgId: number, userId: string) => {
-
     removeMemberOfOrg({
       orgId,
       userId,
@@ -218,21 +209,24 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
                       ),
                     },
                   ];
-                  return (
-                    <div
-                      className='flex justify-between items-center'
-                      key={index}
-                    >
-                      <Space size='small'>
-                        <Icon iconUrl={userInfo?.avatar_url} size='large' />
-                        <Space direction='vertical' size='small'>
-                          <p>{userInfo?.full_name}</p>
-                          <p className='text-gray-500'>{userInfo?.email}</p>
+                  if (
+                    userInfo?.avatar_url === null &&
+                    userInfo?.full_name === null
+                  ) {
+                    return (
+                      <div
+                        className='flex justify-between items-center'
+                        key={index}
+                      >
+                        <Space size='small'>
+                          <Icon iconUrl={userInfo?.avatar_url} size='large' />
+                          <Space direction='vertical' size='small'>
+                            <p className='text-gray-500'>
+                              This email is not associated with an account
+                            </p>
+                            <p className='text-gray-500'>{userInfo?.email}</p>
+                          </Space>
                         </Space>
-                      </Space>
-                      {userInfo?.role === 'ADMIN' ? (
-                        <p className='text-base text-gray-500 mr-1'>Owner</p>
-                      ) : (
                         <Dropdown menu={{ items }} trigger={['click']}>
                           <a onClick={(e) => e.preventDefault()}>
                             <Space className='mr-1'>
@@ -241,9 +235,38 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
                             </Space>
                           </a>
                         </Dropdown>
-                      )}
-                    </div>
-                  );
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        className='flex justify-between items-center'
+                        key={index}
+                      >
+                        <Space size='small'>
+                          <Icon iconUrl={userInfo?.avatar_url} size='large' />
+                          <Space direction='vertical' size='small'>
+                            <p>{userInfo?.full_name}</p>
+                            <p className='text-gray-500'>{userInfo?.email}</p>
+                          </Space>
+                        </Space>
+                        {userInfo?.role === 'ADMIN' ? (
+                          <p className='text-base text-gray-500 mr-1'>Owner</p>
+                        ) : (
+                          <Dropdown menu={{ items }} trigger={['click']}>
+                            <a onClick={(e) => e.preventDefault()}>
+                              <Space className='mr-1'>
+                                <p className='text-base text-gray-500'>
+                                  Editor
+                                </p>
+                                <DownOutlined className='text-base text-gray-500' />
+                              </Space>
+                            </a>
+                          </Dropdown>
+                        )}
+                      </div>
+                    );
+                  }
                 })}
             </Space>
           </Space>
