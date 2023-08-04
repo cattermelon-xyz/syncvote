@@ -95,6 +95,9 @@ export const upsertAnOrg = async ({
     "preset_icon_url",
     "preset_banner_url",
   ];
+
+  console.log("org", org);
+
   Object.keys(newOrg).forEach((key) => {
     if (props.indexOf(key) === -1) {
       delete newOrg[key];
@@ -596,11 +599,11 @@ export const deleteOrg = async ({
   onSuccess: () => void;
   onError?: (data: any) => void;
 }) => {
-  const {error} = await supabase.from("org").delete().eq("id", orgId);
+  const { error } = await supabase.from("org").delete().eq("id", orgId);
   const { data, error: errorQuery } = await supabase
-    .from('org')
-    .select('id')
-    .eq('id', orgId);
+    .from("org")
+    .select("id")
+    .eq("id", orgId);
 
   if (error || data?.length != 0) {
     onError(error);
