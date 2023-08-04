@@ -18,6 +18,8 @@ import {
   CopyOutlined,
   DeleteOutlined,
   ClockCircleOutlined,
+  LogoutOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
@@ -62,6 +64,11 @@ function Header({
   const handleClearStore = () => {};
   const [showWorkflowPanel, setShowWorkflowPanel] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [openPopover, setOpenPopover] = useState(false);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpenPopover(newOpen);
+  };
   const handleSaveWorkflowInfo = async ({
     title,
     desc,
@@ -148,6 +155,37 @@ function Header({
       },
     });
   };
+  const contentPopOver = (
+    <div>
+      <div>
+        <Button
+          type='text'
+          icon={<SettingOutlined />}
+          onClick={() => {
+            setOpenPopover(false);
+            navigate(`/account/setting`);
+          }}
+        >
+          {L('accountSettings')}
+        </Button>
+      </div>
+      <div>
+        <Button
+          type='text'
+          icon={<LogoutOutlined />}
+          className='w-full flex items-center'
+          onClick={async () => {
+            dispatch(startLoading({}));
+            await supabase.auth.signOut();
+            dispatch(finishLoading({}));
+            navigate('/login');
+          }}
+        >
+          {L('logOut')}
+        </Button>
+      </div>
+    </div>
+  );
   return (
     <>
       <EditWorkflow
@@ -333,22 +371,21 @@ function Header({
           {/* <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
             <BellOutlined style={{ fontSize: '20px' }} />
           </div> */}
-          <div
-            className='cursor-pointer flex items-center'
-            onClick={async () => {
-              dispatch(startLoading({}));
-              await supabase.auth.signOut();
-              dispatch(finishLoading({}));
-              navigate('/login');
-            }}
-            title={L('clickToLogout')}
+          <Popover
+            placement='bottomRight'
+            content={contentPopOver}
+            trigger='click'
+            open={openPopover}
+            onOpenChange={handleOpenChange}
           >
-            <img
-              src={session?.user?.user_metadata?.avatar_url}
-              alt='user_avatar'
-              className='w-[36px] h-[36px] rounded-full inline-block mr-2'
-            />
-          </div>
+            <div className='cursor-pointer flex items-center'>
+              <img
+                src={session?.user?.user_metadata?.avatar_url}
+                alt='user_avatar'
+                className='w-[36px] h-[36px] rounded-full inline-block mr-2'
+              />
+            </div>
+          </Popover>
         </Space>
       </div>
     </>

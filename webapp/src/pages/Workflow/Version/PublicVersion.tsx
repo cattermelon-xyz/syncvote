@@ -1,6 +1,8 @@
 import {
   CloseCircleFilled,
   CloseOutlined,
+  FullscreenExitOutlined,
+  FullscreenOutlined,
   LeftOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
@@ -101,6 +103,8 @@ export const PublicVersion = () => {
     setSelectedEdgeId(edge.id);
   };
 
+  const isFullScreen = searchParams.get('view') === 'full' ? true : false;
+
   useEffect(() => {
     queryWeb2Integration({
       orgId,
@@ -164,6 +168,7 @@ export const PublicVersion = () => {
       });
     }
   };
+  const isDesktop = window.innerWidth > 700;
   return (
     <>
       {contextHolder}
@@ -214,22 +219,24 @@ export const PublicVersion = () => {
                 <Space className='absolute left-0 m-3 flex items-center border border-solid border-[#E3E3E2] rounded-lg text-[#252422] p-3 w-fit mt-7 bg-white z-50'>
                   <Icon iconUrl={workflow?.icon_url} size='large' />
                   <Space direction='vertical' className='w-full'>
-                    <p className='text-[17px] font-normal items-left w-full'>
+                    <p className='text-[17px] font-normal items-left w-full text-ellipsis overflow-hidden whitespace-nowrap'>
                       {worflowInfo?.workflow}
                     </p>
                     <Space direction='horizontal'>
-                      <div className='flex items-center text-[13px]'>
+                      <div className='flex items-center text-[13px] text-ellipsis overflow-hidden whitespace-nowrap'>
                         <FiHome className='mr-1' size={16} />
                         {worflowInfo?.org}
                       </div>
-                      <div className='flex items-center text-[13px]'>
+                      <div className='flex items-center text-[13px] text-ellipsis overflow-hidden  whitespace-nowrap'>
                         <FiUser className='mr-1' size={16} />
                         {worflowInfo?.authority}
                       </div>
-                      <div className='flex items-center text-[13px]'>
-                        <FiCalendar className='mr-1' size={16} />
-                        {worflowInfo?.date}
-                      </div>
+                      {isDesktop ? (
+                        <div className='flex items-center text-[13px] text-ellipsis overflow-hidden  whitespace-nowrap'>
+                          <FiCalendar className='mr-1' size={16} />
+                          {worflowInfo?.date}
+                        </div>
+                      ) : null}
                     </Space>
                   </Space>
                 </Space>
@@ -251,9 +258,16 @@ export const PublicVersion = () => {
                           : null
                       }`}
                       onClick={() => {
-                        rightSiderStatus === 'description'
-                          ? setRSiderStatus('closed')
-                          : setRSiderStatus('description');
+                        if (isDesktop) {
+                          rightSiderStatus === 'description'
+                            ? setRSiderStatus('closed')
+                            : setRSiderStatus('description');
+                        } else {
+                          Modal.info({
+                            title: 'Description',
+                            content: parse(worflowInfo.desc),
+                          });
+                        }
                       }}
                       icon={<GrDocumentText className='w-5 h-5' />}
                     />
@@ -262,9 +276,16 @@ export const PublicVersion = () => {
                         rightSiderStatus === 'comment' ? 'bg-violet-100' : null
                       }`}
                       onClick={() => {
-                        rightSiderStatus === 'comment'
-                          ? setRSiderStatus('closed')
-                          : setRSiderStatus('comment');
+                        if (isDesktop) {
+                          rightSiderStatus === 'comment'
+                            ? setRSiderStatus('closed')
+                            : setRSiderStatus('comment');
+                        } else {
+                          Modal.info({
+                            title: 'Alert',
+                            content: 'This function only available on desktop',
+                          });
+                        }
                       }}
                       icon={<MdChatBubbleOutline className='w-5 h-5' />}
                     />
@@ -292,9 +313,33 @@ export const PublicVersion = () => {
                       }`}
                       icon={<LuPaintbrush className='w-5 h-5' />}
                       onClick={() => {
-                        rightSiderStatus === 'markers'
-                          ? setRSiderStatus('closed')
-                          : setRSiderStatus('markers');
+                        if (isDesktop) {
+                          rightSiderStatus === 'markers'
+                            ? setRSiderStatus('closed')
+                            : setRSiderStatus('markers');
+                        } else {
+                          Modal.info({
+                            title: 'Alert',
+                            content: 'This function only available on desktop',
+                          });
+                        }
+                      }}
+                    />
+                    <Button
+                      className={`flex items-center justify-center`}
+                      icon={
+                        isFullScreen ? (
+                          <FullscreenOutlined />
+                        ) : (
+                          <FullscreenExitOutlined />
+                        )
+                      }
+                      onClick={() => {
+                        if (isFullScreen) {
+                          navigate(window.location.pathname);
+                        } else {
+                          navigate(window.location.pathname + '?view=full');
+                        }
                       }}
                     />
                   </Space>

@@ -12,7 +12,13 @@ import ReactFlow, {
 import { toPng } from 'html-to-image';
 import React, { useEffect, useCallback, useState, useContext } from 'react';
 import { Button, Drawer, Modal, Space } from 'antd';
-import { BulbOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons';
+import {
+  BulbOutlined,
+  CloseCircleOutlined,
+  CloseOutlined,
+  PlusOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import 'reactflow/dist/style.css';
 import { buildATree } from './buildATree';
 import MultipleDirectNode from './CustomNodes/MultipleDiretionNode';
@@ -166,6 +172,17 @@ const Flow = () => {
         onClose={onConfigEdgePanelClose}
         className='edge-config-panel'
         closeIcon={<></>}
+        extra={
+          window.innerWidth > 700 ? (
+            <></>
+          ) : (
+            <Button
+              icon={<CloseOutlined />}
+              shape='circle'
+              onClick={onConfigEdgePanelClose}
+            />
+          )
+        }
       >
         {selectedEdgeId !== '' && selectedEdgeId !== undefined ? (
           <EdgeConfigPanel selectedEdge={selectedEdge} nodes={nodes} />
@@ -188,7 +205,9 @@ const Flow = () => {
           minZoom: 1,
         }}
       >
-        <Controls position='bottom-left' showInteractive={false} />
+        {window.innerWidth > 700 ? (
+          <Controls position='bottom-left' showInteractive={false} />
+        ) : null}
         <Background color='#aaa' variant={BackgroundVariant.Dots} />
         <Panel position='top-left'>
           <Space direction='vertical'>
@@ -287,7 +306,7 @@ export const DirectedGraph = (props: IGraph) => {
     <div
       style={{
         width: '100%',
-        minWidth: '800px',
+        // minWidth: '800px',
         backgroundColor: 'white',
       }}
       className='h-full directed-graph'

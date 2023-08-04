@@ -4,8 +4,9 @@ import {
   NodeExpandOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { Button, Drawer, Input, Select, Space, Tag } from 'antd';
+import { Button, Drawer, Input, Popover, Select, Space, Tag } from 'antd';
 import { useState } from 'react';
+import parse from 'html-react-parser';
 
 import {
   IVoteMachine,
@@ -13,7 +14,10 @@ import {
   IVoteMachineConfigProps,
   ICheckPoint,
   GraphViewMode,
+  IToken,
+  IParticipant,
 } from '../types';
+import moment from 'moment';
 
 interface Option {
   title: string;
@@ -28,6 +32,74 @@ interface IData {
   fallback?: string;
   upTo?: number;
 }
+
+const displayDuration = (duration: moment.Duration) => {
+  const years =
+    duration.years() === 0
+      ? ''
+      : `${duration.years()} ${duration.years() > 1 ? 'years' : 'year'} `;
+  const months =
+    duration.months() === 0
+      ? ''
+      : `${duration.months()} ${duration.months() > 1 ? 'months' : 'month'} `;
+  const days =
+    duration.days() === 0
+      ? ''
+      : `${duration.days()} ${duration.days() > 1 ? 'days' : 'day'} `;
+  const hours =
+    duration.hours() === 0
+      ? ''
+      : `${duration.hours()} ${duration.hours() > 1 ? 'hours' : 'hour'} `;
+  const minutes =
+    duration.minutes() === 0
+      ? ''
+      : `${duration.minutes()} ${
+          duration.minutes() > 1 ? 'minutes' : 'minute'
+        } `;
+  const seconds =
+    duration.seconds() === 0
+      ? ''
+      : `${duration.seconds()} ${
+          duration.seconds() > 1 ? 'seconds' : 'second'
+        } `;
+  const drt = years + months + days + hours + minutes + seconds;
+  return drt ? drt : '0 seconds';
+};
+
+const displayAddress = (address: string | undefined) => {
+  if (!address) {
+    return '';
+  }
+  const chain = address.split('.')[0] || '';
+  const tokenName = address.split('.')[1] || '';
+  const tokenAddress = address
+    .replace(`${chain}.`, '')
+    .replace(`${tokenName}.`, '');
+  let explorer = tokenAddress;
+  switch (chain) {
+    case 'sol':
+      explorer = 'https://explorer.solana.com/address/' + explorer;
+      break;
+    case 'eth':
+      explorer = 'https://etherscan.io/address/' + explorer;
+      break;
+    case 'bsc':
+      explorer = 'https://bscscan.com/address/' + explorer;
+      break;
+  }
+  if (tokenName) {
+    return (
+      <a href={explorer} target='_blank' title={tokenAddress}>
+        {tokenName}
+      </a>
+    );
+  }
+  return tokenAddress;
+};
+
+const isRTE = (str: string | undefined) => {
+  return str && str !== '<p></p>' && str !== '<p><br></p>';
+};
 
 const deleteChildNode = (data: IData, children: string[], childId: string) => {
   //eslint-disable-line
@@ -86,7 +158,7 @@ const ConfigPanel = ({
     return !val ? (
       <Space
         direction='horizontal'
-        className='flex items-center justify-between'
+        className='flex items-center justify-between w-full'
         size='small'
       >
         <div>
@@ -118,7 +190,7 @@ const ConfigPanel = ({
       <Space
         direction='horizontal'
         size='small'
-        className='flex items-center justify-between'
+        className='flex items-center justify-between w-full'
       >
         <Button
           type='link'
@@ -398,7 +470,129 @@ const explain = ({
   data: IData;
 }) => {
   // console.log(checkpoint, data);
-  return <div>Comming soon</div>;
+  if (!checkpoint) {
+    return <></>;
+  }
+  const { participation, participationDescription } = checkpoint;
+  const renderParticipation = (participation: IParticipant | undefined) => {
+    let rs = null;
+    if (!participation || (participation.type && !participation.data)) {
+      // rs = <div className='text-red-500'>Missing participation setup</div>;
+      rs = '';
+    } else {
+      const { type, data: pdata } = participation;
+      if (type === 'identity') {
+        rs = (
+          <span className='mr-1'>
+            Only
+            <span className='text-violet-500 mx-1'>
+              {((pdata as string[]) || []).length}
+            </span>
+            can participate in the voting process.
+          </span>
+        );
+      } else if (type === 'token') {
+        rs = (
+          <span className='mr-1'>
+            The checkpoint is open for
+            <span className='text-violet-500 mx-1'>
+              {displayAddress((pdata as IToken)?.address)}
+            </span>{' '}
+            token/nft holders to vote with a minimum of
+            <span className='text-violet-500 mx-1'>
+              {(pdata as IToken)?.min}
+            </span>{' '}
+            tokens can participate.
+          </span>
+        );
+      }
+    }
+    return rs;
+  };
+  return (
+    <div className='block'>
+      <ul className='list-disc ml-4 w-full'>
+        {participation ? (
+          <li>
+            Voter:{' '}
+            <span className='text-violet-500 font-bold'>
+              {participation.type === 'token'
+                ? `Token holder`
+                : `Other identity`}
+            </span>
+          </li>
+        ) : null}
+        <li>
+          Voting method:{' '}
+          <span className='text-violet-500 font-bold'>Multiple Choice</span>
+        </li>
+        {data.max !== undefined ? (
+          <li>
+            Threshold:{' '}
+            <span className='text-violet-500 font-bold'>
+              {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
+            </span>
+          </li>
+        ) : null}
+      </ul>
+      {checkpoint?.duration || isRTE(checkpoint?.votingLocation) ? (
+        <>
+          <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+          <ul className='list-disc ml-4'>
+            {checkpoint?.duration ? (
+              <li>
+                Duration:{' '}
+                <span className='font-bold text-violet-500'>
+                  {displayDuration(
+                    moment.duration((checkpoint?.duration || 0) * 1000)
+                  )}
+                </span>
+              </li>
+            ) : null}
+            {isRTE(checkpoint?.votingLocation) ? (
+              <li>
+                Voting location:{' '}
+                <span className='font-bold text-violet-500'>
+                  {parse(checkpoint?.votingLocation || '')}
+                </span>
+              </li>
+            ) : null}
+          </ul>
+        </>
+      ) : null}
+      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+      {renderParticipation(participation)}
+      {isRTE(participationDescription) ? (
+        <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
+          {parse(participationDescription || '')}
+        </div>
+      ) : null}
+      <div className='mt-2'>
+        Each of them can vote up to{' '}
+        <span className='text-violet-500 font-bold'>{data?.upTo || '0'}</span>{' '}
+        option(s) from a list of
+        <Popover
+          content={
+            <span className='flex flex-col p-2'>
+              {data?.options?.map((opt: Option, idx: number) => {
+                return (
+                  <div title={opt.description} key={opt.title}>
+                    {opt.title}
+                  </div>
+                );
+              })}
+            </span>
+          }
+          trigger='hover'
+        >
+          <span className='text-violet-500 mx-1 cursor-pointer px-1'>
+            {data?.options?.length}
+          </span>
+        </Popover>
+        options.
+      </div>
+    </div>
+  );
 };
 
 const validate = ({

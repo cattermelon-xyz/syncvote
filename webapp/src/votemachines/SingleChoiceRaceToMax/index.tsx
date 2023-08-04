@@ -1,6 +1,6 @@
 import { ShareAltOutlined, TwitterOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import { Tag } from 'antd';
+import { Popover, Tag } from 'antd';
 import { getVoteMachine } from '@components/DirectedGraph';
 import {
   ICheckPoint,
@@ -146,7 +146,8 @@ export const explain = ({
   const renderParticipation = (participation: IParticipant | undefined) => {
     let rs = null;
     if (!participation || (participation.type && !participation.data)) {
-      rs = <div className='text-red-500'>Missing participation setup</div>;
+      // rs = <div className='text-red-500'>Missing participation setup</div>;
+      rs = '';
     } else {
       const { type, data: pdata } = participation;
       if (type === 'identity') {
@@ -162,11 +163,11 @@ export const explain = ({
       } else if (type === 'token') {
         rs = (
           <span className='mr-1'>
-            Only
+            The checkpoint is open for
             <span className='text-violet-500 mx-1'>
               {displayAddress((pdata as IToken)?.address)}
             </span>{' '}
-            token/nft holders with a minimum of
+            token/nft holders to vote with a minimum of
             <span className='text-violet-500 mx-1'>
               {(pdata as IToken)?.min}
             </span>{' '}
@@ -179,11 +180,58 @@ export const explain = ({
   };
   const p1 = (
     <div className='block'>
-      The voting duration for this checkpoint is set for
-      <span className='text-violet-500 mx-1'>
-        {displayDuration(moment.duration((checkpoint?.duration || 0) * 1000))}
-      </span>{' '}
-      from the active time.
+      <ul className='list-disc ml-4'>
+        {participation ? (
+          <li>
+            Voter:{' '}
+            <span className='text-violet-500 font-bold'>
+              {participation.type === 'token'
+                ? `Token holder`
+                : `Other identity`}
+            </span>
+          </li>
+        ) : null}
+        <li>
+          Voting method:{' '}
+          <span className='text-violet-500 font-bold'>Single Choice</span>
+        </li>
+        {data.max !== undefined ? (
+          <li>
+            Threshold:{' '}
+            <span className='text-violet-500 font-bold'>
+              {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
+            </span>
+          </li>
+        ) : null}
+        {isRTE(resultDescription) ? (
+          <li>Calculation Rules: {resultDescription}</li>
+        ) : null}
+      </ul>
+      {checkpoint?.duration || isRTE(checkpoint?.votingLocation) ? (
+        <>
+          <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+          <ul className='list-disc ml-4'>
+            {checkpoint?.duration ? (
+              <li>
+                Duration:{' '}
+                <span className='font-bold text-violet-500'>
+                  {displayDuration(
+                    moment.duration((checkpoint?.duration || 0) * 1000)
+                  )}
+                </span>
+              </li>
+            ) : null}
+            {isRTE(checkpoint?.votingLocation) ? (
+              <li>
+                Voting location:{' '}
+                <span className='font-bold text-violet-500'>
+                  {parse(checkpoint?.votingLocation || '')}
+                </span>
+              </li>
+            ) : null}
+          </ul>
+        </>
+      ) : null}
       {/* <div>
         Voting method is
         <Tag className='text-red-500 mx-2 font-bold'>
@@ -208,8 +256,8 @@ export const explain = ({
       {/* Only user with ... can vote. */}
       <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
       <div className='mb-2'>
-        Winning option is the option that receive the highest number of votes
-        and reach a minimum of{' '}
+        Winning option is the one that receive the highest number of votes and
+        reach the threshold of{' '}
         <span className='text-violet-500 mx-1'>
           {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
           {!data.token ? 'votes' : ` voted token ${data.token}`}

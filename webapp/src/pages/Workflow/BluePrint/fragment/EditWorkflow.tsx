@@ -1,6 +1,7 @@
-import { SaveOutlined } from '@ant-design/icons';
+import { LoadingOutlined, RestOutlined, SaveOutlined } from '@ant-design/icons';
 import Banner from '@components/Banner/Banner';
 import TextEditor from '@components/Editor/TextEditor';
+import GlobalLoading from '@components/GlobalLoading/GlobalLoading';
 import Icon from '@components/Icon/Icon';
 import { updateAWorkflowTag } from '@middleware/data';
 import { newTag, queryTag } from '@middleware/data/tag';
@@ -67,6 +68,7 @@ const EditWorkflow = ({
   const [status, setStatus] = useState(workflow?.workflow_version[0]?.status);
   const tags: ITag[] = useSelector((state: any) => state.ui.tags) || [];
   const dispatch = useDispatch();
+  const [saving, setSaving] = useState(false);
   useEffect(() => {
     setTitle(workflow?.title);
     setDesc(workflow?.desc);
@@ -166,15 +168,7 @@ const EditWorkflow = ({
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              onBlur={async () => {
-                if (title !== originalTitle) {
-                  setOpen(false);
-                  await onSave({
-                    title,
-                  });
-                  setOpen(true);
-                }
-              }}
+              disabled={saving}
             />
           </Space>
           <Space direction='vertical' size='small' className='w-full'>
@@ -198,16 +192,42 @@ const EditWorkflow = ({
               setValue={(val: any) => {
                 setDesc(val);
               }}
-              onBlur={async () => {
-                if (desc !== originalDesc) {
-                  setOpen(false);
-                  await onSave({
-                    desc,
-                  });
-                  setOpen(true);
-                }
-              }}
+              readOnly={saving}
             />
+          </Space>
+          <Space direction='horizontal' className='flex justify-between'>
+            <Button
+              icon={<RestOutlined />}
+              onClick={() => {
+                setTitle(originalTitle);
+                setDesc(originalDesc);
+              }}
+              disabled={
+                saving || (title === originalTitle && desc === originalDesc)
+              }
+            >
+              Reset
+            </Button>
+            <Button
+              type='primary'
+              className='w-full'
+              icon={saving ? <LoadingOutlined /> : <SaveOutlined />}
+              onClick={async () => {
+                setSaving(true);
+                const newDesc = desc !== originalDesc ? desc : undefined;
+                const newTitle = title !== originalTitle ? title : undefined;
+                await onSave({
+                  desc: newDesc,
+                  title: newTitle,
+                });
+                setSaving(false);
+              }}
+              disabled={
+                saving || (title === originalTitle && desc === originalDesc)
+              }
+            >
+              Save
+            </Button>
           </Space>
         </Space>
         {/* <Space
@@ -249,14 +269,6 @@ const EditWorkflow = ({
             />
           </Space>
         </Space> */}
-        {/* <Button
-          type="default"
-          className="w-full"
-          icon={<SaveOutlined />}
-          onClick={() => onSave(title, desc, iconUrl)}
-        >
-          Save
-        </Button> */}
       </Space>
     </Drawer>
   );

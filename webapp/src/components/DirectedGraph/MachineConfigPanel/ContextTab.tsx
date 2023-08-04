@@ -102,10 +102,14 @@ const ContextTab = () => {
       {!selectedNode?.isEnd && selectedNode?.vote_machine_type ? (
         <>
           <CollapsiblePanel title='Rules & conditions' collapsable={false}>
-            <Space direction='vertical' size='small'>
+            <Space direction='vertical' size='small' className='w-full'>
               {summary}
-              {renderValidation(validation)}
-              {renderValidation(vmValidation)}
+              {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
+                <>
+                  {renderValidation(validation)}
+                  {renderValidation(vmValidation)}
+                </>
+              ) : null}
             </Space>
           </CollapsiblePanel>
         </>
