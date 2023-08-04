@@ -317,5 +317,5 @@ export const LANG: any = {
   aboutMe: 'About me',
   changeContent: 'Change content',
   changeAboutMe: 'Change “About me” content',
-  changeSpaceInfo: "Change workspace info"
+  changeSpaceInfo: 'Change workspace info',
 };

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Modal, Input } from "antd";
-import Icon from "@components/Icon/Icon";
-import { L } from "@utils/locales/L";
-import { useDispatch } from "react-redux";
-import { upsertAnOrg } from "@middleware/data";
+import React, { useState } from 'react';
+import { Modal, Input } from 'antd';
+import Icon from '@components/Icon/Icon';
+import { L } from '@utils/locales/L';
+import { useDispatch } from 'react-redux';
+import { upsertAnOrg } from '@middleware/data';
 
 interface ModalChangeWorkSpaceProps {
   visible: boolean;
@@ -23,7 +23,7 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
     onClose();
   };
 
-  console.log("dataSpace", dataSpace);
+  console.log('dataSpace', dataSpace);
 
   const handleChangeIcon = (obj: any) => {
     const newIcon = obj.isPreset ? `preset:${obj.filePath}` : obj.filePath;
@@ -39,16 +39,16 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
       },
       onLoad: (data) => {
         Modal.success({
-          title: "Success",
-          content: "Change avatar successfully",
+          title: 'Success',
+          content: 'Change avatar successfully',
         });
         onClose();
       },
       onError: (error) => {
         // Lưu ý thêm tham số error
         Modal.error({
-          title: "Error",
-          content: "Cannot change avatar",
+          title: 'Error',
+          content: 'Cannot change avatar',
         });
         onClose();
       },
@@ -62,20 +62,20 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
       onOk={handleChangeSpaceInfo}
       open={visible}
       onCancel={handleCancel}
-      okText={L("save")}
-      cancelButtonProps={{ style: { display: "none" } }}
+      okText={L('save')}
+      cancelButtonProps={{ style: { display: 'none' } }}
     >
       <Icon
-        size="xlarge"
+        size='xlarge'
         editable
         iconUrl={iconUrl}
         onUpload={handleChangeIcon}
       />
-      <div className="mt-4">
+      <div className='mt-4'>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full"
+          className='w-full'
         />
       </div>
     </Modal>
@@ -85,5 +85,5 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
 export default ModalChangeWorkSpace;
 
 const Title = () => {
-  return <p className="text-xl">{L("changeSpaceInfo")}</p>;
+  return <p className='text-xl'>{L('changeSpaceInfo')}</p>;
 };

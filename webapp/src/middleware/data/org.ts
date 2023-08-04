@@ -1,5 +1,5 @@
-import { supabase } from "@utils/supabaseClient";
-import { finishLoading, startLoading } from "@redux/reducers/ui.reducer";
+import { supabase } from '@utils/supabaseClient';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import {
   changeOrgInfo,
   setOrgsInfo,
@@ -7,7 +7,7 @@ import {
   addUserToOrg,
   removeUserOfOrg,
   deleteOrgInfo,
-} from "@redux/reducers/orginfo.reducer";
+} from '@redux/reducers/orginfo.reducer';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -35,12 +35,12 @@ export const newOrg = async ({
 }) => {
   dispatch(startLoading({}));
   try {
-    const url = "https://uafmqopjujmosmilsefw.supabase.co/functions/v1/new-org";
+    const url = 'https://uafmqopjujmosmilsefw.supabase.co/functions/v1/new-org';
     const response = await fetch(url, {
-      method: "POST",
+      method: 'POST',
       headers: {
         authorization: `Bearer ${supabaseAnonKey}`,
-        "content-type": "application/json",
+        'content-type': 'application/json',
       },
       body: JSON.stringify({
         orgInfo,
@@ -54,7 +54,7 @@ export const newOrg = async ({
       dispatch(
         changeOrgInfo({
           id: data.id,
-          role: "ADMIN",
+          role: 'ADMIN',
           ...info,
         })
       );
@@ -85,18 +85,18 @@ export const upsertAnOrg = async ({
   const newOrg = { ...org };
   dispatch(startLoading({}));
   const props = [
-    "id",
-    "title",
-    "desc",
-    "org_size",
-    "org_type",
-    "icon_url",
-    "banner_url",
-    "preset_icon_url",
-    "preset_banner_url",
+    'id',
+    'title',
+    'desc',
+    'org_size',
+    'org_type',
+    'icon_url',
+    'banner_url',
+    'preset_icon_url',
+    'preset_banner_url',
   ];
 
-  console.log("org", org);
+  console.log('org', org);
 
   Object.keys(newOrg).forEach((key) => {
     if (props.indexOf(key) === -1) {
@@ -107,15 +107,15 @@ export const upsertAnOrg = async ({
     // invalid id, probably a new mission
     delete newOrg.id;
   }
-  if (newOrg.icon_url?.indexOf("preset:") === 0) {
-    newOrg.preset_icon_url = newOrg.icon_url.replace("preset:", "");
-    newOrg.icon_url = "";
+  if (newOrg.icon_url?.indexOf('preset:') === 0) {
+    newOrg.preset_icon_url = newOrg.icon_url.replace('preset:', '');
+    newOrg.icon_url = '';
   }
-  if (newOrg.banner_url?.indexOf("preset:") === 0) {
-    newOrg.preset_banner_url = newOrg.banner_url.replace("preset:", "");
-    newOrg.banner_url = "";
+  if (newOrg.banner_url?.indexOf('preset:') === 0) {
+    newOrg.preset_banner_url = newOrg.banner_url.replace('preset:', '');
+    newOrg.banner_url = '';
   }
-  const { data, error } = await supabase.from("org").upsert(newOrg).select();
+  const { data, error } = await supabase.from('org').upsert(newOrg).select();
   dispatch(finishLoading({}));
   if (data) {
     const newData = [...data];
@@ -152,7 +152,7 @@ export const getDataOrgs = async ({
 }) => {
   dispatch(startLoading({}));
   const { data, error } = await supabase
-    .from("user_org")
+    .from('user_org')
     .select(
       `
     org (
@@ -184,15 +184,15 @@ export const getDataOrgs = async ({
     )
   `
     )
-    .eq("user_id", userId);
+    .eq('user_id', userId);
 
   if (!error) {
     const tmp: any[] = [];
     data.forEach((d: any) => {
       const org: any = d?.org || {
-        id: "",
-        title: "",
-        desc: "",
+        id: '',
+        title: '',
+        desc: '',
       };
       const presetIcon = org?.preset_icon_url
         ? `preset:${org.preset_icon_url}`
@@ -244,7 +244,7 @@ export const queryOrgs = async ({
   // TODO: add email in table profile, use ref in profile to select user
   // TODO: query list of user
   const { data, error } = await supabase
-    .from("user_org")
+    .from('user_org')
     .select(
       `
     role,
@@ -286,14 +286,14 @@ export const queryOrgs = async ({
     )
   `
     )
-    .eq("user_id", userId);
+    .eq('user_id', userId);
   if (!error) {
     const tmp: any[] = [];
     data.forEach((d: any) => {
       const org: any = d?.org || {
-        id: "",
-        title: "",
-        desc: "",
+        id: '',
+        title: '',
+        desc: '',
       };
       const presetIcon = org?.preset_icon_url
         ? `preset:${org.preset_icon_url}`
@@ -321,9 +321,9 @@ export const queryOrgs = async ({
         }) || [];
 
       profiles.sort((a: any, b: any) => {
-        if (a.role === "ADMIN" && b.role !== "ADMIN") {
+        if (a.role === 'ADMIN' && b.role !== 'ADMIN') {
           return -1;
-        } else if (b.role === "ADMIN" && a.role !== "ADMIN") {
+        } else if (b.role === 'ADMIN' && a.role !== 'ADMIN') {
           return 1;
         } else {
           return 0;
@@ -385,7 +385,7 @@ export const queryOrgsAndWorkflowForHome = async ({
 }) => {
   dispatch(startLoading({}));
   const { data, error } = await supabase
-    .from("user_org")
+    .from('user_org')
     .select(
       `
       role,
@@ -418,14 +418,14 @@ export const queryOrgsAndWorkflowForHome = async ({
       )
     `
     )
-    .eq("user_id", userId);
+    .eq('user_id', userId);
   const tmp: any[] = [];
   if (!error) {
     data.forEach((d: any) => {
       const org: any = d?.org || {
-        id: "",
-        title: "",
-        desc: "",
+        id: '',
+        title: '',
+        desc: '',
       };
       const presetIcon = org?.preset_icon_url
         ? `preset:${org.preset_icon_url}`
@@ -489,9 +489,9 @@ export const queryOrgByOrgId = async ({
   // TODO: add email in table profile, use ref in profile to select user
   // TODO: query list of user
   const { data, error } = await supabase
-    .from("org")
+    .from('org')
     .select(`*`)
-    .eq("id", orgId);
+    .eq('id', orgId);
   if (!error) {
     const tmp: any[] = [];
     data.forEach((org: any) => {
@@ -542,7 +542,7 @@ export const addMemberToOrg = async ({
     role: role,
   };
   const { data, error } = await supabase
-    .from("user_org")
+    .from('user_org')
     .insert(infoMemberSupabase);
   if (error) {
     onError(error);
@@ -576,10 +576,10 @@ export const removeMemberOfOrg = async ({
   onError?: (error: any) => void;
 }) => {
   const { error } = await supabase
-    .from("user_org")
+    .from('user_org')
     .delete()
-    .eq("org_id", orgId)
-    .eq("user_id", userId);
+    .eq('org_id', orgId)
+    .eq('user_id', userId);
   if (error) {
     onError(error);
   } else {
@@ -599,11 +599,11 @@ export const deleteOrg = async ({
   onSuccess: () => void;
   onError?: (data: any) => void;
 }) => {
-  const { error } = await supabase.from("org").delete().eq("id", orgId);
+  const { error } = await supabase.from('org').delete().eq('id', orgId);
   const { data, error: errorQuery } = await supabase
-    .from("org")
-    .select("id")
-    .eq("id", orgId);
+    .from('org')
+    .select('id')
+    .eq('id', orgId);
 
   if (error || data?.length != 0) {
     onError(error);

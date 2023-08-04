@@ -1,8 +1,8 @@
-import React from "react";
-import { Modal } from "antd";
-import { L } from "@utils/locales/L";
-import { deleteOrg } from "@middleware/data";
-import { useDispatch } from "react-redux";
+import React from 'react';
+import { Modal } from 'antd';
+import { L } from '@utils/locales/L';
+import { deleteOrg } from '@middleware/data';
+import { useDispatch } from 'react-redux';
 
 interface ModalDeleteSpaceProps {
   visible: boolean;
@@ -26,15 +26,15 @@ const ModalDeleteSpace: React.FC<ModalDeleteSpaceProps> = ({
       dispatch,
       onSuccess: () => {
         Modal.success({
-          title: "Success",
-          content: "Delete workspace successfully",
+          title: 'Success',
+          content: 'Delete workspace successfully',
         });
         onClose();
       },
       onError: () => {
         Modal.error({
-          title: "Error",
-          content: "Failed to delete workspace",
+          title: 'Error',
+          content: 'Failed to delete workspace',
         });
         onClose();
       },
@@ -47,9 +47,9 @@ const ModalDeleteSpace: React.FC<ModalDeleteSpaceProps> = ({
       onOk={handleOk}
       open={visible}
       onCancel={handleCancel}
-      okText={L("deleteForever")}
-      okButtonProps={{ style: { backgroundColor: "#A22C29" } }}
-      cancelButtonProps={{ style: { display: "none" } }}
+      okText={L('deleteForever')}
+      okButtonProps={{ style: { backgroundColor: '#A22C29' } }}
+      cancelButtonProps={{ style: { display: 'none' } }}
     >
       <div>
         <p>
@@ -65,5 +65,5 @@ const ModalDeleteSpace: React.FC<ModalDeleteSpaceProps> = ({
 export default ModalDeleteSpace;
 
 const Title: React.FC<{ titleSpace: string }> = ({ titleSpace }) => {
-  return <p className="text-xl">{` Delete "${titleSpace}"`}</p>;
+  return <p className='text-xl'>{` Delete "${titleSpace}"`}</p>;
 };
