@@ -48,7 +48,8 @@ const BluePrint = () => {
   const org = orgs.find(
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
   );
-  const data = location.state?.dataSpace || org;
+  // const data = location.state?.dataSpace || org;
+  const data = org;
   const dispatch = useDispatch();
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
@@ -123,7 +124,7 @@ const BluePrint = () => {
         onDeleted={() => {
           navigate('/');
         }}
-        profile={[]}
+        profile={data?.profile || []}
       />
       {org === undefined ? (
         loading ? (

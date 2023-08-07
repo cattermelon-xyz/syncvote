@@ -16,6 +16,7 @@ import {
 } from '@components/DirectedGraph';
 import Icon from '@components/Icon/Icon';
 import {
+  canUserEditWorkflowVersion,
   queryWeb2Integration,
   queryWorkflow,
   upsertWorkflowVersion,
@@ -52,11 +53,13 @@ const extractVersion = ({
     extractedVersion = structuredClone(
       wf.workflow_version.find((wv: any) => wv.id === versionId)
     );
+    // console.log('extractedVersion', extractedVersion);
+    if (!extractedVersion) return {};
   } else {
     return {};
   }
-  const cosmetic = extractedVersion.data.cosmetic;
-  if (typeof extractedVersion.data === 'string') {
+  const cosmetic = extractedVersion?.data?.cosmetic;
+  if (typeof extractedVersion?.data === 'string') {
     extractedVersion.data = emptyStage;
   }
   if (!cosmetic) {
@@ -81,7 +84,8 @@ const extractVersion = ({
 
 export const EditVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
-  const [loading, setLoading] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isDataFetchedFromServer, setIsDataFetchedFromServer] = useState(false);
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
   const versionId = extractIdFromIdString(versionIdString);
@@ -139,7 +143,8 @@ export const EditVersion = () => {
   //   autoSaveWorker.postMessage(null);
   // }, [dataHasChanged]);
   const fetchDataFromServer = () => {
-    setLoading(true);
+    setIsDataFetchedFromServer(true);
+    setIsLoadingData(true);
     queryWeb2Integration({
       orgId,
       dispatch,
@@ -152,14 +157,14 @@ export const EditVersion = () => {
       dispatch,
       onLoad: (wfList: any) => {
         extractWorkflowFromList(wfList);
-        setLoading(false);
+        setIsLoadingData(false);
       },
       onError: (error: any) => {
         Modal.error({
           title: 'Error',
           content: error.message,
         });
-        setLoading(false);
+        setIsLoadingData(false);
       },
     });
   };
@@ -168,11 +173,19 @@ export const EditVersion = () => {
       fetchDataFromServer();
     } else {
       const isDataInRedux = extractWorkflowFromList(workflows);
-      if (!isDataInRedux) {
+      if (!isDataInRedux && isDataFetchedFromServer === false) {
         fetchDataFromServer();
       }
       setWeb2IntegrationsState(web2Integrations);
     }
+    canUserEditWorkflowVersion({
+      workflowVersionId: versionId,
+      onResult: (canEdit: boolean) => {
+        if (!canEdit) {
+          setViewMode(GraphViewMode.VIEW_ONLY);
+        }
+      },
+    });
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
   useEffect(() => {
@@ -185,6 +198,56 @@ export const EditVersion = () => {
       window.removeEventListener('beforeunload', handleTabClose);
     };
   }, [workflows]);
+  let timerHandler: any = undefined;
+  const [autoSaveStatus, setAutoSaveStatus] = useState('');
+  useEffect(() => {
+    if (
+      dataHasChanged &&
+      isLoadingData === false &&
+      lastSaved === -1 &&
+      version.data
+    ) {
+      // this is the first time data is loaded
+      setLastSaved(Date.now());
+      setAutoSaveStatus('first time, lastSaved is set');
+      return;
+    }
+    if (
+      dataHasChanged &&
+      isLoadingData === false &&
+      lastSaved !== -1 &&
+      version.data
+    ) {
+      const now = Date.now();
+      if (now - lastSaved > 10000) {
+        // let' save data to server
+        // TODO: this data is not the latest data, it's the data when the timer is set
+        handleSave('data');
+        setAutoSaveStatus('auto save');
+        // setDataHasChanged(false);
+      } else {
+        // if there is a timer then do nothing
+        if (timerHandler !== undefined) {
+          return;
+        } else {
+          // else, let's set a timer
+          setAutoSaveStatus(
+            'a timer is set to 10s to save. Tick tock tick tock'
+          );
+          timerHandler = setTimeout(() => {
+            // TODO: this data is not the latest data, it's the data when the timer is set
+            handleSave('data');
+            // setDataHasChanged(false);
+            // setLastSaved(Date.now());
+            clearTimeout(timerHandler);
+            timerHandler = undefined;
+            setAutoSaveStatus('saved & clear timeout');
+          }, 10000 - (now - lastSaved));
+        }
+      }
+      return;
+    }
+  }, [dataHasChanged]);
 
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
@@ -380,15 +443,15 @@ export const EditVersion = () => {
         {({ session }) => (
           <div className='w-full bg-slate-100 h-screen'>
             <Debug>
-              <div>{loading ? 'loading is true' : 'loading is false'}</div>
+              <div>
+                {viewMode}-{GraphViewMode.VIEW_ONLY}
+              </div>
               <div className='block'>
                 {version ? 'version is TRUE' : 'version is FALSE'}
               </div>
-              {version
-                ? version.data
-                  ? 'version.data is TRUE'
-                  : 'version.data is FALSE'
-                : null}
+              <div className='block'>
+                {autoSaveStatus ? autoSaveStatus : ''}
+              </div>
             </Debug>
             <Header
               session={session}
@@ -405,13 +468,57 @@ export const EditVersion = () => {
               style={{ height: 'calc(100% - 80px)' }}
             >
               {versionId && !version?.data ? (
-                loading === true ? (
+                isLoadingData === true ? (
                   <div className='w-full h-full'>
                     <Skeleton className='p-16' />
+                  </div>
+                ) : workflow ? (
+                  <div>
+                    <NotFound404
+                      title='Permission denied'
+                      message={
+                        <div className='w-full text-center'>
+                          <p>
+                            Sorry, you don not have permission to access to this
+                            workflow.
+                          </p>
+                          <p>
+                            Ask the owner to publish this workflow or add you as
+                            a workspace editor.
+                          </p>
+                        </div>
+                      }
+                    />
                   </div>
                 ) : (
                   <NotFound404 />
                 )
+              ) : viewMode === GraphViewMode.VIEW_ONLY ? (
+                <NotFound404
+                  title='Permission denied'
+                  message={
+                    <div className='w-full text-center'>
+                      <p>
+                        Sorry, you don not have permission to{' '}
+                        <span className='text-violet-500'>EDIT</span> to this
+                        workflow.
+                      </p>
+                      <div>Click here to open the view mode</div>
+                    </div>
+                  }
+                  cta={
+                    <Button
+                      type='primary'
+                      onClick={() =>
+                        navigate(
+                          `/public/${orgIdString}/${workflowIdString}/${versionIdString}`
+                        )
+                      }
+                    >
+                      Open in View
+                    </Button>
+                  }
+                />
               ) : (
                 <div className='w-full h-full'>
                   <DirectedGraph

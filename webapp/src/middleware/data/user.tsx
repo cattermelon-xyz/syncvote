@@ -58,7 +58,6 @@ export const queryUserByEmail = async ({
   onSuccess: (data: any) => void;
   onError?: (error: any) => void;
 }) => {
-  dispatch(startLoading({}));
   const { data, error } = await supabase
     .from('profile')
     .select('id, email, full_name')

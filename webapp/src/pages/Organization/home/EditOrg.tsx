@@ -1,6 +1,7 @@
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Button,
+  Divider,
   Drawer,
   Input,
   Modal,
@@ -65,11 +66,15 @@ const EditOrg = ({
           />
         </Space>
         {profile && profile.length > 0 ? (
-          <Space direction='vertical' size='small' className='w-full'>
+          <Space
+            direction='vertical'
+            size='small'
+            className='w-full border border-solid border-zinc-200 rounded-md'
+          >
             <Space
               direction='horizontal'
               size='small'
-              className='w-full flex justify-between'
+              className='w-full flex justify-between items-center pt-2 pb-0 px-2'
             >
               <span className='font-bold'>Member list</span>
               <Button
@@ -82,16 +87,21 @@ const EditOrg = ({
                 Invite
               </Button>
             </Space>
-            {profile?.map((p: IProfile) => (
-              <Space
-                key={p.email}
-                direction='horizontal'
-                className='flex justify-between'
-              >
-                <div className='w-[350px]'>{p.full_name}</div>
-                <div>{p.email}</div>
-              </Space>
-            ))}
+            <hr className='border border-solid border-zinc-200' />
+            <Space direction='vertical' className='p-2 w-full' size='middle'>
+              {profile?.map((p: IProfile) => (
+                <Space
+                  key={p.email}
+                  direction='horizontal'
+                  className='flex justify-between'
+                >
+                  <div className='w-[350px]'>
+                    {p.full_name || <Tag color='default'>Missing</Tag>}
+                  </div>
+                  <div>{p.email}</div>
+                </Space>
+              ))}
+            </Space>
           </Space>
         ) : null}
         <div className='flex justify-between items-center'>
@@ -150,7 +160,7 @@ const EditOrg = ({
             }}
           >
             <Button type='default' icon={<DeleteOutlined />} danger>
-              Delete
+              Delete workspace
             </Button>
           </Popconfirm>
         </div>
