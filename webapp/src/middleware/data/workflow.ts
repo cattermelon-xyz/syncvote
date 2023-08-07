@@ -18,6 +18,7 @@ import {
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { subtractArray } from '@utils/helpers';
+import { log } from 'console';
 
 export const insertWorkflowAndVersion = async ({
   dispatch,
@@ -105,7 +106,8 @@ export const insertWorkflowAndVersion = async ({
             icon_url: iconUrl,
             banner_url: '',
             owner_org_id: orgId,
-            workflow_version: !err ? versions : [],
+            workflow_version: versions,
+            versions: versions,
           },
         })
       );
@@ -349,7 +351,6 @@ export const updateAWorkflowInfo = async ({
       delete newData[index].preset_banner_url;
     });
     dispatch(changeWorkflowInfo({ workflow: newData[0] }));
-    dispatch(changeWorkflowInfo({ workflow: newData[0] }));
     dispatch(changeWorkflow(newData[0]));
     onSuccess(newData);
   } else {
@@ -470,13 +471,14 @@ export const deleteAWorkflow = async ({
   const { data, error } = await supabase
     .from('workflow')
     .delete()
-    .eq('id', workflow.id);
+    .eq('id', workflow.id)
+    .select('*');
   dispatch(finishLoading({}));
+
   if (!error) {
     dispatch(deleteWorkflow({ workflow: workflow }));
     onSuccess(data);
   } else {
-    onError(error);
     onError(error);
   }
   // if (!error) {

@@ -34,7 +34,7 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
     const org = dataOrgs.find((org: any) => org.id === value);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
     const props = {
-      title: workflow?.title,
+      title: workflow?.title + ' Duplicated',
       desc: workflow?.desc,
       owner_org_id: value,
       emptyStage: workflow?.versions[0]?.data,

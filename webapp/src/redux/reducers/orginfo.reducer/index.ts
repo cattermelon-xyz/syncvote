@@ -110,8 +110,11 @@ const orgInfoSlice = createSlice({
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
           (wf: any) => (wf.id = workflow.id)
         );
+
         if (worfklowIndex !== -1) {
-          state.orgs[orgIndex].workflows[worfklowIndex] = workflow;
+          state.orgs[orgIndex].workflows[worfklowIndex] = {
+            ...workflow,
+          };
         }
       }
     },
@@ -126,12 +129,9 @@ const orgInfoSlice = createSlice({
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
           (wf: any) => (wf.id = workflow.id)
         );
-        console.log(worfklowIndex);
 
         if (worfklowIndex !== -1) {
-          state.orgs[orgIndex].workflows = state.orgs[
-            orgIndex
-          ].workflows.filter((wf: any) => wf.id !== workflow.id);
+          state.orgs[orgIndex].workflows.splice(worfklowIndex, 1);
         }
       }
     },

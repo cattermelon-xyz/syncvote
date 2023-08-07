@@ -13,7 +13,7 @@ const DeleteWorkflowModal: React.FC<DeleteWorkflowModalProps> = ({
   open,
   onClose,
   workflow,
-  dispatch, 
+  dispatch,
 }) => {
   const handleCancel = () => {
     onClose();
@@ -21,7 +21,7 @@ const DeleteWorkflowModal: React.FC<DeleteWorkflowModalProps> = ({
 
   const handleOk = async () => {
     await deleteAWorkflow({
-      workflow: workflow,
+      workflow: { ...workflow },
       dispatch: dispatch,
       onSuccess: (data: any) => {
         console.log(data);

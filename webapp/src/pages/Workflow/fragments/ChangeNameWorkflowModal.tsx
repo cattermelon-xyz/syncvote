@@ -34,7 +34,7 @@ const ChangeNameWorkflowModal: React.FC<ChangeNameWorkflowModalProps> = ({
       },
       dispatch: dispatch,
       onSuccess: (data: any) => {
-        console.log(data);
+        // console.log(data);
       },
     });
     onClose();
