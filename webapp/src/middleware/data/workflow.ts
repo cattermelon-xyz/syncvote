@@ -347,7 +347,6 @@ export const updateAWorkflowInfo = async ({
       delete newData[index].preset_icon_url;
       delete newData[index].preset_banner_url;
     });
-    console.log('New data', newData[0]);
     dispatch(changeWorkflowInfo({ workflow: newData[0] }));
     dispatch(changeWorkflow(newData[0]));
     onSuccess(newData);
