@@ -204,7 +204,7 @@ export const explain = ({
           </li>
         ) : null}
         {isRTE(resultDescription) ? (
-          <li>Calculation Rules: {resultDescription}</li>
+          <li>Calculation Rules: {parse(resultDescription)}</li>
         ) : null}
       </ul>
       {checkpoint?.duration || isRTE(checkpoint?.votingLocation) ? (
@@ -232,22 +232,24 @@ export const explain = ({
           </ul>
         </>
       ) : null}
-      {/* <div>
-        Voting method is
-        <Tag className='text-red-500 mx-2 font-bold'>
-          {getVoteMachine(checkpoint.vote_machine_type || '')?.getName()}
-        </Tag>
-      </div> */}
-      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+      {participation || isRTE(participationDescription) ? (
+        <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+      ) : null}
+
       {renderParticipation(participation)}
       {isRTE(participationDescription) ? (
         <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
           {parse(participationDescription || '')}
         </div>
       ) : null}
-      <div className='mt-2'>
-        Each of them can vote ONE option from a list of
-        <span className='text-violet-500 mx-1'>{noOfOptions}</span>
+      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+      <div>
+        Voting method is
+        <span className='text-violet-500 mx-2 font-bold'>
+          {getVoteMachine(checkpoint.vote_machine_type || '')?.getName()}
+        </span>
+        and each voter can for for
+        <span className='text-violet-500 mx-1'>[1 / {noOfOptions}]</span>
         options.
         {data.includedAbstain
           ? ' User can also choose to abstain from voting.'
@@ -264,16 +266,31 @@ export const explain = ({
         </span>
         made by participants.
       </div>
+      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
       {isRTE(resultDescription) ? (
-        <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
-          {parse(resultDescription)}
+        <div>
+          Calculation rules:
+          <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
+            {parse(resultDescription)}
+          </div>
+        </div>
+      ) : null}
+      {checkpoint?.duration ? (
+        <div>
+          The checkpoint is open for vote for{' '}
+          <span className='font-bold text-violet-500'>
+            {displayDuration(
+              moment.duration((checkpoint?.duration || 0) * 1000)
+            )}
+          </span>
         </div>
       ) : null}
       {isRTE(votingLocation) ? (
         <div>
-          <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
-          <div className='text-zinc-500'>Voting happens at</div>
-          {parse(votingLocation)}
+          <div className='text-zinc-500'>Voting will happens on:</div>
+          <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
+            {parse(votingLocation)}
+          </div>
         </div>
       ) : null}
     </div>

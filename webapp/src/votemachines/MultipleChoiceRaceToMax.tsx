@@ -18,6 +18,7 @@ import {
   IParticipant,
 } from '../types';
 import moment from 'moment';
+import CollapsiblePanel from '@components/DirectedGraph/MachineConfigPanel/fragments/CollapsiblePanel';
 
 interface Option {
   title: string;
@@ -223,148 +224,156 @@ const ConfigPanel = ({
   // const lOptions = options ? options.length : 0;
   return (
     <Space direction='vertical' size='large' className='mb-4 w-full'>
-      <Space direction='vertical' size='small' className='w-full'>
-        <div className='bg-slate-100 p-2 w-full'>{`Everyone choose up to ${
-          upTo || 'X'
-        } options until ${upTo || 'X'} options reach ${
-          maxStr || 'condition to pass'
-        }`}</div>
-      </Space>
-      <Space direction='vertical' size='small' className='w-full'>
-        <div className='text-md'>Min no of vote to pass (e.g: 3, 10%)</div>
-        <Space.Compact className='w-full'>
-          <Input
-            type='text'
+      <CollapsiblePanel title='Options & Navigation'>
+        <Space direction='vertical' size='large' className='w-full'>
+          <Space direction='vertical' size='small' className='w-full'>
+            <div className='bg-slate-100 p-2 w-full'>{`Everyone choose up to ${
+              upTo || 'X'
+            } options until ${upTo || 'X'} options reach ${
+              maxStr || 'condition to pass'
+            }`}</div>
+          </Space>
+          {options && options.length > 0 ? (
+            <Space direction='vertical' size='small' className='w-full'>
+              <div>List of options</div>
+              {options?.map((option: any, index: any) => (
+                <Space
+                  direction='horizontal'
+                  key={option.title}
+                  className='flex items-center'
+                >
+                  <Button
+                    className='mr-2 flex-inline items-center text-center text-red-500'
+                    icon={<DeleteOutlined />}
+                    onClick={() => {
+                      onChange({
+                        data: {
+                          ...structuredClone(data),
+                          options: [
+                            ...options.slice(0, index),
+                            ...options.slice(index + 1),
+                          ],
+                        },
+                      });
+                    }}
+                  />
+                  <Space direction='vertical' size='small'>
+                    <div className='text-slate-700'>{option.title}</div>
+                    <div className='text-xs'>{option.description}</div>
+                  </Space>
+                </Space>
+              ))}
+            </Space>
+          ) : (
+            <></>
+          )}
+          <Button
+            icon={<PlusOutlined />}
             className='w-full'
-            prefix={
-              <div className='text-slate-300'>
-                <ArrowRightOutlined className='inline-flex items-center pr-2' />
-              </div>
-            }
-            value={maxStr}
-            onChange={(e) => {
-              const str = e.target.value;
-              let tMax = 0;
-              if (str !== '') {
-                tMax =
-                  str.indexOf('%') > 0
-                    ? parseFloat(str) / 100
-                    : parseInt(str, 10);
-              }
-              onChange({
-                data: {
-                  ...structuredClone(data),
-                  max: tMax,
-                },
-              });
+            onClick={() => {
+              setShowNewOptionDrawer(true);
             }}
-            disabled={
-              !(
-                viewMode === GraphViewMode.EDIT_MISSION ||
-                GraphViewMode.EDIT_WORKFLOW_VERSION
-              )
-            }
-          />
-        </Space.Compact>
-      </Space>
-      <Space direction='vertical' size='small' className='w-full'>
-        <div className='text-md'>
-          Max number of choices
-          {/* (&lt;
+          >
+            New Option
+          </Button>
+          {renderChildren('next', next)}
+          {renderChildren('fallback', fallback)}
+        </Space>
+      </CollapsiblePanel>
+      <CollapsiblePanel title='Result calculation'>
+        <Space direction='vertical' size='small' className='w-full'>
+          <div className='text-md'>Min no of vote to pass (e.g: 3, 10%)</div>
+          <Space.Compact className='w-full'>
+            <Input
+              type='text'
+              className='w-full'
+              prefix={
+                <div className='text-slate-300'>
+                  <ArrowRightOutlined className='inline-flex items-center pr-2' />
+                </div>
+              }
+              value={maxStr}
+              onChange={(e) => {
+                const str = e.target.value;
+                let tMax = 0;
+                if (str !== '') {
+                  tMax =
+                    str.indexOf('%') > 0
+                      ? parseFloat(str) / 100
+                      : parseInt(str, 10);
+                }
+                onChange({
+                  data: {
+                    ...structuredClone(data),
+                    max: tMax,
+                  },
+                });
+              }}
+              disabled={
+                !(
+                  viewMode === GraphViewMode.EDIT_MISSION ||
+                  viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                )
+              }
+            />
+          </Space.Compact>
+        </Space>
+        <Space direction='vertical' size='small' className='w-full'>
+          <div className='text-md'>
+            Max number of choices
+            {/* (&lt;
           {lOptions}
           ) */}
-        </div>
-        <Space.Compact className='w-full'>
-          <Input
-            type='number'
-            className='w-full'
-            prefix={
-              <div className='text-slate-300'>
-                <ArrowRightOutlined className='inline-flex items-center pr-2' />
-              </div>
-            }
-            value={upTo}
-            disabled={
-              !(
-                viewMode === GraphViewMode.EDIT_MISSION ||
-                viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
-              )
-            }
-            onChange={(e) => {
-              onChange({
-                data: {
-                  ...structuredClone(data),
-                  upTo: parseInt(e.target.value, 10),
-                },
-              });
-              // TODO: check in publish; but not sure if data is taken from previous checkpoint
-              // if (editable === false && e.target.value !== ''
-              //   && !Number.isNaN(parseInt(e.target.value, 10))
-              //   && parseInt(e.target.value, 10) > 0 && parseInt(e.target.value, 10) < lOptions) {
-              //   onChange({
-              //     data: {
-              //       upTo: parseInt(e.target.value, 10),
-              //     },
-              //   });
-              // } else {
-              //   Modal.error({
-              //     title: 'Invalid value',
-              //     content: `Max number of choices should smaller
-              //     than number of options and greater than 0`,
-              //   });
-              //   onChange({
-              //     data: {
-              //       upTo: 0,
-              //     },
-              //   });
-              // }
-            }}
-          />
-        </Space.Compact>
-      </Space>
-      {options && options.length > 0 ? (
-        <Space direction='vertical' size='small' className='w-full'>
-          <div>List of options</div>
-          {options?.map((option: any, index: any) => (
-            <Space
-              direction='horizontal'
-              key={option.title}
-              className='flex items-center'
-            >
-              <Button
-                className='mr-2 flex-inline items-center text-center text-red-500'
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  onChange({
-                    data: {
-                      ...structuredClone(data),
-                      options: [
-                        ...options.slice(0, index),
-                        ...options.slice(index + 1),
-                      ],
-                    },
-                  });
-                }}
-              />
-              <Space direction='vertical' size='small'>
-                <div className='text-slate-700'>{option.title}</div>
-                <div className='text-xs'>{option.description}</div>
-              </Space>
-            </Space>
-          ))}
+          </div>
+          <Space.Compact className='w-full'>
+            <Input
+              type='number'
+              className='w-full'
+              prefix={
+                <div className='text-slate-300'>
+                  <ArrowRightOutlined className='inline-flex items-center pr-2' />
+                </div>
+              }
+              value={upTo}
+              disabled={
+                !(
+                  viewMode === GraphViewMode.EDIT_MISSION ||
+                  viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                )
+              }
+              onChange={(e) => {
+                onChange({
+                  data: {
+                    ...structuredClone(data),
+                    upTo: parseInt(e.target.value, 10),
+                  },
+                });
+                // TODO: check in publish; but not sure if data is taken from previous checkpoint
+                // if (editable === false && e.target.value !== ''
+                //   && !Number.isNaN(parseInt(e.target.value, 10))
+                //   && parseInt(e.target.value, 10) > 0 && parseInt(e.target.value, 10) < lOptions) {
+                //   onChange({
+                //     data: {
+                //       upTo: parseInt(e.target.value, 10),
+                //     },
+                //   });
+                // } else {
+                //   Modal.error({
+                //     title: 'Invalid value',
+                //     content: `Max number of choices should smaller
+                //     than number of options and greater than 0`,
+                //   });
+                //   onChange({
+                //     data: {
+                //       upTo: 0,
+                //     },
+                //   });
+                // }
+              }}
+            />
+          </Space.Compact>
         </Space>
-      ) : (
-        <></>
-      )}
-      <Button
-        icon={<PlusOutlined />}
-        className='w-full'
-        onClick={() => {
-          setShowNewOptionDrawer(true);
-        }}
-      >
-        New Option
-      </Button>
+      </CollapsiblePanel>
       <Drawer
         open={showNewOptionDrawer}
         onClose={() => {
@@ -415,8 +424,6 @@ const ConfigPanel = ({
           </Button>
         </Space>
       </Drawer>
-      {renderChildren('next', next)}
-      {renderChildren('fallback', fallback)}
     </Space>
   );
 };
@@ -560,7 +567,9 @@ const explain = ({
           </ul>
         </>
       ) : null}
-      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+      {participation || isRTE(participationDescription) ? (
+        <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+      ) : null}
       {renderParticipation(participation)}
       {isRTE(participationDescription) ? (
         <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
@@ -568,7 +577,7 @@ const explain = ({
         </div>
       ) : null}
       <div className='mt-2'>
-        Each of them can vote up to{' '}
+        Each of voter can vote up to{' '}
         <span className='text-violet-500 font-bold'>{data?.upTo || '0'}</span>{' '}
         option(s) from a list of
         <Popover
