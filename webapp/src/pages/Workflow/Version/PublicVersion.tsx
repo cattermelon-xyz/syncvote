@@ -329,9 +329,9 @@ export const PublicVersion = () => {
                       className={`flex items-center justify-center`}
                       icon={
                         isFullScreen ? (
-                          <FullscreenOutlined />
-                        ) : (
                           <FullscreenExitOutlined />
+                        ) : (
+                          <FullscreenOutlined />
                         )
                       }
                       onClick={() => {
