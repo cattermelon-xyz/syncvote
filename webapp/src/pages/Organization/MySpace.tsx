@@ -99,7 +99,6 @@ const MySpace: React.FC = () => {
       fetchData();
     }
   }, [user, orgs]);
-  }, [user, orgs]);
 
   return (
     <div className='w-[800px] flex flex-col'>

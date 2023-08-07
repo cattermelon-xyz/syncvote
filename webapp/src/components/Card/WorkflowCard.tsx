@@ -1,17 +1,7 @@
-import React from 'react';
-import { Avatar, Card } from 'antd';
+import React, { useState } from 'react';
+import { Avatar, Card, Modal, Popover } from 'antd';
 import './AntCard.css';
 import { useNavigate } from 'react-router-dom';
-import {
-  CopyOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  EllipsisOutlined,
-  EyeOutlined,
-  ImportOutlined,
-  ShareAltOutlined,
-} from '@ant-design/icons';
-import { createIdString, getImageUrl } from '@utils/helpers';
 import {
   CopyOutlined,
   DeleteOutlined,

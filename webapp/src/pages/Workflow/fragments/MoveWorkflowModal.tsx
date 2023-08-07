@@ -33,7 +33,6 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
     const org_owner = orgs.find((org: any) => org.id === workflow.owner_org_id);
 
     setOrgOwner(org_owner);
-    console.log('Hehe', org_owner);
   }, [orgs]);
 
   const handleCancel = () => {

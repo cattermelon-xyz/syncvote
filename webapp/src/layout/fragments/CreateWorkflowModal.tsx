@@ -89,22 +89,10 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
           {orgs.map((org: any, index: any) => (
             <div
               className='flex h-12 items-center radio cursor-pointer'
-              className='flex h-12 items-center radio cursor-pointer'
               key={index}
               style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
               onMouseEnter={() => setHovered(index)}
               onMouseLeave={() => setHovered(null)}
-              onClick={() => {
-                if (value) {
-                  if (value === org?.id) {
-                    setValue(null);
-                  } else {
-                    setValue(org?.id);
-                  }
-                } else {
-                  setValue(org?.id);
-                }
-              }}
               onClick={() => {
                 if (value) {
                   if (value === org?.id) {
@@ -141,7 +129,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
           className='p-4'
           style={{ color: '#6d28d9' }}
           onClick={setOpenCreateWorkspaceModal}
-        >
+        />
         <a
           className='p-4'
           style={{ color: '#6d28d9' }}

@@ -399,48 +399,6 @@ export const changeAWorkflowOrg = async ({
   dispatch(finishLoading({}));
 };
 
-export const changeAWorkflowOrg = async ({
-  orgId,
-  workflow,
-  dispatch,
-  onSuccess = () => {},
-  onError = () => {},
-}: {
-  orgId: any;
-  workflow: any;
-  dispatch: any;
-  onSuccess?: (data: any) => void;
-  onError?: (data: any) => void;
-}) => {
-  dispatch(startLoading({}));
-  const orgIdFrom = workflow?.owner_org_id;
-
-  const { data, error } = await supabase
-    .from('workflow')
-    .update({ owner_org_id: orgId })
-    .eq('id', workflow?.id).select(`id,
-          title,
-          owner_org_id,
-          icon_url,
-          banner_url,
-          preset_icon_url,
-          preset_banner_url,
-          versions: workflow_version(
-            id, 
-            status,
-            created_at,
-            last_updated
-          )`);
-
-  if (data) {
-    dispatch(changeWorkflowOrg({ orgIdFrom: orgIdFrom, workflow: data[0] }));
-    onSuccess(data);
-  } else {
-    onError(error);
-  }
-  dispatch(finishLoading({}));
-};
-
 export const updateAWorkflowTag = async ({
   workflow,
   newTags,
@@ -498,17 +456,12 @@ export const updateAWorkflowTag = async ({
 
 export const deleteAWorkflow = async ({
   workflow,
-  workflow,
   dispatch,
   onSuccess,
   onError = (error: any) => {
     console.log(error);
   },
-  onError = (error: any) => {
-    console.log(error);
-  },
 }: {
-  workflow: any;
   workflow: any;
   dispatch: any;
   onSuccess: (data: any) => void;
@@ -518,11 +471,7 @@ export const deleteAWorkflow = async ({
     .from('workflow')
     .delete()
     .eq('id', workflow.id);
-    .delete()
-    .eq('id', workflow.id);
   dispatch(finishLoading({}));
-  if (!error) {
-    dispatch(deleteWorkflow({ workflow: workflow }));
   if (!error) {
     dispatch(deleteWorkflow({ workflow: workflow }));
     onSuccess(data);

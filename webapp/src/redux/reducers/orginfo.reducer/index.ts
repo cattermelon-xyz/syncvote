@@ -142,7 +142,6 @@ const orgInfoSlice = createSlice({
         (org: IOrgInfo) => org.id === orgId
       );
 
-
       if (orgIndex !== -1) {
         const userIndex = state.orgs[orgIndex].profile.findIndex(
           (user) => user.id === userId
@@ -167,5 +166,6 @@ export const {
   changeWorkflowInfo,
   deleteWorkflow,
   addWorkflowToOrg,
+  deleteOrgInfo,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;
