@@ -49,6 +49,7 @@ import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import NotFound404 from '@pages/NotFound404';
+import './public-version.scss';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -422,10 +423,7 @@ export const PublicVersion = () => {
                 className='information-collapsed'
               >
                 {rightSiderStatus === 'description' ? (
-                  <Space
-                    direction='vertical'
-                    className='border-r border-gray-200 border-solid h-full w-full'
-                  >
+                  <div className='border-r border-gray-200 border-solid h-full w-full flex flex-col gap-2'>
                     <Space direction='vertical' size='large' className='w-full'>
                       <Space
                         direction='horizontal'
@@ -440,14 +438,16 @@ export const PublicVersion = () => {
                         />
                       </Space>
                     </Space>
-                    {worflowInfo.desc ? (
-                      <div className='m-4 p-4 bg-white rounded-lg'>
-                        {parse(worflowInfo.desc)}
-                      </div>
-                    ) : (
-                      <Empty />
-                    )}
-                  </Space>
+                    <div className='overflow-y-scroll'>
+                      {worflowInfo.desc ? (
+                        <div className='m-4 p-4 bg-white rounded-lg public-desc-wrapper'>
+                          {parse(worflowInfo.desc)}
+                        </div>
+                      ) : (
+                        <Empty />
+                      )}
+                    </div>
+                  </div>
                 ) : null}
                 {rightSiderStatus === 'comment' ? (
                   <div className='bg-white w-full border-r border-gray-300 border-solid'>
