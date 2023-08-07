@@ -200,54 +200,54 @@ export const EditVersion = () => {
   }, [workflows]);
   let timerHandler: any = undefined;
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
-  useEffect(() => {
-    if (
-      dataHasChanged &&
-      isLoadingData === false &&
-      lastSaved === -1 &&
-      version.data
-    ) {
-      // this is the first time data is loaded
-      setLastSaved(Date.now());
-      setAutoSaveStatus('first time, lastSaved is set');
-      return;
-    }
-    if (
-      dataHasChanged &&
-      isLoadingData === false &&
-      lastSaved !== -1 &&
-      version.data
-    ) {
-      const now = Date.now();
-      if (now - lastSaved > 10000) {
-        // let' save data to server
-        // TODO: this data is not the latest data, it's the data when the timer is set
-        handleSave('data');
-        setAutoSaveStatus('auto save');
-        // setDataHasChanged(false);
-      } else {
-        // if there is a timer then do nothing
-        if (timerHandler !== undefined) {
-          return;
-        } else {
-          // else, let's set a timer
-          setAutoSaveStatus(
-            'a timer is set to 10s to save. Tick tock tick tock'
-          );
-          timerHandler = setTimeout(() => {
-            // TODO: this data is not the latest data, it's the data when the timer is set
-            handleSave('data');
-            // setDataHasChanged(false);
-            // setLastSaved(Date.now());
-            clearTimeout(timerHandler);
-            timerHandler = undefined;
-            setAutoSaveStatus('saved & clear timeout');
-          }, 10000 - (now - lastSaved));
-        }
-      }
-      return;
-    }
-  }, [dataHasChanged]);
+  // useEffect(() => {
+  //   if (
+  //     dataHasChanged &&
+  //     isLoadingData === false &&
+  //     lastSaved === -1 &&
+  //     version.data
+  //   ) {
+  //     // this is the first time data is loaded
+  //     setLastSaved(Date.now());
+  //     setAutoSaveStatus('first time, lastSaved is set');
+  //     return;
+  //   }
+  //   if (
+  //     dataHasChanged &&
+  //     isLoadingData === false &&
+  //     lastSaved !== -1 &&
+  //     version.data
+  //   ) {
+  //     const now = Date.now();
+  //     if (now - lastSaved > 10000) {
+  //       // let' save data to server
+  //       // TODO: this data is not the latest data, it's the data when the timer is set
+  //       handleSave('data');
+  //       setAutoSaveStatus('auto save');
+  //       // setDataHasChanged(false);
+  //     } else {
+  //       // if there is a timer then do nothing
+  //       if (timerHandler !== undefined) {
+  //         return;
+  //       } else {
+  //         // else, let's set a timer
+  //         setAutoSaveStatus(
+  //           'a timer is set to 10s to save. Tick tock tick tock'
+  //         );
+  //         timerHandler = setTimeout(() => {
+  //           // TODO: this data is not the latest data, it's the data when the timer is set
+  //           handleSave('data');
+  //           // setDataHasChanged(false);
+  //           // setLastSaved(Date.now());
+  //           clearTimeout(timerHandler);
+  //           timerHandler = undefined;
+  //           setAutoSaveStatus('saved & clear timeout');
+  //         }, 10000 - (now - lastSaved));
+  //       }
+  //     }
+  //     return;
+  //   }
+  // }, [dataHasChanged]);
 
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
