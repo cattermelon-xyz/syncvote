@@ -166,6 +166,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
   return (
     <>
+    
       <PreviewWorkflowModal
         open={openModalPreview}
         onClose={() => {
@@ -174,6 +175,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         }}
         workflow={dataWorkflow}
       />
+
       <ShareModal
         workflow={workflow}
         showShareModal={showShareModal}
@@ -183,6 +185,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
       />
+
       <MoveToWorkflowModal
         open={openModalMoveTo}
         onClose={() => {
@@ -190,7 +193,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
         orgTo={orgTo}
       />
 
@@ -201,7 +203,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
         openMoveToModal={(data: any) => {
           setOrgTo(data);
           setOpenModalMoveTo(true);

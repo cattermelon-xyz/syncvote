@@ -2,7 +2,7 @@ import { Button, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
 import { getDataOrgs } from '@middleware/data';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import './create-new.scss';
 
@@ -10,7 +10,6 @@ interface MoveWorkflowModalProps {
   open: boolean;
   onClose: () => void;
   workflow: any;
-  dispatch: any;
   openMoveToModal: (orgTo: any) => void;
 }
 
@@ -18,11 +17,24 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
   open,
   onClose,
   workflow,
-  dispatch,
   openMoveToModal,
 }) => {
+  const dispatch = useDispatch();
   const [dataOrgs, setDataOrgs] = useState<any>([]);
-  const { user } = useSelector((state: any) => state.orginfo);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
+  const [org_owner, setOrgOwner] = useState<any>();
+
+  useEffect(() => {
+    const dataOrgs = orgs.filter(
+      (org: any) => org.id !== workflow.owner_org_id
+    );
+    setDataOrgs(dataOrgs);
+
+    const org_owner = orgs.find((org: any) => org.id === workflow.owner_org_id);
+
+    setOrgOwner(org_owner);
+    console.log('Hehe', org_owner);
+  }, [orgs]);
 
   const handleCancel = () => {
     onClose();
@@ -34,20 +46,23 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
     onClose();
   };
 
-  const loadWorkflowData = async () => {
-    if (user?.id !== null) {
-      await getDataOrgs({
-        userId: user?.id,
-        dispatch: dispatch,
-        onSuccess: (data: any) => {
-          const dataOrgs = data.filter(
-            (org: any) => org.id !== workflow.owner_org_id
-          );
-          setDataOrgs(dataOrgs);
-        },
-      });
-    }
-  };
+  console.log(org_owner);
+
+  // const loadWorkflowData = async () => {
+  //   if (user?.id !== null) {
+  //     await getDataOrgs({
+  //       userId: user?.id,
+  //       dispatch: dispatch,
+  //       onSuccess: (data: any) => {
+  //         const dataOrgs = data.filter(
+  //           (org: any) => org.id !== workflow.owner_org_id
+  //         );
+  //         setDataOrgs(dataOrgs);
+  //       },
+  //     });
+  //   }
+  // };
+
   const [value, setValue] = useState(null);
   const [hovered, setHovered] = useState(null);
 
@@ -55,9 +70,6 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
     setValue(e.target.value);
   };
 
-  useEffect(() => {
-    loadWorkflowData();
-  }, [user]);
   return (
     <Modal
       title={`${L('move')} "${workflow.title}"`}
@@ -73,12 +85,12 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
           Current location
         </Space>
         <Space className='bg-[#F4F0FA] rounded-lg'>
-          <div className='flex mx-3 my-2'>
+          <div className='flex mx-3 my-2 justify-center items-center'>
             <Icon
-              iconUrl={workflow.icon_url ? workflow.icon_url : ''}
+              iconUrl={org_owner?.icon_url ? org_owner?.icon_url : ''}
               size='medium'
             />
-            <div className='pl-1 text-[#6200EE]'>{workflow.title}</div>
+            <div className='pl-1 text-[#6200EE]'>{org_owner?.title}</div>
           </div>
         </Space>
       </Space>
