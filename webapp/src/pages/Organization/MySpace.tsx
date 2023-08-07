@@ -79,6 +79,16 @@ const MySpace: React.FC = () => {
         //     console.log(error);
         //   },
         // });
+        // await getWorkflowFromEditor({
+        //   userId: user.id,
+        //   dispatch,
+        //   onSuccess: (data: any) => {
+        //     console.log('Editor', data);
+        //   },
+        //   onError: (error: any) => {
+        //     console.log(error);
+        //   },
+        // });
 
         // Querry workflow from workflow_version_editor
       }
@@ -88,6 +98,7 @@ const MySpace: React.FC = () => {
     if (user) {
       fetchData();
     }
+  }, [user, orgs]);
   }, [user, orgs]);
 
   return (
