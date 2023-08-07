@@ -46,23 +46,6 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
     onClose();
   };
 
-  console.log(org_owner);
-
-  // const loadWorkflowData = async () => {
-  //   if (user?.id !== null) {
-  //     await getDataOrgs({
-  //       userId: user?.id,
-  //       dispatch: dispatch,
-  //       onSuccess: (data: any) => {
-  //         const dataOrgs = data.filter(
-  //           (org: any) => org.id !== workflow.owner_org_id
-  //         );
-  //         setDataOrgs(dataOrgs);
-  //       },
-  //     });
-  //   }
-  // };
-
   const [value, setValue] = useState(null);
   const [hovered, setHovered] = useState(null);
 

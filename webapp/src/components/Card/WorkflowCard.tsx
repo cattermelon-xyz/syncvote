@@ -166,7 +166,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
   return (
     <>
-    
       <PreviewWorkflowModal
         open={openModalPreview}
         onClose={() => {
@@ -226,7 +225,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
       />
       <DuplicateWorkflowModal
         open={openModalDuplicate}
