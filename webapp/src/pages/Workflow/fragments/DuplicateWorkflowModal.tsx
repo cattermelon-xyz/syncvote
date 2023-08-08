@@ -2,7 +2,7 @@ import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
 import { getDataOrgs, insertWorkflowAndVersion } from '@middleware/data';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import './create-new.scss';
 import { PlusOutlined } from '@ant-design/icons';
@@ -13,15 +13,14 @@ interface DuplicateWorkflowModalProps {
   open: boolean;
   onClose: () => void;
   workflow: any;
-  dispatch: any;
 }
 
 const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
   open,
   onClose,
   workflow,
-  dispatch,
 }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [dataOrgs, setDataOrgs] = useState<any>([]);
   const { user } = useSelector((state: any) => state.orginfo);

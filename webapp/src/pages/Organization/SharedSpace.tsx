@@ -37,8 +37,6 @@ const SharedSpace: React.FC = () => {
     type: 'asc',
   });
 
-  console.log(orgs);
-
   const handleSortSpaceDetail = (options: SortProps) => {
     setSortOption(options);
   };
@@ -107,7 +105,7 @@ const SharedSpace: React.FC = () => {
             items={
               filterWorkflowByOptions &&
               filterWorkflowByOptions.map((workflow, index) => (
-                <WorkflowCard key={index} dataWorkflow={{ ...workflow }} />
+                <WorkflowCard key={index} dataWorkflow={workflow} />
               ))
             }
             columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}

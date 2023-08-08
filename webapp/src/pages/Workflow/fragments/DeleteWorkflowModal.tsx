@@ -1,20 +1,20 @@
 import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
 import { deleteAWorkflow } from '@middleware/data';
+import { useDispatch } from 'react-redux';
 
 interface DeleteWorkflowModalProps {
   open: boolean;
   onClose: () => void;
   workflow: any;
-  dispatch: any;
 }
 
 const DeleteWorkflowModal: React.FC<DeleteWorkflowModalProps> = ({
   open,
   onClose,
   workflow,
-  dispatch,
 }) => {
+  const dispatch = useDispatch();
   const handleCancel = () => {
     onClose();
   };

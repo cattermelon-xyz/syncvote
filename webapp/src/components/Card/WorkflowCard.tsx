@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Card, Divider, Modal, Popover } from 'antd';
+import { Avatar, Card, Modal, Popover } from 'antd';
 import './AntCard.css';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -46,14 +46,13 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   const [orgTo, setOrgTo] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const navigate = useNavigate();
-  // useEffect(() => {
 
-  // }, [isPopoverVisible]);
+  useEffect(() => {
+    if (!isMyWorkSpacePage && !isSharedWorkSpacePage) {
+      setIsPopoverVisible(false);
+    }
+  }, []);
 
-  const Haha = () => {
-    setIsPopoverVisible(false);
-    return <div></div>;
-  };
   const PopoverContent: React.FC = () => (
     <>
       {isMyWorkSpacePage ? (
@@ -140,7 +139,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         </div>
       ) : (
         <>
-          {isSharedWorkSpacePage ? (
+          {isSharedWorkSpacePage && (
             <div className='cursor-pointer w-[196px]'>
               <div
                 style={{ borderBottom: '1px solid #E3E3E2' }}
@@ -197,8 +196,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
                 </div>
               </div>
             </div>
-          ) : (
-            <Haha />
           )}
         </>
       )}
@@ -293,7 +290,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
       />
 
       <ChangeNameWorkflowModal
@@ -311,7 +307,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
       />
       <Card
         hoverable={true}
