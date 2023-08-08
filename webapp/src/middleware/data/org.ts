@@ -353,6 +353,13 @@ export const queryOrgsAndWorkflowForHome = async ({
         org_size,
         org_type,
         created_at,
+        profile (
+          id,
+          email,
+          full_name,
+          icon_url,
+          preset_icon_url
+        ),
         workflows:workflow (
           id,
           title,
@@ -403,7 +410,6 @@ export const queryOrgsAndWorkflowForHome = async ({
             : workflowPresetBanner,
         };
       });
-
       tmp.push({
         id: org?.id,
         role: d.role,
@@ -415,8 +421,10 @@ export const queryOrgsAndWorkflowForHome = async ({
         org_type: org.org_type,
         created_at: org.created_at,
         workflows: workflows,
+        profile: org.profile || [],
       });
     });
+    dispatch(setOrgsInfo(tmp));
     onSuccess(tmp);
   } else {
     onError(error);
