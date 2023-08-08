@@ -20,6 +20,7 @@ export interface IProfile {
   avatar_url: string;
   about_me: string;
   role: string;
+  confirm_email_at: string;
 }
 
 export interface IMember {

@@ -21,7 +21,7 @@ function SignUpWithInvite() {
       onSuccess: () => {
         Modal.success({
           title: 'Success',
-          content: 'Invite user successfully',
+          content: 'Set password successfully',
           onOk() {
             navigate('/');
           },
@@ -31,7 +31,7 @@ function SignUpWithInvite() {
         console.error(error);
         Modal.error({
           title: 'Error',
-          content: 'Cannot invite user',
+          content: 'Set password failed',
         });
       },
     });

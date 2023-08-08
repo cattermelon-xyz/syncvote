@@ -46,6 +46,7 @@ export const inviteUserByEmail = async ({
         full_name: null,
         avatar_url: null,
         role: 'MEMBER',
+        confirm_email_at: null,
       };
       dispatch(addUserToOrg({ orgId: orgId, user: infoMember }));
       onSuccess(result);

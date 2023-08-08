@@ -20,7 +20,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
     const { email, orgId } = await req.json();
-    const redirectTo = `http://localhost:3001/set-password?email=${email}`;
+    const redirectTo = `https://app.syncvote.com/set-password?email=${email}`;
     const { data, error } = await supabaseClient.auth.admin.inviteUserByEmail(
       email,
       { redirectTo }

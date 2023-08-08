@@ -40,6 +40,10 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
     }
   }, [dataSpace.id, visible, org]);
 
+  useEffect(() => {
+    console.log('usersInOrg', usersInOrg);
+  }, [usersInOrg]);
+
   const handleInvite = async () => {
     setIsLoading(true);
     dispatch;
@@ -193,26 +197,29 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
                   const items: MenuProps['items'] = [
                     {
                       key: '1',
-                      label: <p className='text-base'>Editor</p>,
+                      label: <Button type='text' className='text-base'>Editor</Button>,
+                    },
+                    {
+                      key: '2',
+                      label: <Button type='text' ghost disabled className='text-base'>Owner</Button>,
                     },
                     {
                       key: '3',
                       label: (
-                        <p
+                        <Button
                           className='text-base'
+                          type='text'
+                          danger
                           onClick={() =>
                             handleRemoveMember(dataSpace.id, userInfo.id)
                           }
                         >
                           Remove
-                        </p>
+                        </Button>
                       ),
                     },
                   ];
-                  if (
-                    userInfo?.avatar_url === null &&
-                    userInfo?.full_name === null
-                  ) {
+                  if (userInfo?.confirm_email_at === null) {
                     return (
                       <div
                         className='flex justify-between items-center'
