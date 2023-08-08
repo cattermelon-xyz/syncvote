@@ -152,15 +152,17 @@ const VerticalNav = () => {
             </Dropdown>
           </div>
           <Space direction='vertical' size='small' className='w-full pl-4'>
-            {navs.map((nav) => {
+            {navs.map((nav, index) => {
               const { label, destinationUrl } = nav;
               return (
-                <VerticalNavButton
-                  label={label}
-                  destinationUrl={destinationUrl}
-                  navigate={navigate}
-                  selected={selectedNav.destinationUrl === destinationUrl}
-                />
+                <div key={index}>
+                  <VerticalNavButton
+                    label={label}
+                    destinationUrl={destinationUrl}
+                    navigate={navigate}
+                    selected={selectedNav.destinationUrl === destinationUrl}
+                  />
+                </div>
               );
             })}
           </Space>

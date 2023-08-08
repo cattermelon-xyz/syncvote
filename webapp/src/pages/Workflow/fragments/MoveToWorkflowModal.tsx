@@ -1,7 +1,7 @@
 import { Button, Checkbox, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
-import { changeAWorkflowOrg, getDataOrgs } from '@middleware/data';
+import { changeAWorkflowOrg } from '@middleware/data';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import './create-new.scss';

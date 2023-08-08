@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
-import { getDataOrgs, insertWorkflowAndVersion } from '@middleware/data';
+import { insertWorkflowAndVersion } from '@middleware/data';
 import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';

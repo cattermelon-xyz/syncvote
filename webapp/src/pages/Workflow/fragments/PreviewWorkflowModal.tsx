@@ -1,4 +1,4 @@
-import { Modal, Image, Divider, Empty } from 'antd';
+import { Modal, Image, Empty, Skeleton } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
 import { createIdString } from '@utils/helpers';
@@ -21,7 +21,6 @@ const PreviewWorkflowModal: React.FC<PreviewWorkflowModalProps> = ({
   };
   const navigate = useNavigate();
 
-
   const handleOk = async () => {
     const org = orgs.find((org: any) => org.id === workflow.owner_org_id);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
@@ -32,7 +31,7 @@ const PreviewWorkflowModal: React.FC<PreviewWorkflowModalProps> = ({
 
     onClose();
   };
-  
+
   return (
     <Modal
       title={`Preview "${workflow.title}"`}
@@ -49,9 +48,12 @@ const PreviewWorkflowModal: React.FC<PreviewWorkflowModalProps> = ({
       ) : (
         <div style={{ border: '1px solid #E3E3E2' }}>
           <Image
+            placeholder={<Skeleton />}
             preview={false}
             width={600}
+            height={343}
             src={`${workflow?.workflow_version[0].preview_image_url}`}
+            // fallback=''
           />
         </div>
       )}
