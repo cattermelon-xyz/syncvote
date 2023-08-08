@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Avatar, Card, Popover, Space } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Avatar, Card, Modal, Popover } from 'antd';
 import './AntCard.css';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -9,6 +9,7 @@ import {
   EllipsisOutlined,
   EyeOutlined,
   ImportOutlined,
+  LogoutOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
 import { createIdString, getImageUrl } from '@utils/helpers';
@@ -19,6 +20,9 @@ import DuplicateWorkflowModal from '../../pages/Workflow/fragments/DuplicateWork
 import MoveWorkflowModal from '../../pages/Workflow/fragments/MoveWorkflowModal';
 import MoveToWorkflowModal from '../../pages/Workflow/fragments/MoveToWorkflowModal';
 import { useDispatch } from 'react-redux';
+import ShareModal from '@pages/Workflow/Version/fragment/ShareModal';
+import { upsertWorkflowVersion } from '@middleware/data';
+import PreviewWorkflowModal from '@pages/Workflow/fragments/PreviewWorkflowModal';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
@@ -29,89 +33,234 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   dataWorkflow,
   isListHome,
 }) => {
+  const isMyWorkSpacePage = location.pathname === '/my-workspaces';
+  const isSharedWorkSpacePage = location.pathname === '/shared-workspaces';
+
   const dispatch = useDispatch();
   const [openModalChangeName, setOpenModalChangeName] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [openModalPreview, setOpenModalPreview] = useState(false);
   const [openModalDuplicate, setOpenModalDuplicate] = useState(false);
   const [openModalMove, setOpenModalMove] = useState(false);
   const [openModalMoveTo, setOpenModalMoveTo] = useState(false);
   const [isPopoverVisible, setIsPopoverVisible] = useState(true);
   const [orgTo, setOrgTo] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isMyWorkSpacePage && !isSharedWorkSpacePage) {
+      setIsPopoverVisible(false);
+    }
+  }, []);
+
   const PopoverContent: React.FC = () => (
-    <div className='cursor-pointer w-[196px]'>
-      <div
-        style={{ borderBottom: '1px solid #E3E3E2' }}
-        className='h-9 flex items-center hover:bg-gray-100'
-      >
-        <div className='px-2'>
-          <EyeOutlined /> Preview
-        </div>
-      </div>
-      <div className='flex-col'>
-        <div
-          className='h-9 flex items-center hover:bg-gray-100'
-          onClick={(e: any) => {
-            e.stopPropagation();
-            setOpenModalMove(true);
-            setIsPopoverVisible(false);
-          }}
-        >
-          <div className='px-2'>
-            <ImportOutlined /> Move to...
+    <>
+      {isMyWorkSpacePage ? (
+        <div className='cursor-pointer w-[196px]'>
+          <div
+            style={{ borderBottom: '1px solid #E3E3E2' }}
+            className='h-9 flex items-center hover:bg-gray-100'
+            onClick={(e: any) => {
+              e.stopPropagation();
+              setOpenModalPreview(true);
+              setIsPopoverVisible(false);
+            }}
+          >
+            <div className='px-2'>
+              <EyeOutlined /> Preview
+            </div>
           </div>
-        </div>
-        <div className='h-9 flex items-center hover:bg-gray-100'>
-          <div className='px-2'>
-            <ShareAltOutlined /> Invite
+          <div className='flex-col'>
+            <div
+              className='h-9 flex items-center hover:bg-gray-100'
+              onClick={(e: any) => {
+                e.stopPropagation();
+                setOpenModalMove(true);
+                setIsPopoverVisible(false);
+              }}
+            >
+              <div className='px-2'>
+                <ImportOutlined /> Move to...
+              </div>
+            </div>
+            <div
+              className='h-9 flex items-center hover:bg-gray-100'
+              onClick={(e: any) => {
+                e.stopPropagation();
+                setShowShareModal(true);
+                setIsPopoverVisible(false);
+              }}
+            >
+              <div className='px-2'>
+                <ShareAltOutlined /> Invite
+              </div>
+            </div>
+            <div
+              className='h-9 flex items-center hover:bg-gray-100'
+              style={{ borderBottom: '1px solid #E3E3E2' }}
+              onClick={(e: any) => {
+                e.stopPropagation();
+                setOpenModalChangeName(true);
+                setIsPopoverVisible(false);
+              }}
+            >
+              <div className='px-2'>
+                <EditOutlined /> Change name
+              </div>
+            </div>
           </div>
-        </div>
-        <div
-          className='h-9 flex items-center hover:bg-gray-100'
-          style={{ borderBottom: '1px solid #E3E3E2' }}
-          onClick={(e: any) => {
-            e.stopPropagation();
-            setOpenModalChangeName(true);
-            setIsPopoverVisible(false);
-          }}
-        >
-          <div className='px-2'>
-            <EditOutlined /> Change name
-          </div>
-        </div>
-      </div>
 
-      <div
-        className='h-9 flex items-center hover:bg-gray-100'
-        style={{ borderBottom: '1px solid #E3E3E2' }}
-        onClick={(e: any) => {
-          e.stopPropagation();
-          setOpenModalDuplicate(true);
-          setIsPopoverVisible(false);
-        }}
-      >
-        <div className='px-2'>
-          <CopyOutlined /> Duplicate
-        </div>
-      </div>
+          <div
+            className='h-9 flex items-center hover:bg-gray-100'
+            style={{ borderBottom: '1px solid #E3E3E2' }}
+            onClick={(e: any) => {
+              e.stopPropagation();
+              setOpenModalDuplicate(true);
+              setIsPopoverVisible(false);
+            }}
+          >
+            <div className='px-2'>
+              <CopyOutlined /> Duplicate
+            </div>
+          </div>
 
-      <div
-        className='h-9 flex items-center hover:bg-gray-100'
-        onClick={(e: any) => {
-          e.stopPropagation();
-          setOpenModalDelete(true);
-          setIsPopoverVisible(false);
-        }}
-      >
-        <div className='px-2'>
-          <DeleteOutlined /> Delete
+          <div
+            className='h-9 flex items-center hover:bg-gray-100'
+            onClick={(e: any) => {
+              e.stopPropagation();
+              setOpenModalDelete(true);
+              setIsPopoverVisible(false);
+            }}
+          >
+            <div className='px-2'>
+              <DeleteOutlined /> Delete
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      ) : (
+        <>
+          {isSharedWorkSpacePage && (
+            <div className='cursor-pointer w-[196px]'>
+              <div
+                style={{ borderBottom: '1px solid #E3E3E2' }}
+                className='h-9 flex items-center hover:bg-gray-100'
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  setOpenModalPreview(true);
+                  setIsPopoverVisible(false);
+                }}
+              >
+                <div className='px-2'>
+                  <EyeOutlined /> Preview
+                </div>
+              </div>
+
+              <div
+                className='h-9 flex items-center hover:bg-gray-100'
+                style={{ borderBottom: '1px solid #E3E3E2' }}
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  setOpenModalChangeName(true);
+                  setIsPopoverVisible(false);
+                }}
+              >
+                <div className='px-2'>
+                  <EditOutlined /> Change name
+                </div>
+              </div>
+
+              <div
+                className='h-9 flex items-center hover:bg-gray-100'
+                style={{ borderBottom: '1px solid #E3E3E2' }}
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  setOpenModalDuplicate(true);
+                  setIsPopoverVisible(false);
+                }}
+              >
+                <div className='px-2'>
+                  <CopyOutlined /> Duplicate
+                </div>
+              </div>
+
+              <div
+                className='h-9 flex items-center hover:bg-gray-100'
+                onClick={(e: any) => {
+                  // e.stopPropagation();
+                  // setOpenModalDelete(true);
+                  // setIsPopoverVisible(false);
+                }}
+              >
+                <div className='px-2'>
+                  <LogoutOutlined /> Leave workflow
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </>
   );
 
-  const navigate = useNavigate();
+  const handleWorkflowStatusChanged = async ({
+    versionId,
+    status,
+    onSuccess,
+    onError,
+  }: {
+    versionId: number;
+    status: string;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+  }) => {
+    const workflowId = dataWorkflow.id;
+    const workflowVersion = {
+      versionId,
+      workflowId,
+      status,
+    };
+    await upsertWorkflowVersion({
+      dispatch,
+      mode: 'info',
+      workflowVersion,
+      onSuccess: (data) => {
+        onSuccess(data);
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: 'Failed to update workflow status',
+        });
+        onError(error);
+      },
+    });
+  };
+
+  let workflow = dataWorkflow;
+  workflow.workflow_version = dataWorkflow.versions;
+
   return (
     <>
+      <PreviewWorkflowModal
+        open={openModalPreview}
+        onClose={() => {
+          setOpenModalPreview(false);
+          setIsPopoverVisible(true);
+        }}
+        workflow={dataWorkflow}
+      />
+
+      <ShareModal
+        workflow={workflow}
+        showShareModal={showShareModal}
+        setShowShareModal={setShowShareModal}
+        handleWorkflowStatusChanged={handleWorkflowStatusChanged}
+        onClose={() => {
+          setIsPopoverVisible(true);
+        }}
+      />
+
       <MoveToWorkflowModal
         open={openModalMoveTo}
         onClose={() => {
@@ -119,7 +268,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
         orgTo={orgTo}
       />
 
@@ -130,7 +278,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
         openMoveToModal={(data: any) => {
           setOrgTo(data);
           setOpenModalMoveTo(true);
@@ -144,7 +291,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
       />
 
       <ChangeNameWorkflowModal
@@ -154,8 +300,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
       />
+
       <DuplicateWorkflowModal
         open={openModalDuplicate}
         onClose={() => {
@@ -163,8 +309,8 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           setIsPopoverVisible(true);
         }}
         workflow={dataWorkflow}
-        dispatch={dispatch}
       />
+
       <Card
         hoverable={true}
         style={{ position: 'relative' }}
@@ -263,6 +409,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
               <p></p>
             )}
           </div>
+
           {isPopoverVisible && (
             <Popover
               placement='bottom'

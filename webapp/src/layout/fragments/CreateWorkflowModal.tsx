@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
-import { getDataOrgs } from '@middleware/data';
+import { insertWorkflowAndVersion } from '@middleware/data';
 import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from '@utils/helpers';
+import { createIdString, randomIcon } from '@utils/helpers';
 import './create-new.scss';
+import { emptyStage } from '@components/DirectedGraph';
 
 interface CreateWorkflowModalProps {
   open: boolean;
@@ -21,27 +22,32 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   setOpenCreateWorkspaceModal,
 }) => {
   const navigate = useNavigate();
-  const { user } = useSelector((state: any) => state.orginfo);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const dispatch = useDispatch();
-  const [dataOrgs, setDataOrgs] = useState<any>([]);
-
-  const loadWorkflowData = async () => {
-    if (user?.id !== null) {
-      await getDataOrgs({
-        userId: user?.id,
-        dispatch: dispatch,
-        onSuccess: (data: any) => {
-          setDataOrgs(data);
-        },
-      });
-    }
-  };
 
   const handleOk = async () => {
-    const org = dataOrgs.find((org: any) => org.id === value);
+    const org = orgs.find((org: any) => org.id === value);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
-    navigate(`${orgIdString}/new-workflow/`);
+    const props = {
+      title: 'Untitled Workflow',
+      desc: '',
+      owner_org_id: org.id,
+      emptyStage: emptyStage,
+      iconUrl: 'preset:' + randomIcon(),
+      authority: user.id,
+    };
+    onClose();
+    insertWorkflowAndVersion({
+      dispatch: dispatch,
+      props: props,
+      onError: (error) => {
+        Modal.error({ content: error.message });
+      },
+      onSuccess: (versions, insertedId) => {
+        navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      },
+    });
   };
 
   const handleCancel = () => {
@@ -56,9 +62,9 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
     setValue(e.target.value);
   };
 
-  useEffect(() => {
-    loadWorkflowData();
-  }, [user]);
+  // useEffect(() => {
+  //   loadWorkflowData();
+  // }, [user]);
 
   return (
     <Modal
@@ -80,7 +86,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 
       <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {dataOrgs.map((org: any, index: any) => (
+          {orgs.map((org: any, index: any) => (
             <div
               className='flex h-12 items-center radio cursor-pointer'
               key={index}
@@ -119,6 +125,11 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       </Space>
 
       <Space className='flex'>
+        <a
+          className='p-4'
+          style={{ color: '#6d28d9' }}
+          onClick={setOpenCreateWorkspaceModal}
+        />
         <a
           className='p-4'
           style={{ color: '#6d28d9' }}

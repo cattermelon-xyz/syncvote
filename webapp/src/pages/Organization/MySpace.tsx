@@ -24,7 +24,6 @@ interface DataItem {
 }
 
 const MySpace: React.FC = () => {
-  const dispatch = useDispatch();
   const { orgs, user } = useSelector((state: any) => state.orginfo);
   const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
   const [workflows, setWorkflows] = useState<DataItem[]>([]);
@@ -57,12 +56,6 @@ const MySpace: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      // const orgs = await queryOrgsAndWorkflowForHome({
-      //   userId: user.id,
-      //   onSuccess: () => {},
-      //   dispatch,
-      // });
-      // console.log('Org 2', orgs);
       if (orgs) {
         const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
         setAdminOrgs(adminOrgsData);
@@ -70,12 +63,22 @@ const MySpace: React.FC = () => {
         const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
           adminOrg.workflows.map((workflow: any) => ({
             ...workflow,
-            org_title: adminOrg.title,
+              org_title: adminOrg.title,
           }))
         );
         // Querry from org
         setWorkflows(allWorkflows);
 
+        // await getWorkflowFromEditor({
+        //   userId: user.id,
+        //   dispatch,
+        //   onSuccess: (data: any) => {
+        //     console.log('Editor', data);
+        //   },
+        //   onError: (error: any) => {
+        //     console.log(error);
+        //   },
+        // });
         // await getWorkflowFromEditor({
         //   userId: user.id,
         //   dispatch,

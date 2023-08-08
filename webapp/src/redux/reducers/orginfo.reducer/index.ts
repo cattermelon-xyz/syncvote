@@ -65,6 +65,16 @@ const orgInfoSlice = createSlice({
         state.orgs[orgIndex].profile.push(user);
       }
     },
+    addWorkflowToOrg: (state, action) => {
+      console.log('Add workflow to Org');
+      const { workflow } = action.payload;
+      const orgIndex = state.orgs.findIndex(
+        (org: any) => org.id === workflow.owner_org_id
+      );
+      if (orgIndex !== -1) {
+        state.orgs[orgIndex].workflows.push(workflow);
+      }
+    },
     changeWorkflowOrg: (state, action) => {
       const { orgIdFrom, workflow } = action.payload;
 
@@ -97,10 +107,13 @@ const orgInfoSlice = createSlice({
 
       if (orgIndex !== -1) {
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
-          (wf: any) => (wf.id = workflow.id)
+          (wf: any) => wf.id === workflow.id
         );
+
         if (worfklowIndex !== -1) {
-          state.orgs[orgIndex].workflows[worfklowIndex] = workflow;
+          state.orgs[orgIndex].workflows[worfklowIndex] = {
+            ...workflow,
+          };
         }
       }
     },
@@ -113,13 +126,11 @@ const orgInfoSlice = createSlice({
 
       if (orgIndex !== -1) {
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
-          (wf: any) => (wf.id = workflow.id)
+          (wf: any) => (wf.id === workflow.id)
         );
 
         if (worfklowIndex !== -1) {
-          state.orgs[orgIndex].workflows = state.orgs[
-            orgIndex
-          ].workflows.filter((wf: any) => wf.id !== workflow.id);
+          state.orgs[orgIndex].workflows.splice(worfklowIndex, 1);
         }
       }
     },
@@ -153,6 +164,7 @@ export const {
   changeWorkflowOrg,
   changeWorkflowInfo,
   deleteWorkflow,
+  addWorkflowToOrg,
   deleteOrgInfo,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;

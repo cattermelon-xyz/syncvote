@@ -33,6 +33,36 @@ import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
 import EditWorkflow from '../BluePrint/fragment/EditWorkflow';
 
+function deepEqual(object1: any, object2: any): boolean {
+  if (object1 === object2) {
+    return true;
+  }
+
+  if (
+    typeof object1 !== 'object' ||
+    object1 === null ||
+    typeof object2 !== 'object' ||
+    object2 === null
+  ) {
+    return false;
+  }
+
+  const keys1 = Object.keys(object1);
+  const keys2 = Object.keys(object2);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  for (let key of keys1) {
+    if (!keys2.includes(key) || !deepEqual(object1[key], object2[key])) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 const extractVersion = ({
   workflows,
   workflowId,
@@ -89,6 +119,7 @@ export const EditVersion = () => {
     workflowId,
     versionId,
   });
+
   const { web2Integrations } = useSelector((state: any) => state.integration);
   const [version, setVersion] = useState<any>(extractedVersion);
   const [web2IntegrationsState, setWeb2IntegrationsState] =
@@ -101,6 +132,7 @@ export const EditVersion = () => {
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
   );
+  const [uploadImage, setUploadImage] = useState(false);
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
@@ -112,6 +144,12 @@ export const EditVersion = () => {
       versionId,
     });
     setVersion(extractedVersion);
+
+    if (deepEqual(version.data, emptyStage)) {
+      
+      setUploadImage(true);
+    }
+
     setSelectedLayoutId(
       extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal || 'default'
     );
@@ -140,10 +178,12 @@ export const EditVersion = () => {
     }
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
+
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
     changedData?: any | undefined
   ) => {
+    setUploadImage(true);
     const versionToSave = changedData || version;
     await upsertWorkflowVersion({
       dispatch,
@@ -350,6 +390,8 @@ export const EditVersion = () => {
               ) : (
                 <div className='w-full h-full'>
                   <DirectedGraph
+                    shouldUploadImage={uploadImage}
+                    setUploadImage={setUploadImage}
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
                     navPanel={<></>}

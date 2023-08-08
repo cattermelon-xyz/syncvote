@@ -3,8 +3,6 @@ import { Typography } from 'antd';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
-import { queryOrgsAndWorkflowForHome } from '@middleware/data';
-import { useDispatch } from 'react-redux';
 import SpaceCard from '@components/Card/SpaceCard';
 import ListItem from '@components/ListItem/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
@@ -16,18 +14,11 @@ interface SortProps {
   type: 'asc' | 'des';
 }
 
-interface DataItem {
-  title: string;
-  [key: string]: any;
-}
-
 const SharedSpace: React.FC = () => {
-  const { user } = useSelector((state: any) => state.orginfo);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
   const [memberOrgs, setMemberOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const dispatch = useDispatch();
 
   const [sortOptions, setSortOption] = useState<SortProps>({
     by: '',
@@ -56,12 +47,6 @@ const SharedSpace: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      
-      const orgs = await queryOrgsAndWorkflowForHome({
-        userId: user.id,
-        onSuccess: () => {},
-        dispatch,
-      });
       if (orgs) {
         const MemberOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
         setMemberOrgs(MemberOrgsData);
@@ -82,7 +67,7 @@ const SharedSpace: React.FC = () => {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user, orgs]);
 
   return (
     <div className='w-[800px] flex flex-col'>

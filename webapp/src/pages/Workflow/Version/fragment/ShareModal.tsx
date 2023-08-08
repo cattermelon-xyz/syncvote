@@ -322,11 +322,13 @@ const ShareModal = ({
   showShareModal,
   setShowShareModal,
   handleWorkflowStatusChanged,
+  onClose = () => {},
 }: {
   workflow: IWorkflow;
   showShareModal: boolean;
   setShowShareModal: (data: any) => void;
   handleWorkflowStatusChanged: (status: any) => void;
+  onClose?: () => void;
 }) => {
   const items: TabsProps['items'] = [
     {
@@ -350,7 +352,10 @@ const ShareModal = ({
     <Modal
       open={showShareModal}
       title={null}
-      onCancel={() => setShowShareModal(false)}
+      onCancel={() => {
+        setShowShareModal(false);
+        onClose();
+      }}
       footer={null}
     >
       <Tabs defaultActiveKey='1' items={items} />

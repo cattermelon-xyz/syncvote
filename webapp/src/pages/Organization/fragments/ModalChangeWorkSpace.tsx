@@ -23,8 +23,6 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
     onClose();
   };
 
-  console.log('dataSpace', dataSpace);
-
   const handleChangeIcon = (obj: any) => {
     const newIcon = obj.isPreset ? `preset:${obj.filePath}` : obj.filePath;
     setIconUrl(newIcon);
