@@ -32,7 +32,6 @@ const PreviewWorkflowModal: React.FC<PreviewWorkflowModalProps> = ({
 
     onClose();
   };
-  console.log(workflow);
   
   return (
     <Modal

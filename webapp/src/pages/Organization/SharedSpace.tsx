@@ -22,12 +22,10 @@ interface DataItem {
 }
 
 const SharedSpace: React.FC = () => {
-  const { user } = useSelector((state: any) => state.orginfo);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
   const [memberOrgs, setMemberOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const dispatch = useDispatch();
 
   const [sortOptions, setSortOption] = useState<SortProps>({
     by: '',
@@ -38,6 +36,8 @@ const SharedSpace: React.FC = () => {
     by: '',
     type: 'asc',
   });
+
+  console.log(orgs);
 
   const handleSortSpaceDetail = (options: SortProps) => {
     setSortOption(options);
@@ -56,12 +56,6 @@ const SharedSpace: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      
-      const orgs = await queryOrgsAndWorkflowForHome({
-        userId: user.id,
-        onSuccess: () => {},
-        dispatch,
-      });
       if (orgs) {
         const MemberOrgsData = orgs.filter((org: any) => org.role === 'MEMBER');
         setMemberOrgs(MemberOrgsData);
@@ -82,7 +76,7 @@ const SharedSpace: React.FC = () => {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user, orgs]);
 
   return (
     <div className='w-[800px] flex flex-col'>
@@ -113,7 +107,7 @@ const SharedSpace: React.FC = () => {
             items={
               filterWorkflowByOptions &&
               filterWorkflowByOptions.map((workflow, index) => (
-                <WorkflowCard key={index} dataWorkflow={workflow} />
+                <WorkflowCard key={index} dataWorkflow={{ ...workflow }} />
               ))
             }
             columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
