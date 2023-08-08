@@ -35,6 +35,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 }) => {
   const isMyWorkSpacePage = location.pathname === '/my-workspaces';
   const isSharedWorkSpacePage = location.pathname === '/shared-workspaces';
+
   const dispatch = useDispatch();
   const [openModalChangeName, setOpenModalChangeName] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -300,6 +301,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         }}
         workflow={dataWorkflow}
       />
+
       <DuplicateWorkflowModal
         open={openModalDuplicate}
         onClose={() => {
@@ -308,6 +310,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         }}
         workflow={dataWorkflow}
       />
+
       <Card
         hoverable={true}
         style={{ position: 'relative' }}

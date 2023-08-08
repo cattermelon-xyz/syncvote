@@ -3,8 +3,6 @@ import { Typography } from 'antd';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
-import { queryOrgsAndWorkflowForHome } from '@middleware/data';
-import { useDispatch } from 'react-redux';
 import SpaceCard from '@components/Card/SpaceCard';
 import ListItem from '@components/ListItem/ListItem';
 import WorkflowCard from '@components/Card/WorkflowCard';
@@ -14,11 +12,6 @@ import { useFilteredData } from '@utils/hooks/useFilteredData';
 interface SortProps {
   by: string;
   type: 'asc' | 'des';
-}
-
-interface DataItem {
-  title: string;
-  [key: string]: any;
 }
 
 const SharedSpace: React.FC = () => {

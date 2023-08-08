@@ -19,6 +19,7 @@ import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { subtractArray } from '@utils/helpers';
 import { log } from 'console';
+import { version } from 'os';
 
 export const insertWorkflowAndVersion = async ({
   dispatch,

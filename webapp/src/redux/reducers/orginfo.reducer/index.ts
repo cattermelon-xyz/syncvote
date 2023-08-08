@@ -105,11 +105,13 @@ const orgInfoSlice = createSlice({
       const orgIndex = state.orgs.findIndex(
         (org: IOrgInfo) => org.id === workflow.owner_org_id
       );
-      
+
       if (orgIndex !== -1) {
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
-          (wf: any) => (wf.id = workflow.id)
+          (wf: any) => wf.id === workflow.id
         );
+
+        console.log('Index', worfklowIndex);
 
         if (worfklowIndex !== -1) {
           state.orgs[orgIndex].workflows[worfklowIndex] = {
@@ -127,7 +129,7 @@ const orgInfoSlice = createSlice({
 
       if (orgIndex !== -1) {
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
-          (wf: any) => (wf.id = workflow.id)
+          (wf: any) => (wf.id === workflow.id)
         );
 
         if (worfklowIndex !== -1) {
