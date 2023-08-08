@@ -24,6 +24,7 @@ import PublicAppLayout from '@layout/PublicAppLayout';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { PublicVersion } from '@pages/Workflow/Version/PublicVersion';
 import AccountSetting from '@pages/Account/pages/AccountSetting';
+import SignUpWithInvite from '@pages/Account/pages/SignUpWithInvite';
 import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 
 const AppRoutes = () => (
@@ -62,6 +63,14 @@ const AppRoutes = () => (
       >
         <Route path='login' element={<CreatorLogin />} />
       </Route>
+
+      <Route
+        path='/'
+        element={<App layout={NoHeaderLayout} requiredLogin={true} />}
+      >
+        <Route path='set-password' element={<SignUpWithInvite />} />
+      </Route>
+
       <Route
         path='/'
         element={<App layout={WebLayoutWithoutSider} requiredLogin={true} />}

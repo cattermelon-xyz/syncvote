@@ -239,3 +239,26 @@ export const isEmailExisted = async ({ email }: { email: string }) => {
     return { existed: rs.count, userId: rs.data[0]?.id };
   }
 };
+
+export const changePassword = async ({
+  password,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
+}: {
+  password: string;
+  dispatch?: any;
+  onSuccess?: (() => void) | undefined;
+  onError?: (error: any) => void;
+}) => {
+  const { data, error } = await supabase.auth.updateUser({
+    password: password,
+  });
+  if (error) {
+    onError(error);
+  } else if (onSuccess) {
+    onSuccess();
+  }
+};
