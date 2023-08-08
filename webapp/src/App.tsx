@@ -20,7 +20,7 @@ import { shouldUseCachedData } from '@utils/helpers';
 import { AuthContext } from '@layout/context/AuthContext';
 
 function App({
-  requiredLogin = false,
+  requiredLogin = false,  
   layout,
 }: {
   requiredLogin?: boolean;

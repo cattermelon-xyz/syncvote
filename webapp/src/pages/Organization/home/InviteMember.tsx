@@ -54,22 +54,22 @@ const InviteMember = ({
           });
           setVisible(false);
         } else {
-          inviteUserByEmail({
-            email,
-            dispatch,
-            onSuccess: () => {
-              Modal.success({
-                title: "Success",
-                content: "Invite user successfully",
-              });
-            },
-            onError: () => {
-              Modal.error({
-                title: "Error",
-                content: "Cannot invite user",
-              });
-            },
-          });
+          // inviteUserByEmail({
+          //   email,
+          //   dispatch,
+          //   onSuccess: () => {
+          //     Modal.success({
+          //       title: "Success",
+          //       content: "Invite user successfully",
+          //     });
+          //   },
+          //   onError: () => {
+          //     Modal.error({
+          //       title: "Error",
+          //       content: "Cannot invite user",
+          //     });
+          //   },
+          // });
           setVisible(false);
         }
       },

@@ -1,59 +1,63 @@
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { useEffect, useState } from 'react';
-import { getDataOrgs } from '@middleware/data';
-import { useSelector } from 'react-redux';
+import { insertWorkflowAndVersion } from '@middleware/data';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import './create-new.scss';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { createIdString } from '@utils/helpers';
+import { useState } from 'react';
 
 interface DuplicateWorkflowModalProps {
   open: boolean;
   onClose: () => void;
   workflow: any;
-  dispatch: any;
 }
 
 const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
   open,
   onClose,
   workflow,
-  dispatch,
 }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [dataOrgs, setDataOrgs] = useState<any>([]);
-  const { user } = useSelector((state: any) => state.orginfo);
+  const { orgs, user } = useSelector((state: any) => state.orginfo);
 
   const handleCancel = () => {
     onClose();
   };
 
   const handleOk = async () => {
+    const org = orgs.find((org: any) => org.id === value);
+    const orgIdString = createIdString(`${org.title}`, `${org.id}`);
+    const props = {
+      title: workflow?.title + ' Duplicated',
+      desc: workflow?.desc,
+      owner_org_id: value,
+      emptyStage: workflow?.versions[0]?.data,
+      iconUrl: workflow.icon_url,
+      authority: user.id,
+    };
+    insertWorkflowAndVersion({
+      dispatch: dispatch,
+      props: props,
+      onError: (error) => {
+        Modal.error({ content: error.message });
+      },
+      onSuccess: (versions, insertedId) => {
+        navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      },
+    });
     onClose();
   };
 
-  const loadWorkflowData = async () => {
-    if (user?.id !== null) {
-      await getDataOrgs({
-        userId: user?.id,
-        dispatch: dispatch,
-        onSuccess: (data: any) => {
-          setDataOrgs(data);
-        },
-      });
-    }
-  };
   const [value, setValue] = useState(null);
   const [hovered, setHovered] = useState(null);
 
   const onChange = (e: RadioChangeEvent) => {
     setValue(e.target.value);
   };
-
-  useEffect(() => {
-    loadWorkflowData();
-  }, [user]);
 
   return (
     <Modal
@@ -74,7 +78,7 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
 
       <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {dataOrgs.map((org: any, index: any) => (
+          {orgs.map((org: any, index: any) => (
             <div
               className='flex h-12 items-center radio'
               key={index}

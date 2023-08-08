@@ -3,22 +3,22 @@ import { L } from '@utils/locales/L';
 import Input from '@components/Input/Input';
 import { useState } from 'react';
 import { updateAWorkflowInfo } from '@middleware/data';
+import { useDispatch } from 'react-redux';
 
 interface ChangeNameWorkflowModalProps {
   open: boolean;
   onClose: () => void;
   workflow: any;
-  dispatch: any;
 }
 
 const ChangeNameWorkflowModal: React.FC<ChangeNameWorkflowModalProps> = ({
   open,
   onClose,
   workflow,
-  dispatch,
 }) => {
+  const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState(workflow?.title);
-  
+
   const handleCancel = () => {
     onClose();
   };
@@ -34,7 +34,7 @@ const ChangeNameWorkflowModal: React.FC<ChangeNameWorkflowModalProps> = ({
       },
       dispatch: dispatch,
       onSuccess: (data: any) => {
-        console.log(data);
+        // console.log(data);
       },
     });
     onClose();

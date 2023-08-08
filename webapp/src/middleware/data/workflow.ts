@@ -6,16 +6,20 @@ import {
   setLastFetch,
   changeWorkflowVersion,
   // deleteWorkflow,
+  // deleteWorkflow,
   deleteWorkflowVersion,
 } from '@redux/reducers/workflow.reducer';
 import {
   changeWorkflowOrg,
   changeWorkflowInfo,
   deleteWorkflow,
+  addWorkflowToOrg,
 } from '@redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { subtractArray } from '@utils/helpers';
+import { log } from 'console';
+import { version } from 'os';
 
 export const insertWorkflowAndVersion = async ({
   dispatch,
@@ -81,7 +85,34 @@ export const insertWorkflowAndVersion = async ({
       })
     );
     dispatch(finishLoading({}));
-    if (!error && versions) onSuccess(versions, insertedId);
+
+    if (!error && versions) {
+      const image_name = `${data[0].id}_${versions[0].id}`;
+
+      const { data: d, error: e } = await supabase
+        .from('workflow_version')
+        .update({
+          preview_image_url: `https://uafmqopjujmosmilsefw.supabase.co/storage/v1/object/public/preview_image/${image_name}.jpg`,
+        })
+        .eq('id', versions[0].id)
+        .select();
+
+      onSuccess(versions, insertedId);
+      dispatch(
+        addWorkflowToOrg({
+          workflow: {
+            id: insertedId,
+            title,
+            desc,
+            icon_url: iconUrl,
+            banner_url: '',
+            owner_org_id: orgId,
+            workflow_version: versions,
+            versions: versions,
+          },
+        })
+      );
+    }
   }
   if (error) {
     onError(error);
@@ -297,8 +328,14 @@ export const updateAWorkflowInfo = async ({
   const { data, error } = await supabase
     .from('workflow')
     .update(toUpdate)
-    .eq('id', id)
-    .select('*');
+    .eq('id', id).select(`*, versions: workflow_version(
+      id, 
+      data,
+      preview_image_url,
+      status,
+      created_at,
+      last_updated
+    )`);
   dispatch(finishLoading({}));
   if (data) {
     const newData = structuredClone(data);
@@ -435,14 +472,26 @@ export const deleteAWorkflow = async ({
   const { data, error } = await supabase
     .from('workflow')
     .delete()
-    .eq('id', workflow.id);
+    .eq('id', workflow.id)
+    .select('*');
   dispatch(finishLoading({}));
+
   if (!error) {
     dispatch(deleteWorkflow({ workflow: workflow }));
     onSuccess(data);
   } else {
     onError(error);
   }
+  // if (!error) {
+  //   if (data) {
+  //     dispatch(deleteWorkflow({ workflow: workflow }));
+  //     onSuccess(data);
+  //   }
+  // } else {
+  //   onError({
+  //     message: 'Failed to delete workflow',
+  //   });
+  // }
   // if (!error) {
   //   if (data) {
   //     dispatch(deleteWorkflow({ workflow: workflow }));
@@ -671,8 +720,6 @@ export const getWorkflowFromEditor = async ({
     )`
     )
     .eq('user_id', userId);
-
-  console.log(data);
 
   dispatch(finishLoading({}));
   if (error) {

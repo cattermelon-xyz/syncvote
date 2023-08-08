@@ -12,6 +12,17 @@ export const prependZero = (number: number) => {
   return number;
 };
 
+export const randomIcon = () => {
+  const icons = [
+    'love.svg',
+    'cat.svg',
+    'money.svg',
+    'angel.svg',
+    'dribble.svg',
+  ];
+  return `${icons[Math.floor(Math.random() * icons.length)]}`;
+};
+
 export const createRootLink = (paths: Array<string> = []) => {
   const root = '/';
   let result = '';

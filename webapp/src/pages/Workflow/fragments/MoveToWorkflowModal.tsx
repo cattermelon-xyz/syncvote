@@ -1,8 +1,8 @@
 import { Button, Checkbox, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
-import { changeAWorkflowOrg, getDataOrgs } from '@middleware/data';
-import { useSelector } from 'react-redux';
+import { changeAWorkflowOrg } from '@middleware/data';
+import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import './create-new.scss';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
@@ -11,7 +11,6 @@ interface MoveToWorkflowModalProps {
   open: boolean;
   onClose: () => void;
   workflow: any;
-  dispatch: any;
   orgTo: any;
 }
 
@@ -19,9 +18,10 @@ const MoveToWorkflowModal: React.FC<MoveToWorkflowModalProps> = ({
   open,
   onClose,
   workflow,
-  dispatch,
   orgTo,
 }) => {
+  const dispatch = useDispatch();
+
   const handleCancel = () => {
     onClose();
   };

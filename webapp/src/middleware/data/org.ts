@@ -175,7 +175,8 @@ export const getDataOrgs = async ({
         preset_icon_url,
         preset_banner_url,
         versions: workflow_version(
-          id, 
+          id,
+          data, 
           status,
           created_at,
           last_updated
@@ -278,6 +279,8 @@ export const queryOrgs = async ({
         preset_banner_url,
         versions: workflow_version(
           id, 
+          data,
+          preview_image_url,
           status,
           created_at,
           last_updated
