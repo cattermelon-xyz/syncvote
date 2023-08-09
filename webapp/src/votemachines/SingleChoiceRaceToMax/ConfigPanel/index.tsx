@@ -8,6 +8,7 @@ import {
   Input,
   Drawer,
   Modal,
+  Popover,
 } from 'antd';
 import { useState } from 'react';
 import {
@@ -25,12 +26,14 @@ import {
   EditOutlined,
   MessageOutlined,
   PlusOutlined,
+  SolutionOutlined,
 } from '@ant-design/icons';
 import parse from 'html-react-parser';
 import '../styles.scss';
 import CollapsiblePanel from '@components/DirectedGraph/MachineConfigPanel/fragments/CollapsiblePanel';
 import { IOption } from '../interface';
 import TextEditor from '@components/Editor/TextEditor';
+import { MdHelpOutline } from 'react-icons/md';
 
 /**
  *
@@ -51,13 +54,14 @@ const ConfigPanel = ({
     delayNotes: [], // do not comit this data to blockchain
     includedAbstain: false,
     resultDescription: '',
+    quorum: 0,
   },
   viewMode,
   onChange = (data: ICheckPoint) => {},
   children = [],
   allNodes = [], //eslint-disable-line
 }: IVoteMachineConfigProps) => {
-  const { max, token, options, includedAbstain } = data;
+  const { max, token, options, includedAbstain, quorum } = data;
   const delays = data.delays || Array(options?.length).fill(0);
   const delayUnits =
     data.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
@@ -66,10 +70,15 @@ const ConfigPanel = ({
     data.resultDescription || ''
   );
   let tmpMaxStr = '0';
+  let tmpQuorumStr = '0';
   if (max) {
     tmpMaxStr = max < 1 ? `${max * 100}%` : `${max}`;
   }
+  if (quorum) {
+    tmpQuorumStr = quorum < 1 ? `${quorum * 100}%` : `${quorum}`;
+  }
   const [maxStr, setMaxStr] = useState(tmpMaxStr);
+  const [quorumStr, setQuorumStr] = useState(tmpQuorumStr);
   const posibleOptions: ICheckPoint[] = [];
   const [showAddOptionDrawer, setShowNewOptionDrawer] = useState(false);
   allNodes.forEach((child) => {
@@ -142,10 +151,15 @@ const ConfigPanel = ({
     const str = e.target.value;
     let tMax = 0;
     if (str !== '') {
-      tMax = str.indexOf('%') > 0 ? parseFloat(str) / 100 : parseInt(str, 10);
+      tMax =
+        str.indexOf('%') > 0
+          ? parseFloat(str) / 100 > 1
+            ? 1
+            : parseFloat(str) / 100
+          : parseInt(str, 10);
     }
-    if (tMax > 1) {
-      setMaxStr(tMax.toString());
+    if (tMax >= 1) {
+      setMaxStr(str.indexOf('%') > 0 ? '100%' : tMax.toString());
     }
     onChange({
       data: {
@@ -154,11 +168,32 @@ const ConfigPanel = ({
       },
     });
   };
-  const changeTokenHandler = (e: any) => {
+  const changeQuorumHandler = (e: any) => {
+    const str = e.target.value;
+    let tQuorum = 0;
+    if (str !== '') {
+      tQuorum =
+        str.indexOf('%') > 0
+          ? parseFloat(str) / 100 > 1
+            ? 1
+            : parseFloat(str) / 100
+          : parseInt(str, 10);
+    }
+    if (tQuorum >= 1) {
+      setQuorumStr(str.indexOf('%') > 0 ? '100%' : tQuorum.toString());
+    }
     onChange({
       data: {
         ...data,
-        token: e.target.value,
+        quorum: tQuorum,
+      },
+    });
+  };
+  const changeTokenHandler = (val: string) => {
+    onChange({
+      data: {
+        ...data,
+        token: val,
       },
     });
   };
@@ -379,8 +414,39 @@ const ConfigPanel = ({
           </>
         </CollapsiblePanel>
         <CollapsiblePanel title='Result calculation'>
-          <>
-            <VotingResult countedBy={countedBy} setCountedBy={setCountedBy} />
+          <Space direction='vertical' size='small' className='w-full'>
+            <VotingResult
+              countedBy={countedBy}
+              setCountedBy={(val) => {
+                setCountedBy(val);
+                val === 'count' ? changeTokenHandler('') : null;
+              }}
+            />
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='text-sm text-slate-600 flex items-center gap-2'>
+                Quorum
+                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
+                  <MdHelpOutline />
+                </Popover>
+              </div>
+              <Input
+                prefix={
+                  <div className='text-slate-600'>
+                    <SolutionOutlined className='inline-flex items-center pr-2' />
+                  </div>
+                }
+                type='text'
+                value={quorumStr}
+                disabled={
+                  !(
+                    viewMode === GraphViewMode.EDIT_MISSION ||
+                    viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                  )
+                }
+                onChange={(e) => setQuorumStr(e.target.value)}
+                onBlur={changeQuorumHandler}
+              />
+            </Space>
             <VotingCondition
               getThresholdText={getThresholdText}
               maxStr={maxStr}
@@ -431,7 +497,7 @@ const ConfigPanel = ({
                 </Space>
               )}
             </Space>
-          </>
+          </Space>
         </CollapsiblePanel>
       </Space>
     </>

@@ -78,6 +78,9 @@ const ContextTab = () => {
   };
   return (
     <Space direction='vertical' size='large' className='w-full'>
+      <CollapsiblePanel title='Purpose & Description' collapsable={false}>
+        {parse(selectedNode?.description || 'Not added')}
+      </CollapsiblePanel>
       {/* <Space.Compact className="w-full">
         <Input
           value={selectedNode?.title ? selectedNode.title : selectedNode.id}
@@ -118,7 +121,7 @@ const ContextTab = () => {
       )}
       <Space direction='vertical' size='middle' className='w-full'></Space>
       <CollapsiblePanel title='Note' collapsable={false}>
-        {parse(selectedNode?.description || 'Not added')}
+        {parse(selectedNode?.note || 'Not added')}
       </CollapsiblePanel>
       {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
         <Button

@@ -89,8 +89,48 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
         />
       </Drawer>
       <Space className='w-full pb-4' direction='vertical' size='large'>
+        <CollapsiblePanel title='Purpose & description'>
+          <Space direction='vertical' size='small' className='w-full'>
+            {/* <Space direction="horizontal" className="justify-between w-full">
+                <span>Information supporting the decision</span>
+                <Button
+                  icon={locked.description ? <LockFilled /> : <UnlockOutlined />}
+                  onClick={() => {
+                    const newLocked = { ...locked, description: !locked.description };
+                    const newNode = structuredClone(selectedNode);
+                    newNode.locked = newLocked;
+                    onChange(newNode);
+                  }}
+                  disabled={!editable}
+                />
+              </Space> */}
+            <TextEditor
+              value={selectedNode?.description}
+              setValue={(val: any) => {
+                const newNode = structuredClone(selectedNode);
+                if (newNode) {
+                  newNode.description = val;
+                  onChange(newNode);
+                }
+              }}
+            />
+          </Space>
+        </CollapsiblePanel>
         {!selectedNode?.isEnd ? (
           <CollapsiblePanel title='Participants'>
+            <Space direction='vertical' size='small' className='w-full'>
+              <div>Who can propose</div>
+              <Input
+                value={selectedNode?.proposerDescription}
+                onChange={(e) => {
+                  const newNode = structuredClone(selectedNode);
+                  if (newNode) {
+                    newNode.proposerDescription = e.target.value;
+                    onChange(newNode);
+                  }
+                }}
+              />
+            </Space>
             <VotingPartipation />
             {!selectedNode?.participationDescription ? (
               <Button
@@ -158,7 +198,7 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
         </CollapsiblePanel>
         {vmConfigPanel}
         {!selectedNode?.isEnd ? <VotingDuration /> : null}
-        <CollapsiblePanel title='General info'>
+        <CollapsiblePanel title='Other info'>
           <Space direction='vertical' size='middle' className='w-full'>
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-gray-400'>Voting location</div>
@@ -198,11 +238,11 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
                 />
               </Space> */}
               <TextEditor
-                value={selectedNode?.description}
+                value={selectedNode?.note}
                 setValue={(val: any) => {
                   const newNode = structuredClone(selectedNode);
                   if (newNode) {
-                    newNode.description = val;
+                    newNode.note = val;
                     onChange(newNode);
                   }
                 }}

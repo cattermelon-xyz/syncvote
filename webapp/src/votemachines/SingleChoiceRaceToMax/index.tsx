@@ -3,6 +3,7 @@ import moment from 'moment';
 import { Popover, Tag } from 'antd';
 import { getVoteMachine } from '@components/DirectedGraph';
 import {
+  DelayUnit,
   ICheckPoint,
   IParticipant,
   IToken,
@@ -140,9 +141,11 @@ export const explain = ({
     return <></>;
   }
   const noOfOptions = checkpoint.children ? checkpoint.children.length : 0;
-  const { participation, participationDescription } = checkpoint;
+  const { participation, participationDescription, proposerDescription } =
+    checkpoint;
   const resultDescription = checkpoint.data?.resultDescription || '';
   const votingLocation = checkpoint.votingLocation || '';
+  const quorum = checkpoint.data?.quorum || 0;
   const renderParticipation = (participation: IParticipant | undefined) => {
     let rs = null;
     if (!participation || (participation.type && !participation.data)) {
@@ -150,15 +153,30 @@ export const explain = ({
       rs = '';
     } else {
       const { type, data: pdata } = participation;
+      const identities = (pdata as string[]) || [];
       if (type === 'identity') {
         rs = (
-          <span className='mr-1'>
-            Only
-            <span className='text-violet-500 mx-1'>
-              {((pdata as string[]) || []).length}
+          <Popover
+            content={
+              <div>
+                <div className='text-zinc-500'>List of identity:</div>
+                <ol className='ml-2'>
+                  {identities.map((str) => {
+                    return <li className='ml-1'>{str}</li>;
+                  })}
+                </ol>
+              </div>
+            }
+            trigger='click'
+          >
+            <span className='mr-1 cursor-pointer hover:bg-violet-200 hover:pr-1'>
+              Only
+              <span className='text-violet-500 mx-1'>
+                {((pdata as string[]) || []).length}
+              </span>
+              can participate in the voting process.
             </span>
-            can participate in the voting process.
-          </span>
+          </Popover>
         );
       } else if (type === 'token') {
         rs = (
@@ -178,120 +196,144 @@ export const explain = ({
     }
     return rs;
   };
+  const renderOption = ({ data, index }: { data: IData; index: number }) => {
+    const { options, delays, delayUnits, delayNotes } = data;
+    const option = options[index];
+    const delay = delays ? delays[index] : 0;
+    const delayUnit = delayUnits ? delayUnits[index] : DelayUnit.MINUTE;
+    const delayNote = delayNotes ? delayNotes[index] : '';
+    return option ? (
+      <div key={index}>
+        <div className='text-violet-500'>{option}</div>
+        {delay ? (
+          <div>
+            Timelock:{' '}
+            <span className='text-violet-500'>
+              {displayDuration(moment.duration(delay, delayUnit))}
+            </span>
+          </div>
+        ) : null}
+        {isRTE(delayNote) ? (
+          <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
+            {parse(delayNote)}
+          </div>
+        ) : null}
+      </div>
+    ) : null;
+  };
   const p1 = (
     <div className='block'>
+      <div className='text-zinc-400'>General info</div>
       <ul className='list-disc ml-4'>
+        {proposerDescription ? (
+          <li>
+            Who can propose:{' '}
+            <span className='text-violet-500'>{proposerDescription}</span>
+          </li>
+        ) : null}
         {participation ? (
           <li>
-            Voter:{' '}
-            <span className='text-violet-500 font-bold'>
-              {participation.type === 'token'
+            Who can vote:{' '}
+            <span>
+              {/* {participation.type === 'token'
                 ? `Token holder`
-                : `Other identity`}
+                : `Other identity`} */}
+              <span className='text-violet-500'>
+                {renderParticipation(participation)}
+              </span>
+              {isRTE(participationDescription) ? (
+                <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
+                  {parse(participationDescription || '')}
+                </div>
+              ) : null}
             </span>
           </li>
         ) : null}
-        <li>
-          Voting method:{' '}
-          <span className='text-violet-500 font-bold'>Single Choice</span>
-        </li>
-        {data.max !== undefined ? (
+        {isRTE(votingLocation) ? (
           <li>
-            Threshold:{' '}
-            <span className='text-violet-500 font-bold'>
-              {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
-            </span>
+            Location:
+            <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100 mb-1'>
+              {parse(votingLocation)}
+            </div>
           </li>
         ) : null}
-        {isRTE(resultDescription) ? (
-          <li>Calculation Rules: {parse(resultDescription)}</li>
+        {checkpoint?.duration ? (
+          <li>
+            Duration:{' '}
+            <span className='font-bold text-violet-500'>
+              {displayDuration(
+                moment.duration((checkpoint?.duration || 0) * 1000)
+              )}
+            </span>
+          </li>
         ) : null}
       </ul>
       {checkpoint?.duration || isRTE(checkpoint?.votingLocation) ? (
         <>
           <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
+          <div className='text-zinc-400'>Voting format</div>
           <ul className='list-disc ml-4'>
-            {checkpoint?.duration ? (
+            <li>
+              Voting method:{' '}
+              <span className='text-violet-500'>Single Choice</span>
+            </li>
+            {noOfOptions ? (
               <li>
-                Duration:{' '}
-                <span className='font-bold text-violet-500'>
-                  {displayDuration(
-                    moment.duration((checkpoint?.duration || 0) * 1000)
+                Voting options:{' '}
+                <div className='flex flex-col gap-1'>
+                  {data.options.map((option: string, index: number) => {
+                    return (
+                      <>
+                        {renderOption({ data, index })}
+                        {index <
+                        noOfOptions - 1 * (data.includedAbstain ? 0 : 1) ? (
+                          <hr
+                            className='my-1'
+                            style={{ borderTop: '1px solid #E3E3E2' }}
+                          />
+                        ) : null}
+                      </>
+                    );
+                  })}
+                  {data.includedAbstain ? (
+                    <span className='text-violet-500'>Abstain</span>
+                  ) : null}
+                </div>
+              </li>
+            ) : null}
+            {quorum ? (
+              <li>
+                Voting quorum:{' '}
+                <span className='text-violet-500'>
+                  {quorum}{' '}
+                  {!data.token ? (
+                    'votes'
+                  ) : (
+                    <> token(s) {displayAddress(data.token)}</>
                   )}
                 </span>
               </li>
             ) : null}
-            {isRTE(checkpoint?.votingLocation) ? (
+            {data.max !== undefined ? (
               <li>
-                Voting location:{' '}
-                <span className='font-bold text-violet-500'>
-                  {parse(checkpoint?.votingLocation || '')}
+                Wining threshold:{' '}
+                <span className='text-violet-500'>
+                  {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}{' '}
+                  {!data.token ? (
+                    'votes'
+                  ) : (
+                    <> token(s) {displayAddress(data.token)}</>
+                  )}
                 </span>
+                {isRTE(resultDescription) ? (
+                  <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
+                    {parse(resultDescription)}
+                  </div>
+                ) : null}
               </li>
             ) : null}
           </ul>
         </>
-      ) : null}
-      {participation || isRTE(participationDescription) ? (
-        <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
-      ) : null}
-
-      {renderParticipation(participation)}
-      {isRTE(participationDescription) ? (
-        <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
-          {parse(participationDescription || '')}
-        </div>
-      ) : null}
-      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
-      <div>
-        Voting method is
-        <span className='text-violet-500 mx-2 font-bold'>
-          {getVoteMachine(checkpoint.vote_machine_type || '')?.getName()}
-        </span>
-        and each voter can for for
-        <span className='text-violet-500 mx-1'>[1 / {noOfOptions}]</span>
-        options.
-        {data.includedAbstain
-          ? ' User can also choose to abstain from voting.'
-          : ''}
-      </div>
-      {/* Only user with ... can vote. */}
-      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
-      <div className='mb-2'>
-        Winning option is the one that receive the highest number of votes and
-        reach the threshold of{' '}
-        <span className='text-violet-500 mx-1'>
-          {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
-          {!data.token ? 'votes' : ` voted token ${data.token}`}
-        </span>
-        made by participants.
-      </div>
-      <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
-      {isRTE(resultDescription) ? (
-        <div>
-          Calculation rules:
-          <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
-            {parse(resultDescription)}
-          </div>
-        </div>
-      ) : null}
-      {checkpoint?.duration ? (
-        <div>
-          The checkpoint is open for vote for{' '}
-          <span className='font-bold text-violet-500'>
-            {displayDuration(
-              moment.duration((checkpoint?.duration || 0) * 1000)
-            )}
-          </span>
-        </div>
-      ) : null}
-      {isRTE(votingLocation) ? (
-        <div>
-          <div className='text-zinc-500'>Voting will happens on:</div>
-          <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
-            {parse(votingLocation)}
-          </div>
-        </div>
       ) : null}
     </div>
   );

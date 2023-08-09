@@ -32,6 +32,9 @@ export const changeVersion = ({
   if (changedCheckPointData.description) {
     newData.checkpoints[index].description = changedCheckPointData.description;
   }
+  if (changedCheckPointData.note) {
+    newData.checkpoints[index].note = changedCheckPointData.note;
+  }
   if (changedCheckPointData.votingLocation) {
     newData.checkpoints[index].votingLocation =
       changedCheckPointData.votingLocation;
@@ -63,6 +66,10 @@ export const changeVersion = ({
   if (changedCheckPointData.participationDescription) {
     newData.checkpoints[index].participationDescription =
       changedCheckPointData.participationDescription;
+  }
+  if (changedCheckPointData.proposerDescription) {
+    newData.checkpoints[index].proposerDescription =
+      changedCheckPointData.proposerDescription;
   }
   return newData;
 };

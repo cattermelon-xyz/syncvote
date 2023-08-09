@@ -4,6 +4,7 @@ export interface IData {
   //eslint-disable-line
   options: string[];
   max: number;
+  quorum?: number;
   token: string;
   includedAbstain: boolean;
   delays: number[];

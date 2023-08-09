@@ -1,15 +1,16 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Space, Tooltip, Select } from 'antd';
+import { MdHelpOutline } from 'react-icons/md';
 
 type VotingResultProps = {
   countedBy: string;
-  setCountedBy: (value:string) => void;
+  setCountedBy: (value: string) => void;
 };
 
 const VotingResult = (props: VotingResultProps) => {
   const { countedBy, setCountedBy } = props;
   return (
-    <Space direction="vertical" size="small" className="w-full">
+    <Space direction='vertical' size='small' className='w-full'>
       {/* <Space className="text-md" direction="horizontal" size="small">
         <span className="text-lg">Voting results</span>
         <div className="items-center flex">
@@ -18,25 +19,21 @@ const VotingResult = (props: VotingResultProps) => {
           </Tooltip>
         </div>
       </Space> */}
-      <Space direction="vertical" size="small" className="w-full">
-        <div className="text-sm text-slate-600">
-          Results counted by
-        </div>
+      <Space direction='vertical' size='small' className='w-full'>
+        <div className='text-sm text-slate-600'>Results counted by</div>
         <Select
-          className="w-full"
+          className='w-full'
           value={countedBy}
-          options={
-            [
-              {
-                label: 'Number of votes',
-                value: 'count',
-              },
-              {
-                label: 'Number of token',
-                value: 'token',
-              },
-            ]
-          }
+          options={[
+            {
+              label: 'Number of votes',
+              value: 'count',
+            },
+            {
+              label: 'Number of token',
+              value: 'token',
+            },
+          ]}
           onChange={(value) => {
             setCountedBy(value);
           }}
