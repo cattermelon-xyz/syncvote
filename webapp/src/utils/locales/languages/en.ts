@@ -318,4 +318,6 @@ export const LANG: any = {
   changeContent: 'Change content',
   changeAboutMe: 'Change “About me” content',
   changeSpaceInfo: 'Change workspace info',
+  password: 'Password',
+  youSignUpWith: `You're signing up as`,
 };

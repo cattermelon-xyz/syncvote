@@ -35,6 +35,7 @@ export const inviteUserByEmail = async ({
       body: JSON.stringify({
         email,
         orgId,
+        env: import.meta.env.VITE_EVN
       }),
     });
     const result = await response.json();
@@ -46,6 +47,7 @@ export const inviteUserByEmail = async ({
         full_name: null,
         avatar_url: null,
         role: 'MEMBER',
+        confirm_email_at: null,
       };
       dispatch(addUserToOrg({ orgId: orgId, user: infoMember }));
       onSuccess(result);
@@ -237,5 +239,28 @@ export const isEmailExisted = async ({ email }: { email: string }) => {
     return { existed: false, userId: null };
   } else {
     return { existed: rs.count, userId: rs.data[0]?.id };
+  }
+};
+
+export const changePassword = async ({
+  password,
+  dispatch,
+  onSuccess,
+  onError = (e: any) => {
+    console.error(e);
+  },
+}: {
+  password: string;
+  dispatch?: any;
+  onSuccess?: (() => void) | undefined;
+  onError?: (error: any) => void;
+}) => {
+  const { data, error } = await supabase.auth.updateUser({
+    password: password,
+  });
+  if (error) {
+    onError(error);
+  } else if (onSuccess) {
+    onSuccess();
   }
 };

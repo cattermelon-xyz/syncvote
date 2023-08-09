@@ -266,7 +266,8 @@ export const queryOrgs = async ({
           email,
           full_name,
           icon_url,
-          preset_icon_url
+          preset_icon_url,
+          confirm_email_at
         )
       ),
       workflows:workflow (
@@ -290,6 +291,7 @@ export const queryOrgs = async ({
   `
     )
     .eq('user_id', userId);
+
   if (!error) {
     const tmp: any[] = [];
     data.forEach((d: any) => {
@@ -320,6 +322,7 @@ export const queryOrgs = async ({
               : presetIconProfile,
             about_me: user.profile.about_me,
             role: user.role,
+            confirm_email_at: user.profile.confirm_email_at,
           };
         }) || [];
 
