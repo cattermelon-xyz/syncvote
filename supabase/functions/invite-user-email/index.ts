@@ -19,8 +19,27 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-    const { email, orgId } = await req.json();
-    const redirectTo = `https://app.syncvote.com/set-password?email=${email}`;
+
+    const { email, orgId, env } = await req.json();
+    let baseURL: string;
+
+    switch (env) {
+      case 'local':
+        baseURL = 'http://localhost:3001';
+        break;
+      case 'dev':
+        baseURL = 'https://dev.syncvote.com';
+        break;
+      case 'product':
+        baseURL = 'https://app.syncvote.com';
+        break;
+      default:
+        baseURL = 'https://app.syncvote.com';
+        break;
+    }
+
+    const redirectTo = `${baseURL}/set-password?email=${email}`;
+
     const { data, error } = await supabaseClient.auth.admin.inviteUserByEmail(
       email,
       { redirectTo }
