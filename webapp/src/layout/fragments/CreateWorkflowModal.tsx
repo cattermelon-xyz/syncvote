@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { createIdString, randomIcon } from '@utils/helpers';
 import './create-new.scss';
 import { emptyStage } from '@components/DirectedGraph';
+import moment from 'moment';
 
 interface CreateWorkflowModalProps {
   open: boolean;
@@ -25,6 +26,15 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   const { orgs, user } = useSelector((state: any) => state.orginfo);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const dispatch = useDispatch();
+  const sortedOrgs = [...orgs];
+
+  if (orgs) {
+    sortedOrgs.sort((a: any, b: any) => {
+      const timeA = moment(a.last_updated);
+      const timeB = moment(b.last_updated);
+      return timeB.diff(timeA);
+    });
+  }
 
   const handleOk = async () => {
     const org = orgs.find((org: any) => org.id === value);
@@ -62,9 +72,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
     setValue(e.target.value);
   };
 
-  // useEffect(() => {
-  //   loadWorkflowData();
-  // }, [user]);
+  console.log(sortedOrgs);
 
   return (
     <Modal
@@ -86,7 +94,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 
       <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {orgs.map((org: any, index: any) => (
+          {sortedOrgs.map((org: any, index: any) => (
             <div
               className='flex h-12 items-center radio cursor-pointer'
               key={index}
@@ -125,11 +133,6 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
       </Space>
 
       <Space className='flex'>
-        <a
-          className='p-4'
-          style={{ color: '#6d28d9' }}
-          onClick={setOpenCreateWorkspaceModal}
-        />
         <a
           className='p-4'
           style={{ color: '#6d28d9' }}

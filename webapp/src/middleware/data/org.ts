@@ -96,8 +96,6 @@ export const upsertAnOrg = async ({
     'preset_banner_url',
   ];
 
-  console.log('org', org);
-
   Object.keys(newOrg).forEach((key) => {
     if (props.indexOf(key) === -1) {
       delete newOrg[key];
@@ -259,6 +257,7 @@ export const queryOrgs = async ({
       preset_banner_url,
       org_size,
       org_type,
+      last_updated,
       user_org(
         role,
         profile (
@@ -363,7 +362,7 @@ export const queryOrgs = async ({
         org_size: org.org_size,
         org_type: org.org_type,
         profile: profiles,
-        // workflows: org.workflows || [],
+        last_updated: org.last_updated,
         workflows: workflows || [],
       });
     });
