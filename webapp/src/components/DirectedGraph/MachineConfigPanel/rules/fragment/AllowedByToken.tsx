@@ -1,5 +1,6 @@
 import BSC from '@assets/icons/svg-icons/BSC';
 import Solana from '@assets/icons/svg-icons/Solana';
+import TokenInput from '@components/DirectedGraph/components/TokenInput';
 import { Input, Select, Space } from 'antd';
 import { FaEthereum } from 'react-icons/fa6';
 
@@ -12,67 +13,19 @@ type AllowedByTokenProps = {
 };
 
 const AllowedByToken = (props: AllowedByTokenProps) => {
-  const { address: tokenInfo, setAddress, min, setMin, editable } = props;
-  const chain = tokenInfo?.split('.')[0] || '';
-  const tokenName = tokenInfo?.split('.')[1] || '';
-  const address = tokenInfo?.replace(`${chain}.${tokenName}.`, '') || '';
+  const { address, setAddress, min, setMin, editable } = props;
+
   return (
     <Space direction='vertical' size='middle' className='w-full'>
       <Space direction='vertical' size='small' className='w-full'>
         <div className='text-sm'>Token/NFT info</div>
-        <Space.Compact className='w-full'>
-          <Select
-            style={{ width: '150px' }}
-            value={chain}
-            onChange={(value) => {
-              setAddress(`${value}.${tokenName}.${address}`);
-            }}
-            options={[
-              {
-                value: 'eth',
-                label: (
-                  <div className='flex items-center'>
-                    <FaEthereum className='mr-1' /> ETH
-                  </div>
-                ),
-              },
-              {
-                value: 'bsc',
-                label: (
-                  <div className='flex items-center gap-1'>
-                    <BSC className='mr-1' /> BSC
-                  </div>
-                ),
-              },
-              {
-                value: 'sol',
-                label: (
-                  <div className='flex items-center gap-1'>
-                    <Solana />
-                    SOL
-                  </div>
-                ),
-              },
-            ]}
-          />
-          <Input
-            placeholder='Token/NFT name'
-            style={{ width: '200px' }}
-            value={tokenName}
-            onChange={(e) => {
-              setAddress(`${chain}.${e.target.value}.${address}`);
-            }}
-          />
-          <Input
-            placeholder='Token/NFT address'
-            className='w-full'
-            value={address}
-            onChange={(e) =>
-              setAddress(`${chain}.${tokenName}.${e.target.value}`)
-            }
-            disabled={!editable}
-          />
-        </Space.Compact>
+        <TokenInput
+          address={address || ''}
+          setAddress={(str) => {
+            setAddress(str);
+          }}
+          editable={editable}
+        />
       </Space>
       <Space direction='vertical' size='small' className='w-full'>
         <div className='text-sm'>Minimum holding quantity (optional)</div>
@@ -81,7 +34,7 @@ const AllowedByToken = (props: AllowedByTokenProps) => {
           className='w-full'
           value={min}
           onChange={(e) => {
-            const num = parseInt(e.target.value, 10);
+            const num = parseFloat(e.target.value);
             if (num > 0) {
               setMin(num);
             } else {
@@ -89,6 +42,7 @@ const AllowedByToken = (props: AllowedByTokenProps) => {
             }
           }}
           disabled={!editable}
+          suffix={'Token(s)'}
         />
       </Space>
     </Space>

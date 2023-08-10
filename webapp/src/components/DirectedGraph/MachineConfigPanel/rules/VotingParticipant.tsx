@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { GraphPanelContext } from '@components/DirectedGraph/context';
 import { FiUserCheck } from 'react-icons/fi';
 import { TbAtom } from 'react-icons/tb';
-import CollapsiblePanel from '../fragments/CollapsiblePanel';
+import CollapsiblePanel from '../../components/CollapsiblePanel';
 
 const VotingPartipation = () => {
   const {
@@ -63,19 +63,20 @@ const VotingPartipation = () => {
       />
       {type ? <div className='py-1'>{/* <hr /> */}</div> : null}
       {type === 'identity' ? (
-        <AllowedByIdentity
-          editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
-          identity={identity}
-          setIdentity={(newIdentity: string[]) => {
-            onChange({
-              participation: {
-                type: 'identity',
-                data: newIdentity,
-              },
-            });
-          }}
-        />
-      ) : null}
+        <></>
+      ) : // <AllowedByIdentity
+      //   editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
+      //   identity={identity}
+      //   setIdentity={(newIdentity: string[]) => {
+      //     onChange({
+      //       participation: {
+      //         type: 'identity',
+      //         data: newIdentity,
+      //       },
+      //     });
+      //   }}
+      // />
+      null}
       {type === 'token' ? (
         <AllowedByToken
           editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}

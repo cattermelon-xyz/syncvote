@@ -10,7 +10,8 @@ export interface IData {
   delays: number[];
   delayUnits: DelayUnit[];
   delayNotes: string[];
-  resultDescription: string;
+  resultDescription?: string;
+  optionsDescription?: string;
 }
 
 export interface IOption {

@@ -14,7 +14,8 @@ import { useContext } from 'react';
 import { GraphPanelContext } from '../context';
 import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
 import { GraphViewMode } from '../interface';
-import CollapsiblePanel from './fragments/CollapsiblePanel';
+import CollapsiblePanel from '../components/CollapsiblePanel';
+import GeneralInfo from '../components/GeneralInfo';
 
 const ContextTab = () => {
   const {
@@ -77,7 +78,7 @@ const ContextTab = () => {
     return rs;
   };
   return (
-    <Space direction='vertical' size='large' className='w-full'>
+    <Space direction='vertical' size='large' className='w-full pb-4'>
       <CollapsiblePanel title='Purpose & Description' collapsable={false}>
         {parse(selectedNode?.description || 'Not added')}
       </CollapsiblePanel>
@@ -106,6 +107,8 @@ const ContextTab = () => {
         <>
           <CollapsiblePanel title='Rules & conditions' collapsable={false}>
             <Space direction='vertical' size='small' className='w-full'>
+              <GeneralInfo checkpoint={selectedNode} />
+              <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
               {summary}
               {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
                 <>

@@ -18,7 +18,8 @@ import {
   IParticipant,
 } from '../types';
 import moment from 'moment';
-import CollapsiblePanel from '@components/DirectedGraph/MachineConfigPanel/fragments/CollapsiblePanel';
+import CollapsiblePanel from '@components/DirectedGraph/components/CollapsiblePanel';
+import SideNote from '@components/DirectedGraph/components/SideNote';
 
 interface Option {
   title: string;
@@ -571,11 +572,7 @@ const explain = ({
         <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
       ) : null}
       {renderParticipation(participation)}
-      {isRTE(participationDescription) ? (
-        <div className='p-2 border border-solid border-zinc-100 mt-2 rounded-lg border-zinc-200 bg-zinc-100'>
-          {parse(participationDescription || '')}
-        </div>
-      ) : null}
+      <SideNote value={participationDescription} />
       <div className='mt-2'>
         Each of voter can vote up to{' '}
         <span className='text-violet-500 font-bold'>{data?.upTo || '0'}</span>{' '}

@@ -30,10 +30,12 @@ import {
 } from '@ant-design/icons';
 import parse from 'html-react-parser';
 import '../styles.scss';
-import CollapsiblePanel from '@components/DirectedGraph/MachineConfigPanel/fragments/CollapsiblePanel';
+import CollapsiblePanel from '@components/DirectedGraph/components/CollapsiblePanel';
 import { IOption } from '../interface';
 import TextEditor from '@components/Editor/TextEditor';
 import { MdHelpOutline } from 'react-icons/md';
+import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
+import SideNote from '@components/DirectedGraph/components/SideNote';
 
 /**
  *
@@ -55,30 +57,19 @@ const ConfigPanel = ({
     includedAbstain: false,
     resultDescription: '',
     quorum: 0,
+    optionsDescription: '',
   },
   viewMode,
   onChange = (data: ICheckPoint) => {},
   children = [],
   allNodes = [], //eslint-disable-line
 }: IVoteMachineConfigProps) => {
-  const { max, token, options, includedAbstain, quorum } = data;
+  const { max, token, options, includedAbstain, quorum, optionsDescription } =
+    data;
   const delays = data.delays || Array(options?.length).fill(0);
   const delayUnits =
     data.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
   const delayNotes = data.delayNotes || Array(options?.length).fill('');
-  const [newResultDescription, setNewResultDescription] = useState(
-    data.resultDescription || ''
-  );
-  let tmpMaxStr = '0';
-  let tmpQuorumStr = '0';
-  if (max) {
-    tmpMaxStr = max < 1 ? `${max * 100}%` : `${max}`;
-  }
-  if (quorum) {
-    tmpQuorumStr = quorum < 1 ? `${quorum * 100}%` : `${quorum}`;
-  }
-  const [maxStr, setMaxStr] = useState(tmpMaxStr);
-  const [quorumStr, setQuorumStr] = useState(tmpQuorumStr);
   const posibleOptions: ICheckPoint[] = [];
   const [showAddOptionDrawer, setShowNewOptionDrawer] = useState(false);
   allNodes.forEach((child) => {
@@ -94,7 +85,6 @@ const ConfigPanel = ({
     delayNote: '',
   });
   const [countedBy, setCountedBy] = useState(token ? 'token' : 'count');
-  const [showSideNote, setShowSideNote] = useState(false); //eslint-disable-line
   const addNewOptionHandler = (newOptionData: any) => {
     if (newOptionData.id && newOptionData.title) {
       const opts = options ? [...options] : [];
@@ -144,48 +134,6 @@ const ConfigPanel = ({
         delays: newDelays,
         delayUnits: newDelayUnits,
         delayNotes: newDelayNotes,
-      },
-    });
-  };
-  const changeMaxHandler = (e: any) => {
-    const str = e.target.value;
-    let tMax = 0;
-    if (str !== '') {
-      tMax =
-        str.indexOf('%') > 0
-          ? parseFloat(str) / 100 > 1
-            ? 1
-            : parseFloat(str) / 100
-          : parseInt(str, 10);
-    }
-    if (tMax >= 1) {
-      setMaxStr(str.indexOf('%') > 0 ? '100%' : tMax.toString());
-    }
-    onChange({
-      data: {
-        ...data,
-        max: tMax,
-      },
-    });
-  };
-  const changeQuorumHandler = (e: any) => {
-    const str = e.target.value;
-    let tQuorum = 0;
-    if (str !== '') {
-      tQuorum =
-        str.indexOf('%') > 0
-          ? parseFloat(str) / 100 > 1
-            ? 1
-            : parseFloat(str) / 100
-          : parseInt(str, 10);
-    }
-    if (tQuorum >= 1) {
-      setQuorumStr(str.indexOf('%') > 0 ? '100%' : tQuorum.toString());
-    }
-    onChange({
-      data: {
-        ...data,
-        quorum: tQuorum,
       },
     });
   };
@@ -301,27 +249,6 @@ const ConfigPanel = ({
   };
   return (
     <>
-      <Modal
-        title='Side note'
-        open={showSideNote}
-        onCancel={() => setShowSideNote(false)}
-        onOk={async () => {
-          onChange({
-            data: {
-              ...data,
-              resultDescription: newResultDescription,
-            },
-          });
-          setShowSideNote(false);
-        }}
-      >
-        <TextEditor
-          value={newResultDescription}
-          setValue={(val: any) => {
-            setNewResultDescription(val);
-          }}
-        />
-      </Modal>
       <Space direction='vertical' size='large' className='w-full single-choice'>
         {/* <Space direction="vertical" size="small" className="w-full">
         <div className="bg-slate-100 p-2 w-full">
@@ -411,6 +338,17 @@ const ConfigPanel = ({
               posibleOptions={posibleOptions}
               addNewOptionHandler={addNewOptionHandler}
             />
+            <SideNote
+              value={optionsDescription}
+              setValue={(val: string) => {
+                onChange({
+                  data: {
+                    ...data,
+                    optionsDescription: val,
+                  },
+                });
+              }}
+            />
           </>
         </CollapsiblePanel>
         <CollapsiblePanel title='Result calculation'>
@@ -429,33 +367,43 @@ const ConfigPanel = ({
                   <MdHelpOutline />
                 </Popover>
               </div>
-              <Input
+              <NumberWithPercentageInput
+                value={quorum}
                 prefix={
                   <div className='text-slate-600'>
                     <SolutionOutlined className='inline-flex items-center pr-2' />
                   </div>
                 }
-                type='text'
-                value={quorumStr}
-                disabled={
-                  !(
-                    viewMode === GraphViewMode.EDIT_MISSION ||
-                    viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
-                  )
+                setValue={
+                  viewMode === GraphViewMode.EDIT_MISSION ||
+                  viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                    ? (val: number) => {
+                        onChange({
+                          data: {
+                            ...data,
+                            quorum: val,
+                          },
+                        });
+                      }
+                    : undefined
                 }
-                onChange={(e) => setQuorumStr(e.target.value)}
-                onBlur={changeQuorumHandler}
               />
             </Space>
             <VotingCondition
               getThresholdText={getThresholdText}
-              maxStr={maxStr}
+              max={max}
               editable={
                 viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ||
                 viewMode === GraphViewMode.EDIT_MISSION
               }
-              setMaxStr={setMaxStr}
-              changeMaxHandler={changeMaxHandler}
+              changeMaxHandler={(val: number) => {
+                onChange({
+                  data: {
+                    ...data,
+                    max: val,
+                  },
+                });
+              }}
               countedBy={countedBy}
               token={token}
               changeTokenHandler={changeTokenHandler}
@@ -465,37 +413,17 @@ const ConfigPanel = ({
               size='small'
               className='flex w-full pt-2'
             >
-              {!data.resultDescription ? (
-                <Button
-                  icon={<CommentOutlined />}
-                  onClick={() => setShowSideNote(true)}
-                >
-                  Add side note
-                </Button>
-              ) : (
-                <Space
-                  direction='vertical'
-                  className='w-full border border-zinc-300 border-solid rounded-lg p-2'
-                  size='middle'
-                >
-                  <Space
-                    direction='horizontal'
-                    className='w-full justify-between'
-                  >
-                    <div>
-                      <MessageOutlined className='mr-1' />
-                      Sidenote
-                    </div>
-                    <Button
-                      type='text'
-                      icon={<EditOutlined />}
-                      className='hover:text-violet-500'
-                      onClick={() => setShowSideNote(true)}
-                    />
-                  </Space>
-                  {parse(data.resultDescription)}
-                </Space>
-              )}
+              <SideNote
+                value={data.resultDescription}
+                setValue={(val: string) => {
+                  onChange({
+                    data: {
+                      ...data,
+                      resultDescription: val,
+                    },
+                  });
+                }}
+              />
             </Space>
           </Space>
         </CollapsiblePanel>

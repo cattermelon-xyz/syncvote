@@ -5,14 +5,15 @@ import {
 } from '@ant-design/icons';
 import BSC from '@assets/icons/svg-icons/BSC';
 import Solana from '@assets/icons/svg-icons/Solana';
+import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
+import TokenInput from '@components/DirectedGraph/components/TokenInput';
 import { Space, Tooltip, Input, Popover, Select } from 'antd';
 import { FaEthereum } from 'react-icons/fa6';
 
 type VotingConditionProps = {
   getThresholdText: () => string;
-  maxStr: string;
+  max: number;
   editable: boolean;
-  setMaxStr: (value: string) => void;
   changeMaxHandler: (e: any) => void;
   countedBy: string;
   token: string;
@@ -22,18 +23,13 @@ type VotingConditionProps = {
 const VotingCondition = (props: VotingConditionProps) => {
   const {
     getThresholdText,
-    maxStr,
     editable,
-    setMaxStr,
     changeMaxHandler,
     countedBy,
     token,
     changeTokenHandler,
+    max,
   } = props;
-  const tokenInfo = token ? token : '';
-  const chain = tokenInfo?.split('.')[0] || '';
-  const tokenName = tokenInfo?.split('.')[1] || '';
-  const address = tokenInfo?.replace(`${chain}.${tokenName}.`, '') || '';
   return (
     <Space direction='vertical' size='small' className='w-full'>
       {/* <Space className="text-md" direction="horizontal" size="small">
@@ -64,76 +60,24 @@ const VotingCondition = (props: VotingConditionProps) => {
             <QuestionCircleOutlined />
           </Popover>
         </div>
-        <Input
-          type='text'
-          className='w-full'
+        <NumberWithPercentageInput
           prefix={
             <div className='text-slate-600'>
               <CarryOutOutlined className='inline-flex items-center pr-2' />
             </div>
           }
-          value={maxStr}
-          disabled={!editable}
-          onChange={(e) => setMaxStr(e.target.value)}
-          onBlur={changeMaxHandler}
+          value={max}
+          setValue={editable ? changeMaxHandler : undefined}
         />
       </Space>
       {countedBy === 'token' ? (
         <Space direction='vertical' size='small' className='w-full'>
           <div className='text-sm'>Token using for voting</div>
-          <Space.Compact className='w-full'>
-            <Select
-              style={{ width: '150px' }}
-              value={chain}
-              onChange={(value) => {
-                changeTokenHandler(`${value}.${tokenName}.${address}`);
-              }}
-              options={[
-                {
-                  value: 'eth',
-                  label: (
-                    <div className='flex items-center'>
-                      <FaEthereum className='mr-1' /> ETH
-                    </div>
-                  ),
-                },
-                {
-                  value: 'bsc',
-                  label: (
-                    <div className='flex items-center gap-1'>
-                      <BSC className='mr-1' /> BSC
-                    </div>
-                  ),
-                },
-                {
-                  value: 'sol',
-                  label: (
-                    <div className='flex items-center gap-1'>
-                      <Solana />
-                      SOL
-                    </div>
-                  ),
-                },
-              ]}
-            />
-            <Input
-              placeholder='Token/NFT name'
-              style={{ width: '200px' }}
-              value={tokenName}
-              onChange={(e) => {
-                changeTokenHandler(`${chain}.${e.target.value}.${address}`);
-              }}
-            />
-            <Input
-              placeholder='Token/NFT address'
-              className='w-full'
-              value={address}
-              onChange={(e) =>
-                changeTokenHandler(`${chain}.${tokenName}.${e.target.value}`)
-              }
-              disabled={!editable}
-            />
-          </Space.Compact>
+          <TokenInput
+            address={token}
+            setAddress={(val: String) => changeTokenHandler(val)}
+            editable={editable}
+          />
         </Space>
       ) : (
         // <Space direction='vertical' size='small' className='w-full'>
