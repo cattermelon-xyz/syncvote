@@ -46,7 +46,7 @@ const VerticalNav = () => {
       label: (
         <>
           <FileOutlined className='text-base mr-2' />
-          <span className='text-[17px]'>Worflow</span>
+          <span className='text-sm'>Worflow</span>
         </>
       ),
       key: 'workflow',

@@ -63,7 +63,7 @@ const MySpace: React.FC = () => {
         const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
           adminOrg.workflows.map((workflow: any) => ({
             ...workflow,
-              org_title: adminOrg.title,
+            org_title: adminOrg.title,
           }))
         );
         // Querry from org
