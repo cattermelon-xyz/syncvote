@@ -54,6 +54,9 @@
   .react-flow__edge:hover {
     opacity: 0.3;
   }
+  .react-flow__handle {
+    opacity: 0;
+  }
 }
 
 .machine-config-panel-tabs {

@@ -258,15 +258,27 @@ export const buildATree = ({
       );
       const position = checkpointFromLayout?.position || checkpoint.position;
       const style = { ...nodeStyle, ...checkpointFromLayout?.style };
+      const vm = getVoteMachine(checkpoint.vote_machine_type);
+      const vmIcon = vm?.getIcon();
+      let label = checkpoint.title ? checkpoint.title : checkpoint.id;
+      if (vmIcon) {
+        label = (
+          <div className='flex gap-1'>
+            {vmIcon}
+            {label}
+          </div>
+        );
+      }
       nodes.push({
         id: checkpoint.id,
         data: {
-          label: checkpoint.title ? checkpoint.title : checkpoint.id,
+          label: label,
           style,
           isEnd: checkpoint.isEnd,
           raw: checkpoint,
           triggers: checkpoint.triggers,
           selected: checkpoint.id === selectedNodeId,
+          abstract: vm?.abstract({ checkpoint, data: checkpoint.data }),
         },
         x: checkpoint.x,
         y: checkpoint.y,

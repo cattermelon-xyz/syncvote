@@ -4,169 +4,138 @@ import { Polling as Interface } from './interface';
 import { Button, Drawer, Input, Select, Space, Tag } from 'antd';
 import {
   ArrowRightOutlined,
+  CommentOutlined,
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import CollapsiblePanel from '@components/DirectedGraph/components/CollapsiblePanel';
 import ResultCalculator from '@components/DirectedGraph/components/ResultCalculator';
+import NavConfigPanel from '@components/DirectedGraph/components/NavConfigPanel';
+import SideNote from '@components/DirectedGraph/components/SideNote';
+import { isRTE } from '@components/DirectedGraph/utils';
 
 export namespace Polling {
-  export const ConfigPanel = ({
-    currentNodeId,
-    votingPowerProvider = '',
-    whitelist = [],
-    onChange = (data) => {},
-    children = [], //eslint-disable-line
-    data = {
-      max: 0,
-      upTo: 1,
-      options: [],
-      next: '',
-      fallback: '',
-      token: '',
-    },
-    allNodes,
-    quorum,
-    resultDescription,
-  }: IVoteMachineConfigProps) => {
-    // TODO: config `upTo`
-    const { max, options, next, fallback, upTo, token }: Interface.IData = data;
+  export const ConfigPanel = (props: IVoteMachineConfigProps) => {
+    const {
+      currentNodeId,
+      onChange = (data) => {},
+      children = [], //eslint-disable-line
+      data = {
+        max: 0,
+        upTo: 1,
+        options: [],
+        next: '',
+        fallback: '',
+        token: '',
+      },
+      allNodes,
+      quorum,
+      resultDescription,
+      optionsDescription,
+    } = props;
+    const { max, next, fallback, upTo, token, options }: Interface.IData = data;
     const [newOption, setNewOption] = useState({
       title: '',
       description: '',
     });
     const [showNewOptionDrawer, setShowNewOptionDrawer] = useState(false);
-    const possibleOptions: any[] = [];
-    let maxStr = '0';
-    if (max) {
-      maxStr = max < 1 ? `${max * 100}%` : `${max}`;
-    }
-    let nextTitle = next;
-    let fallbackTitle = fallback;
-    allNodes.forEach((node) => {
-      if (
-        node.id !== fallback &&
-        node.id !== next &&
-        node.id !== currentNodeId
-      ) {
-        possibleOptions.push({
-          value: node.id,
-          label: node.title ? node.title : node.id,
-        });
-      } else if (node.id === fallback) {
-        fallbackTitle = node.title ? node.title : node.id;
-      } else if (node.id === next) {
-        nextTitle = node.title ? node.title : node.id;
+    const possibleNodes: any[] = allNodes.filter(
+      (n) => [currentNodeId, fallback, next].indexOf(n.id) === -1
+    );
+    const fallbackNode = allNodes.find((n) => n.id === fallback);
+    const nextNode = allNodes.find((n) => n.id === next);
+    const delays = props.delays || Array(2).fill(0);
+    const delayUnits = props.delayUnits || Array(2).fill(0);
+    const delayNotes = props.delayNotes || Array(2).fill('');
+    const changeDelayHandler = (val: any, childIdx: number) => {
+      const { delay, delayUnit, delayNote } = val;
+      const newDelays = [...delays];
+      const newDelayUnits = [...delayUnits];
+      const newDelayNotes = [...delayNotes];
+      newDelays[childIdx] = delay;
+      newDelayUnits[childIdx] = delayUnit;
+      newDelayNotes[childIdx] = delayNote;
+      onChange({
+        delays: newDelays,
+        delayUnits: newDelayUnits,
+        delayNotes: newDelayNotes,
+      });
+    };
+    const replaceHandler = (val: any, childIdx: number) => {
+      const { id } = val;
+      const newChildren = [...children];
+      newChildren[childIdx] = id;
+      if (childIdx === Interface.PollingIndex.nextIdx) {
+        data.next = id;
+      } else if (childIdx === Interface.PollingIndex.fallbackIdx) {
+        data.fallback = id;
       }
-    });
-    const renderChildren = (type: any, val: any) => {
-      return !val ? (
-        <Space
-          direction='horizontal'
-          className='flex items-center justify-between w-full'
-          size='small'
-        >
-          <div>
-            {type === 'next'
-              ? 'If we found winner then '
-              : 'If voting is over and we can not find winners, then '}
-          </div>
-          <ArrowRightOutlined />
-          <Select
-            style={{ width: '200px' }}
-            options={possibleOptions}
-            onChange={(value) => {
-              const newData: any = structuredClone(data);
-              newData[type] = value; //eslint-disable-line
-              onChange({
-                data: newData,
-                children: [...children, value],
-              });
-            }}
-          />
-        </Space>
-      ) : (
-        <Space
-          direction='horizontal'
-          size='small'
-          className='flex items-center justify-between w-full'
-        >
-          <Button
-            type='link'
-            className='flex items-center text-red-500 justify-between'
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              const newData: any = structuredClone(data);
-              delete newData[type];
-              const newChildren = [...children];
-              const idx = children.indexOf(val);
-              newChildren.splice(idx, 1);
-              onChange({
-                data: newData,
-                children: newChildren,
-              });
-            }}
-          />
-          {type === 'next' ? 'Winner found' : 'No winner found'}
-          <ArrowRightOutlined />
-          {type === 'next' ? (
-            <Tag>{nextTitle}</Tag>
-          ) : (
-            <Tag>{fallbackTitle}</Tag>
-          )}
-        </Space>
-      );
+      onChange({ children: [...newChildren], data: { ...data } });
     };
     // const lOptions = options ? options.length : 0;
     return (
       <Space direction='vertical' size='large' className='mb-4 w-full'>
         <CollapsiblePanel title='Options & Navigation'>
-          <Space direction='vertical' size='large' className='w-full'>
+          <Space direction='vertical' size='small' className='w-full'>
             {options && options.length > 0 ? (
               <Space direction='vertical' size='small' className='w-full'>
-                <div>List of options</div>
+                <div className='font-bold'>List of options</div>
                 {options?.map((option: any, index: any) => (
-                  <Space
-                    direction='horizontal'
+                  <div
                     key={option.title}
-                    className='flex items-center'
+                    className='flex items-center flex-col'
                   >
-                    <Button
-                      className='mr-2 flex-inline items-center text-center text-red-500'
-                      icon={<DeleteOutlined />}
-                      onClick={() => {
-                        onChange({
-                          data: {
-                            ...structuredClone(data),
-                            options: [
-                              ...options.slice(0, index),
-                              ...options.slice(index + 1),
-                            ],
-                          },
-                        });
-                      }}
-                    />
-                    <Space direction='vertical' size='small'>
-                      <div className='text-slate-700'>{option.title}</div>
-                      <div className='text-xs'>{option.description}</div>
+                    <Space direction='vertical' size='small' className='w-full'>
+                      <div className='flex gap-2  items-center'>
+                        <Button
+                          className='mr-2 flex-inline items-center text-center text-red-500'
+                          icon={<DeleteOutlined />}
+                          onClick={() => {
+                            onChange({
+                              data: {
+                                ...structuredClone(data),
+                                options: [
+                                  ...options.slice(0, index),
+                                  ...options.slice(index + 1),
+                                ],
+                              },
+                            });
+                          }}
+                        />
+                        <div className='text-slate-700'>{option.title}</div>
+                      </div>
+
+                      {isRTE(option.description) ? (
+                        <div className='text-xs w-full p-2 bg-gray-100 rounded-md'>
+                          {option.description}
+                        </div>
+                      ) : null}
                     </Space>
-                  </Space>
+                  </div>
                 ))}
               </Space>
             ) : (
               <></>
             )}
             <Button
+              type='link'
+              className='pl-0'
               icon={<PlusOutlined />}
-              className='w-full'
               onClick={() => {
                 setShowNewOptionDrawer(true);
               }}
             >
               New Option
             </Button>
+            <SideNote
+              value={optionsDescription}
+              setValue={(val: string) => {
+                onChange({ optionsDescription: val });
+              }}
+              buttonLabel='Add Option Note'
+            />
             <Space direction='vertical' size='small' className='w-full'>
-              <div className='text-md'>
+              <div className='font-bold'>
                 Max number of choices
                 {/* (&lt;
             {lOptions}
@@ -191,8 +160,33 @@ export namespace Polling {
                 }}
               />
             </Space>
-            {renderChildren('next', next)}
-            {renderChildren('fallback', fallback)}
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='font-bold'>Navigation</div>
+              <NavConfigPanel
+                title='Failed'
+                currentNode={fallbackNode}
+                possibleNodes={possibleNodes}
+                index={Interface.PollingIndex.fallbackIdx}
+                navLabel='None of options reach Threshold or Quorum'
+                delay={delays[Interface.PollingIndex.fallbackIdx]}
+                delayUnit={delayUnits[Interface.PollingIndex.fallbackIdx]}
+                delayNote={delayNotes[Interface.PollingIndex.fallbackIdx]}
+                changeDelayHandler={changeDelayHandler}
+                replaceHandler={replaceHandler}
+              />
+              <NavConfigPanel
+                title='Passed'
+                currentNode={nextNode}
+                possibleNodes={possibleNodes}
+                index={Interface.PollingIndex.nextIdx}
+                navLabel='1 or more options reach Threshold'
+                delay={delays[Interface.PollingIndex.nextIdx]}
+                delayUnit={delayUnits[Interface.PollingIndex.nextIdx]}
+                delayNote={delayNotes[Interface.PollingIndex.nextIdx]}
+                changeDelayHandler={changeDelayHandler}
+                replaceHandler={replaceHandler}
+              />
+            </Space>
           </Space>
         </CollapsiblePanel>
         <CollapsiblePanel title='Result calculation'>

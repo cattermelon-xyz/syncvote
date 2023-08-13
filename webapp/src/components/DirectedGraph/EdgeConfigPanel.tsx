@@ -64,23 +64,17 @@ const EdgeConfigPanel = ({
         </Space>
         <Space direction='vertical' size='small' className='w-full'>
           <div className='text-zinc-400'>From checkpoint</div>
-          <Input
-            type='text'
-            value={sourceNode.data.label}
-            className='w-full'
-            style={{ ...selectedEdge?.labelStyle }}
-            disabled
-          />
+          {/* <div style={{ ...selectedEdge?.labelStyle }}> */}
+          <div className='p-2 border border-solid rounded-md'>
+            {sourceNode.data.label}
+          </div>
         </Space>
         <Space direction='vertical' size='small' className='w-full'>
           <div className='text-zinc-400'>Navigate to checkpoint</div>
-          <Input
-            type='text'
-            value={targetNode.data.label}
-            className='w-full'
-            style={{ ...selectedEdge?.labelStyle }}
-            disabled
-          />
+          {/* <div style={{ ...selectedEdge?.labelStyle }}> */}
+          <div className='p-2 border border-solid rounded-md'>
+            {targetNode.data.label}
+          </div>
         </Space>
       </Space>
 

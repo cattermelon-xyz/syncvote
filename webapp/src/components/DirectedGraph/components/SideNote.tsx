@@ -5,7 +5,7 @@ import {
 } from '@ant-design/icons';
 import TextEditor from '@components/Editor/TextEditor';
 import { Button, Modal, Space } from 'antd';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import parse from 'html-react-parser';
 import { isRTE } from '../utils';
 
@@ -13,14 +13,21 @@ const SideNote = ({
   value,
   setValue = undefined,
   className = '',
+  buttonLabel = 'Add Side Note',
+  title = (
+    <span>
+      <MessageOutlined className='mr-1' /> Side Note
+    </span>
+  ),
 }: {
   value: string | undefined;
   setValue?: (val: string) => void;
   className?: string;
+  buttonLabel?: string;
+  title?: React.ReactNode;
 }) => {
   const [showSideNote, setShowSideNote] = useState(false);
   const [tmpValue, setTmpValue] = useState(value || '');
-
   return (
     <>
       {setValue !== undefined ? (
@@ -47,7 +54,7 @@ const SideNote = ({
                 icon={<CommentOutlined />}
                 onClick={() => setShowSideNote(true)}
               >
-                Add side note
+                {buttonLabel}
               </Button>
             </div>
           ) : (
@@ -57,10 +64,7 @@ const SideNote = ({
               size='middle'
             >
               <Space direction='horizontal' className='w-full justify-between'>
-                <div>
-                  <MessageOutlined className='mr-1' />
-                  Sidenote
-                </div>
+                <div>{title}</div>
                 <Button
                   type='text'
                   icon={<EditOutlined />}

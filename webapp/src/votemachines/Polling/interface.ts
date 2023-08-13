@@ -13,4 +13,9 @@ export namespace Polling {
     upTo?: number;
     token?: string;
   }
+
+  export const PollingIndex = {
+    nextIdx: 0,
+    fallbackIdx: 1,
+  };
 }

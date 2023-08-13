@@ -1,4 +1,8 @@
-import { ShareAltOutlined, TwitterOutlined } from '@ant-design/icons';
+import {
+  ShareAltOutlined,
+  TwitterOutlined,
+  VerticalAlignTopOutlined,
+} from '@ant-design/icons';
 import moment from 'moment';
 import {
   DelayUnit,
@@ -9,10 +13,12 @@ import {
 import ConfigPanel from './ConfigPanel';
 import { SingleChoice as Interface } from './interface';
 import TokenInput from '@components/DirectedGraph/components/TokenInput';
-import { displayDuration } from '@components/DirectedGraph/utils';
+import { displayDuration, isRTE } from '@components/DirectedGraph/utils';
 import SideNote from '@components/DirectedGraph/components/SideNote';
 import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
 import { SingleChoice as Funcs } from './funcs';
+import { LuMapPin } from 'react-icons/lu';
+import parse from 'html-react-parser';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
@@ -159,6 +165,38 @@ const explain = ({
   );
   return p1;
 };
+const abstract = ({
+  checkpoint,
+  data,
+}: {
+  checkpoint: ICheckPoint | undefined;
+  data: any;
+}) => {
+  const { votingLocation } = checkpoint || {};
+  const threshold = data.max;
+  const token = data.token;
+  return threshold || isRTE(votingLocation) ? (
+    <>
+      {threshold ? (
+        <div className='flex text-ellipsis items-center px-2'>
+          <VerticalAlignTopOutlined className='mr-2' />
+          {/* {`Threshold ${threshold} ${token}`} */}
+          <div className='flex gap-1'>
+            <span>Threshold</span>
+            <NumberWithPercentageInput value={threshold} />
+            {token ? <TokenInput address={token} /> : 'votes'}
+          </div>
+        </div>
+      ) : null}
+      {isRTE(votingLocation) ? (
+        <div className='flex text-ellipsis items-center px-2'>
+          <LuMapPin className='mr-2' />
+          {parse(votingLocation || '')}
+        </div>
+      ) : null}
+    </>
+  ) : null;
+};
 
 const VoteMachine: IVoteMachine = {
   ConfigPanel: ConfigPanel,
@@ -171,6 +209,7 @@ const VoteMachine: IVoteMachine = {
   getInitialData: Funcs.getInitialData,
   explain,
   validate: Funcs.validate,
+  abstract,
 };
 
 export default VoteMachine;

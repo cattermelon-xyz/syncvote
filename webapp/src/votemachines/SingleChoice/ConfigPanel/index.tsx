@@ -215,7 +215,7 @@ export default (props: IVoteMachineConfigProps) => {
             <Button
               type='link'
               icon={<PlusOutlined />}
-              className='w-full flex items-center justify-start pl-0'
+              className='w-full flex items-center justify-start pl-0 my-2'
               onClick={() => setShowNewOptionDrawer(true)}
             >
               Add a new option & navigation

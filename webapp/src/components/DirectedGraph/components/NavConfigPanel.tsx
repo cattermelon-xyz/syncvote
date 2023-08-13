@@ -16,7 +16,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { ReactNode, useState } from 'react';
-import { displayDelayDuration } from '../utils';
+import { displayDelayDuration, isRTE } from '../utils';
 import parse from 'html-react-parser';
 import TimelockPanel from './TimelockPanel';
 import { DelayUnit } from '../interface';
@@ -138,7 +138,8 @@ const NavConfigPanel = ({
             className='w-6/12 flex pt-1 justify-between items-center'
           >
             <span className='text-gray-400 pl-6'>Navigate to</span>
-            <Popover content={parse(delayNote ? delayNote : 'No note')}>
+
+            <Popover content={isRTE(delayNote) ? parse(delayNote) : 'No note'}>
               <span
                 className='text-violet-400 flex items-center gap-1 cursor-pointer'
                 onClick={() => setShowEditDelay(true)}

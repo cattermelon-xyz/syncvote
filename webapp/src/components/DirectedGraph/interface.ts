@@ -80,6 +80,13 @@ export interface IVoteMachine {
   getLabel: (props: IVoteMachineGetLabelProps) => JSX.Element;
   getIcon: () => JSX.Element;
   getInitialData: () => any;
+  abstract: ({
+    checkpoint,
+    data,
+  }: {
+    checkpoint: ICheckPoint | undefined;
+    data: any;
+  }) => JSX.Element | null;
   explain: ({
     checkpoint,
     data,

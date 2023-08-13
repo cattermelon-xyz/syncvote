@@ -2,21 +2,12 @@ import {
   ClockCircleOutlined,
   SettingOutlined,
   TwitterOutlined,
-  VerticalAlignTopOutlined,
 } from '@ant-design/icons';
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 
 import parse from 'html-react-parser';
 import moment from 'moment';
-import {
-  FaLocationArrow,
-  FaLocationPin,
-  FaMapLocation,
-  FaMapPin,
-} from 'react-icons/fa6';
-import { GrLocationPin } from 'react-icons/gr';
-import { LuMapPin } from 'react-icons/lu';
 // TODO: how to register getIcon in 1 place?
 const getIcon = (provider: string, id: number | undefined) => {
   let rs = <></>;
@@ -44,17 +35,11 @@ const Node = memo(
     isConnectable?: boolean;
     id: string | undefined;
   }) => {
-    const description = data.raw?.description || '';
     const duration = data.raw?.duration * 1000 || 0;
     const selected = data.selected
       ? 'border-2 border-violet-500 border-dashed'
       : 'border border-slate-700 border-solid';
     const style = data.style;
-    const votingLocation = data.raw?.votingLocation || '';
-    let threshold = data.raw?.data?.max || 0;
-    threshold =
-      threshold > 0 && threshold < 1 ? threshold * 100 + '%' : threshold;
-    let token = data.raw?.data?.token || '';
     return (
       <>
         <Handle
@@ -129,23 +114,15 @@ const Node = memo(
             className={`p-2 font-bold`}
             style={style.title ? style.title : {}}
           >
-            {data.label ? parse(data.label) : 'untitled'}
+            {data.label
+              ? typeof data.label === 'string'
+                ? parse(data.label)
+                : data.label
+              : 'untitled'}
           </div>
-          {(votingLocation && votingLocation !== ' ') || threshold ? ( // TODO: voting condition
+          {data.abstract ? (
             <div style={style.content ? style.content : {}} className='py-2'>
-              {threshold ? (
-                <div className='flex text-ellipsis items-center px-2'>
-                  <VerticalAlignTopOutlined className='mr-2' />
-                  {/* {`Threshold ${threshold} ${token}`} */}
-                  {`Threshold ${threshold}`}
-                </div>
-              ) : null}
-              {votingLocation && votingLocation !== ' ' ? (
-                <div className='flex text-ellipsis items-center px-2'>
-                  <LuMapPin className='mr-2' />
-                  {parse(votingLocation)}
-                </div>
-              ) : null}
+              {data.abstract}
             </div>
           ) : null}
 
