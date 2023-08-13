@@ -1,22 +1,14 @@
-import Logo from '@assets/icons/svg-icons/Logo';
-import { L } from '@utils/locales/L';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 // import { sliceAddressToken } from '@utils/helpers';
 // import { AddressToken } from '@utils/mockData/addressToken';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
-import { supabase } from '@utils/supabaseClient';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
-import { Avatar, Button, Popover, Space } from 'antd';
-import Icon from '@components/Icon/Icon';
-import {
-  HomeOutlined,
-  BellOutlined,
-  SettingOutlined,
-  LogoutOutlined,
-} from '@ant-design/icons';
+import { Avatar, Button } from 'antd';
+import { HomeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
 
 type HeaderProps = {
   session: any;
@@ -40,11 +32,6 @@ function Header({ session }: HeaderProps) {
   const [currentOrg, setCurrentOrg] = useState(
     orgs.find((org: any) => org.id === orgId)
   );
-  const [openPopover, setOpenPopover] = useState(false);
-
-  const handleOpenChange = (newOpen: boolean) => {
-    setOpenPopover(newOpen);
-  };
 
   const handleClearStore = () => {};
 
@@ -66,38 +53,6 @@ function Header({ session }: HeaderProps) {
       currentPage = Pages.UNKNOWN;
       break;
   }
-
-  const contentPopOver = (
-    <div>
-      <div>
-        <Button
-          type='text'
-          icon={<SettingOutlined />}
-          onClick={() => {
-            setOpenPopover(false);
-            navigate(`/account/setting`);
-          }}
-        >
-          {L('accountSettings')}
-        </Button>
-      </div>
-      <div>
-        <Button
-          type='text'
-          icon={<LogoutOutlined />}
-          className='w-full flex items-center'
-          onClick={async () => {
-            dispatch(startLoading({}));
-            await supabase.auth.signOut();
-            dispatch(finishLoading({}));
-            navigate('/login');
-          }}
-        >
-          {L('logOut')}
-        </Button>
-      </div>
-    </div>
-  );
 
   return (
     <div
@@ -185,26 +140,7 @@ function Header({ session }: HeaderProps) {
             </span>
           </div>
         </div>
-        <Space className='flex w-w_3 items-center justify-end gap-3'>
-          <div className='flex rounded-full h-11 w-11 bg-gray-100 justify-center cursor-pointer'>
-            <BellOutlined style={{ fontSize: '24px' }} />
-          </div>
-          <Popover
-            placement='bottomRight'
-            content={contentPopOver}
-            trigger='click'
-            open={openPopover}
-            onOpenChange={handleOpenChange}
-          >
-            <div className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'>
-              <Icon size='medium' iconUrl={user?.avatar_url} />
-              <p className='text-text_2 text-[#252422] ml-2'>
-                {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
-                {user?.full_name}
-              </p>
-            </div>
-          </Popover>
-        </Space>
+        {user && <AvatarAndNoti user={user} isShowAccountSetting={true} />}
       </div>
     </div>
   );

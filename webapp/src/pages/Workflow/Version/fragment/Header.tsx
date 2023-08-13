@@ -32,6 +32,7 @@ import moment from 'moment';
 import VersionHistoryDialog from './VersionHistoryDialog';
 import ShareModal from './ShareModal';
 import { GraphViewMode } from '@types';
+import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
 
 type HeaderProps = {
   session: any;
@@ -325,25 +326,7 @@ function Header({
             </Popover>
           </Space>
           <Divider type='vertical' />
-          <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
-            <BellOutlined style={{ fontSize: '20px' }} />
-          </div>
-          <div
-            className='cursor-pointer flex items-center'
-            onClick={async () => {
-              dispatch(startLoading({}));
-              await supabase.auth.signOut();
-              dispatch(finishLoading({}));
-              navigate('/login');
-            }}
-            title={L('clickToLogout')}
-          >
-            <img
-              src={session?.user?.user_metadata?.avatar_url}
-              alt='user_avatar'
-              className='w-[36px] h-[36px] rounded-full inline-block mr-2'
-            />
-          </div>
+          <AvatarAndNoti user={session?.user} />
         </Space>
       </div>
     </>
