@@ -1,32 +1,20 @@
 import { ShareAltOutlined, TwitterOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import { Popover, Tag } from 'antd';
-import { getVoteMachine } from '@components/DirectedGraph';
 import {
   DelayUnit,
   ICheckPoint,
-  IParticipant,
-  IToken,
   IVoteMachine,
   IVoteMachineGetLabelProps,
 } from '../../types';
-import parse from 'html-react-parser';
-import {
-  getProgramAddress as gpa,
-  getName as gn,
-  deleteChildNode as dcn,
-  getType as gt,
-  getInitialData as gid,
-  validate as v,
-} from './funcs';
-import cf from './ConfigPanel';
-import { IData } from './interface';
+import ConfigPanel from './ConfigPanel';
+import { SingleChoice as Interface } from './interface';
 import TokenInput from '@components/DirectedGraph/components/TokenInput';
-import { displayDuration, isRTE } from '@components/DirectedGraph/utils';
+import { displayDuration } from '@components/DirectedGraph/utils';
 import SideNote from '@components/DirectedGraph/components/SideNote';
 import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
+import { SingleChoice as Funcs } from './funcs';
 
-export const getLabel = (props: IVoteMachineGetLabelProps) => {
+const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
   const data = source.data || {};
   const { triggers } = source;
@@ -62,32 +50,39 @@ export const getLabel = (props: IVoteMachineGetLabelProps) => {
 };
 // label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
 
-export const getIcon = () => {
+const getIcon = () => {
   return <ShareAltOutlined />;
 };
 
-export const explain = ({
+const explain = ({
   checkpoint,
   data,
 }: {
   checkpoint: ICheckPoint | undefined;
-  data: IData;
+  data: Interface.IData;
 }) => {
   if (!checkpoint) {
     return <></>;
   }
   const noOfOptions = checkpoint.children ? checkpoint.children.length : 0;
-  const resultDescription = checkpoint.data?.resultDescription || '';
-  const quorum = checkpoint.data?.quorum || 0;
-  const optionsDescription = checkpoint.data?.optionsDescription;
-  const renderOption = ({ data, index }: { data: IData; index: number }) => {
-    const { options, delays, delayUnits, delayNotes } = data;
+  const resultDescription = checkpoint.resultDescription || '';
+  const quorum = checkpoint.quorum || 0;
+  const optionsDescription = checkpoint.optionsDescription;
+  const renderOption = ({
+    data,
+    index,
+  }: {
+    data: Interface.IData;
+    index: number;
+  }) => {
+    const { options } = data;
+    const { delays, delayUnits, delayNotes } = checkpoint;
     const option = options[index];
     const delay = delays ? delays[index] : 0;
     const delayUnit = delayUnits ? delayUnits[index] : DelayUnit.MINUTE;
     const delayNote = delayNotes ? delayNotes[index] : '';
     return option ? (
-      <li key={index}>
+      <>
         <div>
           <span className='text-violet-500'>{option}</span>{' '}
           {delay ? (
@@ -102,7 +97,7 @@ export const explain = ({
         <div className='py-1'>
           <SideNote value={delayNote} />
         </div>
-      </li>
+      </>
     ) : null;
   };
   const p1 = (
@@ -117,9 +112,9 @@ export const explain = ({
             Voting options:{' '}
             <ul className='flex flex-col gap-1'>
               {data.options.map((option: string, index: number) => {
-                return <div key={index}>{renderOption({ data, index })}</div>;
+                return <li key={index}>{renderOption({ data, index })}</li>;
               })}
-              {data.includedAbstain ? (
+              {checkpoint.includedAbstain ? (
                 <li className='text-violet-500'>Abstain</li>
               ) : null}
             </ul>
@@ -166,16 +161,16 @@ export const explain = ({
 };
 
 const VoteMachine: IVoteMachine = {
-  ConfigPanel: cf,
-  getProgramAddress: gpa,
-  getName: gn,
-  deleteChildNode: dcn,
+  ConfigPanel: ConfigPanel,
+  getProgramAddress: Funcs.getProgramAddress,
+  getName: Funcs.getName,
+  deleteChildNode: Funcs.deleteChildNode,
   getLabel,
-  getType: gt,
+  getType: Funcs.getType,
   getIcon,
-  getInitialData: gid,
+  getInitialData: Funcs.getInitialData,
   explain,
-  validate: v,
+  validate: Funcs.validate,
 };
 
 export default VoteMachine;

@@ -35,6 +35,13 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
               children={selectedNode.children || []}
               allNodes={versionData.checkpoints}
               data={structuredClone(data)}
+              quorum={selectedNode.quorum}
+              includedAbstain={selectedNode.includedAbstain}
+              delays={selectedNode.delays}
+              delayUnits={selectedNode.delayUnits}
+              delayNotes={selectedNode.delayNotes}
+              resultDescription={selectedNode.resultDescription}
+              optionsDescription={selectedNode.optionsDescription}
             />
           }
         />

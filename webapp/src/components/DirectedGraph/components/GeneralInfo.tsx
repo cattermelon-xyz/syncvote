@@ -1,4 +1,3 @@
-import { IData } from '@votemachines/SingleChoiceRaceToMax/interface';
 import { ICheckPoint, IParticipant, IToken } from '../interface';
 import { Popover } from 'antd';
 import { displayDuration, isRTE } from '../utils';

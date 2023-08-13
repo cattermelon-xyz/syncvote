@@ -15,45 +15,58 @@ import {
   Popover,
 } from 'antd';
 import moment from 'moment';
-import { useState } from 'react';
-import { displayDelayDuration } from '@components/DirectedGraph/utils';
+import { ReactNode, useState } from 'react';
+import { displayDelayDuration } from '../utils';
 import parse from 'html-react-parser';
-import TextEditor from '@components/Editor/TextEditor';
-export const Option = ({
+import TimelockPanel from './TimelockPanel';
+import { DelayUnit } from '../interface';
+
+export interface INavPanelNode {
+  id: string;
+  title: string;
+}
+
+interface INavPanelProps {
+  index: number;
+  title: ReactNode;
+  currentNode: INavPanelNode;
+  navLabel: string;
+  possibleNodes: INavPanelNode[];
+  delay: number;
+  delayUnit: DelayUnit;
+  delayNote: string;
+
+  changeLabelHandler?: (value: any, index: number) => void;
+  changeDelayHandler: (value: any, index: number) => void;
+  replaceHandler: (newOptionData: any, index: number) => void;
+  deleteHandler?: (index: number) => void;
+}
+
+const NavConfigPanel = ({
   index,
+  title,
   currentNode,
-  option,
-  deleteOptionHandler,
-  changeOptionHandler,
-  editable = false,
-  possibleOptions,
-  replaceOption,
+  navLabel,
   delay,
   delayUnit,
   delayNote,
-}: {
-  index: number;
-  currentNode: any;
-  option: string;
-  deleteOptionHandler: (index: number) => void;
-  changeOptionHandler: (value: any, index: number) => void;
-  editable?: boolean;
-  possibleOptions: any[];
-  replaceOption: (newOptionData: any, index: number) => void;
-  delay: number;
-  delayUnit: 'year' | 'month' | 'week' | 'hour' | 'minute';
-  delayNote: string;
-}) => {
-  const [label, setLabel] = useState(option);
+  possibleNodes,
+
+  changeLabelHandler,
+  changeDelayHandler,
+  replaceHandler,
+  deleteHandler,
+}: INavPanelProps) => {
+  const [label, setLabel] = useState(navLabel);
   const [showEditDelay, setShowEditDelay] = useState(false);
   const [newDelay, setNewDelay] = useState(delay);
   const [newDelayUnit, setNewDelayUnit] = useState(
-    delayUnit ? delayUnit : 'minute'
+    delayUnit ? delayUnit : DelayUnit.MINUTE
   );
   const [newDelayNote, setNewDelayNote] = useState(delayNote ? delayNote : '');
   const reset = () => {
     setNewDelay(delay);
-    setNewDelayUnit(delayUnit ? delayUnit : 'minute');
+    setNewDelayUnit(delayUnit ? delayUnit : DelayUnit.MINUTE);
     setNewDelayNote(delayNote ? delayNote : '');
   };
   return (
@@ -67,42 +80,20 @@ export const Option = ({
         title='Set Timelock'
       >
         <Space direction='vertical' size='large' className='w-full'>
-          <div className='text-violet-500'>
-            {displayDelayDuration(moment.duration(newDelay, newDelayUnit))}
-          </div>
-          <Space.Compact className='w-full'>
-            <Input
-              value={newDelay}
-              defaultValue={delay}
-              type='number'
-              onChange={(e) => {
-                const num = parseInt(e.target.value) || 0;
-                if (num > 65535) {
-                  setNewDelay(65535);
-                } else {
-                  setNewDelay(num);
-                }
-              }}
-            />
-            <Select
-              value={newDelayUnit}
-              options={[
-                { value: 'year', label: 'Year' },
-                { value: 'month', label: 'Month' },
-                { value: 'day', label: 'Day' },
-                { value: 'hour', label: 'Hour' },
-                { value: 'minute', label: 'Minute' },
-              ]}
-              defaultValue={delayUnit ? delayUnit : 'minutes'}
-              onChange={(val: any) => {
-                setNewDelayUnit(val);
-              }}
-            />
-          </Space.Compact>
-          <TextEditor
-            value={newDelayNote}
-            setValue={(val: string) => {
-              setNewDelayNote(val);
+          <TimelockPanel
+            delay={newDelay}
+            delayUnit={newDelayUnit}
+            delayNote={newDelayNote}
+            setValue={(keyValue: any) => {
+              if (keyValue.hasOwnProperty('delay')) {
+                setNewDelay(keyValue.delay);
+              }
+              if (keyValue.hasOwnProperty('delayUnit')) {
+                setNewDelayUnit(keyValue.delayUnit);
+              }
+              if (keyValue.hasOwnProperty('delayNote')) {
+                setNewDelayNote(keyValue.delayNote);
+              }
             }}
           />
           <div className='flex justify-between items-center'>
@@ -112,9 +103,9 @@ export const Option = ({
             <Button
               icon={<SaveOutlined />}
               onClick={() => {
-                changeOptionHandler(
+                console.log('newDelayNote: ', newDelayNote);
+                changeDelayHandler(
                   {
-                    id: label,
                     delay: newDelay,
                     delayUnit: newDelayUnit,
                     delayNote: newDelayNote,
@@ -132,14 +123,15 @@ export const Option = ({
       <Space direction='vertical' className='w-full flex justify-between'>
         <div className='w-full flex justify-between'>
           <div className='w-6/12 flex pt-1 justify-between items-center'>
-            <span className='text-gray-400'>{`Option ${index + 1}`}</span>
-            <Button
-              type='link'
-              className='flex items-center text-violet-600'
-              icon={<DeleteOutlined />}
-              disabled={!editable}
-              onClick={() => deleteOptionHandler(index)}
-            />
+            <span className='text-gray-400'>{title}</span>
+            {deleteHandler ? (
+              <Button
+                type='link'
+                className='flex items-center text-violet-600'
+                icon={<DeleteOutlined />}
+                onClick={() => deleteHandler(index)}
+              />
+            ) : null}
           </div>
           <Space
             direction='horizontal'
@@ -162,29 +154,26 @@ export const Option = ({
         </div>
         <div className='w-full flex justify-between'>
           <div className='w-6/12 flex pt-0.25 justify-between items-center pr-2.5'>
-            <Input
-              className='w-full'
-              value={label}
-              onChange={(e: any) => {
-                setLabel(e.target.value);
-              }}
-              onBlur={() => {
-                changeOptionHandler(
-                  {
-                    id: label,
-                    delay: newDelay,
-                    delayUnit: newDelayUnit,
-                  },
-                  index
-                );
-              }}
-            />
+            {changeLabelHandler ? (
+              <Input
+                className='w-full'
+                value={label}
+                onChange={(e: any) => {
+                  setLabel(e.target.value);
+                }}
+                onBlur={() => {
+                  changeLabelHandler(label, index);
+                }}
+              />
+            ) : (
+              label
+            )}
           </div>
           <div className='w-6/12 flex pt-0.25 justify-between items-center gap-2'>
             <ArrowRightOutlined />
             <Select
               value={currentNode?.title || currentNode?.id}
-              options={possibleOptions?.map((p: any) => {
+              options={possibleNodes?.map((p: any) => {
                 return {
                   value: p.id,
                   label: p.title ? p.title : p.id,
@@ -192,12 +181,10 @@ export const Option = ({
               })}
               className='w-full'
               onChange={(value) => {
-                replaceOption(
+                replaceHandler(
                   {
                     id: value,
                     title: label,
-                    delay: newDelay,
-                    delayUnit: newDelayUnit,
                   },
                   index
                 );
@@ -209,3 +196,5 @@ export const Option = ({
     </>
   );
 };
+
+export default NavConfigPanel;

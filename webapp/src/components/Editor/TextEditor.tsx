@@ -34,6 +34,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   readOnly = false,
 }) => {
   return (
+    // TODO: onBlur event do not fire when click on button outside of this component, might lead to data loss
     <ReactQuill
       onBlur={onBlur}
       theme='snow'

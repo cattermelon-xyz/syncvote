@@ -213,12 +213,14 @@ const TokenInput = ({
         onChange={(e) => setAddress(`${chain}.${tokenName}.${e.target.value}`)}
         disabled={!editable}
         suffix={
-          <span
-            onClick={() => window.open(explorer, '_blank')}
-            className='user-select-none h-5'
-          >
-            <TbExternalLink className='text-violet-500 w-5 h-5 cursor-pointer' />
-          </span>
+          explorer ? (
+            <span
+              onClick={() => window.open(explorer, '_blank')}
+              className='user-select-none h-5'
+            >
+              <TbExternalLink className='text-violet-500 w-5 h-5 cursor-pointer' />
+            </span>
+          ) : null
         }
       />
     </Space.Compact>

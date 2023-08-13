@@ -16,6 +16,7 @@ import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
 import { GraphViewMode } from '../interface';
 import CollapsiblePanel from '../components/CollapsiblePanel';
 import GeneralInfo from '../components/GeneralInfo';
+import { isRTE } from '../utils';
 
 const ContextTab = () => {
   const {
@@ -123,9 +124,11 @@ const ContextTab = () => {
         <></>
       )}
       <Space direction='vertical' size='middle' className='w-full'></Space>
-      <CollapsiblePanel title='Note' collapsable={false}>
-        {parse(selectedNode?.note || 'Not added')}
-      </CollapsiblePanel>
+      {isRTE(selectedNode?.note) ? (
+        <CollapsiblePanel title='Note' collapsable={false}>
+          {parse(selectedNode?.note || 'Not added')}
+        </CollapsiblePanel>
+      ) : null}
       {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
         <Button
           type='default'

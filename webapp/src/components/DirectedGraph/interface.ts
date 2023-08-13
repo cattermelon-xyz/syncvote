@@ -15,6 +15,13 @@ export interface ICheckPoint {
   participationDescription?: string;
   proposerDescription?: string;
   note?: string;
+  quorum?: number;
+  includedAbstain?: boolean;
+  delays?: number[];
+  delayUnits?: DelayUnit[];
+  delayNotes?: string[];
+  resultDescription?: string;
+  optionsDescription?: string;
 }
 
 // TODO: add version
@@ -38,12 +45,10 @@ export enum GraphViewMode {
 }
 
 // TODO: do we need this interface or the ICheckPoint interface is sufficient?
-export interface IVoteMachineConfigProps {
+export interface IVoteMachineConfigProps extends ICheckPoint {
   viewMode: GraphViewMode;
   currentNodeId?: string;
   allNodes: any[];
-  children: string[];
-  data: any;
   onChange: (data: any) => void;
   /**
    * Solana Address

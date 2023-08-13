@@ -71,6 +71,30 @@ export const changeVersion = ({
     newData.checkpoints[index].proposerDescription =
       changedCheckPointData.proposerDescription;
   }
+  if (changedCheckPointData.quorum) {
+    newData.checkpoints[index].quorum = changedCheckPointData.quorum;
+  }
+  if (changedCheckPointData.delays) {
+    newData.checkpoints[index].delays = changedCheckPointData.delays;
+  }
+  if (changedCheckPointData.delayUnits) {
+    newData.checkpoints[index].delayUnits = changedCheckPointData.delayUnits;
+  }
+  if (changedCheckPointData.delayNotes) {
+    newData.checkpoints[index].delayNotes = changedCheckPointData.delayNotes;
+  }
+  if (changedCheckPointData.includedAbstain) {
+    newData.checkpoints[index].includedAbstain =
+      changedCheckPointData.includedAbstain;
+  }
+  if (changedCheckPointData.resultDescription) {
+    newData.checkpoints[index].resultDescription =
+      changedCheckPointData.resultDescription;
+  }
+  if (changedCheckPointData.optionsDescription) {
+    newData.checkpoints[index].optionsDescription =
+      changedCheckPointData.optionsDescription;
+  }
   return newData;
 };
 
