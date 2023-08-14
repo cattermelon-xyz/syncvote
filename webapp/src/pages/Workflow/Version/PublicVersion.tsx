@@ -178,7 +178,7 @@ export const PublicVersion = () => {
                     }}
                   />
                 </Space>
-                <div className='p-5'>{parse(worflowInfo.desc)}</div>
+                {/* <div className='p-5'>{parse(worflowInfo?.desc)}</div> */}
               </Sider>
 
               <Sider
