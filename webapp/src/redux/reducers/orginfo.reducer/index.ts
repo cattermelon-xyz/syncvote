@@ -18,6 +18,7 @@ const initialState: {
     avatar_url: '',
     about_me: '',
     role: '',
+    confirm_email_at: '',
   },
 };
 
@@ -126,7 +127,7 @@ const orgInfoSlice = createSlice({
 
       if (orgIndex !== -1) {
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
-          (wf: any) => (wf.id === workflow.id)
+          (wf: any) => wf.id === workflow.id
         );
 
         if (worfklowIndex !== -1) {
