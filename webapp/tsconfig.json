@@ -28,7 +28,7 @@
     },
     "types": ["node"]
   },
-  "include": ["src", "types/@ckeditor", "deprecated_src/pages/Authentication/creator.tsx"],
+  "include": ["src", "types/@ckeditor", "deprecated_src/pages/Authentication/creator.tsx", "checkImports.cjs"],
   "references": [
     {
       "path": "./tsconfig.node.json"
