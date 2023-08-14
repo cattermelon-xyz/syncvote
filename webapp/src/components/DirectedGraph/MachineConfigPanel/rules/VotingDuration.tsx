@@ -3,7 +3,7 @@ import { GraphPanelContext } from '@components/DirectedGraph/context';
 import { Space, Input, Button, Modal } from 'antd';
 import moment from 'moment';
 import { useContext } from 'react';
-import CollapsiblePanel from '../fragments/CollapsiblePanel';
+import CollapsiblePanel from '../../components/CollapsiblePanel';
 
 const VotingDuration = () => {
   const { data, onChange, viewMode, selectedNodeId } =

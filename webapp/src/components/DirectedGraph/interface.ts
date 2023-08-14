@@ -12,6 +12,16 @@ export interface ICheckPoint {
   locked?: any;
   triggers?: any[];
   participation?: IParticipant;
+  participationDescription?: string;
+  proposerDescription?: string;
+  note?: string;
+  quorum?: number;
+  includedAbstain?: boolean;
+  delays?: number[];
+  delayUnits?: DelayUnit[];
+  delayNotes?: string[];
+  resultDescription?: string;
+  optionsDescription?: string;
 }
 
 // TODO: add version
@@ -35,12 +45,10 @@ export enum GraphViewMode {
 }
 
 // TODO: do we need this interface or the ICheckPoint interface is sufficient?
-export interface IVoteMachineConfigProps {
+export interface IVoteMachineConfigProps extends ICheckPoint {
   viewMode: GraphViewMode;
   currentNodeId?: string;
   allNodes: any[];
-  children: string[];
-  data: any;
   onChange: (data: any) => void;
   /**
    * Solana Address
@@ -72,6 +80,13 @@ export interface IVoteMachine {
   getLabel: (props: IVoteMachineGetLabelProps) => JSX.Element;
   getIcon: () => JSX.Element;
   getInitialData: () => any;
+  abstract: ({
+    checkpoint,
+    data,
+  }: {
+    checkpoint: ICheckPoint | undefined;
+    data: any;
+  }) => JSX.Element | null;
   explain: ({
     checkpoint,
     data,
@@ -144,8 +159,6 @@ export interface IGraph {
   navPanel?: JSX.Element;
   web2Integrations?: any[];
   shouldExportImage?: boolean;
-  shouldUploadImage?: boolean;
-  setUploadImage?: (value: boolean) => void;
   setExportImage?: (value: boolean) => void;
   onNodeClick?: (event: any, data: any) => void;
   onEdgeClick?: (event: any, data: any) => void;
@@ -173,4 +186,13 @@ export interface IConfigPanel {
   onDelete: (ckpId: string) => void;
   onClose: () => void;
   onChangeLayout: (data: IWorkflowVersionLayout) => void;
+}
+
+export enum DelayUnit {
+  MINUTE = 'minute',
+  HOUR = 'hour',
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
 }
