@@ -10,7 +10,7 @@ export const Markers = [
       color: '#252422',
     },
     path: {
-      stroke: '#E0E0E0',
+      stroke: '#D7D7D7',
       strokeWidth: 2,
     },
     labelStyle: {
@@ -30,7 +30,7 @@ export const Markers = [
       color: '#252422',
     },
     path: {
-      stroke: '#FAB9B5',
+      stroke: '#F0B2AE',
       strokeWidth: 2,
     },
     labelStyle: {
@@ -49,7 +49,7 @@ export const Markers = [
       color: '#252422',
     },
     path: {
-      stroke: '#FAC78B',
+      stroke: '#F0BF86',
       strokeWidth: 2,
     },
     labelStyle: {
@@ -68,7 +68,7 @@ export const Markers = [
       color: '#252422',
     },
     path: {
-      stroke: '#FCE493',
+      stroke: '#F2DB8D',
       strokeWidth: 2,
     },
     labelStyle: {

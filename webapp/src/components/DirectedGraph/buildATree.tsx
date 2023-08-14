@@ -58,7 +58,7 @@ function calcAngle(cx: number, cy: number, ex: number, ey: number) {
   return theta;
 }
 
-const SELECTED_COLOR = '#caf0f8';
+const SELECTED_COLOR = '#5D23BB';
 
 const SELECTED_NODE_STYLE = {
   backgroundColor: SELECTED_COLOR,
@@ -66,21 +66,25 @@ const SELECTED_NODE_STYLE = {
 
 const SELECTED_EDGE_STYLE = {
   stroke: SELECTED_COLOR,
-  strokeWidth: 5,
+  strokeWidth: 2,
 };
 
 const buildEdge = ({
+  selectedEdgeId,
   source,
   target,
   label,
   style = {},
   labelStyle = {},
+  animated = false,
 }: {
+  selectedEdgeId: string | undefined;
   source: any;
   target: any;
   label: JSX.Element;
   style?: any;
   labelStyle?: any;
+  animated: boolean;
 }) => {
   const sourcePos = getCenterPos({
     node: source,
@@ -129,11 +133,13 @@ const buildEdge = ({
     targetHandle,
     style,
     type,
+    animated: selectedEdgeId === `${source.id}-${target.id}` ? true : animated,
     markerEnd: {
       type: MarkerType.Arrow,
       color: style.stroke || '#000',
     },
     labelStyle,
+    data: source.data.raw,
   };
 };
 
@@ -141,10 +147,12 @@ export const buildATree = ({
   data,
   selectedNodeId,
   selectedLayoutId,
+  selectedEdgeId,
 }: {
   data: IWorkflowVersionData;
   selectedNodeId: string | undefined;
   selectedLayoutId: string | undefined;
+  selectedEdgeId: string | undefined;
 }) => {
   const checkpoints: Array<any> = [];
   let newData = { ...data };
@@ -209,13 +217,15 @@ export const buildATree = ({
         );
         let edgeStyle = { ...edgeFromLayout?.style };
         let edgeLableStyle = { ...edgeFromLayout?.labelStyle };
-
+        let animated = false;
         if (selectedNodeId && sourceId === selectedNodeId) {
           edgeStyle = SELECTED_EDGE_STYLE;
+          animated = true;
         } else if (node.edgeStyle) {
           edgeStyle = node.edgeStyle;
         }
         const newEdge = buildEdge({
+          selectedEdgeId,
           source: nodes.find((_node) => _node.id === sourceId),
           target: nodes.find((_node) => _node.id === childId),
           label: buildLabel({
@@ -225,6 +235,7 @@ export const buildATree = ({
           }),
           style: edgeStyle,
           labelStyle: edgeLableStyle,
+          animated,
         });
         // return the newEdge
         edges.push(newEdge);
@@ -247,15 +258,27 @@ export const buildATree = ({
       );
       const position = checkpointFromLayout?.position || checkpoint.position;
       const style = { ...nodeStyle, ...checkpointFromLayout?.style };
+      const vm = getVoteMachine(checkpoint.vote_machine_type);
+      const vmIcon = vm?.getIcon();
+      let label = checkpoint.title ? checkpoint.title : checkpoint.id;
+      if (vmIcon) {
+        label = (
+          <div className='flex gap-1'>
+            {vmIcon}
+            {label}
+          </div>
+        );
+      }
       nodes.push({
         id: checkpoint.id,
         data: {
-          label: checkpoint.title ? checkpoint.title : checkpoint.id,
+          label: label,
           style,
           isEnd: checkpoint.isEnd,
           raw: checkpoint,
           triggers: checkpoint.triggers,
           selected: checkpoint.id === selectedNodeId,
+          abstract: vm?.abstract({ checkpoint, data: checkpoint.data }),
         },
         x: checkpoint.x,
         y: checkpoint.y,

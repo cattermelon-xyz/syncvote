@@ -8,14 +8,15 @@ import {
 } from '@ant-design/icons';
 import { validateWorkflow, validateMission } from '@middleware/logic';
 import parse from 'html-react-parser';
-import TextEditor from '@components/Editor/TextEditor';
 import { getVoteMachine } from '../voteMachine';
 import { Markers } from '../markers';
 import { useContext } from 'react';
 import { GraphPanelContext } from '../context';
 import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
 import { GraphViewMode } from '../interface';
-import CollapsiblePanel from './fragments/CollapsiblePanel';
+import CollapsiblePanel from '../components/CollapsiblePanel';
+import GeneralInfo from '../components/GeneralInfo';
+import { isRTE } from '../utils';
 
 const ContextTab = () => {
   const {
@@ -78,7 +79,10 @@ const ContextTab = () => {
     return rs;
   };
   return (
-    <Space direction='vertical' size='large' className='w-full'>
+    <Space direction='vertical' size='large' className='w-full pb-4'>
+      <CollapsiblePanel title='Purpose & Description' collapsable={false}>
+        {parse(selectedNode?.description || 'Not added')}
+      </CollapsiblePanel>
       {/* <Space.Compact className="w-full">
         <Input
           value={selectedNode?.title ? selectedNode.title : selectedNode.id}
@@ -103,10 +107,16 @@ const ContextTab = () => {
       {!selectedNode?.isEnd && selectedNode?.vote_machine_type ? (
         <>
           <CollapsiblePanel title='Rules & conditions' collapsable={false}>
-            <Space direction='vertical' size='small'>
+            <Space direction='vertical' size='small' className='w-full'>
+              <GeneralInfo checkpoint={selectedNode} />
+              <hr className='my-2' style={{ borderTop: '1px solid #E3E3E2' }} />
               {summary}
-              {renderValidation(validation)}
-              {renderValidation(vmValidation)}
+              {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
+                <>
+                  {renderValidation(validation)}
+                  {renderValidation(vmValidation)}
+                </>
+              ) : null}
             </Space>
           </CollapsiblePanel>
         </>
@@ -114,9 +124,11 @@ const ContextTab = () => {
         <></>
       )}
       <Space direction='vertical' size='middle' className='w-full'></Space>
-      <CollapsiblePanel title='Note' collapsable={false}>
-        {parse(selectedNode?.description || 'Not added')}
-      </CollapsiblePanel>
+      {isRTE(selectedNode?.note) ? (
+        <CollapsiblePanel title='Note' collapsable={false}>
+          {parse(selectedNode?.note || 'Not added')}
+        </CollapsiblePanel>
+      ) : null}
       {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
         <Button
           type='default'

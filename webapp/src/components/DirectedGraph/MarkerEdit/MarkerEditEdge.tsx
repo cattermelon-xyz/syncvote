@@ -2,9 +2,11 @@ import { Input, Popover, Space } from 'antd';
 import { Markers } from '../markers';
 import { GraphContext } from '../context';
 import { useContext } from 'react';
+import { GraphViewMode } from '../interface';
 
 const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
-  const { data, selectedLayoutId, onChangeLayout } = useContext(GraphContext);
+  const { data, selectedLayoutId, onChangeLayout, viewMode } =
+    useContext(GraphContext);
   const selectedLayout = data.cosmetic?.layouts?.find(
     (l: any) => l?.id === selectedLayoutId
   );
@@ -32,6 +34,9 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
                       backgroundColor: marker.title.backgroundColor,
                     }}
                     onClick={() => {
+                      if (viewMode === GraphViewMode.VIEW_ONLY) {
+                        return;
+                      }
                       const tmp = structuredClone(selectedLayout);
                       if (tmp) {
                         const edges = tmp?.edges;
@@ -49,8 +54,7 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
                           tmp.markers.push(newMarker);
                         } else {
                           const idx = markers.findIndex(
-                            (marker: any) =>
-                              marker.title.backgroundColor === newMarker.color
+                            (marker: any) => marker.color === newMarker.color
                           );
                           if (idx === -1) {
                             markers.push(newMarker);
@@ -117,6 +121,11 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
           );
           if (idx !== -1) {
             markers[idx].title = label;
+          } else {
+            markers.push({
+              color: style?.title?.backgroundColor,
+              title: label,
+            });
           }
           onChangeLayout
             ? onChangeLayout({
@@ -126,7 +135,9 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
             : null;
         }
       }}
-      disabled={style?.stroke === '#fff'}
+      disabled={
+        style?.stroke === '#fff' || viewMode === GraphViewMode.VIEW_ONLY
+      }
     />
   );
 };

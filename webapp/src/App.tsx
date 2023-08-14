@@ -8,8 +8,10 @@ import GlobalLoading from '@components/GlobalLoading/GlobalLoading';
 import { registerVoteMachine } from '@components/DirectedGraph';
 import { setUser } from '@redux/reducers/orginfo.reducer';
 import { useLocation } from 'react-router-dom';
-import SingleChoiceRaceToMax from '@votemachines/SingleChoiceRaceToMax';
-import MultipleChoiceRaceToMax from '@votemachines/MultipleChoiceRaceToMax';
+import SingleChoice from '@votemachines/SingleChoice';
+import Polling from '@votemachines/Polling';
+import Veto from '@votemachines/Veto';
+import UpVote from '@votemachines/UpVote';
 import {
   queryOrgs,
   queryPresetBanner,
@@ -20,7 +22,7 @@ import { shouldUseCachedData } from '@utils/helpers';
 import { AuthContext } from '@layout/context/AuthContext';
 
 function App({
-  requiredLogin = false,  
+  requiredLogin = false,
   layout,
 }: {
   requiredLogin?: boolean;
@@ -68,7 +70,7 @@ function App({
           userId: user.id,
           onSuccess: () => {},
           dispatch,
-        })
+        });
         // console.log('user', user);
         // dispatch(
         //   setUser({
@@ -85,8 +87,10 @@ function App({
     supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
       await handleSession(_session);
     });
-    registerVoteMachine(SingleChoiceRaceToMax);
-    registerVoteMachine(MultipleChoiceRaceToMax);
+    registerVoteMachine(SingleChoice);
+    registerVoteMachine(Polling);
+    registerVoteMachine(Veto);
+    registerVoteMachine(UpVote);
   }, []);
   const Layout: any = layout;
   return (

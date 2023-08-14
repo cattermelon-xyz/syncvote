@@ -1,6 +1,9 @@
 import {
   BranchesOutlined,
+  CloseCircleOutlined,
   DownloadOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
   SaveOutlined,
 } from '@ant-design/icons';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
@@ -13,14 +16,15 @@ import {
 } from '@components/DirectedGraph';
 import Icon from '@components/Icon/Icon';
 import {
+  canUserEditWorkflowVersion,
   queryWeb2Integration,
   queryWorkflow,
   upsertWorkflowVersion,
 } from '@middleware/data';
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
-import { Button, Drawer, Modal, Skeleton, Space } from 'antd';
-import { useEffect, useState } from 'react';
+import { Button, Drawer, Modal, Skeleton, Space, Typography } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditInfo from './fragment/EditInfo';
@@ -31,37 +35,8 @@ import {
 } from '@types';
 import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
-import EditWorkflow from '../BluePrint/fragment/EditWorkflow';
-
-function deepEqual(object1: any, object2: any): boolean {
-  if (object1 === object2) {
-    return true;
-  }
-
-  if (
-    typeof object1 !== 'object' ||
-    object1 === null ||
-    typeof object2 !== 'object' ||
-    object2 === null
-  ) {
-    return false;
-  }
-
-  const keys1 = Object.keys(object1);
-  const keys2 = Object.keys(object2);
-
-  if (keys1.length !== keys2.length) {
-    return false;
-  }
-
-  for (let key of keys1) {
-    if (!keys2.includes(key) || !deepEqual(object1[key], object2[key])) {
-      return false;
-    }
-  }
-
-  return true;
-}
+import NotFound404 from '@pages/NotFound404';
+import Debug from '@components/Debug/Debug';
 
 const extractVersion = ({
   workflows,
@@ -78,11 +53,13 @@ const extractVersion = ({
     extractedVersion = structuredClone(
       wf.workflow_version.find((wv: any) => wv.id === versionId)
     );
+    // console.log('extractedVersion', extractedVersion);
+    if (!extractedVersion) return {};
   } else {
     return {};
   }
-  const cosmetic = extractedVersion.data.cosmetic;
-  if (typeof extractedVersion.data === 'string') {
+  const cosmetic = extractedVersion?.data?.cosmetic;
+  if (typeof extractedVersion?.data === 'string') {
     extractedVersion.data = emptyStage;
   }
   if (!cosmetic) {
@@ -107,6 +84,8 @@ const extractVersion = ({
 
 export const EditVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isDataFetchedFromServer, setIsDataFetchedFromServer] = useState(false);
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
   const versionId = extractIdFromIdString(versionIdString);
@@ -119,7 +98,6 @@ export const EditVersion = () => {
     workflowId,
     versionId,
   });
-
   const { web2Integrations } = useSelector((state: any) => state.integration);
   const [version, setVersion] = useState<any>(extractedVersion);
   const [web2IntegrationsState, setWeb2IntegrationsState] =
@@ -132,7 +110,6 @@ export const EditVersion = () => {
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
   );
-  const [uploadImage, setUploadImage] = useState(false);
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
@@ -144,46 +121,138 @@ export const EditVersion = () => {
       versionId,
     });
     setVersion(extractedVersion);
-
-    if (deepEqual(version.data, emptyStage)) {
-      
-      setUploadImage(true);
-    }
-
     setSelectedLayoutId(
       extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal || 'default'
     );
     setDataHasChanged(false);
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
+    return extractedVersion.data ? true : false;
+  };
+  // const autoSaveWorker: Worker = useMemo(
+  //   () => new Worker(new URL('/workers/AutoSave.ts', import.meta.url)),
+  //   []
+  // );
+  // autoSaveWorker.onmessage = (e) => {
+  //   if (dataHasChanged) {
+  //     handleSave('data');
+  //     console.log('try auto save');
+  //     autoSaveWorker.postMessage(null);
+  //   }
+  // };
+  // useEffect(() => {
+  //   autoSaveWorker.postMessage(null);
+  // }, [dataHasChanged]);
+  const fetchDataFromServer = () => {
+    setIsDataFetchedFromServer(true);
+    setIsLoadingData(true);
+    queryWeb2Integration({
+      orgId,
+      dispatch,
+      onLoad: (data: any) => {
+        setWeb2IntegrationsState(data);
+      },
+    });
+    queryWorkflow({
+      orgId,
+      dispatch,
+      onLoad: (wfList: any) => {
+        extractWorkflowFromList(wfList);
+        setIsLoadingData(false);
+      },
+      onError: (error: any) => {
+        Modal.error({
+          title: 'Error',
+          content: error.message,
+        });
+        setIsLoadingData(false);
+      },
+    });
   };
   useEffect(() => {
     if (!shouldUseCachedData(lastFetch)) {
-      queryWeb2Integration({
-        orgId,
-        dispatch,
-        onLoad: (data: any) => {
-          setWeb2IntegrationsState(data);
-        },
-      });
-      queryWorkflow({
-        orgId,
-        dispatch,
-        onLoad: (wfList: any) => {
-          extractWorkflowFromList(wfList);
-        },
-      });
+      fetchDataFromServer();
     } else {
-      extractWorkflowFromList(workflows);
+      const isDataInRedux = extractWorkflowFromList(workflows);
+      if (!isDataInRedux && isDataFetchedFromServer === false) {
+        fetchDataFromServer();
+      }
       setWeb2IntegrationsState(web2Integrations);
     }
+    canUserEditWorkflowVersion({
+      workflowVersionId: versionId,
+      onResult: (canEdit: boolean) => {
+        if (!canEdit) {
+          setViewMode(GraphViewMode.VIEW_ONLY);
+        }
+      },
+    });
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
+  useEffect(() => {
+    const handleTabClose = (event: any) => {
+      event.preventDefault();
+      return (event.returnValue = 'Are you sure you want to exit?');
+    };
+    window.addEventListener('beforeunload', handleTabClose);
+    return () => {
+      window.removeEventListener('beforeunload', handleTabClose);
+    };
+  }, [workflows]);
+  let timerHandler: any = undefined;
+  const [autoSaveStatus, setAutoSaveStatus] = useState('');
+  // useEffect(() => {
+  //   if (
+  //     dataHasChanged &&
+  //     isLoadingData === false &&
+  //     lastSaved === -1 &&
+  //     version.data
+  //   ) {
+  //     // this is the first time data is loaded
+  //     setLastSaved(Date.now());
+  //     setAutoSaveStatus('first time, lastSaved is set');
+  //     return;
+  //   }
+  //   if (
+  //     dataHasChanged &&
+  //     isLoadingData === false &&
+  //     lastSaved !== -1 &&
+  //     version.data
+  //   ) {
+  //     const now = Date.now();
+  //     if (now - lastSaved > 10000) {
+  //       // let' save data to server
+  //       // TODO: this data is not the latest data, it's the data when the timer is set
+  //       handleSave('data');
+  //       setAutoSaveStatus('auto save');
+  //       // setDataHasChanged(false);
+  //     } else {
+  //       // if there is a timer then do nothing
+  //       if (timerHandler !== undefined) {
+  //         return;
+  //       } else {
+  //         // else, let's set a timer
+  //         setAutoSaveStatus(
+  //           'a timer is set to 10s to save. Tick tock tick tock'
+  //         );
+  //         timerHandler = setTimeout(() => {
+  //           // TODO: this data is not the latest data, it's the data when the timer is set
+  //           handleSave('data');
+  //           // setDataHasChanged(false);
+  //           // setLastSaved(Date.now());
+  //           clearTimeout(timerHandler);
+  //           timerHandler = undefined;
+  //           setAutoSaveStatus('saved & clear timeout');
+  //         }, 10000 - (now - lastSaved));
+  //       }
+  //     }
+  //     return;
+  //   }
+  // }, [dataHasChanged]);
 
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
     changedData?: any | undefined
   ) => {
-    setUploadImage(true);
     const versionToSave = changedData || version;
     await upsertWorkflowVersion({
       dispatch,
@@ -364,11 +433,26 @@ export const EditVersion = () => {
       y: (-viewport.y + 250) / viewport.zoom,
     });
   };
+  const markers =
+    version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
+      ?.markers || [];
+  const [showColorLegend, setShowColorLegend] = useState(true);
   return (
     <>
       <AuthContext.Consumer>
         {({ session }) => (
           <div className='w-full bg-slate-100 h-screen'>
+            <Debug>
+              <div>
+                {viewMode}-{GraphViewMode.VIEW_ONLY}
+              </div>
+              <div className='block'>
+                {version ? 'version is TRUE' : 'version is FALSE'}
+              </div>
+              <div className='block'>
+                {autoSaveStatus ? autoSaveStatus : ''}
+              </div>
+            </Debug>
             <Header
               session={session}
               workflow={workflow}
@@ -384,17 +468,146 @@ export const EditVersion = () => {
               style={{ height: 'calc(100% - 80px)' }}
             >
               {versionId && !version?.data ? (
-                <div className='w-full h-full'>
-                  <Skeleton className='p-16' />
-                </div>
+                isLoadingData === true ? (
+                  <div className='w-full h-full'>
+                    <Skeleton className='p-16' />
+                  </div>
+                ) : workflow ? (
+                  <div>
+                    <NotFound404
+                      title='Permission denied'
+                      message={
+                        <div className='w-full text-center'>
+                          <p>
+                            Sorry, you don not have permission to access to this
+                            workflow.
+                          </p>
+                          <p>
+                            Ask the owner to publish this workflow or add you as
+                            a workspace editor.
+                          </p>
+                        </div>
+                      }
+                    />
+                  </div>
+                ) : (
+                  <NotFound404 />
+                )
+              ) : viewMode === GraphViewMode.VIEW_ONLY ? (
+                <NotFound404
+                  title='Permission denied'
+                  message={
+                    <div className='w-full text-center'>
+                      <p>
+                        Sorry, you don not have permission to{' '}
+                        <span className='text-violet-500'>EDIT</span> to this
+                        workflow.
+                      </p>
+                      <div>Click here to open the view mode</div>
+                    </div>
+                  }
+                  cta={
+                    <Button
+                      type='primary'
+                      onClick={() =>
+                        navigate(
+                          `/public/${orgIdString}/${workflowIdString}/${versionIdString}`
+                        )
+                      }
+                    >
+                      Open in View
+                    </Button>
+                  }
+                />
               ) : (
                 <div className='w-full h-full'>
                   <DirectedGraph
-                    shouldUploadImage={uploadImage}
-                    setUploadImage={setUploadImage}
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
-                    navPanel={<></>}
+                    navPanel={
+                      <Space direction='vertical'>
+                        <div
+                          className='text-gray-400 font-bold flex items-center gap-2'
+                          style={{ marginBottom: '0px' }}
+                        >
+                          <div>Color legend</div>
+                          <div
+                            className='hover:text-violet-500 cursor-pointer'
+                            onClick={() => setShowColorLegend(!showColorLegend)}
+                          >
+                            {showColorLegend ? (
+                              <EyeOutlined />
+                            ) : (
+                              <EyeInvisibleOutlined />
+                            )}
+                          </div>
+                        </div>
+                        {showColorLegend &&
+                          markers.map((marker: any) => {
+                            return (
+                              <div
+                                className='flex gap-2 items-center'
+                                key={marker.color}
+                              >
+                                <div
+                                  className='w-[16px] h-[16px]'
+                                  style={{ backgroundColor: marker.color }}
+                                ></div>
+                                <Typography.Paragraph
+                                  editable={{
+                                    onChange: (val) => {
+                                      markers[markers.indexOf(marker)].title =
+                                        val;
+                                      const selectedLayout =
+                                        version?.data?.cosmetic?.layouts.find(
+                                          (l: any) => l.id === selectedLayoutId
+                                        );
+                                      selectedLayout.markers = markers;
+                                      const cosmetic = changeCosmetic(
+                                        version?.data.cosmetic,
+                                        {
+                                          layouts: [selectedLayout],
+                                        }
+                                      );
+                                      setVersion({
+                                        ...version,
+                                        data: { ...version.data, cosmetic },
+                                      });
+                                      setDataHasChanged(true);
+                                    },
+                                  }}
+                                  style={{ marginBottom: '0px' }}
+                                >
+                                  {marker.title}
+                                </Typography.Paragraph>
+
+                                <CloseCircleOutlined
+                                  className='hover:text-red-500'
+                                  onClick={() => {
+                                    markers.splice(markers.indexOf(marker), 1);
+                                    const selectedLayout =
+                                      version?.data?.cosmetic?.layouts.find(
+                                        (l: any) => l.id === selectedLayoutId
+                                      );
+                                    selectedLayout.markers = markers;
+                                    const cosmetic = changeCosmetic(
+                                      version?.data.cosmetic,
+                                      {
+                                        layouts: [selectedLayout],
+                                      }
+                                    );
+                                    setVersion({
+                                      ...version,
+                                      data: { ...version.data, cosmetic },
+                                    });
+                                    setDataHasChanged(true);
+                                  }}
+                                />
+                              </div>
+                            );
+                          })}
+                      </Space>
+                    }
                     viewMode={viewMode}
                     data={version?.data || emptyStage}
                     selectedNodeId={selectedNodeId}
