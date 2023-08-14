@@ -37,9 +37,9 @@ export namespace UpVote {
   export const getLabel = (props: IVoteMachineGetLabelProps) => {
     const { source, target } = props;
     return source?.data.pass === target?.id ? (
-      <span>Passed</span>
+      <span>Pass</span>
     ) : (
-      <span>Failed to reach unanimous</span>
+      <span>Fail</span>
     );
   };
 

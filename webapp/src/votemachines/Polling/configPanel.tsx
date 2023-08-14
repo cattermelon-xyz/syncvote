@@ -1,7 +1,16 @@
 import { IVoteMachineConfigProps } from '@types';
 import { useState } from 'react';
 import { Polling as Interface } from './interface';
-import { Button, Drawer, Input, Select, Space, Tag } from 'antd';
+import {
+  Button,
+  Drawer,
+  Input,
+  Select,
+  Space,
+  Switch,
+  Tag,
+  Typography,
+} from 'antd';
 import {
   ArrowRightOutlined,
   CommentOutlined,
@@ -33,7 +42,15 @@ export namespace Polling {
       resultDescription,
       optionsDescription,
     } = props;
-    const { max, next, fallback, upTo, token, options }: Interface.IData = data;
+    const {
+      max,
+      next,
+      fallback,
+      upTo,
+      token,
+      options,
+      optsFromPrevChoice,
+    }: Interface.IData = data;
     const [newOption, setNewOption] = useState({
       title: '',
       description: '',
@@ -64,13 +81,12 @@ export namespace Polling {
     const replaceHandler = (val: any, childIdx: number) => {
       const { id } = val;
       const newChildren = [...children];
-      newChildren[childIdx] = id;
-      if (childIdx === Interface.PollingIndex.nextIdx) {
-        data.next = id;
-      } else if (childIdx === Interface.PollingIndex.fallbackIdx) {
-        data.fallback = id;
+      if (childIdx === -1) {
+        newChildren.push(id);
+      } else {
+        newChildren[childIdx] = id;
       }
-      onChange({ children: [...newChildren], data: { ...data } });
+      return newChildren;
     };
     // const lOptions = options ? options.length : 0;
     return (
@@ -102,7 +118,24 @@ export namespace Polling {
                             });
                           }}
                         />
-                        <div className='text-slate-700'>{option.title}</div>
+                        <Typography.Paragraph
+                          className='text-slate-700'
+                          style={{ marginBottom: 0 }}
+                          editable={{
+                            onChange: (str: string) => {
+                              const options = [...data.options];
+                              options[index].title = str;
+                              onChange({
+                                data: {
+                                  ...structuredClone(data),
+                                  options: structuredClone(options),
+                                },
+                              });
+                            },
+                          }}
+                        >
+                          {option.title}
+                        </Typography.Paragraph>
                       </div>
 
                       {isRTE(option.description) ? (
@@ -117,6 +150,17 @@ export namespace Polling {
             ) : (
               <></>
             )}
+            <div className='flex justify-between'>
+              <div>All passed options of previous checkpoint</div>
+              <Switch
+                checked={optsFromPrevChoice}
+                onChange={(checked: boolean) => {
+                  onChange({
+                    data: { ...data, optsFromPrevChoice: checked },
+                  });
+                }}
+              />
+            </div>
             <Button
               type='link'
               className='pl-0'
@@ -127,13 +171,6 @@ export namespace Polling {
             >
               New Option
             </Button>
-            <SideNote
-              value={optionsDescription}
-              setValue={(val: string) => {
-                onChange({ optionsDescription: val });
-              }}
-              buttonLabel='Add Option Note'
-            />
             <Space direction='vertical' size='small' className='w-full'>
               <div className='font-bold'>
                 Max number of choices
@@ -163,30 +200,61 @@ export namespace Polling {
             <Space direction='vertical' size='small' className='w-full'>
               <div className='font-bold'>Navigation</div>
               <NavConfigPanel
-                title='Failed'
+                title='Fail'
                 currentNode={fallbackNode}
                 possibleNodes={possibleNodes}
-                index={Interface.PollingIndex.fallbackIdx}
-                navLabel='None of options reach Threshold or Quorum'
-                delay={delays[Interface.PollingIndex.fallbackIdx]}
-                delayUnit={delayUnits[Interface.PollingIndex.fallbackIdx]}
-                delayNote={delayNotes[Interface.PollingIndex.fallbackIdx]}
+                index={children.indexOf(fallback || '')}
+                navLabel='If total votes fail Quorum and/or no option fail Threshold'
+                delay={
+                  fallbackNode ? delays[children.indexOf(fallback || '')] : 0
+                }
+                delayUnit={
+                  fallbackNode
+                    ? delayUnits[children.indexOf(fallback || '')]
+                    : 0
+                }
+                delayNote={
+                  fallbackNode
+                    ? delayNotes[children.indexOf(fallback || '')]
+                    : 0
+                }
                 changeDelayHandler={changeDelayHandler}
-                replaceHandler={replaceHandler}
+                replaceHandler={(val: any, idx: number) => {
+                  onChange({
+                    children: replaceHandler(val, idx),
+                    data: { ...data, fallback: val.id },
+                  });
+                }}
               />
               <NavConfigPanel
-                title='Passed'
+                title='Pass'
                 currentNode={nextNode}
                 possibleNodes={possibleNodes}
-                index={Interface.PollingIndex.nextIdx}
-                navLabel='1 or more options reach Threshold'
-                delay={delays[Interface.PollingIndex.nextIdx]}
-                delayUnit={delayUnits[Interface.PollingIndex.nextIdx]}
-                delayNote={delayNotes[Interface.PollingIndex.nextIdx]}
+                index={children.indexOf(next || '')}
+                navLabel='If total votes pass Quorum and ≥ 1 options pass Threshold'
+                delay={nextNode ? delays[children.indexOf(next || '')] : 0}
+                delayUnit={
+                  nextNode ? delayUnits[children.indexOf(next || '')] : 0
+                }
+                delayNote={
+                  nextNode ? delayNotes[children.indexOf(next || '')] : 0
+                }
                 changeDelayHandler={changeDelayHandler}
-                replaceHandler={replaceHandler}
+                replaceHandler={(val: any, idx: number) => {
+                  onChange({
+                    children: replaceHandler(val, idx),
+                    data: { ...data, next: val.id },
+                  });
+                }}
               />
             </Space>
+            <SideNote
+              value={optionsDescription}
+              setValue={(val: string) => {
+                onChange({ optionsDescription: val });
+              }}
+              buttonLabel='Add Option Note'
+            />
           </Space>
         </CollapsiblePanel>
         <CollapsiblePanel title='Result calculation'>

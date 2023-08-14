@@ -38,9 +38,9 @@ export namespace Polling {
     // label = source?.data.next === target?.id ? 'Next' : 'Fallback';
     const { source, target } = props;
     return source?.data.next === target?.id ? (
-      <span>Next</span>
+      <span>Pass</span>
     ) : (
-      <span>Fallback</span>
+      <span>Fail</span>
     );
   };
 

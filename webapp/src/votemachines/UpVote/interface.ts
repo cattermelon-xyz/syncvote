@@ -6,8 +6,4 @@ export namespace UpVote {
     token?: string;
     threshold?: number;
   }
-  export const UpVoteIndex = {
-    fallbackIdx: 0,
-    passIdx: 1,
-  };
 }

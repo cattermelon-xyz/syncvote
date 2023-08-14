@@ -42,6 +42,7 @@ export default (props: IVoteMachineConfigProps) => {
     includedAbstain,
     quorum,
     optionsDescription,
+    resultDescription,
   } = props;
   const { max, token, options } = data;
   const delays = props.delays || Array(options?.length).fill(0);
@@ -232,10 +233,7 @@ export default (props: IVoteMachineConfigProps) => {
               value={optionsDescription}
               setValue={(val: string) => {
                 onChange({
-                  data: {
-                    ...data,
-                    optionsDescription: val,
-                  },
+                  optionsDescription: val,
                 });
               }}
             />
@@ -274,7 +272,7 @@ export default (props: IVoteMachineConfigProps) => {
                 });
               }
             }}
-            sideNote={data.resultDescription}
+            sideNote={resultDescription}
             tokenAddress={token}
           />
         </CollapsiblePanel>

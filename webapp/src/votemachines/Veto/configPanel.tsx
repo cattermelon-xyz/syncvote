@@ -6,7 +6,6 @@ import { Alert, Space, Switch } from 'antd';
 import { all } from 'axios';
 import NavConfigPanel from '@components/DirectedGraph/components/NavConfigPanel';
 
-const VetoIndex = Interface.VetoIndex;
 export default (props: IVoteMachineConfigProps) => {
   const {
     quorum,
@@ -18,7 +17,7 @@ export default (props: IVoteMachineConfigProps) => {
     currentNodeId,
   } = props;
   const data: Interface.IVeto = props.data;
-  const { fallback, pass, token } = data;
+  const { fallback, pass, token, threshold } = data;
   const delays = props.delays || Array(2).fill(0);
   const delayUnits = props.delayUnits || Array(2).fill(0);
   const delayNotes = props.delayNotes || Array(2).fill('');
@@ -43,16 +42,13 @@ export default (props: IVoteMachineConfigProps) => {
   };
   const replaceHandler = (val: any, childIdx: number) => {
     const { id } = val;
-    children[childIdx] = id;
-    if (childIdx === VetoIndex.passIdx) {
-      data.pass = id;
-    } else if (childIdx === VetoIndex.fallbackIdx) {
-      data.fallback = id;
+    const newChildren = [...children];
+    if (childIdx === -1) {
+      newChildren.push(id);
+    } else {
+      newChildren[childIdx] = id;
     }
-    onChange({
-      children: structuredClone(children),
-      data: structuredClone(data),
-    });
+    return newChildren;
   };
   return (
     <div className='flex gap-4 flex-col'>
@@ -70,40 +66,59 @@ export default (props: IVoteMachineConfigProps) => {
         />
         <Space direction='vertical' size='middle' className='w-full mt-4'>
           <NavConfigPanel
-            title='Vetoed'
+            title='Fail'
             currentNode={fallbackNode}
             possibleNodes={posibleNodes}
-            index={VetoIndex.fallbackIdx}
-            navLabel='Vetoed or Failed'
-            delay={delays[VetoIndex.fallbackIdx]}
-            delayUnit={delayUnits[VetoIndex.fallbackIdx]}
-            delayNote={delayNotes[VetoIndex.fallbackIdx]}
+            index={children.indexOf(fallback || '')}
+            navLabel='Total votes fail Quorum and/or Vetos pass Threshold'
+            delay={fallbackNode ? delays[children.indexOf(fallback || '')] : 0}
+            delayUnit={
+              fallbackNode ? delayUnits[children.indexOf(fallback || '')] : 0
+            }
+            delayNote={
+              fallbackNode ? delayNotes[children.indexOf(fallback || '')] : 0
+            }
             changeDelayHandler={changeDelayHandler}
-            replaceHandler={replaceHandler}
+            replaceHandler={(val: any, idx: number) => {
+              onChange({
+                children: replaceHandler(val, idx),
+                data: { ...data, fallback: val.id },
+              });
+            }}
           />
           <NavConfigPanel
             title='Pass'
             currentNode={passNode}
             possibleNodes={posibleNodes}
-            index={VetoIndex.passIdx}
-            navLabel='Proposal is passed'
-            delay={delays[VetoIndex.passIdx]}
-            delayUnit={delayUnits[VetoIndex.passIdx]}
-            delayNote={delayNotes[VetoIndex.passIdx]}
+            index={children.indexOf(pass || '')}
+            navLabel='Total votes pass Quorum and Vetos fail Threshold'
+            delay={passNode ? delays[children.indexOf(pass || '')] : 0}
+            delayUnit={passNode ? delayUnits[children.indexOf(pass || '')] : 0}
+            delayNote={passNode ? delayNotes[children.indexOf(pass || '')] : 0}
             changeDelayHandler={changeDelayHandler}
-            replaceHandler={replaceHandler}
+            replaceHandler={(val: any, idx: number) => {
+              onChange({
+                children: replaceHandler(val, idx),
+                data: { ...data, pass: val.id },
+              });
+            }}
           />
         </Space>
       </CollapsiblePanel>
       <CollapsiblePanel title='Result'>
         <ResultCalculator
           quorum={quorum || 0}
-          excluded={['winnerThreshold']}
+          winnerThreshold={threshold}
           sideNote={resultDescription || ''}
           tokenAddress={token || ''}
           setValue={(keyValue: any) => {
             if (keyValue.hasOwnProperty('quorum')) {
               onChange({ quorum: keyValue.quorum });
+            }
+            if (keyValue.hasOwnProperty('winnerThreshold')) {
+              onChange({
+                data: { ...data, threshold: keyValue.winnerThreshold },
+              });
             }
             if (keyValue.hasOwnProperty('tokenAddress')) {
               onChange({ data: { ...data, token: keyValue.tokenAddress } });

@@ -44,7 +44,7 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
   };
   const machine: any = getVoteMachine(selectedNode?.vote_machine_type || '');
   const [votingLocation, setVotingLocation] = useState(
-    selectedNode?.votingLocation || 'Discorse or Forum'
+    selectedNode?.votingLocation || ''
   );
   return (
     <>

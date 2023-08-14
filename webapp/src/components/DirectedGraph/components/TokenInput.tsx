@@ -225,7 +225,12 @@ const TokenInput = ({
       />
     </Space.Compact>
   ) : tokenName ? (
-    <a href={explorer} target='_blank' title={tokenAddress}>
+    <a
+      href={explorer}
+      target='_blank'
+      title={tokenAddress}
+      className='text-violet-500'
+    >
       {tokenName}
     </a>
   ) : null;

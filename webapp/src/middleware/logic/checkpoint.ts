@@ -26,11 +26,14 @@ export const changeVersion = ({
   if (changedCheckPointData.children) {
     newData.checkpoints[index].children = changedCheckPointData.children;
   }
-  if (changedCheckPointData.title) {
+  if (changedCheckPointData.hasOwnProperty('title')) {
     newData.checkpoints[index].title = changedCheckPointData.title;
   }
-  if (changedCheckPointData.description) {
+  if (changedCheckPointData.hasOwnProperty('description')) {
     newData.checkpoints[index].description = changedCheckPointData.description;
+  }
+  if (changedCheckPointData.hasOwnProperty('note')) {
+    newData.checkpoints[index].note = changedCheckPointData.note;
   }
   if (changedCheckPointData.votingLocation) {
     newData.checkpoints[index].votingLocation =
@@ -59,6 +62,42 @@ export const changeVersion = ({
   if (changedCheckPointData.participation) {
     newData.checkpoints[index].participation =
       changedCheckPointData.participation;
+  }
+  if (changedCheckPointData.hasOwnProperty('participationDescription')) {
+    newData.checkpoints[index].participationDescription =
+      changedCheckPointData.participationDescription;
+  }
+  if (changedCheckPointData.hasOwnProperty('proposerDescription')) {
+    newData.checkpoints[index].proposerDescription =
+      changedCheckPointData.proposerDescription;
+  }
+  if (changedCheckPointData.hasOwnProperty('quorum')) {
+    newData.checkpoints[index].quorum = changedCheckPointData.quorum;
+  }
+  if (changedCheckPointData.delays) {
+    newData.checkpoints[index].delays = changedCheckPointData.delays;
+  }
+  if (changedCheckPointData.delayUnits) {
+    newData.checkpoints[index].delayUnits = changedCheckPointData.delayUnits;
+  }
+  if (changedCheckPointData.delayNotes) {
+    newData.checkpoints[index].delayNotes = changedCheckPointData.delayNotes;
+  }
+  if (changedCheckPointData.hasOwnProperty('includedAbstain')) {
+    newData.checkpoints[index].includedAbstain =
+      changedCheckPointData.includedAbstain;
+  }
+  if (changedCheckPointData.hasOwnProperty('resultDescription')) {
+    newData.checkpoints[index].resultDescription =
+      changedCheckPointData.resultDescription;
+  }
+  if (changedCheckPointData.hasOwnProperty('optionsDescription')) {
+    newData.checkpoints[index].optionsDescription =
+      changedCheckPointData.optionsDescription;
+  }
+  if (changedCheckPointData.hasOwnProperty('durationDescription')) {
+    newData.checkpoints[index].durationDescription =
+      changedCheckPointData.durationDescription;
   }
   return newData;
 };

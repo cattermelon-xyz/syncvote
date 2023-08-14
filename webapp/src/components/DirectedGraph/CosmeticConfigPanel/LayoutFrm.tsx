@@ -16,28 +16,28 @@ const LayoutFrm = ({
   const [screen, setScreen] = useState('' || layout.screen);
   const [renderer, setRenderer] = useState('' || layout.renderer);
   return (
-    <Space direction='vertical' size='large' className='w-full'>
+    <Space direction="vertical" size="large" className="w-full">
       <span>id : {id}</span>
-      <Space direction='vertical' size='middle' className='w-full'>
+      <Space direction="vertical" size="middle" className="w-full">
         <span>Title</span>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className='w-full'
+          className="w-full"
         />
       </Space>
-      <Space direction='vertical' size='middle' className='w-full'>
+      <Space direction="vertical" size="middle" className="w-full">
         <span>Description</span>
         <Input.TextArea
-          className='w-full'
+          className="w-full"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
       </Space>
       <Space
-        direction='horizontal'
-        size='middle'
-        className='w-full flex justify-between'
+        direction="horizontal"
+        size="middle"
+        className="w-full flex justify-between"
       >
         <span>Screen</span>
         <Select
@@ -46,16 +46,16 @@ const LayoutFrm = ({
             setScreen(val);
             setTitle(val === 'horizontal' ? 'Desktop' : 'Mobile');
           }}
-          className='w-[200px]'
+          className="w-[200px]"
         >
-          <Select.Option value='horizontal'>Horizontal | Desktop</Select.Option>
-          <Select.Option value='vertical'>Vertical | Mobile</Select.Option>
+          <Select.Option value="horizontal">Horizontal | Desktop</Select.Option>
+          <Select.Option value="vertical">Vertical | Mobile</Select.Option>
         </Select>
       </Space>
-      <Space direction='horizontal' className='w-full flex justify-end'>
+      <Space direction="horizontal" className="w-full flex justify-end">
         <Button
-          type='primary'
-          className='flex items-center'
+          type="primary"
+          className="flex items-center"
           icon={<SaveOutlined />}
           onClick={() => {
             const toSave = { title, description, screen, id, renderer };

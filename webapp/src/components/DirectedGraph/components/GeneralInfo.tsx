@@ -45,11 +45,9 @@ const renderParticipation = (participation: IParticipant | undefined) => {
     } else if (type === 'token') {
       rs = (
         <span className='mr-1'>
-          The checkpoint is open for
           <span className='text-violet-500 mx-1'>
             <TokenInput address={(pdata as IToken)?.address || ''} />
           </span>{' '}
-          token/nft holders to vote
           {(pdata as IToken)?.min ? (
             <>
               {' '}
