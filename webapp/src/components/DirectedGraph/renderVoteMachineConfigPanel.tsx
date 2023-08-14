@@ -1,4 +1,8 @@
-import { DeleteOutlined } from '@ant-design/icons';
+import {
+  CloseCircleOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 import { Button, Drawer, Typography } from 'antd';
 import MachineConfigPanel from './MachineConfigPanel/MachineConfigPanel';
 import { getVoteMachine } from './voteMachine';
@@ -31,6 +35,13 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
               children={selectedNode.children || []}
               allNodes={versionData.checkpoints}
               data={structuredClone(data)}
+              quorum={selectedNode.quorum}
+              includedAbstain={selectedNode.includedAbstain}
+              delays={selectedNode.delays}
+              delayUnits={selectedNode.delayUnits}
+              delayNotes={selectedNode.delayNotes}
+              resultDescription={selectedNode.resultDescription}
+              optionsDescription={selectedNode.optionsDescription}
             />
           }
         />
@@ -40,6 +51,13 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
   return (
     <Drawer
       closeIcon={<></>}
+      extra={
+        window.innerWidth > 700 ? (
+          <></>
+        ) : (
+          <Button icon={<CloseOutlined />} shape='circle' onClick={onClose} />
+        )
+      }
       className='directed-graph-config-panel'
       headerStyle={{ paddingLeft: '0px' }}
       open={selectedNodeId !== '' && selectedNodeId !== undefined}
@@ -66,7 +84,7 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
         </Typography.Paragraph>
       }
       bodyStyle={{ padding: '0px', backgroundColor: '#f6f6f6' }}
-      size='large'
+      size={window.innerWidth > 700 ? 'large' : 'default'}
     >
       {configPanel}
     </Drawer>
