@@ -6,7 +6,6 @@ import { Alert, Space, Switch } from 'antd';
 import { all } from 'axios';
 import NavConfigPanel from '@components/DirectedGraph/components/NavConfigPanel';
 
-const UpVoteIndex = Interface.UpVoteIndex;
 export default (props: IVoteMachineConfigProps) => {
   const {
     quorum,
@@ -43,16 +42,13 @@ export default (props: IVoteMachineConfigProps) => {
   };
   const replaceHandler = (val: any, childIdx: number) => {
     const { id } = val;
-    children[childIdx] = id;
-    if (childIdx === UpVoteIndex.passIdx) {
-      data.pass = id;
-    } else if (childIdx === UpVoteIndex.fallbackIdx) {
-      data.fallback = id;
+    const newChildren = [...children];
+    if (childIdx === -1) {
+      newChildren.push(id);
+    } else {
+      newChildren[childIdx] = id;
     }
-    onChange({
-      children: structuredClone(children),
-      data: structuredClone(data),
-    });
+    return newChildren;
   };
   return (
     <div className='flex gap-4 flex-col'>
@@ -74,25 +70,39 @@ export default (props: IVoteMachineConfigProps) => {
             title='Pass'
             currentNode={passNode}
             possibleNodes={posibleNodes}
-            index={UpVoteIndex.passIdx}
-            navLabel='Proposal is passed'
-            delay={delays[UpVoteIndex.passIdx]}
-            delayUnit={delayUnits[UpVoteIndex.passIdx]}
-            delayNote={delayNotes[UpVoteIndex.passIdx]}
+            index={children.indexOf(pass || '')}
+            navLabel='If total votes pass Quorum and Upvotes pass Threshold'
+            delay={passNode ? delays[children.indexOf(pass || '')] : 0}
+            delayUnit={passNode ? delayUnits[children.indexOf(pass || '')] : 0}
+            delayNote={passNode ? delayNotes[children.indexOf(pass || '')] : 0}
             changeDelayHandler={changeDelayHandler}
-            replaceHandler={replaceHandler}
+            replaceHandler={(val: any, idx: number) => {
+              onChange({
+                children: replaceHandler(val, idx),
+                data: { ...data, pass: val.id },
+              });
+            }}
           />
           <NavConfigPanel
-            title='Failed'
+            title='Fail'
             currentNode={fallbackNode}
             possibleNodes={posibleNodes}
-            index={UpVoteIndex.fallbackIdx}
-            navLabel='Failed to reach Threshold or Quorum'
-            delay={delays[UpVoteIndex.fallbackIdx]}
-            delayUnit={delayUnits[UpVoteIndex.fallbackIdx]}
-            delayNote={delayNotes[UpVoteIndex.fallbackIdx]}
+            index={children.indexOf(fallback || '')}
+            navLabel='If total votes fail Quorum and/or Upvotes fail Threshold'
+            delay={fallbackNode ? delays[children.indexOf(fallback || '')] : 0}
+            delayUnit={
+              fallbackNode ? delayUnits[children.indexOf(fallback || '')] : 0
+            }
+            delayNote={
+              fallbackNode ? delayNotes[children.indexOf(fallback || '')] : 0
+            }
             changeDelayHandler={changeDelayHandler}
-            replaceHandler={replaceHandler}
+            replaceHandler={(val: any, idx: number) => {
+              onChange({
+                children: replaceHandler(val, idx),
+                data: { ...data, fallback: val.id },
+              });
+            }}
           />
         </Space>
       </CollapsiblePanel>

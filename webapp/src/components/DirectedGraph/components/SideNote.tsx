@@ -5,7 +5,7 @@ import {
 } from '@ant-design/icons';
 import TextEditor from '@components/Editor/TextEditor';
 import { Button, Modal, Space } from 'antd';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import parse from 'html-react-parser';
 import { isRTE } from '../utils';
 
@@ -48,7 +48,7 @@ const SideNote = ({
               }}
             />
           </Modal>
-          {!value ? (
+          {!isRTE(value) ? (
             <div className={className}>
               <Button
                 icon={<CommentOutlined />}
@@ -72,7 +72,7 @@ const SideNote = ({
                   onClick={() => setShowSideNote(true)}
                 />
               </Space>
-              {parse(value)}
+              {parse(value || '')}
             </Space>
           )}
         </>

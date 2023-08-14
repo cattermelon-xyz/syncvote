@@ -4,6 +4,7 @@ import { Space, Input, Button, Modal } from 'antd';
 import moment from 'moment';
 import { useContext } from 'react';
 import CollapsiblePanel from '../../components/CollapsiblePanel';
+import SideNote from '@components/DirectedGraph/components/SideNote';
 
 const VotingDuration = () => {
   const { data, onChange, viewMode, selectedNodeId } =
@@ -70,6 +71,10 @@ const VotingDuration = () => {
             disabled={locked.duration}
           />
         </Space>
+        <SideNote
+          value={selectedNode?.durationDescription}
+          setValue={(val: string) => onChange({ durationDescription: val })}
+        />
       </Space>
       {/* <Button
           icon={locked.duration ? <LockFilled /> : <UnlockOutlined />}

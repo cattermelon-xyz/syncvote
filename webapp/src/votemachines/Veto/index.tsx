@@ -7,7 +7,7 @@ import NumberWithPercentageInput from '@components/DirectedGraph/components/Numb
 import TokenInput from '@components/DirectedGraph/components/TokenInput';
 import { isRTE } from '@components/DirectedGraph/utils';
 import SideNote from '@components/DirectedGraph/components/SideNote';
-import { VerticalAlignTopOutlined } from '@ant-design/icons';
+import { SolutionOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
 
@@ -60,15 +60,27 @@ const abstract = ({
 }) => {
   const { votingLocation, quorum } = checkpoint || {};
   const token = data.token;
-  return quorum || isRTE(votingLocation) ? (
+  const threshold = data.threshold;
+  return quorum || isRTE(votingLocation) || threshold ? (
     <>
       {quorum ? (
         <div className='flex text-ellipsis items-center px-2'>
-          <VerticalAlignTopOutlined className='mr-2' />
+          <SolutionOutlined className='mr-2' />
           {/* {`Threshold ${threshold} ${token}`} */}
           <div className='flex gap-1'>
             <span>Quorum</span>
             <NumberWithPercentageInput value={quorum} />
+            {token ? <TokenInput address={token} /> : 'votes'}
+          </div>
+        </div>
+      ) : null}
+      {threshold ? (
+        <div className='flex text-ellipsis items-center px-2'>
+          <VerticalAlignTopOutlined className='mr-2' />
+          {/* {`Threshold ${threshold} ${token}`} */}
+          <div className='flex gap-1'>
+            <span>Threshold</span>
+            <NumberWithPercentageInput value={threshold} />
             {token ? <TokenInput address={token} /> : 'votes'}
           </div>
         </div>

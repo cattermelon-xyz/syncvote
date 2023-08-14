@@ -1,5 +1,6 @@
 import {
   ShareAltOutlined,
+  SolutionOutlined,
   TwitterOutlined,
   VerticalAlignTopOutlined,
 } from '@ant-design/icons';
@@ -172,11 +173,21 @@ const abstract = ({
   checkpoint: ICheckPoint | undefined;
   data: any;
 }) => {
-  const { votingLocation } = checkpoint || {};
+  const { votingLocation, quorum } = checkpoint || {};
   const threshold = data.max;
   const token = data.token;
-  return threshold || isRTE(votingLocation) ? (
+  return threshold || isRTE(votingLocation) || quorum ? (
     <>
+      {quorum ? (
+        <div className='flex text-ellipsis items-center px-2'>
+          <SolutionOutlined className='mr-2' />
+          <div className='flex gap-1'>
+            <span>Quorum</span>
+            <NumberWithPercentageInput value={quorum} />
+            {token ? <TokenInput address={token} /> : 'votes'}
+          </div>
+        </div>
+      ) : null}
       {threshold ? (
         <div className='flex text-ellipsis items-center px-2'>
           <VerticalAlignTopOutlined className='mr-2' />

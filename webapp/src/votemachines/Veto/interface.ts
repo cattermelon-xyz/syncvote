@@ -4,9 +4,6 @@ export namespace Veto {
     pass?: string;
     fallback?: string;
     token?: string;
-  };
-  export const VetoIndex = {
-    fallbackIdx: 0,
-    passIdx: 1,
+    threshold?: number;
   };
 }

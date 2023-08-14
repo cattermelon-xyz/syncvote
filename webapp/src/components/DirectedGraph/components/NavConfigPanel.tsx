@@ -103,7 +103,6 @@ const NavConfigPanel = ({
             <Button
               icon={<SaveOutlined />}
               onClick={() => {
-                console.log('newDelayNote: ', newDelayNote);
                 changeDelayHandler(
                   {
                     delay: newDelay,

@@ -22,6 +22,7 @@ export interface ICheckPoint {
   delayNotes?: string[];
   resultDescription?: string;
   optionsDescription?: string;
+  durationDescription?: string;
 }
 
 // TODO: add version

@@ -6,7 +6,7 @@ import { Space } from 'antd';
 import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
 import TokenInput from '@components/DirectedGraph/components/TokenInput';
 import SideNote from '@components/DirectedGraph/components/SideNote';
-import { VerticalAlignTopOutlined } from '@ant-design/icons';
+import { SolutionOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
 import { isRTE } from '@components/DirectedGraph/utils';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
@@ -75,11 +75,21 @@ const abstract = ({
   checkpoint: ICheckPoint | undefined;
   data: any;
 }) => {
-  const { votingLocation } = checkpoint || {};
+  const { votingLocation, quorum } = checkpoint || {};
   const threshold = data.threshold;
   const token = data.token;
-  return threshold || isRTE(votingLocation) ? (
+  return threshold || isRTE(votingLocation) || quorum ? (
     <>
+      {quorum ? (
+        <div className='flex text-ellipsis items-center px-2'>
+          <SolutionOutlined className='mr-2' />
+          <div className='flex gap-1'>
+            <span>Quorum</span>
+            <NumberWithPercentageInput value={quorum} />
+            {token ? <TokenInput address={token} /> : 'votes'}
+          </div>
+        </div>
+      ) : null}
       {threshold ? (
         <div className='flex text-ellipsis items-center px-2'>
           <VerticalAlignTopOutlined className='mr-2' />

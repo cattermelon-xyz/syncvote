@@ -12,10 +12,6 @@ export namespace Polling {
     fallback?: string;
     upTo?: number;
     token?: string;
+    optsFromPrevChoice?: boolean;
   }
-
-  export const PollingIndex = {
-    nextIdx: 0,
-    fallbackIdx: 1,
-  };
 }

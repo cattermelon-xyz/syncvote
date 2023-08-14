@@ -37,9 +37,9 @@ export namespace Veto {
   export const getLabel = (props: IVoteMachineGetLabelProps) => {
     const { source, target } = props;
     return source?.data.pass === target?.id ? (
-      <span>Passed</span>
+      <span>Pass</span>
     ) : (
-      <span>Vetoed or Failed</span>
+      <span>Fail</span>
     );
   };
 

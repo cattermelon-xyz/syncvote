@@ -33,6 +33,7 @@ export const displayDelayDuration = (duration: moment.Duration) => {
   );
 };
 
+// return TRUE if str is not empty and not '<p></p>' and not '<p><br></p>'
 export const isRTE = (str: string | undefined) => {
   return str && str !== '<p></p>' && str !== '<p><br></p>';
 };

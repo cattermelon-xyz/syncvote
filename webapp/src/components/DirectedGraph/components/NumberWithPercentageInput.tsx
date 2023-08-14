@@ -17,7 +17,10 @@ const NumberWithPercentageInput = ({
   const convertToStr = (val: number) => {
     let tmp = '0';
     if (val !== undefined || val !== 0) {
-      tmp = val < 1 ? `${val * 100}%` : `${val.toLocaleString()}`;
+      tmp =
+        val < 1
+          ? `${(val * 100).toFixed(2)}%`
+          : `${val.toLocaleString('en-US')}`;
     }
     return tmp;
   };
