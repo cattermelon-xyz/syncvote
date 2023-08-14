@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { GraphPanelContext } from '@components/DirectedGraph/context';
 import { FiUserCheck } from 'react-icons/fi';
 import { TbAtom } from 'react-icons/tb';
-import CollapsiblePanel from '../fragments/CollapsiblePanel';
+import CollapsiblePanel from '../../components/CollapsiblePanel';
 
 const VotingPartipation = () => {
   const {
@@ -24,94 +24,89 @@ const VotingPartipation = () => {
   const identity = type === 'identity' && data ? (data as string[]) : [];
   const tokenData = type === 'token' && data ? (data as IToken) : {};
   return (
-    <CollapsiblePanel title='Participants'>
-      <Space direction='vertical' size='small' className='w-full'>
-        <div className='text-sm'>Voter</div>
-        <Select
-          disabled={!(viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION)}
-          value={type}
-          style={{ width: '100%' }}
-          onChange={(value) => {
+    <Space direction='vertical' size='small' className='w-full'>
+      <div className='text-sm'>Voter</div>
+      <Select
+        disabled={!(viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION)}
+        value={type}
+        style={{ width: '100%' }}
+        onChange={(value) => {
+          onChange({
+            participation: {
+              type: value,
+            },
+          });
+        }}
+        options={[
+          {
+            key: 'identity',
+            label: (
+              <div className='flex items-center'>
+                <FiUserCheck className='mr-2' />
+                Other identity
+              </div>
+            ),
+            value: 'identity',
+          },
+          // choosing this option would engage Votemachine
+          {
+            key: 'token',
+            label: (
+              <div className='flex items-center'>
+                <TbAtom className='mr-2' />
+                Token/NFT holder
+              </div>
+            ),
+            value: 'token',
+          },
+        ]}
+      />
+      {type ? <div className='py-1'>{/* <hr /> */}</div> : null}
+      {type === 'identity' ? (
+        <></>
+      ) : // <AllowedByIdentity
+      //   editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
+      //   identity={identity}
+      //   setIdentity={(newIdentity: string[]) => {
+      //     onChange({
+      //       participation: {
+      //         type: 'identity',
+      //         data: newIdentity,
+      //       },
+      //     });
+      //   }}
+      // />
+      null}
+      {type === 'token' ? (
+        <AllowedByToken
+          editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
+          address={tokenData?.address}
+          setAddress={(address: string) => {
             onChange({
               participation: {
-                type: value,
+                type: 'token',
+                data: {
+                  address,
+                  min: tokenData?.min,
+                },
               },
             });
           }}
-          options={[
-            {
-              key: 'identity',
-              label: (
-                <div className='flex items-center'>
-                  <FiUserCheck className='mr-2' />
-                  Other identity
-                </div>
-              ),
-              value: 'identity',
-            },
-            // choosing this option would engage Votemachine
-            {
-              key: 'token',
-              label: (
-                <div className='flex items-center'>
-                  <TbAtom className='mr-2' />
-                  Token holder
-                </div>
-              ),
-              value: 'token',
-            },
-          ]}
+          min={tokenData?.min}
+          setMin={(min: number) => {
+            onChange({
+              participation: {
+                type: 'token',
+                data: {
+                  min,
+                  address: tokenData?.address,
+                },
+              },
+            });
+          }}
         />
-        {type ? (
-          <div className='py-2'>
-            <hr />
-          </div>
-        ) : null}
-        {type === 'identity' ? (
-          <AllowedByIdentity
-            editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
-            identity={identity}
-            setIdentity={(newIdentity: string[]) => {
-              onChange({
-                participation: {
-                  type: 'identity',
-                  data: newIdentity,
-                },
-              });
-            }}
-          />
-        ) : null}
-        {type === 'token' ? (
-          <AllowedByToken
-            editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
-            address={tokenData?.address}
-            setAddress={(address: string) => {
-              onChange({
-                participation: {
-                  type: 'token',
-                  data: {
-                    address,
-                    min: tokenData?.min,
-                  },
-                },
-              });
-            }}
-            min={tokenData?.min}
-            setMin={(min: number) => {
-              onChange({
-                participation: {
-                  type: 'token',
-                  data: {
-                    min,
-                    address: tokenData?.address,
-                  },
-                },
-              });
-            }}
-          />
-        ) : null}
-      </Space>
-    </CollapsiblePanel>
+      ) : null}
+    </Space>
   );
 };
 

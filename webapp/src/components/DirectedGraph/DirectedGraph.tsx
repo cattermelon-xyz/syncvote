@@ -12,7 +12,13 @@ import ReactFlow, {
 import { toPng } from 'html-to-image';
 import React, { useEffect, useCallback, useState, useContext } from 'react';
 import { Button, Drawer, Modal, Space } from 'antd';
-import { BulbOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons';
+import {
+  BulbOutlined,
+  CloseCircleOutlined,
+  CloseOutlined,
+  PlusOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import 'reactflow/dist/style.css';
 import { buildATree } from './buildATree';
 import MultipleDirectNode from './CustomNodes/MultipleDiretionNode';
@@ -26,9 +32,6 @@ import QuickStartDialog from './QuickStartDialog';
 import { GraphContext } from './context';
 import EdgeConfigPanel from './EdgeConfigPanel';
 import { renderVoteMachineConfigPanel } from './renderVoteMachineConfigPanel';
-import { supabase } from '@utils/supabaseClient';
-import { useParams } from 'react-router-dom';
-import { extractIdFromIdString } from '@utils/helpers';
 
 const nodeTypes = { ...MultipleDirectNode.getType() };
 const edgeTypes = {
@@ -36,11 +39,10 @@ const edgeTypes = {
   ...BezierCustomEdge.getType(),
   ...SmoothCustomEdge.getType(),
 };
-
 function downloadImage(dataUrl: any) {
   const a = document.createElement('a');
 
-  a.setAttribute('download', 'reactflow.png');
+  a.setAttribute('download', 'syncvote-diagram.png');
   a.setAttribute('href', dataUrl);
   a.click();
 }
@@ -71,62 +73,33 @@ const Flow = () => {
     onConfigEdgePanelClose,
     shouldExportImage,
     setExportImage,
-    shouldUploadImage,
-    setUploadImage,
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
-
   useOnViewportChange({
     onChange: useCallback((viewport: any) => {
       onViewPortChange ? onViewPortChange(viewport) : null;
     }, []),
   });
-  const { workflowIdString, versionIdString } = useParams();
-  const workflowId = extractIdFromIdString(workflowIdString);
-  const versionId = extractIdFromIdString(versionIdString);
-
-  async function uploadImageToSupabase(dataUrl: string) {
-    const image_name = `${workflowId}_${versionId}.jpg`;
-    const response = await fetch(dataUrl);
-    const blob = await response.blob();
-
-    const avatarFile = new File([blob], `${image_name}`, {
-      type: 'image/jpg',
-    });
-
-    const { data, error } = await supabase.storage
-      .from('preview_image')
-      .upload(`${image_name}`, avatarFile, {
-        cacheControl: '3600',
-        upsert: true,
-      });
-
-    if (error) {
-      console.log('Upload fail!', error);
-    } else {
-      console.log('Upload successful!');
-    }
-  }
-
   useEffect(() => {
-    const obj: any = buildATree({ data, selectedNodeId, selectedLayoutId });
+    const obj: any = buildATree({
+      data,
+      selectedNodeId,
+      selectedLayoutId,
+      selectedEdgeId,
+    });
     setNodes(obj.nodes);
     setEdges(obj.edges);
     if (shouldExportImage) {
       selfDownloadImage({ imageWidth: 1344, imageHeight: 768 });
       setExportImage ? setExportImage(false) : null;
     }
-    if (shouldUploadImage) {
-      selfUploadImage({ imageWidth: 1344, imageHeight: 768 });
-      setUploadImage ? setUploadImage(false) : null;
-    }
   }, [
     data,
     selectedNodeId,
     selectedLayoutId,
     shouldExportImage,
-    shouldUploadImage,
+    selectedEdgeId,
   ]);
   const proOptions = {
     hideAttribution: true,
@@ -138,39 +111,6 @@ const Flow = () => {
   const selectedEdge = edges?.find((edge: any) => edge.id === selectedEdgeId);
 
   const { getNodes } = useReactFlow();
-
-  const selfUploadImage = ({
-    imageWidth = 1344,
-    imageHeight = 768,
-  }: {
-    imageWidth?: number;
-    imageHeight?: number;
-  }) => {
-    // we calculate a transform for the nodes so that all nodes are visible
-    // we then overwrite the transform of the `.react-flow__viewport` element
-    // with the style option of the html-to-image library
-    const nodesBounds = getRectOfNodes(getNodes());
-    const transform = getTransformForBounds(
-      nodesBounds,
-      imageWidth,
-      imageHeight,
-      0.4,
-      10
-    );
-
-    toPng(document.querySelector('.react-flow__viewport') as HTMLElement, {
-      backgroundColor: '#fff',
-      width: imageWidth,
-      height: imageHeight,
-      skipAutoScale: true,
-      style: {
-        width: imageWidth + 'px',
-        height: imageHeight + 'px',
-        transform: `translate(${transform[0]}px, ${transform[1]}px) scale(${transform[2]})`,
-      },
-    }).then(uploadImageToSupabase);
-  };
-
   const selfDownloadImage = ({
     imageWidth = 1344,
     imageHeight = 768,
@@ -232,6 +172,17 @@ const Flow = () => {
         onClose={onConfigEdgePanelClose}
         className='edge-config-panel'
         closeIcon={<></>}
+        extra={
+          window.innerWidth > 700 ? (
+            <></>
+          ) : (
+            <Button
+              icon={<CloseOutlined />}
+              shape='circle'
+              onClick={onConfigEdgePanelClose}
+            />
+          )
+        }
       >
         {selectedEdgeId !== '' && selectedEdgeId !== undefined ? (
           <EdgeConfigPanel selectedEdge={selectedEdge} nodes={nodes} />
@@ -249,14 +200,14 @@ const Flow = () => {
         onEdgeClick={onEdgeClick}
         fitView={true}
         fitViewOptions={{
-          padding: 1,
-          includeHiddenNodes: true,
-          duration: 1000,
+          padding: 20,
           maxZoom: 4,
-          minZoom: 0.7,
+          minZoom: 1,
         }}
       >
-        <Controls position='bottom-left' />
+        {window.innerWidth > 700 ? (
+          <Controls position='bottom-left' showInteractive={false} />
+        ) : null}
         <Background color='#aaa' variant={BackgroundVariant.Dots} />
         <Panel position='top-left'>
           <Space direction='vertical'>
@@ -355,7 +306,7 @@ export const DirectedGraph = (props: IGraph) => {
     <div
       style={{
         width: '100%',
-        minWidth: '800px',
+        // minWidth: '800px',
         backgroundColor: 'white',
       }}
       className='h-full directed-graph'

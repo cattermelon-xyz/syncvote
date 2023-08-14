@@ -288,6 +288,23 @@ export const queryWorkflowVersion = async ({
   }
 };
 
+export const canUserEditWorkflowVersion = async ({
+  workflowVersionId,
+  onResult,
+}: {
+  workflowVersionId: number;
+  onResult: (data: boolean) => void;
+}) => {
+  const { data, error } = await supabase.rpc('can_user_edit_workflow_version', {
+    version_id: workflowVersionId,
+  });
+  if (error) {
+    onResult(false);
+  } else {
+    onResult(data === 1);
+  }
+};
+
 export const updateAWorkflowInfo = async ({
   info,
   dispatch,
