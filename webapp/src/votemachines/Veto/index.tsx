@@ -19,7 +19,7 @@ const explain = ({
   data: any;
 }) => {
   const { quorum, resultDescription } = checkpoint || {};
-  const { token } = data || {};
+  const { token, threshold } = data || {};
   return (
     <Space direction='vertical' className='w-full'>
       <div className='text-gray-400'>Voting format</div>
@@ -34,6 +34,23 @@ const explain = ({
               Voting quorum:{' '}
               <span className='text-violet-500'>
                 {<NumberWithPercentageInput value={quorum} />}
+              </span>{' '}
+              {token ? (
+                <>
+                  <TokenInput address={token} /> tokens
+                </>
+              ) : (
+                'votes'
+              )}
+            </span>
+          </li>
+        ) : null}
+        {threshold ? (
+          <li>
+            <span>
+              Voting Threshold:{' '}
+              <span className='text-violet-500'>
+                {<NumberWithPercentageInput value={threshold} />}
               </span>{' '}
               {token ? (
                 <>

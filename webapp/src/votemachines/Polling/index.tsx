@@ -31,6 +31,7 @@ const explain = ({
     return <></>;
   }
   const { quorum } = checkpoint;
+  const threshold = data.max;
 
   return (
     <div className='block'>
@@ -62,7 +63,7 @@ const explain = ({
           <li>
             Voting quorum:{' '}
             <span className='text-violet-500'>
-              {quorum < 1 ? `${quorum * 100}% ` : `${data.max} `}
+              <NumberWithPercentageInput value={quorum} />{' '}
               <TokenInput address={data.token || ''} />
             </span>
           </li>
@@ -71,7 +72,7 @@ const explain = ({
           <li>
             Wining threshold:{' '}
             <span className='text-violet-500'>
-              {data.max < 1 ? `${data.max * 100}% ` : `${data.max} `}
+              <NumberWithPercentageInput value={data.max} />{' '}
               <TokenInput address={data.token || ''} />
             </span>
           </li>

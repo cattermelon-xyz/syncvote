@@ -66,6 +66,23 @@ export default (props: IVoteMachineConfigProps) => {
         />
         <Space direction='vertical' size='middle' className='w-full mt-4'>
           <NavConfigPanel
+            title='Pass'
+            currentNode={passNode}
+            possibleNodes={posibleNodes}
+            index={children.indexOf(pass || '')}
+            navLabel='Total votes pass Quorum and Vetos fail Threshold'
+            delay={passNode ? delays[children.indexOf(pass || '')] : 0}
+            delayUnit={passNode ? delayUnits[children.indexOf(pass || '')] : 0}
+            delayNote={passNode ? delayNotes[children.indexOf(pass || '')] : 0}
+            changeDelayHandler={changeDelayHandler}
+            replaceHandler={(val: any, idx: number) => {
+              onChange({
+                children: replaceHandler(val, idx),
+                data: { ...data, pass: val.id },
+              });
+            }}
+          />
+          <NavConfigPanel
             title='Fail'
             currentNode={fallbackNode}
             possibleNodes={posibleNodes}
@@ -83,23 +100,6 @@ export default (props: IVoteMachineConfigProps) => {
               onChange({
                 children: replaceHandler(val, idx),
                 data: { ...data, fallback: val.id },
-              });
-            }}
-          />
-          <NavConfigPanel
-            title='Pass'
-            currentNode={passNode}
-            possibleNodes={posibleNodes}
-            index={children.indexOf(pass || '')}
-            navLabel='Total votes pass Quorum and Vetos fail Threshold'
-            delay={passNode ? delays[children.indexOf(pass || '')] : 0}
-            delayUnit={passNode ? delayUnits[children.indexOf(pass || '')] : 0}
-            delayNote={passNode ? delayNotes[children.indexOf(pass || '')] : 0}
-            changeDelayHandler={changeDelayHandler}
-            replaceHandler={(val: any, idx: number) => {
-              onChange({
-                children: replaceHandler(val, idx),
-                data: { ...data, pass: val.id },
               });
             }}
           />

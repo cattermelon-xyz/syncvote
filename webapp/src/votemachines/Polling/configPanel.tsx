@@ -200,6 +200,27 @@ export namespace Polling {
             <Space direction='vertical' size='small' className='w-full'>
               <div className='font-bold'>Navigation</div>
               <NavConfigPanel
+                title='Pass'
+                currentNode={nextNode}
+                possibleNodes={possibleNodes}
+                index={children.indexOf(next || '')}
+                navLabel='If total votes pass Quorum and ≥ 1 options pass Threshold'
+                delay={nextNode ? delays[children.indexOf(next || '')] : 0}
+                delayUnit={
+                  nextNode ? delayUnits[children.indexOf(next || '')] : 0
+                }
+                delayNote={
+                  nextNode ? delayNotes[children.indexOf(next || '')] : 0
+                }
+                changeDelayHandler={changeDelayHandler}
+                replaceHandler={(val: any, idx: number) => {
+                  onChange({
+                    children: replaceHandler(val, idx),
+                    data: { ...data, next: val.id },
+                  });
+                }}
+              />
+              <NavConfigPanel
                 title='Fail'
                 currentNode={fallbackNode}
                 possibleNodes={possibleNodes}
@@ -226,34 +247,12 @@ export namespace Polling {
                   });
                 }}
               />
-              <NavConfigPanel
-                title='Pass'
-                currentNode={nextNode}
-                possibleNodes={possibleNodes}
-                index={children.indexOf(next || '')}
-                navLabel='If total votes pass Quorum and ≥ 1 options pass Threshold'
-                delay={nextNode ? delays[children.indexOf(next || '')] : 0}
-                delayUnit={
-                  nextNode ? delayUnits[children.indexOf(next || '')] : 0
-                }
-                delayNote={
-                  nextNode ? delayNotes[children.indexOf(next || '')] : 0
-                }
-                changeDelayHandler={changeDelayHandler}
-                replaceHandler={(val: any, idx: number) => {
-                  onChange({
-                    children: replaceHandler(val, idx),
-                    data: { ...data, next: val.id },
-                  });
-                }}
-              />
             </Space>
             <SideNote
               value={optionsDescription}
               setValue={(val: string) => {
                 onChange({ optionsDescription: val });
               }}
-              buttonLabel='Add Option Note'
             />
           </Space>
         </CollapsiblePanel>
