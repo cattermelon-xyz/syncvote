@@ -261,6 +261,7 @@ export const buildATree = ({
       const vm = getVoteMachine(checkpoint.vote_machine_type);
       const vmIcon = vm?.getIcon();
       let label = checkpoint.title ? checkpoint.title : checkpoint.id;
+      label = label.length > 30 ? label.substr(0, 30) + '...' : label;
       if (vmIcon) {
         label = (
           <div className='flex gap-1'>

@@ -47,15 +47,15 @@ const renderParticipation = (participation: IParticipant | undefined) => {
         <span className='mr-1'>
           <span className='text-violet-500 mx-1'>
             <TokenInput address={(pdata as IToken)?.address || ''} />
-          </span>{' '}
+          </span>
           {(pdata as IToken)?.min ? (
             <>
               {' '}
               with a minimum of
               <span className='text-violet-500 mx-1'>
                 {<NumberWithPercentageInput value={(pdata as IToken)?.min} />}
-              </span>{' '}
-              tokens.
+              </span>
+              tokens
             </>
           ) : null}
         </span>

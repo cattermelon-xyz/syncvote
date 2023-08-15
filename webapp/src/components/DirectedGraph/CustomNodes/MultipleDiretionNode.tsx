@@ -8,6 +8,7 @@ import { Handle, Position } from 'reactflow';
 
 import parse from 'html-react-parser';
 import moment from 'moment';
+import { displayDelayDuration } from '../utils';
 // TODO: how to register getIcon in 1 place?
 const getIcon = (provider: string, id: number | undefined) => {
   let rs = <></>;
@@ -106,8 +107,7 @@ const Node = memo(
         >
           {duration > 0 ? (
             <div className='absolute -top-8 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
-              <ClockCircleOutlined className='pr-2' />
-              {moment.duration(duration).humanize()}
+              {displayDelayDuration(moment.duration(duration))}
             </div>
           ) : null}
           <div
@@ -116,7 +116,11 @@ const Node = memo(
           >
             {data.label
               ? typeof data.label === 'string'
-                ? parse(data.label)
+                ? parse(
+                    data.label.length > 30
+                      ? data.label.substr(0, 30) + '...'
+                      : data.label
+                  )
                 : data.label
               : 'untitled'}
           </div>

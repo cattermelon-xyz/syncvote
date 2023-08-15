@@ -204,7 +204,7 @@ export namespace Polling {
                 currentNode={fallbackNode}
                 possibleNodes={possibleNodes}
                 index={children.indexOf(fallback || '')}
-                navLabel='If total votes fail Quorum and/or no option fail Threshold'
+                navLabel='If total votes fail Quorum and/or no option pass Threshold'
                 delay={
                   fallbackNode ? delays[children.indexOf(fallback || '')] : 0
                 }

@@ -43,7 +43,7 @@ const explain = ({
         <li>
           Voting options: Up to{' '}
           <span className='text-violet-500 font-bold'>{data?.upTo || '0'}</span>{' '}
-          option(s) from a list of {data?.options?.length} options.
+          option(s) from a list of {data?.options?.length} options
           <ul className='flex flex-col gap-1'>
             {data?.options?.map((opt: Interface.Option, idx: number) => {
               return (
