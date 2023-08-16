@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
 
 const srcDir = path.join(__dirname, 'src');
 const foldersToCheck = ['middleware', 'redux', 'pages', 'components'];
@@ -44,7 +45,9 @@ function checkImports() {
             importLine.includes('middleware') ||
             importLine.includes('redux')
           ) {
-            console.error(`Components: Error in ${filePath}: ${importLine}`);
+            console.error(
+              chalk.blue(`Components: Error in ${filePath}: ${importLine}`)
+            );
           }
         } else if (folder === 'redux') {
           if (
@@ -52,14 +55,18 @@ function checkImports() {
             importLine.includes('middleware') ||
             importLine.includes('components')
           ) {
-            console.error(`Redux: Error in ${filePath}: ${importLine}`);
+            console.error(
+              chalk.yellow(`Redux: Error in ${filePath}: ${importLine}`)
+            );
           }
         } else if (folder === 'middleware') {
           if (
             importLine.includes('pages') ||
             importLine.includes('components')
           ) {
-            console.error(`Middleware: Error in ${filePath}: ${importLine}`);
+            console.error(
+              chalk.green(`Middleware: Error in ${filePath}: ${importLine}`)
+            );
           }
         } else if (folder === 'pages') {
           if (importLine.includes('redux')) {
@@ -67,12 +74,14 @@ function checkImports() {
               !importLine.includes('react-redux') &&
               !importLine.includes('@redux/reducers/ui.reducer')
             ) {
-              console.error(`Pages: Error in ${filePath}: ${importLine}`);
+              console.error(
+                chalk.red(`Pages: Error in ${filePath}: ${importLine}`)
+              );
             }
           }
           if (isInsidePagesFragmentsFolder(filePath)) {
             if (importLine.includes('pages')) {
-              console.error(`Fragment: Error in ${filePath}: ${importLine}`);
+              console.error(chalk.pinl(`Fragment: Error in ${filePath}: ${importLine}`));
             }
           }
         }
