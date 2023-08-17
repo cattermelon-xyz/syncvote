@@ -18,6 +18,7 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   open,
   onClose,
 }) => {
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const { user } = useSelector((state: any) => state.orginfo);
   const [title, setTitle] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -74,6 +75,7 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
       cancelButtonProps={{ style: { display: 'none' } }}
     >
       <Icon
+        presetIcon={presetIcons}
         size='xlarge'
         editable
         iconUrl={icon_url}

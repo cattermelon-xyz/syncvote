@@ -81,7 +81,9 @@ function checkImports() {
           }
           if (isInsidePagesFragmentsFolder(filePath)) {
             if (importLine.includes('pages')) {
-              console.error(chalk.pinl(`Fragment: Error in ${filePath}: ${importLine}`));
+              console.error(
+                chalk.magenta(`Fragment: Error in ${filePath}: ${importLine}`)
+              );
             }
           }
         }

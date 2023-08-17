@@ -24,9 +24,8 @@ import {
   TabsProps,
   Typography,
 } from 'antd';
-import { error } from 'console';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 type TabProps = {
   workflow: IWorkflow;
@@ -44,6 +43,7 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
   const [emailExisted, setEmailExisted] = useState('');
   const dispatch = useDispatch();
   const versionId = workflow?.workflow_version[0]?.id;
+  const { presetIcons } = useSelector((state: any) => state.ui);
   useEffect(() => {
     if (versionId) {
       queryVersionEditor({
@@ -134,7 +134,11 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
               className='w-full flex justify-between'
             >
               <Space direction='horizontal'>
-                <Icon iconUrl={invitee.icon_url} size='medium' />
+                <Icon
+                  presetIcon={presetIcons}
+                  iconUrl={invitee.icon_url}
+                  size='medium'
+                />
                 <Space direction='vertical'>
                   {invitee.full_name}
                   {invitee.email}

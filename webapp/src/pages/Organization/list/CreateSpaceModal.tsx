@@ -25,6 +25,8 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userId = user.id;
+  const { presetIcons } = useSelector((state: any) => state.ui);
+
   const handleOk = async () => {
     onClose();
 
@@ -74,6 +76,7 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
       cancelButtonProps={{ style: { display: 'none' } }}
     >
       <Icon
+        presetIcon={presetIcons}
         size='xlarge'
         editable
         iconUrl={icon_url}

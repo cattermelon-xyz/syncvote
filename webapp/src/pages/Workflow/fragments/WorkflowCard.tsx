@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Card, Modal, Popover } from 'antd';
-import './AntCard.css';
+// import './AntCard.css';
+import '@components/Card/AntCard.css';
 import { useNavigate } from 'react-router-dom';
 import {
   CopyOutlined,
@@ -14,15 +15,15 @@ import {
 } from '@ant-design/icons';
 import { createIdString, getImageUrl } from '@utils/helpers';
 import Banner from '@components/Banner/Banner';
-import ChangeNameWorkflowModal from '../../pages/Workflow/fragments/ChangeNameWorkflowModal';
-import DeleteWorkflowModal from '../../pages/Workflow/fragments/DeleteWorkflowModal';
-import DuplicateWorkflowModal from '../../pages/Workflow/fragments/DuplicateWorkflowModal';
-import MoveWorkflowModal from '../../pages/Workflow/fragments/MoveWorkflowModal';
-import MoveToWorkflowModal from '../../pages/Workflow/fragments/MoveToWorkflowModal';
-import { useDispatch } from 'react-redux';
-import ShareModal from '@pages/Workflow/Version/fragment/ShareModal';
+import ChangeNameWorkflowModal from './ChangeNameWorkflowModal';
+import DeleteWorkflowModal from './DeleteWorkflowModal';
+import DuplicateWorkflowModal from './DuplicateWorkflowModal';
+import MoveWorkflowModal from './MoveWorkflowModal';
+import MoveToWorkflowModal from './MoveToWorkflowModal';
+import { useDispatch, useSelector } from 'react-redux';
+import ShareModal from '../Version/fragment/ShareModal';
 import { upsertWorkflowVersion } from '@middleware/data';
-import PreviewWorkflowModal from '@pages/Workflow/fragments/PreviewWorkflowModal';
+import PreviewWorkflowModal from './PreviewWorkflowModal';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
@@ -35,7 +36,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 }) => {
   const isMyWorkSpacePage = location.pathname === '/my-workspaces';
   const isSharedWorkSpacePage = location.pathname === '/shared-workspaces';
-
+  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
   const dispatch = useDispatch();
   const [openModalChangeName, setOpenModalChangeName] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -341,6 +342,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       >
         {
           <Banner
+            presetBanners={presetBanners}
             bannerUrl={dataWorkflow.banner_url}
             className='w-full h-[86px] rounded-lg m-0'
           />

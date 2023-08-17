@@ -33,6 +33,7 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const { orgs, user } = useSelector((state: any) => state.orginfo);
   const org = orgs.find((tmp: any) => tmp.id === dataSpace.id);
+  const { presetIcons } = useSelector((state: any) => state.ui);
 
   useEffect(() => {
     if (visible) {
@@ -197,11 +198,24 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
                   const items: MenuProps['items'] = [
                     {
                       key: '1',
-                      label: <Button type='text' className='text-base'>Editor</Button>,
+                      label: (
+                        <Button type='text' className='text-base'>
+                          Editor
+                        </Button>
+                      ),
                     },
                     {
                       key: '2',
-                      label: <Button type='text' ghost disabled className='text-base'>Owner</Button>,
+                      label: (
+                        <Button
+                          type='text'
+                          ghost
+                          disabled
+                          className='text-base'
+                        >
+                          Owner
+                        </Button>
+                      ),
                     },
                     {
                       key: '3',
@@ -226,7 +240,11 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
                         key={index}
                       >
                         <Space size='small'>
-                          <Icon iconUrl={userInfo?.avatar_url} size='large' />
+                          <Icon
+                            presetIcon={presetIcons}
+                            iconUrl={userInfo?.avatar_url}
+                            size='large'
+                          />
                           <Space direction='vertical' size='small'>
                             <p className='text-gray-500'>
                               This email is not associated with an account
@@ -251,7 +269,11 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
                         key={index}
                       >
                         <Space size='small'>
-                          <Icon iconUrl={userInfo?.avatar_url} size='large' />
+                          <Icon
+                            presetIcon={presetIcons}
+                            iconUrl={userInfo?.avatar_url}
+                            size='large'
+                          />
                           <Space direction='vertical' size='small'>
                             <p>{userInfo?.full_name}</p>
                             <p className='text-gray-500'>{userInfo?.email}</p>

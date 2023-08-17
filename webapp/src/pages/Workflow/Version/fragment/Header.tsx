@@ -63,6 +63,7 @@ function Header({
   const handleClearStore = () => {};
   const [showWorkflowPanel, setShowWorkflowPanel] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const handleSaveWorkflowInfo = async ({
     title,
     desc,
@@ -209,7 +210,11 @@ function Header({
             className='cursor-pointer hover:text-violet-500'
             onClick={() => setShowWorkflowPanel(true)}
           >
-            <Icon iconUrl={workflow?.icon_url} size='medium' />
+            <Icon
+              presetIcon={presetIcons}
+              iconUrl={workflow?.icon_url}
+              size='medium'
+            />
             <div className='flex items-center font-bold'>{workflow?.title}</div>
           </Space>
         </Space>

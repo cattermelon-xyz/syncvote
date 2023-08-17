@@ -4,7 +4,6 @@ import { Card, Button, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUserProfile } from '@middleware/data';
-import { setUser } from '@redux/reducers/orginfo.reducer';
 import { Modal } from 'antd';
 import ChangeModal from '@pages/Account/pages/AccountSetting/fragments/ChangeAccountModal';
 
@@ -14,6 +13,7 @@ const AccountSetting = () => {
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url);
   const [openModal, setOpenModal] = useState(false);
   const [isChangeName, setIsChangeName] = useState(false);
+  const { presetIcons } = useSelector((state: any) => state.ui);
 
   useEffect(() => {
     setAvatarUrl(user?.avatar_url);
@@ -31,12 +31,12 @@ const AccountSetting = () => {
       },
       dispatch,
       onSuccess: () => {
-        dispatch(
-          setUser({
-            ...user,
-            avatar_url: newAvatarUrl,
-          })
-        );
+        // dispatch(
+        //   setUser({
+        //     ...user,
+        //     avatar_url: newAvatarUrl,
+        //   })
+        // );
         Modal.success({
           title: 'Success',
           content: 'Change avatar successfully',
@@ -64,6 +64,7 @@ const AccountSetting = () => {
       <div className='flex w-1/3 mt-12 gap-8 items-start'>
         <Space>
           <Icon
+            presetIcon={presetIcons}
             editable={true}
             iconUrl={avatarUrl}
             onUpload={handleChangeAvatar}

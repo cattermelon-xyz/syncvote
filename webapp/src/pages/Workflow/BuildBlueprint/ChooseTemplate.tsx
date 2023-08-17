@@ -7,7 +7,6 @@ import Icon from '@components/Icon/Icon';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
-import { changeWorkflow } from '@redux/reducers/workflow.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
 import { emptyStage } from '@components/DirectedGraph';
 import { insertWorkflowAndVersion } from '@middleware/data';
@@ -26,6 +25,7 @@ const ChooseTemplate = () => {
   const [desc, setDesc] = useState('');
   const [iconUrl, setIconUrl] = useState('');
   const handleNavigate = () => {};
+  const { presetIcons } = useSelector((state: any) => state.ui);
   // TODO: use utils/data in here
   const handleSave = async () => {
     // Cannot test because dont have create workflow button
@@ -60,6 +60,7 @@ const ChooseTemplate = () => {
             <h1 className=''>Add basic Info</h1>
           </Space>
           <Icon
+            presetIcon={presetIcons}
             iconUrl={iconUrl}
             editable
             onUpload={(obj) => {

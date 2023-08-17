@@ -20,6 +20,7 @@ const NewOrgFrm = ({ onSubmit }: { onSubmit: () => void }) => {
   const [org_type, setOrgType] = useState(OrgType[0]); //eslint-disable-line
   const [icon_url, setIconUrl] = useState(''); //eslint-disable-line
   const dispatch = useDispatch();
+  const { presetIcons } = useSelector((state: any) => state.ui);
 
   const { user } = useSelector((state: any) => state.orginfo);
 
@@ -28,6 +29,7 @@ const NewOrgFrm = ({ onSubmit }: { onSubmit: () => void }) => {
       <div className='mt-4'>
         <div className='mt-4'>
           <Icon
+            presetIcon={presetIcons}
             size='xlarge'
             editable
             iconUrl={icon_url}

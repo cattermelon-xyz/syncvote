@@ -3,7 +3,6 @@ import { Modal, Input } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUserProfile } from '@middleware/data';
-import { setUser } from '@redux/reducers/orginfo.reducer';
 
 interface ChangeModalProps {
   open: boolean;
@@ -35,7 +34,6 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
       userProfile: newUserProfile,
       dispatch,
       onSuccess: () => {
-        dispatch(setUser(newUserProfile));
         Modal.success({
           title: 'Success',
           content: 'Change information successfully',

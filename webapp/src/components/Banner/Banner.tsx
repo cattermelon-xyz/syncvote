@@ -2,7 +2,6 @@ import { getImageUrl } from '@utils/helpers';
 import { OrgPresetBanner } from '@utils/constants/organization';
 import { Button, Modal, Space, Tabs } from 'antd';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 import './index.scss';
 import { LoadingOutlined } from '@ant-design/icons';
 import { supabase } from '@utils/supabaseClient';
@@ -12,6 +11,7 @@ type BannerProps = {
   onChange?: (args: { filePath: string; isPreset: boolean }) => void;
   editable?: boolean;
   className?: string;
+  presetBanners: any;
 };
 
 const Banner = ({
@@ -19,6 +19,7 @@ const Banner = ({
   onChange,
   editable = false,
   className = '',
+  presetBanners,
 }: BannerProps) => {
   let url = bannerUrl ? bannerUrl : `preset:${OrgPresetBanner}`;
   url = getImageUrl({
@@ -27,7 +28,6 @@ const Banner = ({
     type: 'banner',
   });
   const [shouldShowModal, setShouldShowModal] = useState(false);
-  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
   const [showButtonPanel, setShowButtonPanel] = useState(false);
   const [uploading, setUploading] = useState(false);
   const uploadBanner = async (event: any) => {

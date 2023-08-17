@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import SpaceCard from '@components/Card/SpaceCard';
+import SpaceCard from '@pages/Organization/fragments/SpaceCard';
 import { useSelector } from 'react-redux';
 import { queryOrgsAndWorkflowForHome } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import { L } from '@utils/locales/L';
-import WorkflowCard from '@components/Card/WorkflowCard';
+import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { useParams } from 'react-router-dom';
 import SortButton from '@components/SortButton/SortButton';
 

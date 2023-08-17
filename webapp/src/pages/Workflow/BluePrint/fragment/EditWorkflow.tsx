@@ -5,15 +5,7 @@ import Icon from '@components/Icon/Icon';
 import { updateAWorkflowTag } from '@middleware/data';
 import { newTag, queryTag } from '@middleware/data/tag';
 import { ITag, IWorkflow } from '@types';
-import {
-  Button,
-  Drawer,
-  Input,
-  Select,
-  SelectProps,
-  Space,
-  Switch,
-} from 'antd';
+import { Drawer, Input, Select, SelectProps, Space, Switch } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -65,8 +57,10 @@ const EditWorkflow = ({
   const [desc, setDesc] = useState(workflowDesc);
   const [iconUrl, setIconUrl] = useState(workflowIcon);
   const [status, setStatus] = useState(workflow?.workflow_version[0]?.status);
+  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
   const tags: ITag[] = useSelector((state: any) => state.ui.tags) || [];
   const dispatch = useDispatch();
+  const { presetIcons } = useSelector((state: any) => state.ui);
   useEffect(() => {
     setTitle(workflow?.title);
     setDesc(workflow?.desc);
@@ -129,6 +123,7 @@ const EditWorkflow = ({
     >
       <div className='relative w-full'>
         <Banner
+          presetBanners={presetBanners}
           bannerUrl={workflow?.banner_url || ''}
           onChange={async ({ filePath, isPreset }) => {
             setOpen(false);
@@ -141,6 +136,7 @@ const EditWorkflow = ({
         />
         <div className='absolute -bottom-[30px] left-[16px]'>
           <Icon
+            presetIcon={presetIcons}
             size='xlarge'
             iconUrl={iconUrl}
             editable

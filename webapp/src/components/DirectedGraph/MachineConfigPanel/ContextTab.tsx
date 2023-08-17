@@ -6,17 +6,73 @@ import {
   LockFilled,
   UnlockOutlined,
 } from '@ant-design/icons';
-import { validateWorkflow, validateMission } from '@middleware/logic';
 import parse from 'html-react-parser';
 import { getVoteMachine } from '../voteMachine';
 import { Markers } from '../markers';
 import { useContext } from 'react';
 import { GraphPanelContext } from '../context';
 import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
-import { GraphViewMode } from '../interface';
+import { GraphViewMode, ICheckPoint } from '../interface';
 import CollapsiblePanel from '../components/CollapsiblePanel';
 import GeneralInfo from '../components/GeneralInfo';
 import { isRTE } from '../utils';
+
+export const validateWorkflow = ({
+  checkPoint,
+}: {
+  checkPoint: ICheckPoint | undefined;
+}) => {
+  const message = [];
+  let isValid = true;
+  if (checkPoint?.isEnd) {
+    // End checkPoint require no condition
+    isValid = true;
+  } else {
+    if (
+      checkPoint?.participation === undefined ||
+      checkPoint?.participation?.data === undefined
+    ) {
+      isValid = false;
+      message.push('Missing voting participation condition');
+    }
+    if (checkPoint?.vote_machine_type === undefined) {
+      isValid = false;
+      message.push('Missing voting machine type');
+    }
+    if (!checkPoint?.duration) {
+      isValid = false;
+      message.push('Missing duration');
+    }
+    if (!checkPoint?.data) {
+      isValid = false;
+      message.push('Vote configuration is missing');
+    }
+  }
+  return {
+    isValid,
+    message,
+  };
+};
+
+export const validateMission = ({
+  checkPoint,
+}: {
+  checkPoint: ICheckPoint | undefined;
+}) => {
+  let message: string[] = [];
+  let isValid = true;
+  if (checkPoint?.isEnd) {
+    // End checkPoint require no condition
+    isValid = true;
+  } else {
+    isValid = true;
+    message = ['nothing has been done'];
+  }
+  return {
+    isValid,
+    message,
+  };
+};
 
 const ContextTab = () => {
   const {

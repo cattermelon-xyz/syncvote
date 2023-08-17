@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { L } from '@utils/locales/L';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@utils/supabaseClient';
-import WorkflowCard from '@components/Card/WorkflowCard';
+import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { SearchOutlined, SortAscendingOutlined } from '@ant-design/icons';
 import { Input, Tag, Space, Button, Popover } from 'antd';

@@ -3,7 +3,7 @@ import { Typography } from 'antd';
 import SearchBar from './fragments/SearchBar';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
-import WorkflowCard from '@components/Card/WorkflowCard';
+import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import ListItem from '@components/ListItem/ListItem';
 import { Skeleton } from 'antd';
 import { useDispatch } from 'react-redux';

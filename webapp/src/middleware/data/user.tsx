@@ -35,7 +35,7 @@ export const inviteUserByEmail = async ({
       body: JSON.stringify({
         email,
         orgId,
-        env: import.meta.env.VITE_EVN
+        env: import.meta.env.VITE_EVN,
       }),
     });
     const result = await response.json();
@@ -165,6 +165,7 @@ export const updateUserProfile = async ({
     .eq('id', newUserProfile.id);
   if (!error) {
     onSuccess();
+    dispatch(setUser(newUserProfile));
   } else {
     onError(error);
   }

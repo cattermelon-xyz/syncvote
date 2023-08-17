@@ -2,22 +2,29 @@ import Icon from '@components/Icon/Icon';
 import { Input, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { IMission } from '@types';
+import { useSelector } from 'react-redux';
 
 const Meta = ({
-  currentMission, setCurrentMission,
-}:{
-  currentMission:IMission,
-  setCurrentMission: (data:any) => void;
+  currentMission,
+  setCurrentMission,
+}: {
+  currentMission: IMission;
+  setCurrentMission: (data: any) => void;
 }) => {
+  const { presetIcons } = useSelector((state: any) => state.ui);
   return (
-    <Space direction="vertical" size="large" className="w-full">
-      <Space direction="vertical" className="w-full">
+    <Space direction='vertical' size='large' className='w-full'>
+      <Space direction='vertical' className='w-full'>
         <Icon
+          presetIcon={presetIcons}
           editable={currentMission.status !== 'PUBLISHED'}
           iconUrl={currentMission.icon_url}
-          onUpload={({ filePath, isPreset }: {
-            filePath: string,
-            isPreset: boolean,
+          onUpload={({
+            filePath,
+            isPreset,
+          }: {
+            filePath: string;
+            isPreset: boolean;
           }) => {
             setCurrentMission({
               ...currentMission,
@@ -26,11 +33,11 @@ const Meta = ({
           }}
         />
       </Space>
-      <Space direction="vertical" size="small" className="w-full">
+      <Space direction='vertical' size='small' className='w-full'>
         <span>Title</span>
         <Input
-          placeholder="Mission title"
-          className="w-full"
+          placeholder='Mission title'
+          className='w-full'
           value={currentMission.title}
           onChange={(e) => {
             setCurrentMission({
@@ -41,11 +48,11 @@ const Meta = ({
           disabled={currentMission.status === 'PUBLISHED'}
         />
       </Space>
-      <Space direction="vertical" className="w-full">
+      <Space direction='vertical' className='w-full'>
         <span>Description</span>
         <TextArea
-          placeholder="Mission description"
-          className="w-[100%] border border-primary_logo"
+          placeholder='Mission description'
+          className='w-[100%] border border-primary_logo'
           rows={2}
           value={currentMission.desc}
           onChange={(e) => {

@@ -10,7 +10,7 @@ import {
 import { extractIdFromIdString } from '@utils/helpers';
 import { Button, Layout, Space, notification, Skeleton, Popover } from 'antd';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FiCalendar, FiHome, FiLink, FiUser, FiDownload } from 'react-icons/fi';
 import { MdChatBubbleOutline } from 'react-icons/md';
@@ -49,6 +49,7 @@ export const PublicVersion = () => {
   const where = `${orgId}$/${workflowId}$/${versionId}$`;
   const [dataReaction, setDataReaction] = useState<any[]>([]);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
+  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
 
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
@@ -67,7 +68,7 @@ export const PublicVersion = () => {
     setDataReaction(data);
   };
   const urlToCopy = window.location.href;
-
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const [visible, setVisible] = useState(false);
 
   const handleClick = async () => {
@@ -135,7 +136,10 @@ export const PublicVersion = () => {
         {version?.status === 'PUBLISHED' ||
         version?.status === 'PUBLIC_COMMUNITY' ? (
           <>
-            <Banner bannerUrl={workflow?.banner_url} />
+            <Banner
+              presetBanners={presetBanners}
+              bannerUrl={workflow?.banner_url}
+            />
             <Layout>
               <Sider
                 collapsed={!collapsed}
@@ -146,7 +150,11 @@ export const PublicVersion = () => {
                 className='information-collapsed'
               >
                 <Space direction='horizontal' className='p-5 bg-white'>
-                  <Icon iconUrl={workflow?.icon_url} size='large' />
+                  <Icon
+                    presetIcon={presetIcons}
+                    iconUrl={workflow?.icon_url}
+                    size='large'
+                  />
                   <Space direction='vertical'>
                     <p className='text-lg font-normal'>
                       {worflowInfo.workflow}
@@ -199,7 +207,11 @@ export const PublicVersion = () => {
                 {!collapsed && (
                   <Space className='absolute left-0 m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit mt-7'>
                     <Space>
-                      <Icon iconUrl={workflow?.icon_url} size='large' />
+                      <Icon
+                        presetIcon={presetIcons}
+                        iconUrl={workflow?.icon_url}
+                        size='large'
+                      />
                     </Space>
                     <Space direction='vertical' className='w-full'>
                       <p className='text-[17px] font-normal items-left w-full'>

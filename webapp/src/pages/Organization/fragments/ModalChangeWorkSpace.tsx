@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
 import Icon from '@components/Icon/Icon';
 import { L } from '@utils/locales/L';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { upsertAnOrg } from '@middleware/data';
 
 interface ModalChangeWorkSpaceProps {
@@ -19,6 +19,7 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
   const dispatch = useDispatch();
   const [iconUrl, setIconUrl] = useState(dataSpace?.icon_url);
   const [title, setTitle] = useState(dataSpace?.title);
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const handleCancel = () => {
     onClose();
   };
@@ -64,6 +65,7 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
       cancelButtonProps={{ style: { display: 'none' } }}
     >
       <Icon
+        presetIcon={presetIcons}
         size='xlarge'
         editable
         iconUrl={iconUrl}

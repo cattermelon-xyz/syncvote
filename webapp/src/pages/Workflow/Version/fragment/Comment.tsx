@@ -9,7 +9,7 @@ import {
   getDataComment,
   CommentType,
 } from '@middleware/data/comment';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type {
   NotificationInstance,
   NotificationPlacement,
@@ -42,7 +42,7 @@ const Comment = ({
   const [dataReply, setDataReply] = useState<CommentType[]>([]);
   const [offset, setOffset] = useState(0);
   const [offsetReply, setOffsetReply] = useState(0);
-
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const limit = 5;
 
   useEffect(() => {
@@ -192,6 +192,7 @@ const Comment = ({
                               <List.Item.Meta
                                 avatar={
                                   <Icon
+                                    presetIcon={presetIcons}
                                     size='large'
                                     iconUrl={item?.profile?.avatar_url}
                                   />
@@ -220,6 +221,7 @@ const Comment = ({
                                     avatar={
                                       // <Avatar src={item?.profile?.avatar_url} />
                                       <Icon
+                                        presetIcon={presetIcons}
                                         size='large'
                                         iconUrl={item?.profile?.avatar_url}
                                       />
@@ -251,6 +253,7 @@ const Comment = ({
                                     avatar={
                                       // <Avatar src={item?.profile?.avatar_url} />
                                       <Icon
+                                        presetIcon={presetIcons}
                                         size='large'
                                         iconUrl={item?.profile?.avatar_url}
                                       />

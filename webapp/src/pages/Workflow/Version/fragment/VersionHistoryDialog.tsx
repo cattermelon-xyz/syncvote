@@ -1,11 +1,10 @@
 import { CiCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { queryVersionHistory } from '@middleware/data';
-import { IWorkflowVersion } from '@types';
 import { Divider, Modal, Space } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 type VersionHistoryDialogProps = {
   workflow: any;
@@ -17,6 +16,7 @@ const VersionHistoryDialog = (props: VersionHistoryDialogProps) => {
   const { workflow, visible, onCancel } = props;
   const [historicalVersions, setHistoricalVersions] = useState([]);
   const dispatch = useDispatch();
+  const { presetIcons } = useSelector((state: any) => state.ui);
   useEffect(() => {
     const versionId = workflow?.workflow_version[0]?.id;
     if (versionId) {
@@ -53,7 +53,11 @@ const VersionHistoryDialog = (props: VersionHistoryDialogProps) => {
               </Space>
               <Space direction='horizontal' className='flex items-center'>
                 <Divider type='vertical' />
-                <Icon iconUrl={version.icon_url} size='small' />
+                <Icon
+                  presetIcon={presetIcons}
+                  iconUrl={version.icon_url}
+                  size='small'
+                />
                 <div>{version.full_name}</div>
               </Space>
             </div>

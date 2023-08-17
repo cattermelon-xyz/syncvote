@@ -23,7 +23,7 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { orgs, user } = useSelector((state: any) => state.orginfo);
-
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const handleCancel = () => {
     onClose();
   };
@@ -94,6 +94,7 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
               ) : (
                 <Space className='p-3'>
                   <Icon
+                    presetIcon={presetIcons}
                     iconUrl={org.icon_url ? org.icon_url : ''}
                     size='medium'
                   />
