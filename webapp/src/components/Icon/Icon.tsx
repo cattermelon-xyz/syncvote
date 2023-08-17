@@ -5,7 +5,6 @@ import {
   CameraOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
 import { L } from '../../utils/locales/L';
 import { supabase } from '../../utils/supabaseClient';
 import { getImageUrl } from '../../utils/helpers';
