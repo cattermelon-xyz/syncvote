@@ -21,9 +21,9 @@ import DuplicateWorkflowModal from './DuplicateWorkflowModal';
 import MoveWorkflowModal from './MoveWorkflowModal';
 import MoveToWorkflowModal from './MoveToWorkflowModal';
 import { useDispatch, useSelector } from 'react-redux';
-import ShareModal from '@pages/Workflow/Version/fragment/ShareModal';
+import ShareModal from '../Version/fragment/ShareModal';
 import { upsertWorkflowVersion } from '@middleware/data';
-import PreviewWorkflowModal from '@pages/Workflow/fragments/PreviewWorkflowModal';
+import PreviewWorkflowModal from './PreviewWorkflowModal';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
