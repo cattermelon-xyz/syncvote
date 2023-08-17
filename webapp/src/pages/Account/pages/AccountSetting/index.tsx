@@ -13,6 +13,7 @@ const AccountSetting = () => {
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url);
   const [openModal, setOpenModal] = useState(false);
   const [isChangeName, setIsChangeName] = useState(false);
+  const { presetIcons } = useSelector((state: any) => state.ui);
 
   useEffect(() => {
     setAvatarUrl(user?.avatar_url);
@@ -63,6 +64,7 @@ const AccountSetting = () => {
       <div className='flex w-1/3 mt-12 gap-8 items-start'>
         <Space>
           <Icon
+            presetIcon={presetIcons}
             editable={true}
             iconUrl={avatarUrl}
             onUpload={handleChangeAvatar}

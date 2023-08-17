@@ -9,17 +9,19 @@ import { useSelector } from 'react-redux';
 import { L } from '../../utils/locales/L';
 import { supabase } from '../../utils/supabaseClient';
 import { getImageUrl } from '../../utils/helpers';
+import React from 'react';
 
 const ChooseImageModal = ({
   isOpen = false,
   onCancel,
   uploadIcon,
+  presetIcons,
 }: {
   isOpen?: boolean;
   onCancel: () => void;
   uploadIcon: (args: any) => void;
+  presetIcons: any;
 }) => {
-  const { presetIcons } = useSelector((state: any) => state.ui);
   return (
     <Modal open={isOpen} title={L('chooseIcon')} onCancel={onCancel}>
       <p>Choose or upload one</p>
@@ -57,9 +59,11 @@ interface UploadIconProps {
 const UploadBtn = ({
   uploading = false,
   uploadIcon,
+  presetIcon,
 }: {
   uploading?: boolean;
   uploadIcon: (args: UploadIconProps) => void;
+  presetIcon: any;
 }) => {
   const [shouldShowDialog, setShouldShowDialog] = useState(false);
   return (
@@ -73,6 +77,7 @@ const UploadBtn = ({
         icon={uploading === true ? <LoadingOutlined /> : <CameraOutlined />}
       />
       <ChooseImageModal
+        presetIcons={presetIcon}
         isOpen={shouldShowDialog}
         onCancel={() => setShouldShowDialog(false)}
         // uploading={uploading}
@@ -91,12 +96,14 @@ const Icon = ({
   onUpload,
   editable,
   children,
+  presetIcon,
 }: {
   iconUrl?: string;
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   onUpload?: (args: { filePath: string; isPreset: boolean }) => void;
   editable?: boolean;
   children?: React.ReactNode;
+  presetIcon: any;
 }) => {
   const [uploading, setUploading] = useState(false);
   const filePath =
@@ -179,7 +186,11 @@ const Icon = ({
             }
           />
           {editable === true ? (
-            <UploadBtn uploading={uploading} uploadIcon={uploadIcon} />
+            <UploadBtn
+              presetIcon={presetIcon}
+              uploading={uploading}
+              uploadIcon={uploadIcon}
+            />
           ) : null}
         </div>
       ) : (
@@ -202,7 +213,11 @@ const Icon = ({
             />
           )}
           {editable === true ? (
-            <UploadBtn uploading={uploading} uploadIcon={uploadIcon} />
+            <UploadBtn
+              presetIcon={presetIcon}
+              uploading={uploading}
+              uploadIcon={uploadIcon}
+            />
           ) : null}
         </div>
       )}

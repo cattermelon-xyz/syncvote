@@ -25,11 +25,13 @@ const BannerDashBoard = ({
   setOrg,
   setShowOrgEdit,
   presetBanners,
+  presetIcon,
 }: {
   presetBanners: any;
   org: any;
   setOrg: (data: any) => void;
   setShowOrgEdit: (data: boolean) => void;
+  presetIcon: any;
 }) => {
   const [isDropDown, setIsDropDown] = useState<boolean>(false);
   const optionRef = useClickOutside(() => setIsDropDown(false));
@@ -105,12 +107,17 @@ const BannerDashBoard = ({
           <div className='flex'>
             {org.icon_url ? (
               <Icon
+                presetIcon={presetIcon}
                 editable={org.role === 'ADMIN'}
                 iconUrl={org.icon_url}
                 onUpload={handleIconChange}
               />
             ) : (
-              <Icon editable={org.role === 'ADMIN'} onUpload={handleIconChange}>
+              <Icon
+                presetIcon={presetIcon}
+                editable={org.role === 'ADMIN'}
+                onUpload={handleIconChange}
+              >
                 <span style={{ fontSize: '48px' }}>{org.title.charAt(0)}</span>
               </Icon>
             )}

@@ -27,6 +27,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   const [offset, setOffset] = useState(0);
   const limit = 5;
   const [dataOrgs, setDataOrgs] = useState<any>([]);
+  const { presetIcons } = useSelector((state: any) => state.ui);
 
   const loadWorkflowData = async (offset: any, limit: any) => {
     if (user?.id !== null) {
@@ -103,6 +104,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
                 ) : (
                   <Space className='p-3'>
                     <Icon
+                      presetIcon={presetIcons}
                       iconUrl={org.icon_url ? org.icon_url : ''}
                       size='medium'
                     />

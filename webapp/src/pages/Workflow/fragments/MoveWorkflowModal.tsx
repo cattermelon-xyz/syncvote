@@ -18,7 +18,7 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
   workflow,
   openMoveToModal,
 }) => {
-  const dispatch = useDispatch();
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const [dataOrgs, setDataOrgs] = useState<any>([]);
   const { orgs, user } = useSelector((state: any) => state.orginfo);
   const [org_owner, setOrgOwner] = useState<any>();
@@ -68,6 +68,7 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
         <Space className='bg-[#F4F0FA] rounded-lg'>
           <div className='flex mx-3 my-2 justify-center items-center'>
             <Icon
+              presetIcon={presetIcons}
               iconUrl={org_owner?.icon_url ? org_owner?.icon_url : ''}
               size='medium'
             />
@@ -111,6 +112,7 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
               ) : (
                 <Space className='p-3'>
                   <Icon
+                    presetIcon={presetIcons}
                     iconUrl={org.icon_url ? org.icon_url : ''}
                     size='medium'
                   />

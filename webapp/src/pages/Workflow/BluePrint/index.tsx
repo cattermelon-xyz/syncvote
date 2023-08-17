@@ -33,9 +33,7 @@ const BluePrint = () => {
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
   );
   const data = location.state?.dataSpace || org;
-  console.log('data:', data);
-  const dispatch = useDispatch();
-
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
     by: '',
     type: 'asc',
@@ -74,7 +72,11 @@ const BluePrint = () => {
       </div>
       <div className='mb-6 flex gap-2 items-center'>
         {data?.icon_url ? (
-          <Icon iconUrl={data?.icon_url} size='large' />
+          <Icon
+            presetIcon={presetIcons}
+            iconUrl={data?.icon_url}
+            size='large'
+          />
         ) : (
           <Avatar
             shape='circle'

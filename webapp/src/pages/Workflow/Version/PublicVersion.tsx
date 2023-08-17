@@ -68,7 +68,7 @@ export const PublicVersion = () => {
     setDataReaction(data);
   };
   const urlToCopy = window.location.href;
-
+  const { presetIcons } = useSelector((state: any) => state.ui);
   const [visible, setVisible] = useState(false);
 
   const handleClick = async () => {
@@ -150,7 +150,11 @@ export const PublicVersion = () => {
                 className='information-collapsed'
               >
                 <Space direction='horizontal' className='p-5 bg-white'>
-                  <Icon iconUrl={workflow?.icon_url} size='large' />
+                  <Icon
+                    presetIcon={presetIcons}
+                    iconUrl={workflow?.icon_url}
+                    size='large'
+                  />
                   <Space direction='vertical'>
                     <p className='text-lg font-normal'>
                       {worflowInfo.workflow}
@@ -203,7 +207,11 @@ export const PublicVersion = () => {
                 {!collapsed && (
                   <Space className='absolute left-0 m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit mt-7'>
                     <Space>
-                      <Icon iconUrl={workflow?.icon_url} size='large' />
+                      <Icon
+                        presetIcon={presetIcons}
+                        iconUrl={workflow?.icon_url}
+                        size='large'
+                      />
                     </Space>
                     <Space direction='vertical' className='w-full'>
                       <p className='text-[17px] font-normal items-left w-full'>

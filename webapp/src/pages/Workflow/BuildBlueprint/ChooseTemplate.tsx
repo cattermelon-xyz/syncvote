@@ -25,6 +25,7 @@ const ChooseTemplate = () => {
   const [desc, setDesc] = useState('');
   const [iconUrl, setIconUrl] = useState('');
   const handleNavigate = () => {};
+  const { presetIcons } = useSelector((state: any) => state.ui);
   // TODO: use utils/data in here
   const handleSave = async () => {
     // Cannot test because dont have create workflow button
@@ -59,6 +60,7 @@ const ChooseTemplate = () => {
             <h1 className=''>Add basic Info</h1>
           </Space>
           <Icon
+            presetIcon={presetIcons}
             iconUrl={iconUrl}
             editable
             onUpload={(obj) => {

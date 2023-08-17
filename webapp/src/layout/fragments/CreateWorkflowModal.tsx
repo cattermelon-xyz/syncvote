@@ -27,6 +27,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   const [confirmLoading, setConfirmLoading] = useState(false);
   const dispatch = useDispatch();
   const sortedOrgs = [...orgs];
+  const { presetIcons } = useSelector((state: any) => state.ui);
 
   if (orgs) {
     sortedOrgs.sort((a: any, b: any) => {
@@ -121,6 +122,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
               ) : (
                 <Space className='p-3'>
                   <Icon
+                    presetIcon={presetIcons}
                     iconUrl={org.icon_url ? org.icon_url : ''}
                     size='medium'
                   />
