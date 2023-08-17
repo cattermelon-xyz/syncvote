@@ -31,6 +31,7 @@ function App({
   // const [isAuth, setIsAuth] = useState(false);
   const navigate = useNavigate();
   // const token = window.localStorage.getItem('isConnectWallet');
+  const { loading } = useSelector((state: any) => state.ui);
   const [session, setSession] = useState<Session | null>(null);
   const location = useLocation();
   const { presetIcons, presetBanners, initialized } = useSelector(
@@ -96,7 +97,7 @@ function App({
   return (
     <AuthContext.Provider value={{ session }}>
       <Layout>
-        <GlobalLoading />
+        <GlobalLoading loading={loading} />
         <Outlet />
       </Layout>
     </AuthContext.Provider>

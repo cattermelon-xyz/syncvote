@@ -7,7 +7,6 @@ import Icon from '@components/Icon/Icon';
 import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
-// import { changeWorkflow } from '@redux/reducers/workflow.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
 import { emptyStage } from '@components/DirectedGraph';
 import { insertWorkflowAndVersion } from '@middleware/data';

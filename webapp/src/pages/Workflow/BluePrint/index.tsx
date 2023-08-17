@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { LeftOutlined } from '@ant-design/icons';
-import WorkflowCard from '@components/Card/WorkflowCard';
+import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { L } from '@utils/locales/L';
 import { Skeleton, Empty } from 'antd';
 import ListItem from '@components/ListItem/ListItem';

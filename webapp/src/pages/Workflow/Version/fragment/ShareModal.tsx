@@ -24,7 +24,6 @@ import {
   TabsProps,
   Typography,
 } from 'antd';
-import { error } from 'console';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 

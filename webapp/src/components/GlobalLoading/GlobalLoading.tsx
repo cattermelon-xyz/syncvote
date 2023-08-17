@@ -1,6 +1,5 @@
 import { Modal, Spin, Space } from 'antd';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 function Spinner() {
   return (
@@ -10,8 +9,7 @@ function Spinner() {
   );
 }
 
-const GlobalLoading = () => {
-  const { loading } = useSelector((state: any) => state.ui);
+const GlobalLoading = ({ loading }: { loading: any }) => {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     setOpen(loading);

@@ -65,6 +65,7 @@ const EditWorkflow = ({
   const [desc, setDesc] = useState(workflowDesc);
   const [iconUrl, setIconUrl] = useState(workflowIcon);
   const [status, setStatus] = useState(workflow?.workflow_version[0]?.status);
+  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
   const tags: ITag[] = useSelector((state: any) => state.ui.tags) || [];
   const dispatch = useDispatch();
   useEffect(() => {
@@ -129,6 +130,7 @@ const EditWorkflow = ({
     >
       <div className='relative w-full'>
         <Banner
+          presetBanners={presetBanners}
           bannerUrl={workflow?.banner_url || ''}
           onChange={async ({ filePath, isPreset }) => {
             setOpen(false);

@@ -4,7 +4,6 @@ import { Card, Button, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUserProfile } from '@middleware/data';
-import { setUser } from '@redux/reducers/orginfo.reducer';
 import { Modal } from 'antd';
 import ChangeModal from '@pages/Account/pages/AccountSetting/fragments/ChangeAccountModal';
 
@@ -31,12 +30,12 @@ const AccountSetting = () => {
       },
       dispatch,
       onSuccess: () => {
-        dispatch(
-          setUser({
-            ...user,
-            avatar_url: newAvatarUrl,
-          })
-        );
+        // dispatch(
+        //   setUser({
+        //     ...user,
+        //     avatar_url: newAvatarUrl,
+        //   })
+        // );
         Modal.success({
           title: 'Success',
           content: 'Change avatar successfully',

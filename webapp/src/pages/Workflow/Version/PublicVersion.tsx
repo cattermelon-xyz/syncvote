@@ -10,7 +10,7 @@ import {
 import { extractIdFromIdString } from '@utils/helpers';
 import { Button, Layout, Space, notification, Skeleton, Popover } from 'antd';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FiCalendar, FiHome, FiLink, FiUser, FiDownload } from 'react-icons/fi';
 import { MdChatBubbleOutline } from 'react-icons/md';
@@ -49,6 +49,7 @@ export const PublicVersion = () => {
   const where = `${orgId}$/${workflowId}$/${versionId}$`;
   const [dataReaction, setDataReaction] = useState<any[]>([]);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
+  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
 
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
@@ -135,7 +136,10 @@ export const PublicVersion = () => {
         {version?.status === 'PUBLISHED' ||
         version?.status === 'PUBLIC_COMMUNITY' ? (
           <>
-            <Banner bannerUrl={workflow?.banner_url} />
+            <Banner
+              presetBanners={presetBanners}
+              bannerUrl={workflow?.banner_url}
+            />
             <Layout>
               <Sider
                 collapsed={!collapsed}

@@ -10,7 +10,6 @@ import './styles.scss';
 import { OrgPresetBanner } from '@utils/constants/organization';
 import Icon from '@components/Icon/Icon';
 import { Modal, Space } from 'antd';
-import { useSelector } from 'react-redux';
 import { createIdString, getImageUrl } from '@utils/helpers';
 import { EditOutlined } from '@ant-design/icons';
 
@@ -25,7 +24,9 @@ const BannerDashBoard = ({
   },
   setOrg,
   setShowOrgEdit,
+  presetBanners,
 }: {
+  presetBanners: any;
   org: any;
   setOrg: (data: any) => void;
   setShowOrgEdit: (data: boolean) => void;
@@ -45,7 +46,6 @@ const BannerDashBoard = ({
     type: 'banner',
   });
   const isAdmin = org.role === 'ADMIN';
-  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
   const handleIconChange = ({
     filePath,
     isPreset,
@@ -60,11 +60,11 @@ const BannerDashBoard = ({
   };
   return (
     <div
-      className="banner-image"
+      className='banner-image'
       style={{ backgroundImage: `url(${bannerUrl})` }}
     >
       <Modal
-        title="Choose Banner"
+        title='Choose Banner'
         open={shouldShowModal}
         onCancel={() => {
           setShouldShowModal(false);
@@ -74,11 +74,11 @@ const BannerDashBoard = ({
           {/* <span>Upload </span>
           <input type="file" /> */}
         </div>
-        <div className="grid grid-cols-3 mt-4">
+        <div className='grid grid-cols-3 mt-4'>
           {presetBanners.map((banner: any) => (
             <div
               key={banner}
-              className="flex items-center w-[150px] p-1 cursor-pointer hover:bg-slate-200"
+              className='flex items-center w-[150px] p-1 cursor-pointer hover:bg-slate-200'
               onClick={() => {
                 setOrg({
                   ...org,
@@ -93,16 +93,16 @@ const BannerDashBoard = ({
                   isPreset: true,
                   type: 'banner',
                 })}`}
-                alt="banner"
-                className="w-[150px]"
+                alt='banner'
+                className='w-[150px]'
               />
             </div>
           ))}
         </div>
       </Modal>
-      <div className="container relative mx-auto h-full">
-        <div className="flex items-end justify-between absolute bottom-[50px] left-0 right-0">
-          <div className="flex">
+      <div className='container relative mx-auto h-full'>
+        <div className='flex items-end justify-between absolute bottom-[50px] left-0 right-0'>
+          <div className='flex'>
             {org.icon_url ? (
               <Icon
                 editable={org.role === 'ADMIN'}
@@ -114,14 +114,14 @@ const BannerDashBoard = ({
                 <span style={{ fontSize: '48px' }}>{org.title.charAt(0)}</span>
               </Icon>
             )}
-            <Space direction="vertical" className="text-white ml-4">
-              <Space direction="horizontal" className="text-white">
-                <p className="text-lg font-semibold tracking-[0.374px]">
+            <Space direction='vertical' className='text-white ml-4'>
+              <Space direction='horizontal' className='text-white'>
+                <p className='text-lg font-semibold tracking-[0.374px]'>
                   {org.title}
                 </p>
                 {isAdmin ? (
                   <EditOutlined
-                    className="cursor-pointer"
+                    className='cursor-pointer'
                     onClick={() => {
                       setShowOrgEdit(true);
                     }}
@@ -131,11 +131,11 @@ const BannerDashBoard = ({
               <p>{org.desc}</p>
             </Space>
           </div>
-          <div className="flex">
+          <div className='flex'>
             {isAdmin ? (
               <Button
-                variant="outline"
-                className="text-white mr-2 change-banner-btn"
+                variant='outline'
+                className='text-white mr-2 change-banner-btn'
                 onClick={() => {
                   setShouldShowModal(true);
                 }}
@@ -145,8 +145,8 @@ const BannerDashBoard = ({
             ) : null}
             <Button
               startIcon={<PlusIcon />}
-              className="bg-white text-violet-version-5 py-[12px] px-[16px] border-[1.5px] border-solid border-[#5D23BB] !text-[17px] h-[48px]"
-              variant="text"
+              className='bg-white text-violet-version-5 py-[12px] px-[16px] border-[1.5px] border-solid border-[#5D23BB] !text-[17px] h-[48px]'
+              variant='text'
               onClick={() => {
                 navigate(
                   `/${createIdString(
@@ -158,23 +158,23 @@ const BannerDashBoard = ({
             >
               {L('newBlueprint')}
             </Button>
-            <div className="relative">
+            <div className='relative'>
               <Button
                 onClick={() => setIsDropDown(!isDropDown)}
-                startIcon={<PlusIcon color="white" />}
-                className="text-text_2 ml-2 py-[12px] px-[16px] h-[48px]"
+                startIcon={<PlusIcon color='white' />}
+                className='text-text_2 ml-2 py-[12px] px-[16px] h-[48px]'
                 endIcon={<ArrowDown />}
               >
                 {L('createNew')}
               </Button>
               {isDropDown && (
                 <div
-                  id="dropdown"
-                  className="z-40 bg-white rounded-lg min-w-[274px] absolute right-0 mt-2 border-1.5 border-gray-normal text-base leading-21px"
+                  id='dropdown'
+                  className='z-40 bg-white rounded-lg min-w-[274px] absolute right-0 mt-2 border-1.5 border-gray-normal text-base leading-21px'
                 >
                   <ul
-                    className="text-sm text-gray-700"
-                    aria-labelledby="dropdownDefaultButton"
+                    className='text-sm text-gray-700'
+                    aria-labelledby='dropdownDefaultButton'
                     ref={optionRef}
                   >
                     <li>
@@ -187,7 +187,7 @@ const BannerDashBoard = ({
                             )}/new-mission`
                           );
                         }}
-                        className="block py-[26px] px-[16px] text-[16px] hover:bg-gray-100 hover:rounded-tl-lg hover:rounded-tr-lg cursor-pointer"
+                        className='block py-[26px] px-[16px] text-[16px] hover:bg-gray-100 hover:rounded-tl-lg hover:rounded-tr-lg cursor-pointer'
                       >
                         {L('newInitiative')}
                       </div>
