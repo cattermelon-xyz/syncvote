@@ -9,9 +9,9 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import ModalInviteOfSpaceCard from '@pages/Organization/fragments/ModalInviteOfSpaceCard';
-import ModalDeleteSpace from '@pages/Organization/fragments/ModalDeleteSpace';
-import ModalChangeWorkSpace from '@pages/Organization/fragments/ModalChangeWorkSpace';
+import ModalInviteOfSpaceCard from './ModalChangeWorkSpace';
+import ModalDeleteSpace from './ModalDeleteSpace';
+import ModalChangeWorkSpace from './ModalChangeWorkSpace';
 import { useLocation } from 'react-router-dom';
 
 interface SpaceCardProps {
