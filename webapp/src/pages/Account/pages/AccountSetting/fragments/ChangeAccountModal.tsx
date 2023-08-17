@@ -35,7 +35,6 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
       userProfile: newUserProfile,
       dispatch,
       onSuccess: () => {
-        dispatch(setUser(newUserProfile));
         Modal.success({
           title: 'Success',
           content: 'Change information successfully',
