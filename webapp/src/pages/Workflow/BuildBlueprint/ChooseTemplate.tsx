@@ -12,7 +12,7 @@ import { emptyStage } from '@components/DirectedGraph';
 import { insertWorkflowAndVersion } from '@middleware/data';
 import { version } from 'os';
 
-const env = import.meta.env.VITE_EVN;
+const env = import.meta.env.VITE_ENV;
 
 const ChooseTemplate = () => {
   // document.title = 'Create new Workflow';
