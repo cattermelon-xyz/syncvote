@@ -93,11 +93,11 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
         </div>
       </Space>
 
-      <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
+      <Space className='h-60 overflow-scroll py-2 w-full' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
           {sortedOrgs.map((org: any, index: any) => (
             <div
-              className='flex h-12 items-center radio cursor-pointer'
+              className='flex h-12 items-center radio cursor-pointer select-none'
               key={index}
               style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
               onMouseEnter={() => setHovered(index)}

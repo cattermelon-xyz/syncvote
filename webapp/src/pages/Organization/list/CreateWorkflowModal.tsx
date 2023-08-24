@@ -85,34 +85,43 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
         </div>
       </Space>
 
-      <Space className='h-60 w-full' direction='vertical'>
+      <Space className='h-60 overflow-scroll py-2 w-full' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
           {dataOrgs.map((org: any, index: any) => (
-            <>
-              <div
-                className='flex h-12 items-center radio'
-                key={index}
-                style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
-                onMouseEnter={() => setHovered(index)}
-                onMouseLeave={() => setHovered(null)}
-              >
-                {hovered === index || org.id === value ? (
-                  <Space className='p-3'>
-                    <Radio value={org.id} className='w-6 h-6' />
-                    <div className='text-base'>{org?.title}</div>
-                  </Space>
-                ) : (
-                  <Space className='p-3'>
-                    <Icon
-                      presetIcon={presetIcons}
-                      iconUrl={org.icon_url ? org.icon_url : ''}
-                      size='medium'
-                    />
-                    <div className='ml-2 text-base'>{org?.title}</div>
-                  </Space>
-                )}
-              </div>
-            </>
+            <div
+              className='flex h-12 items-center radio cursor-pointer select-none'
+              key={index}
+              style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
+              onMouseEnter={() => setHovered(index)}
+              onMouseLeave={() => setHovered(null)}
+              onClick={() => {
+                if (value) {
+                  if (value === org?.id) {
+                    setValue(null);
+                  } else {
+                    setValue(org?.id);
+                  }
+                } else {
+                  setValue(org?.id);
+                }
+              }}
+            >
+              {hovered === index || org.id === value ? (
+                <Space className='p-3'>
+                  <Radio value={org.id} className='w-6 h-6' />
+                  <div className='text-base'>{org?.title}</div>
+                </Space>
+              ) : (
+                <Space className='p-3'>
+                  <Icon
+                    presetIcon={presetIcons}
+                    iconUrl={org.icon_url ? org.icon_url : ''}
+                    size='medium'
+                  />
+                  <div className='ml-2 text-base'>{org?.title}</div>
+                </Space>
+              )}
+            </div>
           ))}
         </Radio.Group>
       </Space>

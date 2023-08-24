@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './assets/css/index.css';
 import { Provider } from 'react-redux';
 import { store } from '@redux/store';
-import AppRoutes from '@routing/AppRoutes';
+import AppRoutes from '@routing';
 import { ConfigProvider } from 'antd';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
