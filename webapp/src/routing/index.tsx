@@ -8,6 +8,7 @@ import AuthRoutes from './AuthRoutes';
 import OrgRoutes from './OrgRoutes';
 import AccountRoutes from './AccountRoutes';
 import EditorRoutes from './EditorRoutes';
+import HomeRoutes from './HomeRoutes';
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
         {EditorRoutes}
         {OrgRoutes}
         {AccountRoutes}
+        {HomeRoutes}
         <Route
           path='*'
           element={<App layout={PublicAppLayout} requiredLogin={false} />}

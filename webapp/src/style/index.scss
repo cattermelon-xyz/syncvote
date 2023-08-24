@@ -1,0 +1,19 @@
+@import url(index.css);
+@import url(font.css);
+@import url(text.css);
+@import url(scrollbar.css);
+
+.react-transform-wrapper {
+  /*border: 1px solid;*/
+  cursor: grab;
+  height: 60vh !important;
+  border-radius: 8px;
+  margin-bottom: 24px !important;
+  width: 100% !important;
+}
+
+.react-transform-wrapper:active {
+  cursor: grabbing;
+}
+
+@import url(create-new.scss);

@@ -3,7 +3,6 @@ import { L } from '@utils/locales/L';
 import { insertWorkflowAndVersion } from '@middleware/data';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
-import './create-new.scss';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';

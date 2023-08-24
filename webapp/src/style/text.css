@@ -1,0 +1,135 @@
+.text-regular-caption-2 {
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 13px;
+}
+
+.text-regular-caption-1 {
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.text-regular-footnote {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.text-regular-subhead {
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.text-regular-callout {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 21px;
+}
+
+.text-regular-body {
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 22px;
+}
+
+.text-regular-headline {
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+}
+
+.text-regular-title-3 {
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 25px;
+}
+
+.text-regular-title-2 {
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+.text-regular-title-1 {
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 34px;
+}
+
+.text-regular-large-title {
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 41px;
+}
+
+.text-emph-caption-2 {
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 13px;
+}
+
+.text-emph-caption-1 {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.text-emph-footnote {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.text-emph-subhead {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.text-emph-callout {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 21px;
+}
+
+.text-emph-body {
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+}
+
+.text-emph-headline {
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+}
+
+.text-emph-title-3 {
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 25px;
+}
+
+.text-emph-title-2 {
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+.text-emph-title-1 {
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 34px;
+}
+.text-emph-medium-title {
+  font-weight: 600;
+  font-size: 25px;
+  line-height: 32px;
+}
+.text-emph-large-title {
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 41px;
+}

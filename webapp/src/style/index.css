@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* .option-container {
+    @apply: ease-in duration-300 z-select-option absolute w-full bg-white p-16px border-1.5 border-grey-version-3 left-0 rounded-8 top-anchor-bottom flex flex-col gap-10px;
+  }
+  .selected-option-badge {
+    @apply bg-violet-version-1 cursor-pointer p-4px rounded-8 text-violet-version-5 text-regular-callout;
+  } */
+}

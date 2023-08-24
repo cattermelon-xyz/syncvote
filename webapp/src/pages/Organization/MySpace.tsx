@@ -14,8 +14,8 @@ import { Skeleton } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FileOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
 import { useSearchParams } from 'react-router-dom';
-import CreateSpaceModal from './list/CreateSpaceModal';
-import CreateWorkflowModal from './list/CreateWorkflowModal';
+import CreateSpaceModal from '@/fragments/CreateNewDialog/CreateSpaceModal';
+import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal';
 const env = import.meta.env.VITE_ENV;
 
 interface SortProps {
