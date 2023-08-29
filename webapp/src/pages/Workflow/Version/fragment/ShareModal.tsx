@@ -26,6 +26,7 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 const env = import.meta.env.VITE_ENV;
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -46,6 +47,11 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
   const dispatch = useDispatch();
   const versionId = workflow?.workflow_version[0]?.id;
   const { presetIcons } = useSelector((state: any) => state.ui);
+  const { orgIdString, versionIdString } = useParams();
+  const publicUrl = `${baseUrl}/public/${orgIdString}/${createIdString(
+    workflow.title || '',
+    workflow.id?.toString() || ''
+  )}/${versionIdString}`;
   useEffect(() => {
     if (versionId) {
       queryVersionEditor({
@@ -153,9 +159,15 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
       </Space>
       <Space direction='horizontal'>
         <Button
-          type='link'
+          type='default'
           icon={<LinkOutlined />}
-          className='text-violet-500 pl-0'
+          onClick={() => {
+            navigator.clipboard.writeText(publicUrl);
+            Modal.success({
+              title: 'Url copied!',
+              content: `"${publicUrl}" is copied to your clipboard`,
+            });
+          }}
         >
           Copy link
         </Button>
@@ -216,6 +228,11 @@ const PublishedWorkflow = ({
   setShowShareModal,
 }: TabProps) => {
   const status = workflow?.workflow_version[0]?.status;
+  const { orgIdString, versionIdString } = useParams();
+  const publicUrl = `${baseUrl}/public/${orgIdString}/${createIdString(
+    workflow.title || '',
+    workflow.id?.toString() || ''
+  )}/${versionIdString}`;
   return (
     <Space direction='vertical' className='w-full' size='middle'>
       <Typography.Text type='success'>
@@ -232,7 +249,17 @@ const PublishedWorkflow = ({
             workflow.id?.toString() || ''
           )}`}
         />
-        <Button type='default' icon={<LinkOutlined />}>
+        <Button
+          type='default'
+          icon={<LinkOutlined />}
+          onClick={() => {
+            navigator.clipboard.writeText(publicUrl);
+            Modal.success({
+              title: 'Url copied!',
+              content: `"${publicUrl}" is copied to your clipboard`,
+            });
+          }}
+        >
           Copy link
         </Button>
       </Space.Compact>
@@ -293,9 +320,11 @@ const PublishedWorkflow = ({
         >
           Unpublish
         </Button>
-        <Button type='primary' disabled>
-          Publish new changes
-        </Button>
+        {env === 'dev' ? (
+          <Button type='primary' disabled>
+            Publish new changes
+          </Button>
+        ) : null}
       </Space>
     </Space>
   );

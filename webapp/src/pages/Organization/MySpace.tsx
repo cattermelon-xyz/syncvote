@@ -13,9 +13,10 @@ import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { Skeleton } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FileOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import CreateSpaceModal from '@/fragments/CreateNewDialog/CreateSpaceModal';
 import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal';
+import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 const env = import.meta.env.VITE_ENV;
 
 interface SortProps {
@@ -64,7 +65,8 @@ const MySpace: React.FC = () => {
     workflows,
     sortWorkflowOptions
   );
-
+  // const dispatch = useDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -110,6 +112,10 @@ const MySpace: React.FC = () => {
         // Querry workflow from workflow_version_editor
       }
       setLoading(false);
+      const url = PublicPageRedirect.getRedirectUrl();
+      if (url) {
+        navigate(url);
+      }
     };
 
     if (user) {
