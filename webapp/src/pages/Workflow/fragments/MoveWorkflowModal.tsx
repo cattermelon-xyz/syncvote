@@ -3,7 +3,6 @@ import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
-import './create-new.scss';
 
 interface MoveWorkflowModalProps {
   open: boolean;

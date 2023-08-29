@@ -81,7 +81,7 @@ const SharedSpace: React.FC = () => {
             items={
               filterSpaceByOptions &&
               filterSpaceByOptions.map((memberOrg, index) => (
-                <SpaceCard key={index} dataSpace={memberOrg} isMySpace={true} />
+                <SpaceCard key={index} dataSpace={memberOrg} />
               ))
             }
             columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}

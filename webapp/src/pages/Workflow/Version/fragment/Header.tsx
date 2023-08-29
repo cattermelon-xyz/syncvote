@@ -33,6 +33,7 @@ import VersionHistoryDialog from './VersionHistoryDialog';
 import ShareModal from './ShareModal';
 import { GraphViewMode } from '@types';
 import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
+const env = import.meta.env.VITE_ENV;
 
 type HeaderProps = {
   session: any;
@@ -57,7 +58,7 @@ function Header({
 }: HeaderProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { orgIdString, workflowIdString } = useParams();
+  const { orgIdString, workflowIdString, versionIdString } = useParams();
   const workflowId = extractIdFromIdString(workflowIdString);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const handleClearStore = () => {};
@@ -200,7 +201,7 @@ function Header({
           <Divider type='vertical' />
           <div
             className='px-3 py-2 rounded-lg bg-violet-100 text-violet-700 hover:bg-violet-200 cursor-pointer'
-            onClick={() => navigate(`/my-spaces/${orgIdString}`)}
+            onClick={() => navigate(`/${orgIdString}`)}
           >
             <FolderOutlined className='stroke-2' />
           </div>
@@ -258,11 +259,18 @@ function Header({
               } `}
               icon={<EyeOutlined />}
               onClick={() => {
-                setViewMode(
-                  viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
-                    ? GraphViewMode.VIEW_ONLY
-                    : GraphViewMode.EDIT_WORKFLOW_VERSION
-                );
+                if (env === 'production') {
+                  window.open(
+                    `/public/${orgIdString}/${workflowIdString}/${versionIdString}`,
+                    '_blank'
+                  );
+                } else if (env === 'dev') {
+                  setViewMode(
+                    viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                      ? GraphViewMode.VIEW_ONLY
+                      : GraphViewMode.EDIT_WORKFLOW_VERSION
+                  );
+                }
               }}
             >
               Preview
@@ -275,14 +283,16 @@ function Header({
             >
               Share
             </Button>
-            <Button
-              type='default'
-              className='flex justify-center items-center text-violet-500 bg-violet-100 border-0'
-              icon={<QuestionCircleOutlined />}
-              onClick={() => {
-                window.open('https://docs.syncvote.com', '_blank');
-              }}
-            />
+            {env === 'dev' ? (
+              <Button
+                type='default'
+                className='flex justify-center items-center text-violet-500 bg-violet-100 border-0'
+                icon={<QuestionCircleOutlined />}
+                onClick={() => {
+                  window.open('https://docs.syncvote.com', '_blank');
+                }}
+              />
+            ) : null}
             <Popover
               trigger='click'
               content={

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { changeAWorkflowOrg } from '@middleware/data';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
-import './create-new.scss';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 interface MoveToWorkflowModalProps {

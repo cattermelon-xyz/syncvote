@@ -35,7 +35,7 @@ export const inviteUserByEmail = async ({
       body: JSON.stringify({
         email,
         orgId,
-        env: import.meta.env.VITE_EVN,
+        env: import.meta.env.VITE_ENV,
       }),
     });
     const result = await response.json();

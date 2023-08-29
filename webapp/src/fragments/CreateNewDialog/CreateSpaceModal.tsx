@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { newOrg } from '@middleware/data';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
-import './create-new.scss';
 
 interface CreateSpaceModalProps {
   open: boolean;

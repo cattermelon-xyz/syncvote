@@ -26,6 +26,9 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+const env = import.meta.env.VITE_ENV;
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
 type TabProps = {
   workflow: IWorkflow;
@@ -44,6 +47,11 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
   const dispatch = useDispatch();
   const versionId = workflow?.workflow_version[0]?.id;
   const { presetIcons } = useSelector((state: any) => state.ui);
+  const { orgIdString, versionIdString } = useParams();
+  const publicUrl = `${baseUrl}/public/${orgIdString}/${createIdString(
+    workflow.title || '',
+    workflow.id?.toString() || ''
+  )}/${versionIdString}`;
   useEffect(() => {
     if (versionId) {
       queryVersionEditor({
@@ -151,9 +159,15 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
       </Space>
       <Space direction='horizontal'>
         <Button
-          type='link'
+          type='default'
           icon={<LinkOutlined />}
-          className='text-violet-500 pl-0'
+          onClick={() => {
+            navigator.clipboard.writeText(publicUrl);
+            Modal.success({
+              title: 'Url copied!',
+              content: `"${publicUrl}" is copied to your clipboard`,
+            });
+          }}
         >
           Copy link
         </Button>
@@ -214,6 +228,11 @@ const PublishedWorkflow = ({
   setShowShareModal,
 }: TabProps) => {
   const status = workflow?.workflow_version[0]?.status;
+  const { orgIdString, versionIdString } = useParams();
+  const publicUrl = `${baseUrl}/public/${orgIdString}/${createIdString(
+    workflow.title || '',
+    workflow.id?.toString() || ''
+  )}/${versionIdString}`;
   return (
     <Space direction='vertical' className='w-full' size='middle'>
       <Typography.Text type='success'>
@@ -225,44 +244,57 @@ const PublishedWorkflow = ({
           type='text'
           disabled
           // TODO: this link is fake
-          value={`https://syncvote.com/${createIdString(
+          value={`${baseUrl}/public/${createIdString(
             workflow.title || '',
             workflow.id?.toString() || ''
           )}`}
         />
-        <Button type='default' icon={<LinkOutlined />}>
+        <Button
+          type='default'
+          icon={<LinkOutlined />}
+          onClick={() => {
+            navigator.clipboard.writeText(publicUrl);
+            Modal.success({
+              title: 'Url copied!',
+              content: `"${publicUrl}" is copied to your clipboard`,
+            });
+          }}
+        >
           Copy link
         </Button>
       </Space.Compact>
-      <Space className='w-full bg-zinc-100 justify-between p-2 rounded-lg'>
-        <div>Publish to Syncvote community?</div>
-        <Switch
-          checked={status === 'PUBLIC_COMMUNITY'}
-          onClick={(val) => {
-            setShowShareModal(false);
-            handleWorkflowStatusChanged({
-              versionId: workflow?.workflow_version[0]?.id,
-              status: val ? 'PUBLIC_COMMUNITY' : 'PUBLIC',
-              onSuccess: () => {
-                Modal.success({
-                  title: 'Success',
-                  content: `Workflow ${
-                    val
-                      ? 'is published to community'
-                      : 'is no longer published to community'
-                  }!`,
-                });
-              },
-              onError: () => {
-                Modal.error({
-                  title: 'Error',
-                  content: 'Something went wrong, cannot change status',
-                });
-              },
-            });
-          }}
-        />
-      </Space>
+      {env === 'dev' ? (
+        <Space className='w-full bg-zinc-100 justify-between p-2 rounded-lg'>
+          <div>Publish to Syncvote community?</div>
+          <Switch
+            checked={status === 'PUBLIC_COMMUNITY'}
+            onClick={(val) => {
+              setShowShareModal(false);
+              handleWorkflowStatusChanged({
+                versionId: workflow?.workflow_version[0]?.id,
+                status: val ? 'PUBLIC_COMMUNITY' : 'PUBLIC',
+                onSuccess: () => {
+                  Modal.success({
+                    title: 'Success',
+                    content: `Workflow ${
+                      val
+                        ? 'is published to community'
+                        : 'is no longer published to community'
+                    }!`,
+                  });
+                },
+                onError: () => {
+                  Modal.error({
+                    title: 'Error',
+                    content: 'Something went wrong, cannot change status',
+                  });
+                },
+              });
+            }}
+          />
+        </Space>
+      ) : null}
+
       <Space className='w-full flex justify-between'>
         <Button
           type='primary'
@@ -288,9 +320,11 @@ const PublishedWorkflow = ({
         >
           Unpublish
         </Button>
-        <Button type='primary' disabled>
-          Publish new changes
-        </Button>
+        {env === 'dev' ? (
+          <Button type='primary' disabled>
+            Publish new changes
+          </Button>
+        ) : null}
       </Space>
     </Space>
   );
@@ -334,24 +368,39 @@ const ShareModal = ({
   handleWorkflowStatusChanged: (status: any) => void;
   onClose?: () => void;
 }) => {
-  const items: TabsProps['items'] = [
-    {
-      key: '1',
-      label: 'Invite',
-      children: <InviteTab workflow={workflow} />,
-    },
-    {
-      key: '2',
-      label: 'Publish',
-      children: (
-        <PublishTab
-          workflow={workflow}
-          handleWorkflowStatusChanged={handleWorkflowStatusChanged}
-          setShowShareModal={setShowShareModal}
-        />
-      ),
-    },
-  ];
+  const items: TabsProps['items'] =
+    env === 'dev'
+      ? [
+          {
+            key: '1',
+            label: 'Invite',
+            children: <InviteTab workflow={workflow} />,
+          },
+          {
+            key: '2',
+            label: 'Publish',
+            children: (
+              <PublishTab
+                workflow={workflow}
+                handleWorkflowStatusChanged={handleWorkflowStatusChanged}
+                setShowShareModal={setShowShareModal}
+              />
+            ),
+          },
+        ]
+      : [
+          {
+            key: '2',
+            label: 'Publish',
+            children: (
+              <PublishTab
+                workflow={workflow}
+                handleWorkflowStatusChanged={handleWorkflowStatusChanged}
+                setShowShareModal={setShowShareModal}
+              />
+            ),
+          },
+        ];
   return (
     <Modal
       open={showShareModal}

@@ -56,7 +56,7 @@ const ListMySpace = () => {
         <div className='grid 2xl:grid-cols-5 xl:grid-cols-4 gap-4 gap-y-6'>
           {adminOrgs &&
             adminOrgs.map((adminOrg, index) => (
-              <SpaceCard key={index} dataSpace={adminOrg} isMySpace={true} />
+              <SpaceCard key={index} dataSpace={adminOrg} />
             ))}
         </div>
       </div>

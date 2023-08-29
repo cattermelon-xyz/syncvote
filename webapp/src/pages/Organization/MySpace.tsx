@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Typography } from 'antd';
+import { Button, Dropdown, MenuProps, Space, Typography } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
 import {
@@ -12,6 +12,12 @@ import ListItem from '../../components/ListItem/ListItem';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { Skeleton } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
+import { FileOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import CreateSpaceModal from '@/fragments/CreateNewDialog/CreateSpaceModal';
+import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal';
+import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
+const env = import.meta.env.VITE_ENV;
 
 interface SortProps {
   by: string;
@@ -38,6 +44,13 @@ const MySpace: React.FC = () => {
     by: '',
     type: 'asc',
   });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(
+    searchParams.get('action') === 'new-workflow'
+  );
+  const [openModalCreateWorkspace, setOpenModalCreateWorkspace] =
+    useState(false);
 
   const handleSortSpaceDetail = (options: SortProps) => {
     setSortOption(options);
@@ -52,12 +65,18 @@ const MySpace: React.FC = () => {
     workflows,
     sortWorkflowOptions
   );
-
+  // const dispatch = useDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       if (orgs) {
-        const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+        let adminOrgsData = [];
+        if (env === 'production') {
+          adminOrgsData = orgs;
+        } else {
+          adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+        }
         setAdminOrgs(adminOrgsData);
 
         const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
@@ -93,51 +112,110 @@ const MySpace: React.FC = () => {
         // Querry workflow from workflow_version_editor
       }
       setLoading(false);
+      const url = PublicPageRedirect.getRedirectUrl();
+      if (url) {
+        navigate(url);
+      }
     };
 
     if (user) {
       fetchData();
     }
   }, [user, orgs]);
+  const items: MenuProps['items'] = [
+    {
+      label: (
+        <>
+          <FileOutlined className='text-base mr-2' />
+          <span className='text-sm'>Workflow</span>
+        </>
+      ),
+      key: 'workflow',
+    },
+    {
+      label: (
+        <div>
+          <FolderOutlined className='text-base mr-2' />
+          <span className='text-sm'>Workspace</span>
+        </div>
+      ),
+      key: 'workspace',
+    },
+  ];
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    if (e?.key === 'workflow') {
+      setOpenModalCreateWorkflow(true);
+    } else if (e?.key === 'workspace') {
+      setOpenModalCreateWorkspace(true);
+    }
+  };
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+  };
 
   return (
-    <div className='w-[800px] flex flex-col'>
-      <p className='text-3xl font-semibold mb-8'>{L('mySpace')}</p>
-      <section className='w-full mb-8'>
-        {loading ? (
-          <Skeleton />
-        ) : (
-          <ListItem
-            handleSort={handleSortSpaceDetail}
-            items={
-              filterSpaceByOptions &&
-              filterSpaceByOptions.map((adminOrg, index) => (
-                <SpaceCard key={index} dataSpace={adminOrg} isMySpace={true} />
-              ))
-            }
-            columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
-            title={L('spaces')}
-          />
-        )}
-      </section>
-      <section className='w-full mb-8'>
-        {loading ? (
-          <Skeleton />
-        ) : (
-          <ListItem
-            handleSort={handleSortWorkflowDetail}
-            items={
-              filterWorkflowByOptions &&
-              filterWorkflowByOptions.map((workflow, index) => (
-                <WorkflowCard key={index} dataWorkflow={workflow} />
-              ))
-            }
-            columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
-            title={L('workflows')}
-          />
-        )}
-      </section>
-    </div>
+    <>
+      <CreateSpaceModal
+        open={openModalCreateWorkspace}
+        onClose={() => setOpenModalCreateWorkspace(false)}
+      />
+      <CreateWorkflowModal
+        open={openModalCreateWorkflow}
+        onClose={() => setOpenModalCreateWorkflow(false)}
+        setOpenCreateWorkspaceModal={() => setOpenModalCreateWorkflow}
+      />
+      <div className='xs:w-[350px] sm:w-[550px] md:w-[720px] lg:w-[800px] flex flex-col'>
+        <Space direction='horizontal' className='flex justify-between'>
+          <p className='text-3xl font-semibold my-8'>{L('mySpace')}</p>
+          {env === 'production' ? (
+            <Dropdown menu={menuProps} trigger={['click']}>
+              <Button icon={<PlusOutlined />} type='primary'>
+                Create new
+              </Button>
+            </Dropdown>
+          ) : null}
+        </Space>
+        <section className='w-full mb-8'>
+          {loading ? (
+            <Skeleton />
+          ) : (
+            <ListItem
+              handleSort={handleSortSpaceDetail}
+              items={
+                filterSpaceByOptions &&
+                filterSpaceByOptions.map((adminOrg, index) => (
+                  <SpaceCard
+                    key={index}
+                    dataSpace={adminOrg}
+                    isOwner={adminOrg.role === 'ADMIN'}
+                  />
+                ))
+              }
+              columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
+              title={L('spaces')}
+            />
+          )}
+        </section>
+        <section className='w-full mb-8'>
+          {loading ? (
+            <Skeleton />
+          ) : (
+            <ListItem
+              handleSort={handleSortWorkflowDetail}
+              items={
+                filterWorkflowByOptions &&
+                filterWorkflowByOptions.map((workflow, index) => (
+                  <WorkflowCard key={index} dataWorkflow={workflow} />
+                ))
+              }
+              columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
+              title={L('workflows')}
+            />
+          )}
+        </section>
+      </div>
+    </>
   );
 };
 

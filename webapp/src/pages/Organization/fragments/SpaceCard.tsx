@@ -2,24 +2,25 @@ import React, { useState } from 'react';
 import { Avatar, Card, Popover, Space, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { EllipsisOutlined, TeamOutlined } from '@ant-design/icons';
 import { getImageUrl } from '@utils/helpers';
 import {
   ShareAltOutlined,
   EditOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import ModalInviteOfSpaceCard from './ModalChangeWorkSpace';
+import ModalInviteOfSpaceCard from './ModalInviteOfSpaceCard';
 import ModalDeleteSpace from './ModalDeleteSpace';
 import ModalChangeWorkSpace from './ModalChangeWorkSpace';
 import { useLocation } from 'react-router-dom';
+import { FiShield } from 'react-icons/fi';
 
 interface SpaceCardProps {
   dataSpace: any;
-  isMySpace?: boolean;
+  isOwner?: boolean;
 }
 
-const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
+const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isOwner }) => {
   const location = useLocation();
   const isSharedWorkspacesRoute = location.pathname === '/shared-workspaces';
 
@@ -62,7 +63,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
         visible ? (
           <div
             key={index}
-            className='flex gap-2 cursor-pointer'
+            className='flex gap-2 cursor-pointer hover:text-violet-500'
             onClick={action}
           >
             {icon}
@@ -117,8 +118,16 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isMySpace }) => {
         </div>
         <div className='justify-start items-center gap-2'>
           <div className='flex-col justify-start items-start gap-1'>
-            <div className='text-neutral-800 text-base font-medium truncate'>
-              {dataSpace.title ? dataSpace.title : 'Null title'}
+            <div
+              className='text-neutral-800 text-base font-medium truncate flex items-center hover:text-violet-500'
+              title={`${isOwner ? 'You are an ADMIN' : 'You are a Member'}`}
+            >
+              {dataSpace.title ? dataSpace.title : 'Untitled'}
+              {isOwner ? (
+                <FiShield className='ml-1' />
+              ) : (
+                <TeamOutlined className='ml-1' />
+              )}
             </div>
             <div className='flex justify-between'>
               <div className='text-zinc-500 text-sm font-medium'>

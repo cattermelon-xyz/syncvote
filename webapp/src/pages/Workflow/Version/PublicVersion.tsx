@@ -1,4 +1,11 @@
-import { LeftOutlined, LoadingOutlined } from '@ant-design/icons';
+import {
+  CloseCircleFilled,
+  CloseOutlined,
+  FullscreenExitOutlined,
+  FullscreenOutlined,
+  LeftOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
 import { GrDocumentText } from 'react-icons/gr';
 import parse from 'html-react-parser';
 import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
@@ -8,10 +15,19 @@ import {
   queryWorkflowVersion,
 } from '@middleware/data';
 import { extractIdFromIdString } from '@utils/helpers';
-import { Button, Layout, Space, notification, Skeleton, Popover } from 'antd';
+import {
+  Button,
+  Layout,
+  Space,
+  notification,
+  Skeleton,
+  Empty,
+  Modal,
+  Result,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { FiCalendar, FiHome, FiLink, FiUser, FiDownload } from 'react-icons/fi';
 import { MdChatBubbleOutline } from 'react-icons/md';
 import { LuPaintbrush } from 'react-icons/lu';
@@ -27,6 +43,13 @@ import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import { GraphViewMode } from '@types';
 import Banner from '@components/Banner/Banner';
 import Icon from '@components/Icon/Icon';
+import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
+import Google from '@assets/icons/svg-icons/Google';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { L } from '@utils/locales/L';
+import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
+import NotFound404 from '@pages/NotFound404';
+import './public-version.scss';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -35,6 +58,7 @@ export const PublicVersion = () => {
   const versionId = extractIdFromIdString(versionIdString);
   const dispatch = useDispatch();
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
+  const navigate = useNavigate();
   const [web2IntegrationsState, setWeb2IntegrationsState] = useState<any>();
   const [version, setVersion] = useState<any>();
   const [workflow, setWorkflow] = useState<any>();
@@ -42,18 +66,26 @@ export const PublicVersion = () => {
   const [profile, setProfile] = useState<any>();
   const [session, setSession] = useState<Session | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const [comment, setComment] = useState(false);
+  const [rightSiderStatus, setRSiderStatus] = useState('closed');
   const [api, contextHolder] = notification.useNotification();
   const where = `${orgId}$/${workflowId}$/${versionId}$`;
   const [dataReaction, setDataReaction] = useState<any[]>([]);
-  const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
-  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
-
+  const [showRegisterInvitation, setShowRegisterInvitation] = useState(
+    session?.user?.user_metadata ? false : true
+  );
+  const [downloadImageStatus, setDownloadImageStatus] = useState(false);
+  const [isMarkerShown, setIsMarkerShown] = useState(false);
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
+    setShowRegisterInvitation(_session?.user?.user_metadata ? false : true);
   };
+  const [searchParams, setSearchParams] = useSearchParams();
+  const diagramFullScreen = searchParams.get('view') === 'full' ? true : false;
+  PublicPageRedirect.attempt(
+    `/public/${orgIdString}/${workflowIdString}/${versionIdString}`
+  );
 
   const worflowInfo = {
     workflow: workflow?.title,
@@ -67,24 +99,13 @@ export const PublicVersion = () => {
     const data = await getDataReactionCount({ where, dispatch });
     setDataReaction(data);
   };
-  const urlToCopy = window.location.href;
-  const { presetIcons } = useSelector((state: any) => state.ui);
-  const [visible, setVisible] = useState(false);
-
-  const handleClick = async () => {
-    if (!navigator.clipboard) {
-      // Clipboard API not available
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(urlToCopy);
-      console.log('Link copied to clipboard');
-    } catch (err) {
-      console.error('Failed to copy link: ', err);
-    }
-    setVisible(true);
-    setTimeout(() => setVisible(false), 1000); // Tắt Popover sau 1 giây
+  const onEdgeClick = (e: any, edge: any) => {
+    // TODO: move this to IGraph interface to drill selectedEdge into children components
+    setSelectedEdgeId(edge.id);
   };
+  const { presetIcons, presetBanners } = useSelector((state: any) => state.ui);
+
+  const isFullScreen = searchParams.get('view') === 'full' ? true : false;
 
   useEffect(() => {
     queryWeb2Integration({
@@ -121,182 +142,217 @@ export const PublicVersion = () => {
       },
       dispatch,
     });
-
     supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
       await handleSession(_session);
     });
 
     fetchData();
   }, []);
-
+  const handleLogin = async () => {
+    dispatch(startLoading({}));
+    PublicPageRedirect.confirm();
+    const redirectTo = import.meta.env.VITE_BASE_URL;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+        redirectTo,
+      },
+    });
+    dispatch(finishLoading({}));
+    if (error) {
+      Modal.error({
+        title: L('error'),
+        content: error.message || '',
+      });
+    }
+  };
+  const isDesktop = window.innerWidth > 700;
   return (
     <>
       {contextHolder}
       <Layout>
         {version?.status === 'PUBLISHED' ||
-        version?.status === 'PUBLIC_COMMUNITY' ? (
+        version?.status === 'PUBLIC_COMMUNITY' ||
+        (version?.status === 'DRAFT' &&
+          session?.user?.id === workflow?.authority) ? (
           <>
-            <Banner
-              presetBanners={presetBanners}
-              bannerUrl={workflow?.banner_url}
-            />
+            <div
+              className={`w-full relative ${
+                diagramFullScreen ? 'hidden' : null
+              }`}
+            >
+              {showRegisterInvitation ? (
+                <div className='absolute w-full h-full flex items-center justify-center z-50'>
+                  <div className='flex items-center flex-row p-4 bg-white rounded-lg'>
+                    <LogoSyncVote />
+                    <div className='mx-4'>
+                      <span className='font-bold mr-2'>
+                        Welcome to Syncvote!
+                      </span>{' '}
+                      Create an account to leave comments and reactions on this
+                      workflow.
+                    </div>
+                    <Button
+                      type='default'
+                      className='flex items-center mr-4'
+                      onClick={handleLogin}
+                    >
+                      <Google />
+                      <div className='ml-1'>Continue with Google</div>
+                    </Button>
+                    <Button
+                      type='default'
+                      shape='circle'
+                      icon={<CloseOutlined />}
+                      onClick={() => setShowRegisterInvitation(false)}
+                    />
+                  </div>
+                </div>
+              ) : null}
+              <Banner
+                presetBanners={presetBanners}
+                bannerUrl={workflow?.banner_url}
+              />
+            </div>
+
             <Layout>
-              <Sider
-                collapsed={!collapsed}
-                collapsedWidth={0}
-                width='33%'
-                theme='light'
-                style={{ backgroundColor: '#EEEEEE' }}
-                className='information-collapsed'
-              >
-                <Space direction='horizontal' className='p-5 bg-white'>
+              <Layout className='relative flex items-center'>
+                <Space className='absolute left-0 m-3 flex items-center border border-solid border-[#E3E3E2] rounded-lg text-[#252422] p-3 w-fit mt-7 bg-white z-50'>
                   <Icon
                     presetIcon={presetIcons}
                     iconUrl={workflow?.icon_url}
                     size='large'
                   />
-                  <Space direction='vertical'>
-                    <p className='text-lg font-normal'>
-                      {worflowInfo.workflow}
+                  <Space direction='vertical' className='w-full'>
+                    <p className='text-[17px] font-normal items-left w-full text-ellipsis overflow-hidden whitespace-nowrap'>
+                      {worflowInfo?.workflow}
                     </p>
                     <Space direction='horizontal'>
-                      <div className='flex items-center text-sm'>
+                      <div className='flex items-center text-[13px] text-ellipsis overflow-hidden whitespace-nowrap'>
                         <FiHome className='mr-1' size={16} />
-                        {worflowInfo.org}
+                        {worflowInfo?.org}
                       </div>
-                      <div className='flex items-center text-sm'>
+                      <div className='flex items-center text-[13px] text-ellipsis overflow-hidden  whitespace-nowrap'>
                         <FiUser className='mr-1' size={16} />
-                        {worflowInfo.authority}
+                        {worflowInfo?.authority}
                       </div>
-                      <div className='flex items-center text-sm'>
-                        <FiCalendar className='mr-1' size={16} />
-                        {worflowInfo.date}
-                      </div>
-                    </Space>
-                  </Space>
-                  <Button
-                    shape='circle'
-                    icon={<LeftOutlined size={36} />}
-                    className='ml-6 bg-white flex items-center justify-center'
-                    onClick={() => {
-                      if (comment) {
-                        setComment(!comment);
-                      }
-                      setCollapsed(!collapsed);
-                    }}
-                  />
-                </Space>
-                {/* <div className='p-5'>{parse(worflowInfo?.desc)}</div> */}
-              </Sider>
-
-              <Sider
-                collapsed={!comment}
-                collapsedWidth={0}
-                width='26%'
-                theme='light'
-                style={{
-                  backgroundColor: '#FFF',
-                  borderRadius: '12px',
-                  borderRight: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
-                }}
-                className='comment-collapsedh'
-              >
-                <Comment where={where} session={session} api={api} />
-              </Sider>
-              <Layout className='relative flex items-center'>
-                {!collapsed && (
-                  <Space className='absolute left-0 m-3 flex bg-[#FFF] items-center border border-solid border-[#E3E3E2] rounded-[10px] text-[#252422] p-3 w-fit mt-7'>
-                    <Space>
-                      <Icon
-                        presetIcon={presetIcons}
-                        iconUrl={workflow?.icon_url}
-                        size='large'
-                      />
-                    </Space>
-                    <Space direction='vertical' className='w-full'>
-                      <p className='text-[17px] font-normal items-left w-full'>
-                        {worflowInfo?.workflow}
-                      </p>
-                      <Space direction='horizontal'>
-                        <div className='flex items-center text-[13px]'>
-                          <FiHome className='mr-1' size={16} />
-                          {worflowInfo?.org}
-                        </div>
-                        <div className='flex items-center text-[13px]'>
-                          <FiUser className='mr-1' size={16} />
-                          {worflowInfo?.authority}
-                        </div>
-                        <div className='flex items-center text-[13px]'>
+                      {isDesktop ? (
+                        <div className='flex items-center text-[13px] text-ellipsis overflow-hidden  whitespace-nowrap'>
                           <FiCalendar className='mr-1' size={16} />
                           {worflowInfo?.date}
                         </div>
-                      </Space>
+                      ) : null}
                     </Space>
                   </Space>
-                )}
-                <div className=' absolute top-0 right-10 z-50'>
-                  <Space direction='horizontal' className='flex p-2'>
+                </Space>
+                <div
+                  className='cursor-pointer flex rounded-t-3xl absolute bottom-0 z-50 bg-white'
+                  style={{
+                    border: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
+                  }}
+                >
+                  <Space
+                    direction='horizontal'
+                    className='flex p-4'
+                    size='middle'
+                  >
                     <Button
-                      className='w-11 h-9 flex justify-center items-center'
+                      className={`flex justify-center items-center ${
+                        rightSiderStatus === 'description'
+                          ? 'bg-violet-100'
+                          : null
+                      }`}
                       onClick={() => {
-                        if (comment) {
-                          setComment(!comment);
+                        if (isDesktop) {
+                          rightSiderStatus === 'description'
+                            ? setRSiderStatus('closed')
+                            : setRSiderStatus('description');
+                        } else {
+                          Modal.info({
+                            title: 'Description',
+                            content: parse(worflowInfo.desc),
+                          });
                         }
-                        setCollapsed(!collapsed);
                       }}
                       icon={<GrDocumentText className='w-5 h-5' />}
                     />
                     <Button
-                      className='w-11 h-9 flex items-center justify-center'
+                      className={`flex items-center justify-center ${
+                        rightSiderStatus === 'comment' ? 'bg-violet-100' : null
+                      }`}
                       onClick={() => {
-                        if (collapsed) {
-                          setCollapsed(!collapsed);
+                        if (isDesktop) {
+                          rightSiderStatus === 'comment'
+                            ? setRSiderStatus('closed')
+                            : setRSiderStatus('comment');
+                        } else {
+                          Modal.info({
+                            title: 'Alert',
+                            content: 'This function only available on desktop',
+                          });
                         }
-                        setComment(!comment);
                       }}
                       icon={<MdChatBubbleOutline className='w-5 h-5' />}
                     />
-                    <Popover
-                      placement='bottomRight'
-                      content={'Copied'}
-                      trigger='click'
-                      visible={visible}
-                    >
-                      <Button
-                        onClick={handleClick}
-                        className='w-11 h-9 flex items-center justify-center'
-                        icon={<FiLink className='w-5 h-5' />}
-                      />
-                    </Popover>
-
                     <Button
+                      className='flex items-center justify-center'
+                      icon={<FiLink className='w-5 h-5' />}
                       onClick={() => {
-                        setShouldDownloadImage(true);
+                        const url = window.location.href;
+                        navigator.clipboard.writeText(url);
+                        Modal.success({
+                          title: 'Url copied!',
+                          content: `"${url}" is copied to your clipboard`,
+                        });
                       }}
-                      className='w-11 h-9 flex items-center justify-center'
+                    />
+                    <Button
+                      className='flex items-center justify-center'
                       icon={<FiDownload className='w-5 h-5' />}
+                      onClick={() => setDownloadImageStatus(true)}
                     />
 
                     <Button
-                      className='w-11 h-9 flex items-center justify-center'
+                      className={`flex items-center justify-center ${
+                        rightSiderStatus === 'markers' ? 'bg-violet-100' : null
+                      }`}
                       icon={<LuPaintbrush className='w-5 h-5' />}
+                      onClick={() => {
+                        if (isDesktop) {
+                          rightSiderStatus === 'markers'
+                            ? setRSiderStatus('closed')
+                            : setRSiderStatus('markers');
+                        } else {
+                          Modal.info({
+                            title: 'Alert',
+                            content: 'This function only available on desktop',
+                          });
+                        }
+                      }}
+                    />
+                    <Button
+                      className={`flex items-center justify-center`}
+                      icon={
+                        isFullScreen ? (
+                          <FullscreenExitOutlined />
+                        ) : (
+                          <FullscreenOutlined />
+                        )
+                      }
+                      onClick={() => {
+                        if (isFullScreen) {
+                          navigate(window.location.pathname);
+                        } else {
+                          navigate(window.location.pathname + '?view=full');
+                        }
+                      }}
                     />
                   </Space>
-                </div>
-
-                <div
-                  className='cursor-pointer flex rounded-3xl absolute bottom-20 w-52 h-14 z-50'
-                  style={{
-                    border: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
-                  }}
-                  onClick={() => {
-                    if (collapsed) {
-                      setCollapsed(!collapsed);
-                    }
-                    setComment(!comment);
-                  }}
-                >
-                  <div className='p-4 flex'>
+                  {/* <div className='p-4 flex'>
                     <div className='pr-3'>
                       <FaRegFaceGrinHearts size={24} />
                     </div>
@@ -312,23 +368,25 @@ export const PublicVersion = () => {
                     <div className='pr-3'>
                       <AiFillDislike size={24} />
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
                 <DirectedGraph
                   viewMode={GraphViewMode.VIEW_ONLY}
-                  shouldExportImage={shouldDownloadImage}
-                  setExportImage={setShouldDownloadImage}
                   data={version?.data || emptyStage}
                   selectedNodeId={selectedNodeId}
+                  selectedEdgeId={selectedEdgeId}
+                  onEdgeClick={onEdgeClick}
+                  onConfigPanelClose={() => setSelectedNodeId('')}
                   selectedLayoutId={
                     version?.data?.cosmetic?.defaultLayout?.horizontal
                   }
+                  onConfigEdgePanelClose={() => setSelectedEdgeId('')}
+                  setExportImage={setDownloadImageStatus}
+                  shouldExportImage={downloadImageStatus}
                   onChange={(newData) => {}}
                   onChangeLayout={(newData) => {}}
                   onDeleteNode={(nodeId) => {}}
-                  onConfigEdgePanelClose={() => {}}
-                  onConfigPanelClose={() => setSelectedNodeId('')}
                   onNodeChanged={(changedNodes) => {
                     const newData = structuredClone(version?.data);
                     newData?.checkpoints?.forEach((v: any, index: number) => {
@@ -364,8 +422,133 @@ export const PublicVersion = () => {
                   }}
                 />
               </Layout>
+              <Sider
+                collapsed={rightSiderStatus === 'closed'}
+                collapsedWidth={0}
+                width='33%'
+                theme='light'
+                style={{ backgroundColor: '#f6f6f6' }}
+                className='information-collapsed'
+              >
+                {rightSiderStatus === 'description' ? (
+                  <div className='border-r border-gray-200 border-solid h-full w-full flex flex-col gap-2'>
+                    <Space direction='vertical' size='large' className='w-full'>
+                      <Space
+                        direction='horizontal'
+                        className='flex justify-between w-full p-2 bg-white drop-shadow'
+                      >
+                        <div className='font-bold text-md'>Description</div>
+                        <Button
+                          icon={<CloseOutlined />}
+                          shape='circle'
+                          className='bg-white'
+                          onClick={() => setRSiderStatus('closed')}
+                        />
+                      </Space>
+                    </Space>
+                    <div className='overflow-y-scroll'>
+                      {worflowInfo.desc ? (
+                        <div className='m-4 p-4 bg-white rounded-lg public-desc-wrapper'>
+                          {parse(worflowInfo.desc)}
+                        </div>
+                      ) : (
+                        <Empty />
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+                {rightSiderStatus === 'comment' ? (
+                  <div className='bg-white w-full border-r border-gray-300 border-solid'>
+                    <Comment
+                      where={where}
+                      session={session}
+                      api={api}
+                      collapse={() => {
+                        setRSiderStatus('closed');
+                      }}
+                    />
+                  </div>
+                ) : // style={{
+                //   backgroundColor: '#FFF',
+                //   borderRadius: '12px',
+                //   borderRight: '1px solid var(--foundation-grey-g-3, #E3E3E2)',
+                // }}
+                // className='comment-collapsedh'
+                null}
+                {rightSiderStatus === 'markers' ? (
+                  <Space
+                    direction='vertical'
+                    className='border-r border-gray-200 border-solid h-full w-full overflow-y-scroll'
+                  >
+                    <Space direction='vertical' size='large' className='w-full'>
+                      <Space
+                        direction='horizontal'
+                        className='flex justify-between w-full p-2 bg-white drop-shadow'
+                      >
+                        <div className='font-bold text-md'>Color legend</div>
+                        <Button
+                          icon={<CloseOutlined />}
+                          shape='circle'
+                          className='bg-white'
+                          onClick={() => setRSiderStatus('closed')}
+                        />
+                      </Space>
+                    </Space>
+                    {version?.data?.cosmetic?.layouts[0]?.markers ? (
+                      <Space
+                        direction='vertical'
+                        size='middle'
+                        className='w-full p-2'
+                      >
+                        {version?.data?.cosmetic?.layouts[0]?.markers.map(
+                          (marker: any) => {
+                            return (
+                              <Space
+                                direction='horizontal'
+                                className='flex items-center w-full bg-white p-4'
+                                size='middle'
+                              >
+                                <div
+                                  className='h-2 w-2'
+                                  style={{ backgroundColor: marker.color }}
+                                ></div>
+                                <div>{marker.title}</div>
+                              </Space>
+                            );
+                          }
+                        )}
+                      </Space>
+                    ) : (
+                      <Empty />
+                    )}
+                  </Space>
+                ) : null}
+              </Sider>
             </Layout>
           </>
+        ) : workflow?.created_at ? (
+          <div className='w-full items-center text-center pt-20'>
+            <Result
+              status='403'
+              title='Missing permission'
+              subTitle={
+                <div>
+                  <p>
+                    Sorry, this page is not published and your are not owner.
+                  </p>
+                  <p>Please contact owner of this page.</p>
+                </div>
+              }
+              extra={
+                <Button
+                  type='primary'
+                  onClick={() => window.open(import.meta.env.VITE_BASE_URL)}
+                >
+                  Back Home
+                </Button>
+              }
+            />
+          </div>
         ) : (
           <Skeleton />
         )}
