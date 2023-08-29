@@ -9,6 +9,7 @@ import {
 
 interface GridColumnProps {
   xs?: number;
+  sm?: number;
   md?: number;
   lg?: number;
   xl?: number;
@@ -26,6 +27,7 @@ const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
   let classes = `w-full grid gap-4 `;
 
   if (columns.xs) classes += `xs:grid-cols-${columns.xs} `;
+  if (columns.sm) classes += `sm:grid-cols-${columns.sm} `;
   if (columns.md) classes += `md:grid-cols-${columns.md} `;
   if (columns.lg) classes += `lg:grid-cols-${columns.lg} `;
   if (columns.xl) classes += `xl:grid-cols-${columns.xl} `;
