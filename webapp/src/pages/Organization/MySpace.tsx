@@ -69,7 +69,12 @@ const MySpace: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       if (orgs) {
-        const adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+        let adminOrgsData = [];
+        if (env === 'production') {
+          adminOrgsData = orgs;
+        } else {
+          adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+        }
         setAdminOrgs(adminOrgsData);
 
         const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
@@ -177,7 +182,7 @@ const MySpace: React.FC = () => {
                   <SpaceCard
                     key={index}
                     dataSpace={adminOrg}
-                    isMySpace={true}
+                    isOwner={adminOrg.role === 'ADMIN'}
                   />
                 ))
               }

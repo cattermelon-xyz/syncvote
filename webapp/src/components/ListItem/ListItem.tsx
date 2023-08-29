@@ -23,7 +23,7 @@ interface Props {
 }
 
 const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
-  let classes = `w-full grid gap-4 grid-row-gap-10`;
+  let classes = `w-full grid gap-4 `;
 
   if (columns.xs) classes += `xs:grid-cols-${columns.xs} `;
   if (columns.md) classes += `md:grid-cols-${columns.md} `;
@@ -70,8 +70,8 @@ const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
 
   return (
     <>
-      <div className='flex justify-between mb-4 '>
-        <p>{title}</p>
+      <div className='flex justify-between items-center mb-4 '>
+        <div className='text-md font-semibold'>{title}</div>
         <Popover content={content} trigger='click' placement='rightTop'>
           <Button
             style={{ border: 'None', padding: '5px' }}
