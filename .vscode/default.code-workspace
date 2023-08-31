@@ -1,0 +1,58 @@
+{
+  "folders": [
+    {
+      "name": "root",
+      "path": "../"
+    },
+    {
+      "name": "syncvote",
+      "path": "../apps/syncvote/webapp"
+    },
+    {
+      "name": "banner",
+      "path": "../components/Banner"
+    },
+    {
+      "name": "directedgraph",
+      "path": "../components/DirectedGraph"
+    },
+    {
+      "name": "icon",
+      "path": "../components/Icon"
+    },
+    {
+      "name": "listitem",
+      "path": "../components/ListItem"
+    },
+    {
+      "name": "richtexteditor",
+      "path": "../components/RichTextEditor"
+    },
+    {
+      "name": "polling",
+      "path": "../votemachines/polling/weblib"
+    },
+    {
+      "name": "singlevote",
+      "path": "../votemachines/singlevote/weblib"
+    },
+    {
+      "name": "upvote",
+      "path": "../votemachines/upvote/weblib"
+    },
+    {
+      "name": "veto",
+      "path": "../votemachines/veto/weblib"
+    },
+    {
+      "name": "utils",
+      "path": "../utils"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "node_modules/": true
+    }
+  },
+  "recommendations": ["dbaeumer.vscode-eslint", "orta.vscode-jest"]
+}
