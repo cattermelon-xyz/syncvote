@@ -2,8 +2,8 @@ package votemachine
 
 import (
 	"syncvote/voteconstants"
-	"singlevote/singlechoiceracetomax"
-	"polling/multichoiceraccetomax"
+	"singlevote"
+	"polling"
 )
 
 type VoteMachineInterface interface {
