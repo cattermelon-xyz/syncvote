@@ -21,7 +21,7 @@ import {
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import EditWorkflow from '@pages/Workflow/BluePrint/fragment/EditWorkflow';
 import {
   deleteAWorkflow,

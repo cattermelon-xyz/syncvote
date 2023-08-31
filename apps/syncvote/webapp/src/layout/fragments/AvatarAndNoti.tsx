@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { L } from '@utils/locales/L';
 import { Button, Popover, Space } from 'antd';
 import {

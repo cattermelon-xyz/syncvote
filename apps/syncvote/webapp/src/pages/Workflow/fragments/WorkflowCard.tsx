@@ -14,7 +14,7 @@ import {
   ShareAltOutlined,
 } from '@ant-design/icons';
 import { createIdString, getImageUrl } from 'utils';
-import Banner from '@components/Banner/Banner';
+import {Banner} from 'banner';
 import ChangeNameWorkflowModal from './ChangeNameWorkflowModal';
 import DeleteWorkflowModal from './DeleteWorkflowModal';
 import DuplicateWorkflowModal from './DuplicateWorkflowModal';

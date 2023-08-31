@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@components/Button/Button';
 import { PlusOutlined } from '@ant-design/icons';
 import { Input, Modal, Space } from 'antd';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { supabase } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';

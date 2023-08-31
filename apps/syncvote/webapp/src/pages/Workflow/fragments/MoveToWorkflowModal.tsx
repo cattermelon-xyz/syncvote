@@ -3,7 +3,7 @@ import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
 import { changeAWorkflowOrg } from '@middleware/data';
 import { useDispatch, useSelector } from 'react-redux';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 interface MoveToWorkflowModalProps {

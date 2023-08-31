@@ -4,7 +4,7 @@ import SearchBar from './fragments/SearchBar';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
-import ListItem from '@components/ListItem/ListItem';
+import {ListItem} from 'listitem';
 import { Skeleton } from 'antd';
 import { useDispatch } from 'react-redux';
 import { getWorkflowByStatus } from '@middleware/data';

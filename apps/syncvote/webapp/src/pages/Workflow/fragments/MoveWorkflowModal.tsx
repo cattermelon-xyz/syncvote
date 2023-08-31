@@ -2,7 +2,7 @@ import { Button, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 
 interface MoveWorkflowModalProps {
   open: boolean;

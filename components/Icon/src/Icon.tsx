@@ -5,8 +5,8 @@ import {
   CameraOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import { L } from '../../utils/locales/L';
-import { getImageUrl, supabase } from 'utils';
+import { supabase } from 'utils';
+import { getImageUrl } from 'utils';
 import React from 'react';
 
 const ChooseImageModal = ({
@@ -21,7 +21,7 @@ const ChooseImageModal = ({
   presetIcons: any;
 }) => {
   return (
-    <Modal open={isOpen} title={L('chooseIcon')} onCancel={onCancel}>
+    <Modal open={isOpen} title={'Choose Icon'} onCancel={onCancel}>
       <p>Choose or upload one</p>
       <input type='file' id='single' accept='image/*' onChange={uploadIcon} />
       <div className='grid grid-cols-6 mt-4'>

@@ -8,7 +8,7 @@ import { L } from '@utils/locales/L';
 import { useClickOutside } from '@utils/hooks/useClickOutSide';
 import './styles.scss';
 import { OrgPresetBanner } from '@utils/constants/organization';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { Modal, Space } from 'antd';
 import { createIdString, getImageUrl } from 'utils';
 import { EditOutlined } from '@ant-design/icons';

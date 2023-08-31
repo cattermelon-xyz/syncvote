@@ -1,9 +1,10 @@
-import { supabase, getImageUrl } from 'utils';
-import { OrgPresetBanner } from '@utils/constants/organization';
+import { getImageUrl } from 'utils';
+import { OrgPresetBanner } from './constant';
 import { Button, Modal, Space, Tabs } from 'antd';
 import { useState } from 'react';
 import './index.scss';
 import { LoadingOutlined } from '@ant-design/icons';
+import { supabase } from 'utils/index';
 
 type BannerProps = {
   bannerUrl: string;

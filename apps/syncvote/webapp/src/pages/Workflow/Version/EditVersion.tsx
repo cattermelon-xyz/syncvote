@@ -14,7 +14,7 @@ import {
   emptyStage,
   getVoteMachine,
 } from 'directedgraph';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import {
   canUserEditWorkflowVersion,
   queryWeb2Integration,

@@ -4,7 +4,7 @@ import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
 import { getDataOrgs } from '@middleware/data';
 import { PlusOutlined } from '@ant-design/icons';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from 'utils';
 

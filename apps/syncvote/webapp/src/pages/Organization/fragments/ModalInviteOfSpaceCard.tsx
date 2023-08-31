@@ -8,7 +8,7 @@ import {
   inviteUserByEmail,
   removeMemberOfOrg,
 } from '@middleware/data';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { IProfile } from '@types';
 import { LinkOutlined, DownOutlined } from '@ant-design/icons';
 import { unsecuredCopyToClipboard } from '@utils/helpers';

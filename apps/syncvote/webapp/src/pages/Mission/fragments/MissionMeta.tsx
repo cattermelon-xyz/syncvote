@@ -1,4 +1,4 @@
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { Input, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { IMission } from '@types';

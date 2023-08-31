@@ -4,7 +4,7 @@ const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
 import SpaceCard from '@pages/Organization/fragments/SpaceCard';
-import ListItem from '@components/ListItem/ListItem';
+import {ListItem} from 'listitem';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { Skeleton } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';

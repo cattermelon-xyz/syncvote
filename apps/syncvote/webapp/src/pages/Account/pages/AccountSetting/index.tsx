@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { Card, Button, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';

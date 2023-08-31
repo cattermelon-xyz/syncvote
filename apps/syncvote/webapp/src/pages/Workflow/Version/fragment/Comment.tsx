@@ -18,7 +18,7 @@ import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
 import { CloseOutlined, LeftOutlined } from '@ant-design/icons';
 import ReactionBox from './Reaction';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 
 const Comment = ({
   where,

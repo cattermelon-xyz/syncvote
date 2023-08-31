@@ -1,5 +1,5 @@
 import { CiCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { queryVersionHistory } from '@middleware/data';
 import { Divider, Modal, Space } from 'antd';
 import moment from 'moment';

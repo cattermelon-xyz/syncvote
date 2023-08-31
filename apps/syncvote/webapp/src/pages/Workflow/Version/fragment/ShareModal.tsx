@@ -5,7 +5,7 @@ import {
   LinkOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import {
   insertNewEditor,
   isEmailExisted,

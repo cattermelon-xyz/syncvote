@@ -1,5 +1,5 @@
 import { L } from '@utils/locales/L';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import { useState } from 'react';
 import {
   OrgPresetBanner,

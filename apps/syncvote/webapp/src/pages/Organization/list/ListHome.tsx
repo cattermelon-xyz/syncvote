@@ -1,5 +1,5 @@
 import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
-import Icon from '@components/Icon/Icon';
+import {Icon} from 'icon';
 import SortButton from '@components/SortButton/SortButton';
 import { createIdString, getImageUrl, supabase } from 'utils';
 import NewOrgFrm from './NewOrgFrm';
