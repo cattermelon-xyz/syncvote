@@ -5,7 +5,10 @@
     "apps/syncvote/webapp",
     "components/*",
     "votemachines/*",
+    "votemachines/polling/weblib",
     "votemachines/singlevote/weblib",
+    "votemachines/upvote/weblib",
+    "votemachines/veto/weblib",
     "utils"
   ]
 }

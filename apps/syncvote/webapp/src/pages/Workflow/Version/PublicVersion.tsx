@@ -68,7 +68,7 @@ export const PublicVersion = () => {
   const [selectedNodeId, setSelectedNodeId] = useState('');
   const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
-  const [rightSiderStatus, setRSiderStatus] = useState('closed');
+  const [rightSiderStatus, setRSiderStatus] = useState('description');
   const [api, contextHolder] = notification.useNotification();
   const where = `${orgId}$/${workflowId}$/${versionId}$`;
   const [dataReaction, setDataReaction] = useState<any[]>([]);
