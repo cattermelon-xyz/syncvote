@@ -1,4 +1,3 @@
-import { IVoteMachineConfigProps } from '@types';
 import { useState } from 'react';
 import { Polling as Interface } from './interface';
 import {
@@ -17,11 +16,14 @@ import {
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import CollapsiblePanel from '@components/DirectedGraph/components/CollapsiblePanel';
-import ResultCalculator from '@components/DirectedGraph/components/ResultCalculator';
-import NavConfigPanel from '@components/DirectedGraph/components/NavConfigPanel';
-import SideNote from '@components/DirectedGraph/components/SideNote';
-import { isRTE } from '@components/DirectedGraph/utils';
+import {
+  IVoteMachineConfigProps,
+  CollapsiblePanel,
+  ResultCalculator,
+  NavConfigPanel,
+  SideNote,
+  isRTE,
+} from 'directedgraph';
 
 export namespace Polling {
   export const ConfigPanel = (props: IVoteMachineConfigProps) => {

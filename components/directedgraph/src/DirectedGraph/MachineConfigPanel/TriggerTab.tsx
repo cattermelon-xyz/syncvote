@@ -1,4 +1,5 @@
-import { GraphViewMode, IWeb2Integration } from '@types';
+import { GraphViewMode } from '../interface';
+import { IWeb2Integration } from '../../types/index';
 import { Button, Space } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useContext, useState } from 'react';

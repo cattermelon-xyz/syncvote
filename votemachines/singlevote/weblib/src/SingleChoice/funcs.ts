@@ -1,4 +1,4 @@
-import { ICheckPoint } from '@types';
+import { ICheckPoint } from 'directedgraph';
 // import { IData } from './interface';
 import { SingleChoice as Interface } from './interface';
 

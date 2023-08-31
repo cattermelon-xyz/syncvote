@@ -1,5 +1,5 @@
-import { DelayUnit } from '@components/DirectedGraph/interface';
-import { displayDelayDuration } from '@components/DirectedGraph/utils';
+import { DelayUnit } from '../../interface';
+import { displayDelayDuration } from '../..//utils';
 import { Popover } from 'antd';
 import moment from 'moment';
 import parse from 'html-react-parser';

@@ -2,8 +2,7 @@ import { ArrowRightOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Drawer, Space, Input, Select, Button } from 'antd';
 import { SingleChoice as Interface } from '../interface';
 import { useState } from 'react';
-import { DelayUnit } from '@components/DirectedGraph/interface';
-import TimelockPanel from '@components/DirectedGraph/components/TimelockPanel';
+import { DelayUnit, TimelockPanel } from 'directedgraph';
 
 export default (props: {
   showAddOptionDrawer: boolean;

@@ -1,14 +1,14 @@
-import SideNote from '@components/DirectedGraph/components/SideNote';
+import SideNote from './SideNote';
 import { Popover, Select, Space, Tag } from 'antd';
 import { useState } from 'react';
 import { MdHelpOutline } from 'react-icons/md';
-import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
+import NumberWithPercentageInput from './NumberWithPercentageInput';
 import {
   CarryOutOutlined,
   QuestionCircleOutlined,
   SolutionOutlined,
 } from '@ant-design/icons';
-import TokenInput from '@components/DirectedGraph/components/TokenInput';
+import TokenInput from './TokenInput';
 
 type ResultCalculatorProps = {
   quorum?: number;

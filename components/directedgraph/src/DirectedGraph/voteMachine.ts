@@ -1,4 +1,4 @@
-import { IVoteMachine } from '@types';
+import { IVoteMachine } from '../types';
 
 type Machines = {
   [key: string]: IVoteMachine;

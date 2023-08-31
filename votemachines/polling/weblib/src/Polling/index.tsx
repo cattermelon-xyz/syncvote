@@ -3,21 +3,15 @@ import parse from 'html-react-parser';
 
 import {
   IVoteMachine,
-  IVoteMachineGetLabelProps,
   ICheckPoint,
-  IToken,
-  IParticipant,
-} from '../../types';
+} from 'directedgraph';
 import moment from 'moment';
-import SideNote from '@components/DirectedGraph/components/SideNote';
-import TokenInput from '@components/DirectedGraph/components/TokenInput';
-import { displayDuration, isRTE } from '@components/DirectedGraph/utils';
+import { TokenInput, isRTE, NumberWithPercentageInput } from 'directedgraph';
 import { Polling as Interface } from './interface';
 import { Polling as Funcs } from './funcs';
 import { Polling } from './configPanel';
 import { SolutionOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
 import { LuMapPin } from 'react-icons/lu';
-import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
 
 const explain = ({
   checkpoint,

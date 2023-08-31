@@ -1,12 +1,15 @@
 import { Veto as Interface } from './interface';
 import { Veto as Funcs } from './funcs';
 import ConfigPanel from './configPanel';
-import { ICheckPoint, IVoteMachine } from '@types';
+import {
+  ICheckPoint,
+  IVoteMachine,
+  NumberWithPercentageInput,
+  TokenInput,
+  isRTE,
+  SideNote,
+} from 'directedgraph';
 import { Space } from 'antd';
-import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
-import TokenInput from '@components/DirectedGraph/components/TokenInput';
-import { isRTE } from '@components/DirectedGraph/utils';
-import SideNote from '@components/DirectedGraph/components/SideNote';
 import { SolutionOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';

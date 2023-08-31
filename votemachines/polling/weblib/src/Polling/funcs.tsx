@@ -1,6 +1,6 @@
 import { CheckSquareOutlined, NodeExpandOutlined } from '@ant-design/icons';
 import { Polling as Interface } from './interface';
-import { IVoteMachineGetLabelProps } from '@types';
+import { IVoteMachineGetLabelProps } from 'directedgraph';
 
 export namespace Polling {
   export const deleteChildNode = (

@@ -1,17 +1,22 @@
 import { Space, Switch, Button, Alert, Input } from 'antd';
 import { useState } from 'react';
-import { GraphViewMode, ICheckPoint, IVoteMachineConfigProps } from '@/types';
-import { DelayUnit } from '@components/DirectedGraph/interface';
-import NewOptionDrawer from './NewOptionDrawer';
-import NavConfigPanel, {
+import {
+  GraphViewMode,
+  ICheckPoint,
+  IVoteMachineConfigProps,
+} from 'directedgraph';
+import {
+  DelayUnit,
+  NavConfigPanel,
   INavPanelNode,
-} from '@components/DirectedGraph/components/NavConfigPanel';
+  CollapsiblePanel,
+  SideNote,
+  ResultCalculator,
+} from 'directedgraph';
+import NewOptionDrawer from './NewOptionDrawer';
 import { PlusOutlined } from '@ant-design/icons';
 import '../styles.scss';
-import CollapsiblePanel from '@components/DirectedGraph/components/CollapsiblePanel';
 import { SingleChoice as Interface } from '../interface';
-import SideNote from '@components/DirectedGraph/components/SideNote';
-import ResultCalculator from '@components/DirectedGraph/components/ResultCalculator';
 
 /**
  *

@@ -1,14 +1,18 @@
 import { Space, Drawer, Tabs, Collapse, Input, Modal, Button } from 'antd';
 import { useContext, useState } from 'react';
 import { EditOutlined } from '@ant-design/icons';
-import { GraphViewMode, ICheckPoint, IVoteMachine } from '../../../types';
+import {
+  GraphViewMode,
+  ICheckPoint,
+  IVoteMachine,
+} from '../interface';
 import ChooseVoteMachine from './ChooseVoteMachine';
 import VotingPartipation from './rules/VotingParticipant';
 import VotingDuration from './rules/VotingDuration';
 import { getVoteMachine } from '../voteMachine';
 import { GraphPanelContext } from '../context';
 import CollapsiblePanel from '../components/CollapsiblePanel';
-import TextEditor from '@components/Editor/TextEditor';
+import { TextEditor } from 'richtexteditor';
 import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
 import SideNote from '../components/SideNote';
 

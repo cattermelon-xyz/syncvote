@@ -1,6 +1,6 @@
-import BSC from '@assets/icons/svg-icons/BSC';
-import Solana from '@assets/icons/svg-icons/Solana';
-import TokenInput from '@components/DirectedGraph/components/TokenInput';
+import BSC from '../../../../assets/BSC';
+import Solana from '../../../../assets/Solana';
+import TokenInput from '../../../components/TokenInput';
 import { Input, Select, Space } from 'antd';
 import { FaEthereum } from 'react-icons/fa6';
 

@@ -1,13 +1,16 @@
 import { UpVote as Interface } from './interface';
 import { UpVote as Funcs } from './funcs';
 import ConfigPanel from './configPanel';
-import { ICheckPoint, IVoteMachine } from '@types';
+import {
+  ICheckPoint,
+  IVoteMachine,
+  NumberWithPercentageInput,
+  TokenInput,
+  SideNote,
+  isRTE,
+} from 'directedgraph';
 import { Space } from 'antd';
-import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
-import TokenInput from '@components/DirectedGraph/components/TokenInput';
-import SideNote from '@components/DirectedGraph/components/SideNote';
 import { SolutionOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
-import { isRTE } from '@components/DirectedGraph/utils';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
 

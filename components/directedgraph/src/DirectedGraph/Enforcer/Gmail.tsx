@@ -23,5 +23,8 @@ const Display = () => {
 };
 
 export default {
-  Add, Display, getName, getIcon,
+  Add,
+  Display,
+  getName,
+  getIcon,
 };

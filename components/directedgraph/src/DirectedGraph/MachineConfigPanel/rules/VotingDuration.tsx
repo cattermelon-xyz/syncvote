@@ -1,10 +1,10 @@
 import { LockFilled, UnlockOutlined } from '@ant-design/icons';
-import { GraphPanelContext } from '@components/DirectedGraph/context';
+import { GraphPanelContext } from '../../context';
 import { Space, Input, Button, Modal } from 'antd';
 import moment from 'moment';
 import { useContext } from 'react';
 import CollapsiblePanel from '../../components/CollapsiblePanel';
-import SideNote from '@components/DirectedGraph/components/SideNote';
+import SideNote from '../../components/SideNote';
 
 const VotingDuration = () => {
   const { data, onChange, viewMode, selectedNodeId } =

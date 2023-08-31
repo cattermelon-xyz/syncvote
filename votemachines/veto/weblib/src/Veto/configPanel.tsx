@@ -1,10 +1,12 @@
-import { IVoteMachineConfigProps } from '@types';
+import {
+  IVoteMachineConfigProps,
+  CollapsiblePanel,
+  ResultCalculator,
+  NavConfigPanel,
+} from 'directedgraph';
 import { Veto as Interface } from './interface';
-import CollapsiblePanel from '@components/DirectedGraph/components/CollapsiblePanel';
-import ResultCalculator from '@components/DirectedGraph/components/ResultCalculator';
 import { Alert, Space, Switch } from 'antd';
 import { all } from 'axios';
-import NavConfigPanel from '@components/DirectedGraph/components/NavConfigPanel';
 
 export default (props: IVoteMachineConfigProps) => {
   const {

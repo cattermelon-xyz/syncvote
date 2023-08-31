@@ -10,13 +10,14 @@ import {
   ICheckPoint,
   IVoteMachine,
   IVoteMachineGetLabelProps,
-} from '../../types';
+  TokenInput,
+  displayDuration,
+  isRTE,
+  SideNote,
+  NumberWithPercentageInput,
+} from 'directedgraph';
 import ConfigPanel from './ConfigPanel';
 import { SingleChoice as Interface } from './interface';
-import TokenInput from '@components/DirectedGraph/components/TokenInput';
-import { displayDuration, isRTE } from '@components/DirectedGraph/utils';
-import SideNote from '@components/DirectedGraph/components/SideNote';
-import NumberWithPercentageInput from '@components/DirectedGraph/components/NumberWithPercentageInput';
 import { SingleChoice as Funcs } from './funcs';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';

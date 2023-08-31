@@ -1,9 +1,9 @@
-import { GraphViewMode, IToken } from '@types';
+import { GraphViewMode, IToken } from '../../../types';
 import { Select, Space } from 'antd';
 import AllowedByIdentity from './fragment/AllowedByIdentity';
 import AllowedByToken from './fragment/AllowedByToken';
 import { useContext } from 'react';
-import { GraphPanelContext } from '@components/DirectedGraph/context';
+import { GraphPanelContext } from '../../context';
 import { FiUserCheck } from 'react-icons/fi';
 import { TbAtom } from 'react-icons/tb';
 import CollapsiblePanel from '../../components/CollapsiblePanel';

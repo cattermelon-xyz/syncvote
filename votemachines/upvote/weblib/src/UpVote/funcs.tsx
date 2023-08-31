@@ -1,6 +1,6 @@
 import { LikeOutlined, NodeExpandOutlined } from '@ant-design/icons';
 import { UpVote as Interface } from './interface';
-import { ICheckPoint, IVoteMachineGetLabelProps } from '@types';
+import { ICheckPoint, IVoteMachineGetLabelProps } from 'directedgraph';
 
 export namespace UpVote {
   export const deleteChildNode = (
