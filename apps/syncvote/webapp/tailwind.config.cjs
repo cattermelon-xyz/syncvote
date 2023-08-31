@@ -1203,5 +1203,14 @@ module.exports = {
   corePlugins: {
     preflight: false,
   },
-  content: ['./src/**/*.{js,jsx,ts,tsx,html}', './index.html'],
+  content: [
+    './src/**/*.{js,jsx,ts,tsx,html}',
+    './index.html',
+    '../../../components/DirectedGraph/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../components/RichTextEditor/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../votemachines/polling/weblib/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../votemachines/singlevote/weblib/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../votemachines/upvote/weblib/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../votemachines/veto/weblib/src/**/*.{js,jsx,ts,tsx,html}',
+  ],
 };

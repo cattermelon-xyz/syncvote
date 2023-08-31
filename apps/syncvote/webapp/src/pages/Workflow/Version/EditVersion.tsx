@@ -13,7 +13,7 @@ import {
   emptyCosmetic,
   emptyStage,
   getVoteMachine,
-} from '@components/DirectedGraph';
+} from 'directedgraph';
 import Icon from '@components/Icon/Icon';
 import {
   canUserEditWorkflowVersion,
@@ -32,7 +32,7 @@ import {
   GraphViewMode,
   IWorkflowVersionCosmetic,
   IWorkflowVersionLayout,
-} from '@types';
+} from 'directedgraph';
 import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
 import NotFound404 from '@pages/NotFound404';

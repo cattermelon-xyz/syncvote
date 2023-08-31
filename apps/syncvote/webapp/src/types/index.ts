@@ -1,4 +1,4 @@
-export * from '@components/DirectedGraph/interface';
+// export * from '@components/DirectedGraph/interface';
 export * from '@redux/reducers/ui.reducer/interface';
 export * from '@redux/reducers/orginfo.reducer/interface';
 export * from '@redux/reducers/mission.reducer/interface';

@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { GrDocumentText } from 'react-icons/gr';
 import parse from 'html-react-parser';
-import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
+import { DirectedGraph, emptyStage } from 'directedgraph';
 import {
   queryOrgByOrgId,
   queryWeb2Integration,
@@ -40,7 +40,7 @@ import { getDataReactionCount } from '@middleware/data/reaction';
 import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
 import { HiMiniFire } from 'react-icons/hi2';
 import { AiFillLike, AiFillDislike } from 'react-icons/ai';
-import { GraphViewMode } from '@types';
+import { GraphViewMode } from 'directedgraph';
 import Banner from '@components/Banner/Banner';
 import Icon from '@components/Icon/Icon';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';

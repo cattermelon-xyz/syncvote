@@ -6,7 +6,7 @@ import {
 import { Button, Drawer, Typography } from 'antd';
 import MachineConfigPanel from './MachineConfigPanel/MachineConfigPanel';
 import { getVoteMachine } from './voteMachine';
-import { GraphViewMode, IConfigPanel } from '../types';
+import { GraphViewMode, IConfigPanel } from './interface';
 import { GraphPanelContext } from './context';
 
 export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {

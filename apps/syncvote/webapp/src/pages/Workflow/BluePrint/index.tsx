@@ -22,7 +22,7 @@ import {
 } from '@utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
-import { emptyStage } from '@components/DirectedGraph';
+import { emptyStage } from 'directedgraph';
 import NotFound404 from '@pages/NotFound404';
 
 // TODO: this file is placed in wrong folder!

@@ -5,13 +5,13 @@ import { supabase } from '@utils/supabaseClient';
 import { Session } from '@supabase/gotrue-js';
 import { useSelector, useDispatch } from 'react-redux';
 import GlobalLoading from '@components/GlobalLoading/GlobalLoading';
-import { registerVoteMachine } from '@components/DirectedGraph';
+import { registerVoteMachine } from 'directedgraph';
 import { setUser } from '@redux/reducers/orginfo.reducer';
 import { useLocation } from 'react-router-dom';
-import SingleChoice from '@votemachines/SingleChoice';
-import Polling from '@votemachines/Polling';
-import Veto from '@votemachines/Veto';
-import UpVote from '@votemachines/UpVote';
+import { SingleChoice } from 'singlevote';
+import { Polling } from 'polling';
+import { Veto } from 'veto';
+import { UpVote } from 'upvote';
 import {
   queryOrgs,
   queryPresetBanner,

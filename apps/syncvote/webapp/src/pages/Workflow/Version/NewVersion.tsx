@@ -8,9 +8,9 @@ import {
 } from '@utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import { queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
-import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
+import { DirectedGraph, emptyStage } from 'directedgraph';
 import { SaveOutlined } from '@ant-design/icons';
-import { GraphViewMode } from '@types';
+import { GraphViewMode } from 'directedgraph';
 // TODO: forbid special character
 export const NewVersion = () => {
   const [versionToCopy, setVersionToCopy] = useState(-1);

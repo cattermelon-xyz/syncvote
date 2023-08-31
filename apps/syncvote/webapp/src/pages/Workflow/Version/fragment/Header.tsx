@@ -31,7 +31,7 @@ import {
 import moment from 'moment';
 import VersionHistoryDialog from './VersionHistoryDialog';
 import ShareModal from './ShareModal';
-import { GraphViewMode } from '@types';
+import { GraphViewMode } from 'directedgraph';
 import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
 const env = import.meta.env.VITE_ENV;
 

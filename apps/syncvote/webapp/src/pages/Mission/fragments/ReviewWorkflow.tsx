@@ -1,14 +1,11 @@
-import {
-  DirectedGraph,
-  ICheckPoint,
-  getVoteMachine,
-} from '@components/DirectedGraph';
+import { DirectedGraph, ICheckPoint, getVoteMachine } from 'directedgraph';
 import { Tag, Space, Drawer } from 'antd';
 import moment from 'moment';
 import { useState } from 'react';
 import ExternalLinkIcon from '@assets/icons/svg-icons/ExternalLinkIcon';
 import { useNavigate, useParams } from 'react-router-dom';
-import { GraphViewMode, IWorkflowVersion } from '@types';
+import { GraphViewMode } from 'directedgraph';
+import { IWorkflowVersion } from '@types';
 
 const getSummary = (selected: ICheckPoint) => {
   const machine: any = getVoteMachine(selected?.vote_machine_type || '');

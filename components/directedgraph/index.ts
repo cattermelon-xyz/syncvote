@@ -1,4 +1,4 @@
-import { ICheckPoint as icp } from './src/types';
+import { ICheckPoint as icp } from './src/DirectedGraph/interface';
 // TODO: ICheckPoint should be defined here, then import in @types and rexport!
 export * from './src/DirectedGraph/DirectedGraph';
 export * from './src/DirectedGraph/voteMachine';

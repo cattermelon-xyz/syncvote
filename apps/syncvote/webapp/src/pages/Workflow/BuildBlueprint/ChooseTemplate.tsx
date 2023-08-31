@@ -8,7 +8,7 @@ import { supabase } from '@utils/supabaseClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
-import { emptyStage } from '@components/DirectedGraph';
+import { emptyStage } from 'directedgraph';
 import { insertWorkflowAndVersion } from '@middleware/data';
 import { version } from 'os';
 

@@ -1,4 +1,4 @@
-import { GraphViewMode, IToken } from '../../../types';
+import { GraphViewMode, IToken } from '../../interface';
 import { Select, Space } from 'antd';
 import AllowedByIdentity from './fragment/AllowedByIdentity';
 import AllowedByToken from './fragment/AllowedByToken';
