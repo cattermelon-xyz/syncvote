@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "apps/syncvote/webapp",
+    "components/*",
+    "votemachines/*",
+    "votemachines/singlevote/weblib",
+    "utils"
+  ]
+}
