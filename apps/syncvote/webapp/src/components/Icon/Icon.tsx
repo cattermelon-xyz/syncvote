@@ -6,8 +6,7 @@ import {
   LoadingOutlined,
 } from '@ant-design/icons';
 import { L } from '../../utils/locales/L';
-import { supabase } from '../../utils/supabaseClient';
-import { getImageUrl } from '../../utils/helpers';
+import { getImageUrl, supabase } from 'utils';
 import React from 'react';
 
 const ChooseImageModal = ({

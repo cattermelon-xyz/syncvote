@@ -5,7 +5,7 @@ import {
   changeMission,
   setLastFetch,
 } from '@redux/reducers/mission.reducer';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 import { IMission } from '@types';
 
 export const queryMission = async ({

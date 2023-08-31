@@ -55,7 +55,8 @@
     "veto": "1.0.0",
     "upvote": "1.0.0",
     "directedgraph": "1.0.0",
-    "richtexteditor": "1.0.0"
+    "richtexteditor": "1.0.0",
+    "utils": "1.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.0",

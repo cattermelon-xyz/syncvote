@@ -1,9 +1,6 @@
 import { queryWorkflow, upsertAMission } from '@middleware/data';
-import {
-  createIdString,
-  extractIdFromIdString,
-  shouldUseCachedData,
-} from '@utils/helpers';
+import { createIdString, extractIdFromIdString } from 'utils';
+import { shouldUseCachedData } from '@utils/helpers';
 import { Modal, Space, Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -95,18 +92,18 @@ const NewMission = () => {
     });
   };
   return (
-    <div className="container flex justify-center mt-12">
-      <div className="flex flex-col gap-4 w-full">
+    <div className='container flex justify-center mt-12'>
+      <div className='flex flex-col gap-4 w-full'>
         {currentScreen === 'review' ? (
           <>
             <ReviewWorkflow currentWorkflowVersion={currentWorkflowVersion} />
             <Space
-              direction="horizontal"
-              size="large"
-              className="flex justify-between"
+              direction='horizontal'
+              size='large'
+              className='flex justify-between'
             >
               <Button
-                type="default"
+                type='default'
                 onClick={() => {
                   if (navigate.length === 0) {
                     navigate(`/${orgIdString}`);
@@ -118,7 +115,7 @@ const NewMission = () => {
                 Back
               </Button>
               <Button
-                type="default"
+                type='default'
                 onClick={() => {
                   setCurrentScreen('metadata');
                 }}
@@ -130,21 +127,21 @@ const NewMission = () => {
         ) : null}
         {currentScreen === 'metadata' ? (
           <Space
-            direction="vertical"
-            size="large"
-            className="lg:w-1/2 md:w-full self-center"
+            direction='vertical'
+            size='large'
+            className='lg:w-1/2 md:w-full self-center'
           >
             <MissionMeta
               currentMission={currentMission}
               setCurrentMission={setCurrentMission}
             />
             <Space
-              direction="horizontal"
-              size="large"
-              className="w-full flex justify-between"
+              direction='horizontal'
+              size='large'
+              className='w-full flex justify-between'
             >
               <Button
-                type="default"
+                type='default'
                 onClick={() => {
                   setCurrentScreen('review');
                 }}
@@ -152,7 +149,7 @@ const NewMission = () => {
                 Back
               </Button>
               <Button
-                type="default"
+                type='default'
                 onClick={() => {
                   onSave();
                 }}

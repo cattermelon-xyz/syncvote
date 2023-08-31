@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
+import { extractIdFromIdString, getImageUrl } from 'utils';
 import { Avatar, Button } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';

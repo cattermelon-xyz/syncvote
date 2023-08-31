@@ -3,7 +3,7 @@ import {
   queryUserByEmail,
   inviteExistingMember,
 } from "@middleware/data";
-import { extractIdFromIdString } from "@utils/helpers";
+import { extractIdFromIdString } from "utils";
 import { Button, Drawer, Input, Modal, Space } from "antd";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

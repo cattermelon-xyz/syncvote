@@ -11,7 +11,8 @@ import {
 import Icon from '@components/Icon/Icon';
 import { IProfile } from '@types';
 import { LinkOutlined, DownOutlined } from '@ant-design/icons';
-import { unsecuredCopyToClipboard, createIdString } from '@utils/helpers';
+import { unsecuredCopyToClipboard } from '@utils/helpers';
+import { createIdString } from 'utils';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import type { MenuProps } from 'antd';
 

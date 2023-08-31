@@ -15,11 +15,8 @@ import {
   queryWorkflow,
   upsertAnOrg,
 } from '@middleware/data';
-import {
-  createIdString,
-  extractIdFromIdString,
-  randomIcon,
-} from '@utils/helpers';
+import { randomIcon } from '@utils/helpers';
+import { createIdString, extractIdFromIdString } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
 import { emptyStage } from 'directedgraph';

@@ -1,7 +1,7 @@
 import {
   finishLoading, setPresetBanners, setPresetIcons, startLoading,
 } from '@redux/reducers/ui.reducer';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 
 // TODO: should store the last time of update
 export const queryPresetIcon = async ({

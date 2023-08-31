@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 import GoogleIcon from '@assets/icons/svg-icons/GoogleIcon';
 import { L } from '@utils/locales/L';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 const env = import.meta.env.VITE_ENV;
 

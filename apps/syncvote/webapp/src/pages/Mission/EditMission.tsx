@@ -1,9 +1,13 @@
 import { Modal } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  upsertAMission, deleteMission, queryAMission, queryWeb2Integration,
+  upsertAMission,
+  deleteMission,
+  queryAMission,
+  queryWeb2Integration,
 } from '@middleware/data';
-import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
+import { shouldUseCachedData } from '@utils/helpers';
+import { extractIdFromIdString } from 'utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IMission } from '@types';
@@ -12,9 +16,7 @@ import { create } from '@middleware/data/dash';
 import MissionData from './fragments/MissionData';
 
 const EditMission = () => {
-  const {
-    missionIdString, orgIdString,
-  } = useParams();
+  const { missionIdString, orgIdString } = useParams();
   const { web2Integrations } = useSelector((state: any) => state.integration);
   const { lastFetch, missions } = useSelector((state: any) => state.workflow);
   const dispatch = useDispatch();
@@ -23,13 +25,15 @@ const EditMission = () => {
   const orgId = extractIdFromIdString(orgIdString);
   const [currentMission, setCurrentMission] = useState<IMission>(
     missions.find((m: any) => m.id === missionId) || {
-    id: -1,
-    title: '',
-    desc: '',
-    data: '{checkpoints:[]}',
-    status: 'DRAFT',
-  });
-  const [web2IntegrationsState, setWeb2IntegrationsState] = useState(web2Integrations);
+      id: -1,
+      title: '',
+      desc: '',
+      data: '{checkpoints:[]}',
+      status: 'DRAFT',
+    }
+  );
+  const [web2IntegrationsState, setWeb2IntegrationsState] =
+    useState(web2Integrations);
   useEffect(() => {
     if (missionIdString && !shouldUseCachedData(lastFetch)) {
       queryAMission({
@@ -48,7 +52,7 @@ const EditMission = () => {
       });
     }
   }, [missions, lastFetch]);
-  const onSave = async (newMission:any) => {
+  const onSave = async (newMission: any) => {
     await upsertAMission({
       mission: newMission,
       onLoad: (data) => {
@@ -86,7 +90,7 @@ const EditMission = () => {
       title: currentMission.title || '',
       desc: currentMission.desc || '',
       dispatch,
-      onSuccess: (blockchainResp:any) => {
+      onSuccess: (blockchainResp: any) => {
         const newMission = {
           ...currentMission,
           status: 'PUBLISHED',
@@ -113,7 +117,7 @@ const EditMission = () => {
     onSave(newMission);
   };
   return (
-    <div className="w-full h-full">
+    <div className='w-full h-full'>
       <MissionData
         currentMission={currentMission}
         web2IntegrationsState={web2IntegrationsState}

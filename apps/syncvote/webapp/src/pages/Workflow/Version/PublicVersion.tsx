@@ -14,7 +14,7 @@ import {
   queryWeb2Integration,
   queryWorkflowVersion,
 } from '@middleware/data';
-import { extractIdFromIdString } from '@utils/helpers';
+import { extractIdFromIdString } from 'utils';
 import {
   Button,
   Layout,
@@ -33,7 +33,7 @@ import { MdChatBubbleOutline } from 'react-icons/md';
 import { LuPaintbrush } from 'react-icons/lu';
 import Sider from 'antd/es/layout/Sider';
 import Comment from './fragment/Comment';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
 import { getDataReactionCount } from '@middleware/data/reaction';

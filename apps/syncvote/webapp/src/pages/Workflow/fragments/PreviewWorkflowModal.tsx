@@ -1,7 +1,7 @@
 import { Modal, Image, Empty, Skeleton } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
-import { createIdString } from '@utils/helpers';
+import { createIdString } from 'utils';
 import { useNavigate } from 'react-router-dom';
 
 interface PreviewWorkflowModalProps {

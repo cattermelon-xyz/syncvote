@@ -13,7 +13,7 @@ import {
   LogoutOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
-import { createIdString, getImageUrl } from '@utils/helpers';
+import { createIdString, getImageUrl } from 'utils';
 import Banner from '@components/Banner/Banner';
 import ChangeNameWorkflowModal from './ChangeNameWorkflowModal';
 import DeleteWorkflowModal from './DeleteWorkflowModal';

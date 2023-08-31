@@ -3,7 +3,7 @@ import Discord from '@assets/icons/svg-icons/Discord';
 import { Button, Space } from 'antd';
 import moment from 'moment';
 import { useParams } from 'react-router-dom';
-import { extractIdFromIdString } from '@utils/helpers';
+import { extractIdFromIdString } from 'utils';
 import { IWeb2Integration } from '@types';
 
 const { TWITTER_CLIENT_ID, TWITTER_BASE_URL } = import.meta.env;

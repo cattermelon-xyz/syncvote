@@ -9,7 +9,7 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 
 interface AvatarAndNotiProps {

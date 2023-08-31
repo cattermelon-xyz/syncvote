@@ -8,7 +8,7 @@ import ButtonRight from '@assets/icons/svg-icons/ButtonRight';
 import { useState } from 'react';
 import ConnectWallet from '@assets/icons/svg-icons/ConnectWallet';
 import { useDispatch } from 'react-redux';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { Button, Modal } from 'antd';
 import { listConnectWallet, listOptionsConnectWallet } from './connectWallet';

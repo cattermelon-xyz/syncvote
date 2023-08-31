@@ -102,45 +102,6 @@ export const renderValidateStatus = (condition: AlertMessage | null) => {
   return '';
 };
 
-export const createIdString = (title: String, id: String) => {
-  let result = '';
-  result = title.toLocaleLowerCase().replace(/([^\w ]|_)/g, '');
-  result = result.split(' ').join('-');
-  return `${result}-${id}`;
-};
-
-export const extractIdFromIdString = (idString: String | undefined) => {
-  if (!idString) return -1;
-  const id = idString?.split('-').pop();
-  if (id === undefined) return -1;
-  return parseInt(id, 10);
-};
-
-export const getImageUrl = ({
-  filePath = '',
-  isPreset,
-  type,
-}: {
-  filePath?: string;
-  isPreset: boolean;
-  type: string;
-}): string => {
-  if (filePath && filePath.includes('https')) {
-    return filePath;
-  }
-  if (filePath === null || filePath === 'null') {
-    return '';
-  }
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  let str = '';
-  if (isPreset) {
-    str = `${supabaseUrl}/storage/v1/object/public/preset_images/${type}/${filePath}`;
-  } else if (filePath) {
-    str = `${supabaseUrl}/storage/v1/object/public/public_images/${filePath}`;
-  }
-  return str;
-};
-
 export const shouldUseCachedData = (lastFetch: number) => {
   const now = new Date().getTime();
   if (!lastFetch || lastFetch < 0) {
@@ -157,14 +118,3 @@ export const shouldUseCachedData = (lastFetch: number) => {
  * @param subtrahend: number[]
  * @returns number[] of which elements are in minuend but not in substrahend
  */
-export const subtractArray = ({
-  minuend,
-  subtrahend,
-}: {
-  minuend: number[];
-  subtrahend: number[];
-}) => {
-  var set2 = new Set(subtrahend);
-  var difference = minuend.filter((x) => !set2.has(x));
-  return difference;
-};

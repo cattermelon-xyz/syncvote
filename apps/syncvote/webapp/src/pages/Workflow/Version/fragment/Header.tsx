@@ -1,9 +1,9 @@
 import { L } from '@utils/locales/L';
 import { useNavigate, useParams } from 'react-router-dom';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { extractIdFromIdString, getImageUrl } from '@utils/helpers';
+import { extractIdFromIdString, getImageUrl } from 'utils';
 import { Button, Divider, Modal, Popover, Space } from 'antd';
 import {
   BellOutlined,

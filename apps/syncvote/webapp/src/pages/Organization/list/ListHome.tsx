@@ -1,13 +1,12 @@
 import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
 import Icon from '@components/Icon/Icon';
 import SortButton from '@components/SortButton/SortButton';
-import { createIdString, getImageUrl } from '@utils/helpers';
+import { createIdString, getImageUrl, supabase } from 'utils';
 import NewOrgFrm from './NewOrgFrm';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { L } from '@utils/locales/L';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@utils/supabaseClient';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { SearchOutlined, SortAscendingOutlined } from '@ant-design/icons';

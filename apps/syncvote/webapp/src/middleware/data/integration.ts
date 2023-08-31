@@ -6,7 +6,7 @@ import {
   deleteWeb2Integration as deleteWeb2IntegrationReducer,
   setLastFetch,
 } from '@redux/reducers/integration.reducer';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 
 export const queryWeb2Integration = async ({
   orgId, onLoad, onError = (error) => {

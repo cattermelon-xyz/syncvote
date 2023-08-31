@@ -22,7 +22,8 @@ import {
   upsertWorkflowVersion,
 } from '@middleware/data';
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
-import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
+import {  shouldUseCachedData } from '@utils/helpers';
+import { extractIdFromIdString } from 'utils';
 import { Button, Drawer, Modal, Skeleton, Space, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

@@ -6,7 +6,7 @@ import Input from '@components/Input/Input';
 import { useSelector, useDispatch } from 'react-redux';
 import { newOrg } from '@middleware/data';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from '@utils/helpers';
+import { createIdString } from 'utils';
 
 interface CreateSpaceModalProps {
   open: boolean;

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Avatar, Card, Popover, Space, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from '@utils/helpers';
+import { createIdString } from 'utils';
 import { EllipsisOutlined, TeamOutlined } from '@ant-design/icons';
-import { getImageUrl } from '@utils/helpers';
+import { getImageUrl } from 'utils';
 import {
   ShareAltOutlined,
   EditOutlined,

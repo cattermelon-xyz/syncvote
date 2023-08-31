@@ -6,7 +6,7 @@ import { getDataOrgs } from '@middleware/data';
 import { PlusOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from '@utils/helpers';
+import { createIdString } from 'utils';
 
 interface CreateWorkflowModalProps {
   open: boolean;

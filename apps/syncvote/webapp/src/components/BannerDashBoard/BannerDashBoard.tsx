@@ -10,7 +10,7 @@ import './styles.scss';
 import { OrgPresetBanner } from '@utils/constants/organization';
 import Icon from '@components/Icon/Icon';
 import { Modal, Space } from 'antd';
-import { createIdString, getImageUrl } from '@utils/helpers';
+import { createIdString, getImageUrl } from 'utils';
 import { EditOutlined } from '@ant-design/icons';
 
 const BannerDashBoard = ({

@@ -1,5 +1,5 @@
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 import { setUser, addUserToOrg } from '@redux/reducers/orginfo.reducer';
 import { addMemberToOrg } from './org';
 

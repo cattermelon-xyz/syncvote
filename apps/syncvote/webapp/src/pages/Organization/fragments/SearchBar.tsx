@@ -7,7 +7,7 @@ import { getWorkflowByStatus, searchWorflow } from '@middleware/data';
 import { useDispatch } from 'react-redux';
 import { error } from 'console';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 
 const { Search } = Input;
 const { CheckableTag } = Tag;

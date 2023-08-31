@@ -4,7 +4,8 @@ import { BoxPlotOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons
 import { Tabs } from 'antd';
 import { deleteWeb2Integration, queryWeb2Integration } from '@middleware/data';
 import { useParams } from 'react-router-dom';
-import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
+import {  shouldUseCachedData } from '@utils/helpers';
+import { extractIdFromIdString } from 'utils';
 import { IWeb2Integration } from '@types';
 import Member from './setting/Member';
 import Integration from './setting/Integration';

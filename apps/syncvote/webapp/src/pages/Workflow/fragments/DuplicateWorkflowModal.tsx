@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from '@utils/helpers';
+import { createIdString } from 'utils';
 import { useState } from 'react';
 
 interface DuplicateWorkflowModalProps {

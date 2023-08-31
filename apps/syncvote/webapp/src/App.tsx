@@ -1,7 +1,7 @@
 import { useEffect, useState, ReactNode } from 'react';
 import './index.css';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from 'utils';
 import { Session } from '@supabase/gotrue-js';
 import { useSelector, useDispatch } from 'react-redux';
 import GlobalLoading from '@components/GlobalLoading/GlobalLoading';

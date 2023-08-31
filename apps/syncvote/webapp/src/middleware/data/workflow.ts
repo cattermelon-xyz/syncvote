@@ -16,8 +16,7 @@ import {
   addWorkflowToOrg,
 } from '@redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
-import { supabase } from '@utils/supabaseClient';
-import { subtractArray } from '@utils/helpers';
+import { supabase, subtractArray } from 'utils';
 import { log } from 'console';
 import { version } from 'os';
 

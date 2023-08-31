@@ -12,7 +12,7 @@ import {
   queryVersionEditor,
 } from '@middleware/data';
 import { IWorkflow } from '@types';
-import { createIdString } from '@utils/helpers';
+import { createIdString } from 'utils';
 import {
   Alert,
   Button,
