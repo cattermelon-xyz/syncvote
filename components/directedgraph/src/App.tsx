@@ -1,32 +1,79 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import reactLogo from './assets/react.svg';
-import './App.css';
+import { Layout } from 'antd';
+import { emptyStage } from './DirectedGraph/empty';
+import { DirectedGraph } from './DirectedGraph/DirectedGraph';
+import { GraphViewMode } from './DirectedGraph/interface';
+import { registerVoteMachine } from './DirectedGraph/voteMachine';
+import { SingleChoice } from 'single-vote';
+import { fakeVersion } from './mockData/fakeVersion';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [dataHasChanged, setDataHasChanged] = useState(false);
+  const [version, setVersion] = useState<any>(fakeVersion);
+  const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
+  const [isVoteMachineRegistered, setIsVoteMachineRegistered] = useState(false);
+
+  useEffect(() => {
+    registerVoteMachine(SingleChoice);
+    setIsVoteMachineRegistered(true);
+  }, []);
 
   return (
-    <div className='App'>
-      <div>
-        <a href='https://vitejs.dev' target='_blank'>
-          <img src='/vite.svg' className='logo' alt='Vite logo' />
-        </a>
-        <a href='https://reactjs.org' target='_blank'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className='card'>
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className='read-the-docs'>
-        Click on the Vite and React logos to learn more
-      </p>
+    <div className='App h-screen'>
+      {isVoteMachineRegistered && (
+        <Layout className='relative items-center w-full h-screen'>
+          <DirectedGraph
+            viewMode={GraphViewMode.VIEW_ONLY}
+            shouldExportImage={shouldDownloadImage}
+            setExportImage={setShouldDownloadImage}
+            data={version?.data || emptyStage}
+            selectedNodeId={selectedNodeId}
+            selectedLayoutId={
+              version?.data?.cosmetic?.defaultLayout?.horizontal
+            }
+            onChange={(newData) => {}}
+            onChangeLayout={(newData) => {}}
+            onDeleteNode={(nodeId) => {}}
+            onConfigEdgePanelClose={() => {}}
+            onConfigPanelClose={() => setSelectedNodeId('')}
+            onNodeChanged={(changedNodes) => {
+              const newData = structuredClone(version?.data);
+              newData?.checkpoints?.forEach((v: any, index: number) => {
+                const changedNode = changedNodes.find(
+                  (cN: any) => cN.id === v.id
+                );
+                if (changedNode && changedNode.position) {
+                  newData.checkpoints[index].position = changedNode.position;
+                }
+              });
+              setVersion({
+                ...version,
+                data: newData,
+              });
+              if (selectedNodeId) {
+                setDataHasChanged(true);
+              }
+            }}
+            onNodeClick={(_event, node) => {
+              setSelectedNodeId(node.id);
+            }}
+            onPaneClick={() => {
+              setSelectedNodeId('');
+            }}
+            onResetPosition={() => {}}
+            onAddNewNode={() => {}}
+            onViewPortChange={(viewport) => {
+              setCenterPos({
+                x: (-viewport.x + 600) / viewport.zoom,
+                y: (-viewport.y + 250) / viewport.zoom,
+              });
+            }}
+          />
+        </Layout>
+      )}
     </div>
   );
 }

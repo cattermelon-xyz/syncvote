@@ -1,6 +1,48 @@
-# syncvote-fe
+# Monorepo for syncvote
 
-Repo for SyncVote: Front end and Edge functions.
+Repo for SyncVote:
+
+```md
+.vscode/
+| default.code-workspace
+| local.code-workspace
+docs/
+supabase/
+components/
+| DirectedGraph/ (ReactJS lib)
+| RichTextEditor/ (ReactJS lib)
+| Icon/ (ReactJS lib)
+| Banner/ (ReactJS lib)
+utils/ (TypeScript lib)
+| src/function
+| | getImageUrl
+| | idString (createIdString, extractIdFromIdString)
+| | subtractArray
+| | supabaseClient
+| | dal (getData, setData)
+| index.ts
+apps/
+| syncvote/
+| | webapp/ (ReactJS app)
+| | service/ (Golang project)
+| admin
+| | webapp/ (ReactJS app)
+votemachines/
+| singlevote/
+| | weblib/ (ReactJS lib)
+| | web2/ (Golang lib)
+| polling/
+| | weblib/ (ReactJS lib)
+| | web2/ (Golang lib)
+| veto/
+| | weblib/ (ReactJS lib)
+| | web2/ (Golang lib)
+| upvote/
+| | weblib/ (ReactJS lib)
+| | web2/ (Golang lib)
+```
+
+Development example: Let's take a look at components/DirectedGraph
 
 Branch naming convention:
 

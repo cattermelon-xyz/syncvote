@@ -10,7 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "rich-text-editor": "1.0.0"
+    "rich-text-editor": "1.0.0",
+    "single-vote": "1.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
