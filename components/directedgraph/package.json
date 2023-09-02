@@ -1,5 +1,5 @@
 {
-  "name": "directedgraph",
+  "name": "directed-graph",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "richtexteditor": "1.0.0"
+    "rich-text-editor": "1.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",

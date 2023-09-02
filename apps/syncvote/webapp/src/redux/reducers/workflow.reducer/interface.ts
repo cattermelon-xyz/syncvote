@@ -1,4 +1,4 @@
-import { IWorkflowVersionData } from 'directedgraph';
+import { IWorkflowVersionData } from 'directed-graph';
 import { ITag } from '../ui.reducer/interface';
 
 export interface IWorkflowVersion {

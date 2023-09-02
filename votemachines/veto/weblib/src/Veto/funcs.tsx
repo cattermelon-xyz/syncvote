@@ -1,6 +1,6 @@
 import { DislikeOutlined, NodeExpandOutlined } from '@ant-design/icons';
 import { Veto as Interface } from './interface';
-import { ICheckPoint, IVoteMachineGetLabelProps } from 'directedgraph';
+import { ICheckPoint, IVoteMachineGetLabelProps } from 'directed-graph';
 
 export namespace Veto {
   export const deleteChildNode = (

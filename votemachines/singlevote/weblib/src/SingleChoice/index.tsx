@@ -15,7 +15,7 @@ import {
   isRTE,
   SideNote,
   NumberWithPercentageInput,
-} from 'directedgraph';
+} from 'directed-graph';
 import ConfigPanel from './ConfigPanel';
 import { SingleChoice as Interface } from './interface';
 import { SingleChoice as Funcs } from './funcs';

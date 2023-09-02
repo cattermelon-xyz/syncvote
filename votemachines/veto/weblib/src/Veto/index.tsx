@@ -8,7 +8,7 @@ import {
   TokenInput,
   isRTE,
   SideNote,
-} from 'directedgraph';
+} from 'directed-graph';
 import { Space } from 'antd';
 import { SolutionOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
 import { LuMapPin } from 'react-icons/lu';

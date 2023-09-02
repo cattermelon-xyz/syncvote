@@ -3,12 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@components/Button/Button';
 import { PlusOutlined } from '@ant-design/icons';
 import { Input, Modal, Space } from 'antd';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import { supabase } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import { extractIdFromIdString } from 'utils';
-import { emptyStage } from 'directedgraph';
+import { emptyStage } from 'directed-graph';
 import { insertWorkflowAndVersion } from '@middleware/data';
 import { version } from 'os';
 

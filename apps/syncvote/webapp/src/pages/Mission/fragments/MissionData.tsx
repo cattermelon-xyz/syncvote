@@ -4,12 +4,12 @@ import {
   ICheckPoint,
   getVoteMachine,
   renderVoteMachineConfigPanel,
-} from 'directedgraph';
+} from 'directed-graph';
 import { useState } from 'react';
 import { Button, Drawer, Modal, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import MissionMeta from './MissionMeta';
-import { GraphViewMode, IWorkflowVersionLayout } from 'directedgraph';
+import { GraphViewMode, IWorkflowVersionLayout } from 'directed-graph';
 
 const Data = ({
   currentMission,

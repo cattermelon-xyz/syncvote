@@ -1,4 +1,4 @@
-import { ICheckPoint } from 'directedgraph';
+import { ICheckPoint } from 'directed-graph';
 // import { IData } from './interface';
 import { SingleChoice as Interface } from './interface';
 

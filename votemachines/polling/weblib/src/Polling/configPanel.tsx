@@ -23,7 +23,7 @@ import {
   NavConfigPanel,
   SideNote,
   isRTE,
-} from 'directedgraph';
+} from 'directed-graph';
 
 export namespace Polling {
   export const ConfigPanel = (props: IVoteMachineConfigProps) => {

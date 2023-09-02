@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { IMission, IWorkflowVersion } from '@types';
 import ReviewWorkflow from './fragments/ReviewWorkflow';
 import MissionMeta from './fragments/MissionMeta';
-import { emptyStage } from 'directedgraph';
+import { emptyStage } from 'directed-graph';
 
 // 3 state:
 // review, metadata, edit

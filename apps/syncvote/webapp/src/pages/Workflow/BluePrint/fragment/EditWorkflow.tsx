@@ -1,7 +1,7 @@
 import { SaveOutlined } from '@ant-design/icons';
-import {Banner} from 'banner';
-import {TextEditor} from 'richtexteditor';
-import {Icon} from 'icon';
+import { Banner } from 'banner';
+import { TextEditor } from 'rich-text-editor';
+import { Icon } from 'icon';
 import { updateAWorkflowTag } from '@middleware/data';
 import { newTag, queryTag } from '@middleware/data/tag';
 import { ITag, IWorkflow } from '@types';

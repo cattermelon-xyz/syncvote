@@ -1,5 +1,5 @@
 {
-  "name": "singlevote",
+  "name": "single-vote",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "directedgraph": "1.0.0"
+    "directed-graph": "1.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",

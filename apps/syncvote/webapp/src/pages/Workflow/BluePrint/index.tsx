@@ -4,8 +4,8 @@ import { LeftOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import WorkflowCard from '../fragments/WorkflowCard';
 import { L } from '@utils/locales/L';
 import { Button, Empty, Modal, Skeleton, Space } from 'antd';
-import {ListItem} from 'listitem';
-import {Icon} from 'icon';
+import { ListItem } from 'list-item';
+import { Icon } from 'icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
@@ -19,7 +19,7 @@ import { randomIcon } from '@utils/helpers';
 import { createIdString, extractIdFromIdString } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
-import { emptyStage } from 'directedgraph';
+import { emptyStage } from 'directed-graph';
 import NotFound404 from '@pages/NotFound404';
 
 // TODO: this file is placed in wrong folder!

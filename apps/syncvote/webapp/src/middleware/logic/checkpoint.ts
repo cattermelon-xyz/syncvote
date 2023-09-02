@@ -2,7 +2,7 @@ import {
   ICheckPoint,
   IWorkflowVersionCosmetic,
   IWorkflowVersionLayout,
-} from 'directedgraph';
+} from 'directed-graph';
 import { generateId } from '@utils/helpers';
 
 export const changeVersion = ({

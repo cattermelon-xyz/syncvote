@@ -1,4 +1,4 @@
-import { DelayUnit } from 'directedgraph';
+import { DelayUnit } from 'directed-graph';
 
 export namespace SingleChoice {
   export interface IData {

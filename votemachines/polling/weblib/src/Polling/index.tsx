@@ -1,12 +1,9 @@
 import { Popover } from 'antd';
 import parse from 'html-react-parser';
 
-import {
-  IVoteMachine,
-  ICheckPoint,
-} from 'directedgraph';
+import { IVoteMachine, ICheckPoint } from 'directed-graph';
 import moment from 'moment';
-import { TokenInput, isRTE, NumberWithPercentageInput } from 'directedgraph';
+import { TokenInput, isRTE, NumberWithPercentageInput } from 'directed-graph';
 import { Polling as Interface } from './interface';
 import { Polling as Funcs } from './funcs';
 import { Polling } from './configPanel';

@@ -21,7 +21,7 @@ import {
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import EditWorkflow from '@pages/Workflow/BluePrint/fragment/EditWorkflow';
 import {
   deleteAWorkflow,
@@ -31,7 +31,7 @@ import {
 import moment from 'moment';
 import VersionHistoryDialog from './VersionHistoryDialog';
 import ShareModal from './ShareModal';
-import { GraphViewMode } from 'directedgraph';
+import { GraphViewMode } from 'directed-graph';
 import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
 const env = import.meta.env.VITE_ENV;
 

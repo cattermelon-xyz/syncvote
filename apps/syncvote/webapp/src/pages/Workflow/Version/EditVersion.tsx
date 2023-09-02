@@ -13,8 +13,8 @@ import {
   emptyCosmetic,
   emptyStage,
   getVoteMachine,
-} from 'directedgraph';
-import {Icon} from 'icon';
+} from 'directed-graph';
+import { Icon } from 'icon';
 import {
   canUserEditWorkflowVersion,
   queryWeb2Integration,
@@ -22,7 +22,7 @@ import {
   upsertWorkflowVersion,
 } from '@middleware/data';
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
-import {  shouldUseCachedData } from '@utils/helpers';
+import { shouldUseCachedData } from '@utils/helpers';
 import { extractIdFromIdString } from 'utils';
 import { Button, Drawer, Modal, Skeleton, Space, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
@@ -33,7 +33,7 @@ import {
   GraphViewMode,
   IWorkflowVersionCosmetic,
   IWorkflowVersionLayout,
-} from 'directedgraph';
+} from 'directed-graph';
 import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
 import NotFound404 from '@pages/NotFound404';

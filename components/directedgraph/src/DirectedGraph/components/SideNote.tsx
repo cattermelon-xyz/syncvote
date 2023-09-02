@@ -3,7 +3,7 @@ import {
   EditOutlined,
   MessageOutlined,
 } from '@ant-design/icons';
-import { TextEditor } from 'richtexteditor';
+import { TextEditor } from 'rich-text-editor';
 import { Button, Modal, Space } from 'antd';
 import { useState } from 'react';
 import parse from 'html-react-parser';

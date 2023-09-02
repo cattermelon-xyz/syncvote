@@ -13,7 +13,7 @@
       "path": "../components/Banner"
     },
     {
-      "name": "directedgraph",
+      "name": "directed-graph",
       "path": "../components/DirectedGraph"
     },
     {
@@ -21,11 +21,11 @@
       "path": "../components/Icon"
     },
     {
-      "name": "listitem",
+      "name": "list-item",
       "path": "../components/ListItem"
     },
     {
-      "name": "richtexteditor",
+      "name": "rich-text-editor",
       "path": "../components/RichTextEditor"
     },
     {
@@ -33,7 +33,7 @@
       "path": "../votemachines/polling/weblib"
     },
     {
-      "name": "singlevote",
+      "name": "single-vote",
       "path": "../votemachines/singlevote/weblib"
     },
     {

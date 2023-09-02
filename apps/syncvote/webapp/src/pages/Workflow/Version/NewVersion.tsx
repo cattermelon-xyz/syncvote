@@ -5,9 +5,9 @@ import { shouldUseCachedData } from '@utils/helpers';
 import { createIdString, extractIdFromIdString } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
-import { DirectedGraph, emptyStage } from 'directedgraph';
+import { DirectedGraph, emptyStage } from 'directed-graph';
 import { SaveOutlined } from '@ant-design/icons';
-import { GraphViewMode } from 'directedgraph';
+import { GraphViewMode } from 'directed-graph';
 // TODO: forbid special character
 export const NewVersion = () => {
   const [versionToCopy, setVersionToCopy] = useState(-1);

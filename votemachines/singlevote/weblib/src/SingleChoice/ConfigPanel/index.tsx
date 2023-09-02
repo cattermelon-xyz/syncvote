@@ -4,7 +4,7 @@ import {
   GraphViewMode,
   ICheckPoint,
   IVoteMachineConfigProps,
-} from 'directedgraph';
+} from 'directed-graph';
 import {
   DelayUnit,
   NavConfigPanel,
@@ -12,7 +12,7 @@ import {
   CollapsiblePanel,
   SideNote,
   ResultCalculator,
-} from 'directedgraph';
+} from 'directed-graph';
 import NewOptionDrawer from './NewOptionDrawer';
 import { PlusOutlined } from '@ant-design/icons';
 import '../styles.scss';

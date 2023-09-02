@@ -3,7 +3,7 @@ import {
   CollapsiblePanel,
   ResultCalculator,
   NavConfigPanel,
-} from 'directedgraph';
+} from 'directed-graph';
 import { Veto as Interface } from './interface';
 import { Alert, Space, Switch } from 'antd';
 import { all } from 'axios';

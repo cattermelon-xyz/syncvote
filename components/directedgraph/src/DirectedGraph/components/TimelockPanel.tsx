@@ -2,7 +2,7 @@ import moment from 'moment';
 import { DelayUnit } from '../interface';
 import { displayDelayDuration } from '../utils';
 import { Input, Select, Space } from 'antd';
-import { TextEditor } from 'richtexteditor';
+import { TextEditor } from 'rich-text-editor';
 import { useState } from 'react';
 
 const TimelockPanel = ({
