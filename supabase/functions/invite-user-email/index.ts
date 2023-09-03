@@ -28,9 +28,9 @@ serve(async (req) => {
         baseURL = 'http://localhost:3001';
         break;
       case 'dev':
-        baseURL = 'https://dev.syncvote.com';
+        baseURL = 'https://main.syncvote.com';
         break;
-      case 'product':
+      case 'production':
         baseURL = 'https://app.syncvote.com';
         break;
       default:
