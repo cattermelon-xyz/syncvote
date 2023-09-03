@@ -2,6 +2,7 @@ import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { supabase } from '@utils/supabaseClient';
 import { setUser, addUserToOrg } from '@redux/reducers/orginfo.reducer';
 import { addMemberToOrg } from './org';
+import { Session } from 'inspector';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -14,6 +15,7 @@ export class GetterUserFunction {
     onSuccess,
     onError,
     reduxVar,
+    session,
   }: {
     params?: any;
     cacheOption?: boolean;
@@ -22,10 +24,17 @@ export class GetterUserFunction {
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
     reduxVar: any;
+    session?: Session;
   }) {
-    const { user: userHaha } = params;
+    let userId;
+    if (session) {
+      let { user } = session as Session;
+      
+    } else {
+      let { userId } = params;
+    }
+
     const { lastFetch, user } = reduxVar;
-    const userId = userHaha.id;
     if (
       cacheOption &&
       lastFetch !== -1 &&

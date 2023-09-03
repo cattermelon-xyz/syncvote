@@ -10,12 +10,14 @@ interface UseGetDataHookProps<T> {
     reduxObjectPath: string;
   };
   cacheOption: boolean;
+  needSession?: boolean;
 }
 
 export async function useGetDataHook<T>({
   params,
   configInfo,
   cacheOption,
+  needSession,
 }: UseGetDataHookProps<T>) {
   const reduxVar = useSelector(
     (state: any) => state[configInfo.reduxObjectPath]
@@ -25,24 +27,50 @@ export async function useGetDataHook<T>({
   let [data, setData] = useState<any[]>([]);
   let [error, setError] = useState<any>(null);
   const now = new Date().getTime();
+  const [session, setSession] = useState<Session | null>(null);
+
+  let props: any;
+
+  if (needSession) {
+    props = {
+      params: clonedParams,
+      cacheOption,
+      dispatch,
+      now,
+      onSuccess: (data: any) => {
+        setData(data);
+      },
+      onError: (error: any) => {
+        setError(error);
+      },
+      reduxVar,
+      session,
+    };
+  } else {
+    props = {
+      params: clonedParams,
+      cacheOption,
+      dispatch,
+      now,
+      onSuccess: (data: any) => {
+        setData(data);
+      },
+      onError: (error: any) => {
+        setError(error);
+      },
+      reduxVar,
+    };
+  }
 
   useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
+      setSession(_session);
+    });
+
     if (typeof configInfo.getterFunction === 'function') {
-      configInfo.getterFunction({
-        params: clonedParams,
-        cacheOption,
-        dispatch,
-        now,
-        onSuccess: (data: any) => {
-          setData(data);
-        },
-        onError: (error: any) => {
-          setError(error);
-        },
-        reduxVar,
-      });
+      configInfo.getterFunction(props);
     }
-  }, []);
+  }, [session]);
 
   return { data, error };
 }

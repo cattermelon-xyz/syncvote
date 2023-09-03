@@ -21,46 +21,37 @@ interface AppProps {
 const App: React.FC<AppProps> = ({ requiredLogin = false, layout }) => {
   const navigate = useNavigate();
   const { loading, initialized } = useSelector((state: any) => state.ui);
-  // const [session, setSession] = useState<Session | null>(null);
-  const [isSessionFetched, setIsSessionFetched] = useState<boolean>(false);
-  const { session } = useContext(AuthContext);
   useGetDataHook({
     cacheOption: false,
     configInfo: config.queryPresetIcon,
   });
+  const [session, setSession] = useState<Session | null>(null);
 
   useGetDataHook({
     cacheOption: false,
     configInfo: config.queryPresetBanner,
   });
-  console.log(session);
 
   // if (isSessionFetched && session) {
-  //   useGetDataHook({
-  //     params: session,
-  //     cacheOption: false,
-  //     configInfo: config.queryUserById,
-  //   });
+  useGetDataHook({
+    cacheOption: false,
+    configInfo: config.queryUserById,
+  });
   // }
 
-  // const handleSession = async (_session: Session | null) => {
-  //   if (requiredLogin === true && _session === null) {
-  //     navigate('/login');
-  //   }
-  //   setSession(_session);
-  //   setIsSessionFetched(true);
-  // };
-
   useEffect(() => {
-    // supabase.auth.getSession().then(({ data: { session: _session } }) => {
-    //   handleSession(_session);
-    // });
+    supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
+      if (session === null) {
+        navigate('/login')
+      }
+        setSession(_session);
+    });
 
     registerVoteMachine(SingleChoice);
     registerVoteMachine(Polling);
     registerVoteMachine(Veto);
     registerVoteMachine(UpVote);
-  }, [session]);
+  }, []);
 
   const Layout: any = layout;
   return (
