@@ -9,21 +9,18 @@ import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
-import {
-  insertWorkflowAndVersion,
-  queryOrgs,
-  queryWorkflow,
-  upsertAnOrg,
-} from '@middleware/data';
+import { insertWorkflowAndVersion } from '@middleware/data';
 import {
   createIdString,
   extractIdFromIdString,
   randomIcon,
 } from '@utils/helpers';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
 import { emptyStage } from '@components/DirectedGraph';
 import NotFound404 from '@pages/NotFound404';
+import { useGetDataHook } from '@dal/dal';
+import { config } from '@dal/config';
 
 // TODO: this file is placed in wrong folder!
 
@@ -32,24 +29,30 @@ interface SortProps {
   type: 'asc' | 'des';
 }
 
-interface DataItem {
-  title: string;
-  [key: string]: any;
-}
-
 const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
-  const { user } = useSelector((state: any) => state.orginfo);
-  const location = useLocation();
+
+  const { data: orgs } = useGetDataHook({
+    cacheOption: true,
+    configInfo: config.queryOrgs,
+  });
+
+  const { data: user } = useGetDataHook({
+    cacheOption: true,
+    configInfo: config.queryUserById,
+  });
+
+  const { data: presetIcons } = useGetDataHook({
+    cacheOption: true,
+    configInfo: config.queryPresetIcon,
+  });
+
   const navigate = useNavigate();
-  const { presetIcons } = useSelector((state: any) => state.ui);
   const { orgIdString } = useParams();
   const [loading, setLoading] = useState(true);
-  const { orgs } = useSelector((state: any) => state.orginfo);
   const org = orgs.find(
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
   );
-  // const data = location.state?.dataSpace || org;
   const data = org;
   const dispatch = useDispatch();
 
@@ -76,16 +79,6 @@ const BluePrint = () => {
       setWorkflows(workflowsData);
       setLoading(false);
     } else {
-      queryOrgs({
-        filter: {},
-        dispatch: dispatch,
-        onSuccess: (data: any) => {
-          setLoading(false);
-        },
-        onError: (error: any) => {
-          setLoading(false);
-        },
-      });
     }
   }, [data]);
   const [showEditOrg, setShowEditOrg] = useState(false);

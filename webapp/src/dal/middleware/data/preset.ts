@@ -9,7 +9,7 @@ import { supabase } from '@utils/supabaseClient';
 export class GetterPresetFunction {
   [key: string]: any;
 
-  async queryPresetIcon({
+  async queryPresetIcons({
     cacheOption,
     dispatch,
     now,
@@ -30,7 +30,7 @@ export class GetterPresetFunction {
     if (
       cacheOption &&
       lastFetch !== -1 &&
-      now - lastFetch <= Number(process.env.REACT_APP_CACHE_TIME!)
+      now - lastFetch <= Number(import.meta.env.VITE_CACHED_TIME!)
     ) {
       onSuccess(presetIcons);
     } else {
@@ -77,7 +77,7 @@ export class GetterPresetFunction {
     if (
       cacheOption &&
       lastFetch !== -1 &&
-      now - lastFetch <= Number(process.env.REACT_APP_CACHE_TIME!)
+      now - lastFetch <= Number(import.meta.env.VITE_CACHED_TIME!)
     ) {
       onSuccess(presetBanners);
     } else {

@@ -5,9 +5,6 @@ import {
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
-  // deleteWorkflow,
-  // deleteWorkflow,
-  deleteWorkflowVersion,
 } from '@redux/reducers/workflow.reducer';
 import {
   changeWorkflowOrg,
@@ -18,9 +15,37 @@ import {
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { subtractArray } from '@utils/helpers';
-import { log } from 'console';
-import { version } from 'os';
-
+export class GetterWorkflowFunction {
+  async getWorkflowByStatus({
+    params,
+    dispatch,
+    onSuccess,
+    onError,
+  }: {
+    params?: any;
+    dispatch: any;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+  }) {
+    const { status } = params;
+    dispatch(startLoading({}));
+    const { data, error } = await supabase.from('workflow').select(`*,
+           versions: workflow_version(id, status),
+           infoOrg: org(title)
+           `);
+    if (error) {
+      onError(error);
+    } else {
+      if (data) {
+        const workflowData = data.filter(
+          (worfklow) => worfklow?.versions[0]?.status === status
+        );
+        onSuccess(workflowData);
+      }
+    }
+    dispatch(finishLoading({}));
+  }
+}
 export const insertWorkflowAndVersion = async ({
   dispatch,
   props,

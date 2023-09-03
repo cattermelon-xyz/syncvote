@@ -1,22 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Dropdown, MenuProps, Space, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { L } from '@utils/locales/L';
-import { useSelector } from 'react-redux';
-import {
-  getWorkflowFromEditor,
-  queryOrgsAndWorkflowForHome,
-} from '@middleware/data';
-import { useDispatch } from 'react-redux';
 import SpaceCard from '@pages/Organization/fragments/SpaceCard';
 import ListItem from '../../components/ListItem/ListItem';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { Skeleton } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
-import { FileOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import CreateSpaceModal from '@/fragments/CreateNewDialog/CreateSpaceModal';
-import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
+import { useGetDataHook } from '@dal/dal';
+import { config } from '@dal/config';
+
 const env = import.meta.env.VITE_ENV;
 
 interface SortProps {
@@ -30,7 +23,16 @@ interface DataItem {
 }
 
 const MySpace: React.FC = () => {
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+  const { data: orgs } = useGetDataHook({
+    cacheOption: true,
+    configInfo: config.queryOrgs,
+  });
+
+  const { data: user } = useGetDataHook({
+    cacheOption: true,
+    configInfo: config.queryUserById,
+  });
+
   const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
   const [workflows, setWorkflows] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -122,60 +124,10 @@ const MySpace: React.FC = () => {
       fetchData();
     }
   }, [user, orgs]);
-  const items: MenuProps['items'] = [
-    {
-      label: (
-        <>
-          <FileOutlined className='text-base mr-2' />
-          <span className='text-sm'>Workflow</span>
-        </>
-      ),
-      key: 'workflow',
-    },
-    {
-      label: (
-        <div>
-          <FolderOutlined className='text-base mr-2' />
-          <span className='text-sm'>Workspace</span>
-        </div>
-      ),
-      key: 'workspace',
-    },
-  ];
-  const handleMenuClick: MenuProps['onClick'] = (e) => {
-    if (e?.key === 'workflow') {
-      setOpenModalCreateWorkflow(true);
-    } else if (e?.key === 'workspace') {
-      setOpenModalCreateWorkspace(true);
-    }
-  };
-  const menuProps = {
-    items,
-    onClick: handleMenuClick,
-  };
 
   return (
     <>
-      <CreateSpaceModal
-        open={openModalCreateWorkspace}
-        onClose={() => setOpenModalCreateWorkspace(false)}
-      />
-      <CreateWorkflowModal
-        open={openModalCreateWorkflow}
-        onClose={() => setOpenModalCreateWorkflow(false)}
-        setOpenCreateWorkspaceModal={() => setOpenModalCreateWorkflow}
-      />
       <div className='xs:w-[350px] sm:w-[550px] md:w-[720px] lg:w-[800px] flex flex-col'>
-        <Space direction='horizontal' className='flex justify-between'>
-          <p className='text-3xl font-semibold my-8'>{L('mySpace')}</p>
-          {env === 'production' ? (
-            <Dropdown menu={menuProps} trigger={['click']}>
-              <Button icon={<PlusOutlined />} type='primary'>
-                Create new
-              </Button>
-            </Dropdown>
-          ) : null}
-        </Space>
         <section className='w-full mb-8'>
           {loading ? (
             <Skeleton />

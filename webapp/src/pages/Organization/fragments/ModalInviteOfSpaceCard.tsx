@@ -42,7 +42,6 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
   }, [dataSpace.id, visible, org]);
 
   useEffect(() => {
-    console.log('usersInOrg', usersInOrg);
   }, [usersInOrg]);
 
   const handleInvite = async () => {

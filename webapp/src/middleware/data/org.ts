@@ -10,7 +10,183 @@ import {
 } from '@redux/reducers/orginfo.reducer';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export class GetterOrgFunction {
+  async queryOrgs({
+    params,
+    cacheOption,
+    dispatch,
+    now,
+    onSuccess,
+    onError,
+    reduxVar,
+  }: {
+    params?: any;
+    cacheOption?: boolean;
+    dispatch: any;
+    now: number;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+    reduxVar: any;
+  }) {
+    let userId;
+    if (params) {
+      userId = params.userId;
+    } else {
+      const session = (await supabase.auth.getSession()).data.session;
+      if (session) {
+        userId = session.user.id;
+      } else {
+        onError('Session is null');
+      }
+    }
 
+    const { lastFetch, orgs } = reduxVar;
+    if (
+      cacheOption &&
+      lastFetch !== -1 &&
+      now - lastFetch <= Number(import.meta.env.VITE_CACHED_TIME!)
+    ) {
+      onSuccess(orgs);
+    } else {
+      dispatch(startLoading({}));
+      // TODO: add email in table profile, use ref in profile to select user
+      // TODO: query list of user
+      const { data, error } = await supabase
+        .from('user_org')
+        .select(
+          `
+        role,
+        org (
+          id,
+          title,
+          desc,
+          icon_url,
+          banner_url,
+          preset_icon_url,
+          preset_banner_url,
+          org_size,
+          org_type,
+          last_updated,
+          user_org(
+            role,
+            profile (
+              id,
+              email,
+              full_name,
+              icon_url,
+              preset_icon_url,
+              confirm_email_at
+            )
+          ),
+          workflows:workflow (
+            id,
+            title,
+            owner_org_id,
+            icon_url,
+            banner_url,
+            preset_icon_url,
+            preset_banner_url,
+            versions: workflow_version(
+              id, 
+              data,
+              preview_image_url,
+              status,
+              created_at,
+              last_updated
+            )
+          )
+        )
+      `
+        )
+        .eq('user_id', userId);
+
+      if (!error) {
+        const tmp: any[] = [];
+        data.forEach((d: any) => {
+          const org: any = d?.org || {
+            id: '',
+            title: '',
+            desc: '',
+          };
+          const presetIcon = org?.preset_icon_url
+            ? `preset:${org.preset_icon_url}`
+            : org.preset_icon_url;
+          const presetBanner = org?.preset_banner_url
+            ? `preset:${org.preset_banner_url}`
+            : org.preset_banner_url;
+
+          const profiles =
+            org.user_org?.map((user: any) => {
+              const presetIconProfile = user.profile?.preset_icon_url
+                ? `preset:${user.profile.preset_icon_url}`
+                : user.profile.preset_icon_url;
+
+              return {
+                id: user.profile.id,
+                email: user.profile.email,
+                full_name: user.profile.full_name,
+                avatar_url: user.profile.icon_url
+                  ? user.profile.icon_url
+                  : presetIconProfile,
+                about_me: user.profile.about_me,
+                role: user.role,
+                confirm_email_at: user.profile.confirm_email_at,
+              };
+            }) || [];
+
+          profiles.sort((a: any, b: any) => {
+            if (a.role === 'ADMIN' && b.role !== 'ADMIN') {
+              return -1;
+            } else if (b.role === 'ADMIN' && a.role !== 'ADMIN') {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+
+          const workflows = org?.workflows?.map((workflow: any) => {
+            const workflowPresetIcon = workflow?.preset_icon_url
+              ? `preset:${workflow.preset_icon_url}`
+              : workflow.preset_icon_url;
+            const workflowPresetBanner = workflow?.preset_banner_url
+              ? `preset:${workflow.preset_banner_url}`
+              : workflow.preset_banner_url;
+
+            return {
+              ...workflow,
+              icon_url: workflow.icon_url
+                ? workflow.icon_url
+                : workflowPresetIcon,
+              banner_url: workflow.banner_url
+                ? workflow.banner_url
+                : workflowPresetBanner,
+            };
+          });
+
+          tmp.push({
+            id: org?.id,
+            role: d.role,
+            title: org?.title,
+            desc: org.desc,
+            icon_url: org.icon_url ? org.icon_url : presetIcon,
+            banner_url: org.banner_url ? org.banner_url : presetBanner,
+            org_size: org.org_size,
+            org_type: org.org_type,
+            profile: profiles,
+            last_updated: org.last_updated,
+            workflows: workflows || [],
+          });
+        });
+        dispatch(setOrgsInfo(tmp));
+        dispatch(setLastFetch({}));
+        onSuccess(tmp);
+      } else {
+        onError(error);
+      }
+      dispatch(finishLoading({}));
+    }
+  }
+}
 export const newOrg = async ({
   orgInfo,
   uid,
@@ -133,264 +309,6 @@ export const upsertAnOrg = async ({
   } else if (error) {
     onError(error);
   }
-};
-
-export const getDataOrgs = async ({
-  userId,
-  dispatch,
-  onSuccess,
-  onError = (error) => {
-    console.error(error);
-  },
-}: {
-  userId: any;
-  dispatch: any;
-  onSuccess: (data: any) => void;
-  onError?: (data: any) => void;
-}) => {
-  dispatch(startLoading({}));
-  const { data, error } = await supabase
-    .from('user_org')
-    .select(
-      `
-    org (
-      id,
-      title,
-      desc,
-      icon_url,
-      banner_url,
-      preset_icon_url,
-      preset_banner_url,
-      org_size,
-      org_type,
-      created_at,
-      workflows:workflow (
-        id,
-        title,
-        owner_org_id,
-        icon_url,
-        banner_url,
-        preset_icon_url,
-        preset_banner_url,
-        versions: workflow_version(
-          id,
-          data, 
-          status,
-          created_at,
-          last_updated
-        )
-      )
-    )
-  `
-    )
-    .eq('user_id', userId);
-
-  if (!error) {
-    const tmp: any[] = [];
-    data.forEach((d: any) => {
-      const org: any = d?.org || {
-        id: '',
-        title: '',
-        desc: '',
-      };
-      const presetIcon = org?.preset_icon_url
-        ? `preset:${org.preset_icon_url}`
-        : org.preset_icon_url;
-      const presetBanner = org?.preset_banner_url
-        ? `preset:${org.preset_banner_url}`
-        : org.preset_banner_url;
-      
-      const workflows = org?.workflows?.map((workflow: any) => {
-        const workflowPresetIcon = workflow?.preset_icon_url
-          ? `preset:${workflow.preset_icon_url}`
-          : workflow.preset_icon_url;
-        const workflowPresetBanner = workflow?.preset_banner_url
-          ? `preset:${workflow.preset_banner_url}`
-          : workflow.preset_banner_url;
-
-        return {
-          ...workflow,
-          icon_url: workflow.icon_url ? workflow.icon_url : workflowPresetIcon,
-          banner_url: workflow.banner_url
-            ? workflow.banner_url
-            : workflowPresetBanner,
-        };
-      });
-      
-      tmp.push({
-        id: org?.id,
-        title: org?.title,
-        desc: org.desc,
-        icon_url: org.icon_url ? org.icon_url : presetIcon,
-        banner_url: org.banner_url ? org.banner_url : presetBanner,
-        org_size: org.org_size,
-        org_type: org.org_type,
-        created_at: org.created_at,
-        workflows: workflows || [],
-      });
-    });
-    data.sort((a: any, b: any) => {
-      const a_time = new Date(a.created_at).getTime();
-      const b_time = new Date(b.created_at).getTime();
-      return b_time - a_time;
-    });
-    // dispatch(setOrgsInfo(tmp));
-    dispatch(setLastFetch({}));
-    onSuccess(tmp);
-  } else {
-    onError(error);
-  }
-  dispatch(finishLoading({}));
-};
-
-export const queryOrgs = async ({
-  filter,
-  onSuccess,
-  onError = (error) => {
-    console.error(error);
-  },
-  dispatch,
-}: {
-  filter: any;
-  onSuccess: (data: any) => void;
-  onError?: (data: any) => void;
-  dispatch: any;
-}) => {
-  const { userId } = filter;
-  dispatch(startLoading({}));
-  // TODO: add email in table profile, use ref in profile to select user
-  // TODO: query list of user
-  const { data, error } = await supabase
-    .from('user_org')
-    .select(
-      `
-    role,
-    org (
-      id,
-      title,
-      desc,
-      icon_url,
-      banner_url,
-      preset_icon_url,
-      preset_banner_url,
-      org_size,
-      org_type,
-      last_updated,
-      user_org(
-        role,
-        profile (
-          id,
-          email,
-          full_name,
-          icon_url,
-          preset_icon_url,
-          confirm_email_at
-        )
-      ),
-      workflows:workflow (
-        id,
-        title,
-        owner_org_id,
-        icon_url,
-        banner_url,
-        preset_icon_url,
-        preset_banner_url,
-        versions: workflow_version(
-          id, 
-          data,
-          preview_image_url,
-          status,
-          created_at,
-          last_updated
-        )
-      )
-    )
-  `
-    )
-    .eq('user_id', userId);
-
-  if (!error) {
-    const tmp: any[] = [];
-    data.forEach((d: any) => {
-      const org: any = d?.org || {
-        id: '',
-        title: '',
-        desc: '',
-      };
-      const presetIcon = org?.preset_icon_url
-        ? `preset:${org.preset_icon_url}`
-        : org.preset_icon_url;
-      const presetBanner = org?.preset_banner_url
-        ? `preset:${org.preset_banner_url}`
-        : org.preset_banner_url;
-
-      const profiles =
-        org.user_org?.map((user: any) => {
-          const presetIconProfile = user.profile?.preset_icon_url
-            ? `preset:${user.profile.preset_icon_url}`
-            : user.profile.preset_icon_url;
-
-          return {
-            id: user.profile.id,
-            email: user.profile.email,
-            full_name: user.profile.full_name,
-            avatar_url: user.profile.icon_url
-              ? user.profile.icon_url
-              : presetIconProfile,
-            about_me: user.profile.about_me,
-            role: user.role,
-            confirm_email_at: user.profile.confirm_email_at,
-          };
-        }) || [];
-
-      profiles.sort((a: any, b: any) => {
-        if (a.role === 'ADMIN' && b.role !== 'ADMIN') {
-          return -1;
-        } else if (b.role === 'ADMIN' && a.role !== 'ADMIN') {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
-
-      const workflows = org?.workflows?.map((workflow: any) => {
-        const workflowPresetIcon = workflow?.preset_icon_url
-          ? `preset:${workflow.preset_icon_url}`
-          : workflow.preset_icon_url;
-        const workflowPresetBanner = workflow?.preset_banner_url
-          ? `preset:${workflow.preset_banner_url}`
-          : workflow.preset_banner_url;
-
-        return {
-          ...workflow,
-          icon_url: workflow.icon_url ? workflow.icon_url : workflowPresetIcon,
-          banner_url: workflow.banner_url
-            ? workflow.banner_url
-            : workflowPresetBanner,
-        };
-      });
-
-      tmp.push({
-        id: org?.id,
-        role: d.role,
-        title: org?.title,
-        desc: org.desc,
-        icon_url: org.icon_url ? org.icon_url : presetIcon,
-        banner_url: org.banner_url ? org.banner_url : presetBanner,
-        org_size: org.org_size,
-        org_type: org.org_type,
-        profile: profiles,
-        last_updated: org.last_updated,
-        workflows: workflows || [],
-      });
-    });
-    dispatch(setOrgsInfo(tmp));
-    dispatch(setLastFetch({}));
-    onSuccess(tmp);
-  } else {
-    onError(error);
-  }
-  dispatch(finishLoading({}));
 };
 
 export const queryOrgsAndWorkflowForHome = async ({

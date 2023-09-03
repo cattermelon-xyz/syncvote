@@ -1,21 +1,29 @@
-import { GetterUserFunction } from '@middleware/data';
+import {
+  GetterOrgFunction,
+  GetterUserFunction,
+  GetterWorkflowFunction,
+  getWorkflowByStatus,
+} from '@middleware/data';
 import { GetterPresetFunction } from './middleware/data/preset';
+import { ConfigInfo } from './dal';
 export interface ConfigTypes {
-  getDataOrgs: {
-    userId?: string;
-  };
-
-  queryUserById: {
-    userId: string;
+  getWorkflowByStatus: {
+    status: string;
   };
 }
 
 const getterPresetFunction = new GetterPresetFunction();
 const getterUserFunction = new GetterUserFunction();
+const getterOrgFunction = new GetterOrgFunction();
+const getterWorkflowFunction = new GetterWorkflowFunction();
 
-export const config = {
-  queryPresetIcon: {
-    getterFunction: getterPresetFunction.queryPresetIcon,
+interface ConfigObject {
+  [key: string]: ConfigInfo;
+}
+
+export const config: ConfigObject = {
+  queryPresetIcons: {
+    getterFunction: getterPresetFunction.queryPresetIcons,
     reduxObjectPath: 'ui',
   },
 
@@ -27,5 +35,15 @@ export const config = {
   queryUserById: {
     getterFunction: getterUserFunction.queryUserById,
     reduxObjectPath: 'orginfo',
+  },
+
+  queryOrgs: {
+    getterFunction: getterOrgFunction.queryOrgs,
+    reduxObjectPath: 'orginfo',
+  },
+
+  getWorkflowByStatus: {
+    getterFunction: getterWorkflowFunction.getWorkflowByStatus,
+    reduxObjectPath: 'workflow',
   },
 };

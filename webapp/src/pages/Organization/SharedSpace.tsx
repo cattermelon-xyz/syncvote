@@ -8,6 +8,8 @@ import ListItem from '@components/ListItem/ListItem';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { Skeleton } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
+import { useGetDataHook } from '@dal/dal';
+import { config } from '@dal/config';
 
 interface SortProps {
   by: string;
@@ -15,7 +17,17 @@ interface SortProps {
 }
 
 const SharedSpace: React.FC = () => {
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+  
+  const { data: orgs } = useGetDataHook({
+    cacheOption: true,
+    configInfo: config.queryOrgs,
+  });
+
+  const { data: user } = useGetDataHook({
+    cacheOption: true,
+    configInfo: config.queryUserById,
+  });
+
   const [memberOrgs, setMemberOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);

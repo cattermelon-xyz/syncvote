@@ -13,7 +13,6 @@ import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal
 import { Button, Dropdown, MenuProps, Space } from 'antd';
 import { ReactNode, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { current } from '@reduxjs/toolkit';
 
 const VerticalNavButton = ({
   label,

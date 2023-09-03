@@ -9,6 +9,8 @@ import { Skeleton } from 'antd';
 import { useDispatch } from 'react-redux';
 import { getWorkflowByStatus } from '@middleware/data';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
+import { useGetDataHook } from '@dal/dal';
+import { ConfigTypes, config } from '@dal/config';
 
 interface SortProps {
   by: string;
@@ -16,7 +18,7 @@ interface SortProps {
 }
 const Home: React.FC = () => {
   const dispatch = useDispatch();
-  const [workflows, setWorkflows] = React.useState<any[]>([]);
+  let [workflows, setWorkflows] = React.useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
@@ -28,29 +30,19 @@ const Home: React.FC = () => {
     setSortWorkflowOption(options);
   };
 
+  workflows = useGetDataHook<ConfigTypes['getWorkflowByStatus']>({
+    params: {
+      status: 'PUBLIC_COMMUNITY',
+    },
+    configInfo: config.getWorkflowByStatus,
+  }).data;
+
+  console.log(workflows);
+
   const filterWorkflowByOptions = useFilteredData(
     workflows,
     sortWorkflowOptions
   );
-
-  useEffect(() => {
-    const fetchDataWorkflow = async () => {
-      setLoading(true);
-      await getWorkflowByStatus({
-        status: 'PUBLIC_COMMUNITY',
-        dispatch,
-        onSuccess: (data: any) => {
-          setWorkflows(data);
-        },
-        onError: (error: any) => {
-          console.log(error);
-        },
-      });
-      setLoading(false);
-    };
-
-    fetchDataWorkflow();
-  }, []);
 
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>

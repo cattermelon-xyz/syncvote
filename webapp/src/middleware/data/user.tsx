@@ -2,7 +2,6 @@ import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { supabase } from '@utils/supabaseClient';
 import { setUser, addUserToOrg } from '@redux/reducers/orginfo.reducer';
 import { addMemberToOrg } from './org';
-import { Session } from 'inspector';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -15,7 +14,6 @@ export class GetterUserFunction {
     onSuccess,
     onError,
     reduxVar,
-    session,
   }: {
     params?: any;
     cacheOption?: boolean;
@@ -24,24 +22,28 @@ export class GetterUserFunction {
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
     reduxVar: any;
-    session?: Session;
   }) {
     let userId;
-    if (session) {
-      let { user } = session as Session;
-      
+    if (params) {
+      userId = params.userId;
     } else {
-      let { userId } = params;
+      const session = (await supabase.auth.getSession()).data.session;
+      if (session) {
+        userId = session.user.id;
+      } else {
+        onError('Session is null');
+      }
     }
 
     const { lastFetch, user } = reduxVar;
     if (
       cacheOption &&
       lastFetch !== -1 &&
-      now - lastFetch <= Number(process.env.REACT_APP_CACHE_TIME!)
+      now - lastFetch <= Number(import.meta.env.VITE_CACHED_TIME!)
     ) {
       onSuccess(user);
     } else {
+      dispatch(startLoading({}));
       const { data, error } = await supabase
         .from('profile')
         .select('id, email, full_name, icon_url,preset_icon_url, about_me')
@@ -65,10 +67,9 @@ export class GetterUserFunction {
             about_me: profileInfo.about_me,
           })
         );
-        dispatch(finishLoading({}));
       }
+      dispatch(finishLoading({}));
     }
-    dispatch(startLoading({}));
   }
 }
 

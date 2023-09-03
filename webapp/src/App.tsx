@@ -19,32 +19,16 @@ interface AppProps {
 }
 
 const App: React.FC<AppProps> = ({ requiredLogin = false, layout }) => {
-  const navigate = useNavigate();
   const { loading, initialized } = useSelector((state: any) => state.ui);
-  useGetDataHook({
-    cacheOption: false,
-    configInfo: config.queryPresetIcon,
-  });
   const [session, setSession] = useState<Session | null>(null);
-
-  useGetDataHook({
-    cacheOption: false,
-    configInfo: config.queryPresetBanner,
-  });
-
-  // if (isSessionFetched && session) {
-  useGetDataHook({
-    cacheOption: false,
-    configInfo: config.queryUserById,
-  });
-  // }
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
-      if (session === null) {
-        navigate('/login')
+      if (_session === null) {
+        navigate('/login');
       }
-        setSession(_session);
+      setSession(_session);
     });
 
     registerVoteMachine(SingleChoice);
@@ -52,6 +36,26 @@ const App: React.FC<AppProps> = ({ requiredLogin = false, layout }) => {
     registerVoteMachine(Veto);
     registerVoteMachine(UpVote);
   }, []);
+
+  useGetDataHook({
+    cacheOption: false,
+    configInfo: config.queryPresetIcons,
+  });
+
+  useGetDataHook({
+    cacheOption: false,
+    configInfo: config.queryPresetBanner,
+  });
+
+  useGetDataHook({
+    cacheOption: false,
+    configInfo: config.queryUserById,
+  });
+
+  useGetDataHook({
+    cacheOption: false,
+    configInfo: config.queryOrgs,
+  });
 
   const Layout: any = layout;
   return (

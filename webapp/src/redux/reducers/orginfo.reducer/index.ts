@@ -40,7 +40,7 @@ const orgInfoSlice = createSlice({
       }
     },
     setOrgsInfo: (state, action) => {
-      state.orgs = [...action.payload];
+      state.orgs = [...action.payload];      
     },
     setUser: (state, action) => {
       state.user = action.payload;

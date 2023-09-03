@@ -145,6 +145,7 @@ export const EditVersion = () => {
   const fetchDataFromServer = () => {
     setIsDataFetchedFromServer(true);
     setIsLoadingData(true);
+
     queryWeb2Integration({
       orgId,
       dispatch,
@@ -152,6 +153,7 @@ export const EditVersion = () => {
         setWeb2IntegrationsState(data);
       },
     });
+
     queryWorkflow({
       orgId,
       dispatch,
@@ -178,6 +180,7 @@ export const EditVersion = () => {
       }
       setWeb2IntegrationsState(web2Integrations);
     }
+    
     canUserEditWorkflowVersion({
       workflowVersionId: versionId,
       onResult: (canEdit: boolean) => {
