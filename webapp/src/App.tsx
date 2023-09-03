@@ -6,93 +6,62 @@ import { Session } from '@supabase/gotrue-js';
 import { useSelector, useDispatch } from 'react-redux';
 import GlobalLoading from '@components/GlobalLoading/GlobalLoading';
 import { registerVoteMachine } from '@components/DirectedGraph';
-import { setUser } from '@redux/reducers/orginfo.reducer';
-import { useLocation } from 'react-router-dom';
 import SingleChoice from '@votemachines/SingleChoice';
 import Polling from '@votemachines/Polling';
 import Veto from '@votemachines/Veto';
 import UpVote from '@votemachines/UpVote';
-import {
-  queryOrgs,
-  queryPresetBanner,
-  queryPresetIcon,
-  queryUserById,
-} from '@middleware/data';
-import { shouldUseCachedData } from '@utils/helpers';
 import { AuthContext } from '@layout/context/AuthContext';
-
-function App({
-  requiredLogin = false,
-  layout,
-}: {
+import { useGetDataHook } from '@dal/dal';
+import { ConfigTypes, config } from '@dal/config';
+interface AppProps {
   requiredLogin?: boolean;
   layout: any;
-}) {
-  // const [isAuth, setIsAuth] = useState(false);
+}
+
+const App: React.FC<AppProps> = ({ requiredLogin = false, layout }) => {
   const navigate = useNavigate();
-  // const token = window.localStorage.getItem('isConnectWallet');
-  const { loading } = useSelector((state: any) => state.ui);
+  const { loading, initialized } = useSelector((state: any) => state.ui);
   const [session, setSession] = useState<Session | null>(null);
-  const location = useLocation();
-  const { presetIcons, presetBanners, initialized } = useSelector(
-    (state: any) => state.ui
-  );
-  const { lastFetch } = useSelector((state: any) => state.orginfo);
-  const dispatch = useDispatch();
+  const [isSessionFetched, setIsSessionFetched] = useState<boolean>(false);
+
+  useGetDataHook({
+    cacheOption: false,
+    configInfo: config.queryPresetIcon,
+  });
+
+  useGetDataHook({
+    cacheOption: false,
+    configInfo: config.queryPresetBanner,
+  });
+
+  if (isSessionFetched && session) {
+    
+    useGetDataHook({
+      params: session,
+      cacheOption: false,
+      configInfo: config.queryUserById,
+    });
+  }
+
   const handleSession = async (_session: Session | null) => {
     if (requiredLogin === true && _session === null) {
       navigate('/login');
     }
     setSession(_session);
-    if (_session !== null) {
-      // query to server to get preset icons and banners
-      queryPresetBanner({
-        dispatch,
-        presetBanners,
-      });
-      queryPresetIcon({
-        dispatch,
-        presetIcons,
-      });
-    }
-    if (_session !== null) {
-      const { user } = _session as Session;
-      if (!shouldUseCachedData(lastFetch)) {
-        queryOrgs({
-          filter: {
-            userId: user.id,
-          },
-          onSuccess: () => {},
-          dispatch,
-        });
-      }
-      if (initialized === false) {
-        queryUserById({
-          userId: user.id,
-          onSuccess: () => {},
-          dispatch,
-        });
-        // console.log('user', user);
-        // dispatch(
-        //   setUser({
-        //     id: user.id,
-        //     email: user.email,
-        //     full_name: user.user_metadata.full_name,
-        //     // avatar_url: user.user_metadata.avatar_url,
-        //   })
-        // );
-      }
-    }
+    setIsSessionFetched(true);
   };
+
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
-      await handleSession(_session);
+    supabase.auth.getSession().then(({ data: { session: _session } }) => {
+      handleSession(_session);
     });
+
     registerVoteMachine(SingleChoice);
     registerVoteMachine(Polling);
     registerVoteMachine(Veto);
     registerVoteMachine(UpVote);
   }, []);
+
   const Layout: any = layout;
   return (
     <AuthContext.Provider value={{ session }}>
@@ -102,6 +71,6 @@ function App({
       </Layout>
     </AuthContext.Provider>
   );
-}
+};
 
 export default App;
