@@ -36,8 +36,6 @@ const Home: React.FC = () => {
     configInfo: config.getWorkflowByStatus,
   }).data;
 
-  console.log(workflows);
-
   const filterWorkflowByOptions = useFilteredData(
     workflows,
     sortWorkflowOptions

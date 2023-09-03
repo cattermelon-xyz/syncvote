@@ -10,8 +10,9 @@ interface DataItem {
   [key: string]: any;
 }
 
-export function useFilteredData(data: DataItem[], options: SortProps) {
+export function useFilteredData(data: any, options: SortProps) {
   return useMemo(() => {
+    if (!data) return;
     let filtered = [...data];
     if (options.by !== '') {
       switch (options.by) {
