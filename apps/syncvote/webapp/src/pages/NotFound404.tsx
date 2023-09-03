@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 
 const NotFound404 = ({
   title = '404',
-  message = 'Sorry, the page you visited does not exist.',
+  message = 'Sorry, the page you visited does not exist or you should login to access.',
   cta = (
     <Button
       type='primary'

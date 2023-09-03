@@ -71,7 +71,7 @@ const SharedSpace: React.FC = () => {
 
   return (
     <div className='w-[800px] flex flex-col'>
-      <p className='text-3xl font-semibold mb-8'>{L('mySpace')}</p>
+      <p className='text-3xl font-semibold mb-8'>Shared Workspace</p>
       <section className='w-full mb-8'>
         {loading ? (
           <Skeleton />

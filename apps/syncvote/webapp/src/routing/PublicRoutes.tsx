@@ -7,10 +7,7 @@ import { Route } from 'react-router-dom';
 
 export default (
   <React.Fragment>
-    <Route
-      path='/public'
-      element={<App layout={PublicAppLayout} requiredLogin={false} />}
-    >
+    <Route path='/public' element={<App layout={PublicAppLayout} />}>
       <Route
         path=':orgIdString/:workflowIdString/:versionIdString'
         element={<PublicVersion />}

@@ -90,7 +90,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ setWorkflows }) => {
               key={tag}
               checked={false}
               onChange={() => 1}
-              style={{ borderRadius: '15px', fontSize: '16px' }}
+              style={{ borderRadius: '15px' }}
             >
               {tag}
             </CheckableTag>
