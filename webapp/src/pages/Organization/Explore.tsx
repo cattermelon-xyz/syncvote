@@ -7,7 +7,6 @@ import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import ListItem from '@components/ListItem/ListItem';
 import { Skeleton } from 'antd';
 import { useDispatch } from 'react-redux';
-import { getWorkflowByStatus } from '@middleware/data';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { useGetDataHook } from '@dal/dal';
 import { ConfigTypes, config } from '@dal/config';

@@ -2,9 +2,8 @@ import {
   GetterOrgFunction,
   GetterUserFunction,
   GetterWorkflowFunction,
-  getWorkflowByStatus,
+  GetterPresetFunction,
 } from '@middleware/data';
-import { GetterPresetFunction } from './middleware/data/preset';
 import { ConfigInfo } from './dal';
 export interface ConfigTypes {
   getWorkflowByStatus: {

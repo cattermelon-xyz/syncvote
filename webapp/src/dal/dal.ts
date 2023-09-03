@@ -19,8 +19,6 @@ export function useGetDataHook<T>({
   cacheOption,
   start,
 }: UseGetDataHookProps<T>) {
-  console.log(configInfo);
-  
   const reduxVar = useSelector(
     (state: any) => state[configInfo.reduxObjectPath]
   );
@@ -30,8 +28,9 @@ export function useGetDataHook<T>({
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<any>(null);
   const now = new Date().getTime();
-
+  console.log('Haha');
   useEffect(() => {
+    console.log('Hehe');
     if (start !== false) {
       if (typeof configInfo.getterFunction === 'function') {
         configInfo.getterFunction({

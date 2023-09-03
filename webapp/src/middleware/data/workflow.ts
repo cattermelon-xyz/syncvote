@@ -15,6 +15,7 @@ import {
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { subtractArray } from '@utils/helpers';
+
 export class GetterWorkflowFunction {
   async getWorkflowByStatus({
     params,
@@ -23,11 +24,15 @@ export class GetterWorkflowFunction {
     onError,
   }: {
     params?: any;
+    cacheOption?: boolean;
     dispatch: any;
+    now: number;
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
+    reduxVar: any;
   }) {
     const { status } = params;
+
     dispatch(startLoading({}));
     const { data, error } = await supabase.from('workflow').select(`*,
            versions: workflow_version(id, status),
