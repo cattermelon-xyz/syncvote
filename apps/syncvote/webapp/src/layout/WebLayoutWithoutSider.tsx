@@ -22,10 +22,11 @@ const WebLayoutWithoutSider = ({ children }: Props) => {
               <Header session={session} />
             </div>
             <Layout className='w-full overflow-y-auto bg-white'>
-              <Layout className='flex w-full items-center bg-white h-fixed-layout'>
+              <Layout className='flex w-full items-center bg-white  my-8'>
                 {children}
               </Layout>
             </Layout>
+            <Footer />
           </Layout>
         )}
       </AuthContext.Consumer>

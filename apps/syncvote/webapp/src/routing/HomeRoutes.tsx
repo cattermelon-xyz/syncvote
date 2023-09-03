@@ -1,7 +1,7 @@
 import App from '@App';
 import WebLayout from '@layout/WebLayout';
 import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Route } from 'react-router-dom';
 const env = import.meta.env.VITE_ENV;
 import {
@@ -10,28 +10,29 @@ import {
   MySpace,
   SharedSpace,
 } from '@pages/Organization';
+import { AuthContext } from '@layout/context/AuthContext';
 
-export default (
-  <React.Fragment>
-    {env === 'production' ? (
-      <Route
-        path='/'
-        element={<App layout={WebLayoutWithoutSider} requiredLogin={true} />}
-      >
+function HomeRoutes() {
+  const { isAuth } = useContext(AuthContext);
+  if (env === 'production' && isAuth) {
+    return (
+      <Route path='/' element={<App layout={WebLayoutWithoutSider} />}>
         <Route index element={<MySpace />} />
       </Route>
-    ) : null}
-    {env === 'dev' ? (
-      <>
-        <Route
-          path='/'
-          element={<App layout={WebLayout} requiredLogin={true} />}
-        >
-          <Route index element={<OrganizationExplore />} />
-          <Route path='/my-workspaces' element={<MySpace />} />
-          <Route path='/shared-workspaces' element={<SharedSpace />} />
-        </Route>
-      </>
-    ) : null}
-  </React.Fragment>
-);
+    );
+  } else if (env === 'dev') {
+    if (isAuth) {
+      return (
+        <>
+          <Route index element={<MySpace />} />
+          <Route path='/explore' element={<OrganizationExplore />} />
+          <Route path='/shared' element={<SharedSpace />} />
+        </>
+      );
+    } else {
+      return <Route index element={<OrganizationExplore />} />;
+    }
+  }
+}
+
+export default HomeRoutes;

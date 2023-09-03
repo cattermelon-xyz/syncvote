@@ -1,30 +1,29 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import { L } from '@utils/locales/L';
 import { Button, Popover, Space } from 'antd';
 import {
   BellOutlined,
   SettingOutlined,
   LogoutOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from 'utils';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { AuthContext } from '@layout/context/AuthContext';
 
 interface AvatarAndNotiProps {
   user?: any;
-  isShowAccountSetting?: any;
 }
 
-const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
-  user,
-  isShowAccountSetting,
-}) => {
+const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openPopover, setOpenPopover] = useState(false);
   const { presetIcons } = useSelector((state: any) => state.ui);
+  const { isAuth } = useContext(AuthContext);
 
   const handleOpenChange = (newOpen: boolean) => {
     setOpenPopover(newOpen);
@@ -53,7 +52,6 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
             dispatch(startLoading({}));
             await supabase.auth.signOut();
             dispatch(finishLoading({}));
-            navigate('/login');
           }}
         >
           {L('logOut')}
@@ -64,10 +62,12 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
 
   return (
     <Space className='flex items-center justify-end gap-3'>
-      <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
-        <BellOutlined style={{ fontSize: '20px' }} />
-      </div>
-      {isShowAccountSetting ? (
+      {isAuth ? (
+        <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
+          <BellOutlined style={{ fontSize: '20px' }} />
+        </div>
+      ) : null}
+      {isAuth ? (
         <Popover
           placement='bottomRight'
           content={contentPopOver}
@@ -89,22 +89,16 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
           </div>
         </Popover>
       ) : (
-        <div
-          className='cursor-pointer flex items-center'
-          onClick={async () => {
-            dispatch(startLoading({}));
-            await supabase.auth.signOut();
-            dispatch(finishLoading({}));
+        <Button
+          type='default'
+          icon={<UserOutlined />}
+          className='rounded-full'
+          onClick={() => {
             navigate('/login');
           }}
-          title={L('clickToLogout')}
         >
-          <img
-            src={user?.user_metadata?.avatar_url}
-            alt='user_avatar'
-            className='w-[36px] h-[36px] rounded-full inline-block mr-2'
-          />
-        </div>
+          Login
+        </Button>
       )}
     </Space>
   );

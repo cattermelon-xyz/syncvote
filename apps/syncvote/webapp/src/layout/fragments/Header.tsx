@@ -7,8 +7,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from 'utils';
 import { Avatar, Button } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
+import { AuthContext } from '@layout/context/AuthContext';
+import { TbBolt } from 'react-icons/tb';
 
 type HeaderProps = {
   session: any;
@@ -32,6 +34,7 @@ function Header({ session }: HeaderProps) {
   const [currentOrg, setCurrentOrg] = useState(
     orgs.find((org: any) => org.id === orgId)
   );
+  const { isAuth } = useContext(AuthContext);
 
   const handleClearStore = () => {};
 
@@ -56,7 +59,7 @@ function Header({ session }: HeaderProps) {
 
   return (
     <div
-      className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full font-sans z-20 bg-white border-b border-solid border-grey-version-3`}
+      className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full font-sans z-20 bg-white border-0 border-b border-solid border-grey-version-3`}
     >
       <div className=' w-full flex justify-between'>
         <div className='flex p-0 gap-2 items-center'>
@@ -140,7 +143,14 @@ function Header({ session }: HeaderProps) {
             </span>
           </div>
         </div>
-        {user && <AvatarAndNoti user={user} isShowAccountSetting={true} />}
+        <div className='flex row'>
+          {!isAuth ? (
+            <Button type='link' icon={<TbBolt />}>
+              Create your own workflow
+            </Button>
+          ) : null}
+          {user && <AvatarAndNoti user={user} />}
+        </div>
       </div>
     </div>
   );

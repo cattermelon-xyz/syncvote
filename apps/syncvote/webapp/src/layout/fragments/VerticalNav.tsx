@@ -2,7 +2,6 @@ import {
   DownOutlined,
   FileOutlined,
   FolderOutlined,
-  HomeOutlined,
   GlobalOutlined,
   LogoutOutlined,
   PlusOutlined,
@@ -13,7 +12,7 @@ import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal
 import { Button, Dropdown, MenuProps, Space } from 'antd';
 import { ReactNode, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { current } from '@reduxjs/toolkit';
+const env = import.meta.env.VITE_ENV;
 
 const VerticalNavButton = ({
   label,
@@ -77,35 +76,57 @@ const VerticalNav = () => {
     useState(false);
   const navigate = useNavigate();
   const current = useLocation().pathname;
-  const navs = [
-    {
-      label: (
-        <>
-          <FolderOutlined />
-          My workspaces
-        </>
-      ),
-      destinationUrl: '/my-workspaces',
-    },
-    {
-      label: (
-        <>
-          <ShareAltOutlined />
-          Shared workspaces
-        </>
-      ),
-      destinationUrl: '/shared-workspaces',
-    },
-    {
-      label: (
-        <>
-          <GlobalOutlined />
-          Explore
-        </>
-      ),
-      destinationUrl: '/',
-    },
-  ];
+  const navs =
+    env === 'dev'
+      ? [
+          {
+            label: (
+              <>
+                <FolderOutlined />
+                My workspaces
+              </>
+            ),
+            destinationUrl: '/',
+          },
+          {
+            label: (
+              <>
+                <ShareAltOutlined />
+                Shared workspaces
+              </>
+            ),
+            destinationUrl: '/shared',
+          },
+          {
+            label: (
+              <>
+                <GlobalOutlined />
+                Explore
+              </>
+            ),
+            destinationUrl: '/explore',
+          },
+        ]
+      : [
+          {
+            label: (
+              <>
+                <FolderOutlined />
+                My workspaces
+              </>
+            ),
+            destinationUrl: '/',
+          },
+          {
+            label: (
+              <>
+                <GlobalOutlined />
+                Explore
+              </>
+            ),
+            destinationUrl: '/explore',
+          },
+        ];
 
   const selectedNav = navs.find((nav) => nav.destinationUrl === current) || {
     destinationUrl: '',

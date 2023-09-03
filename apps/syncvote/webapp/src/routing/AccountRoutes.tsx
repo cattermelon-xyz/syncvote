@@ -1,15 +1,20 @@
 import App from '@App';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Route } from 'react-router-dom';
 import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 import AccountSetting from '@pages/Account/pages/AccountSetting';
 import PageScreen from '@components/HomeScreen/PageScreen';
+import RequireAuth from './RequireAuth';
 
 export default (
   <React.Fragment>
     <Route
       path='/'
-      element={<App layout={WebLayoutWithoutSider} requiredLogin={true} />}
+      element={
+        <RequireAuth>
+          <App layout={WebLayoutWithoutSider} />
+        </RequireAuth>
+      }
     >
       <Route path='account'>
         <Route path='setting' element={<AccountSetting />} />

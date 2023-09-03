@@ -14,6 +14,7 @@ import { Button, Modal } from 'antd';
 import { listConnectWallet, listOptionsConnectWallet } from './connectWallet';
 import loginBanner from '../../assets/images/loginBanner1.png';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [selectedOption, setSelectedOption] = useState(
@@ -48,9 +49,15 @@ function Login() {
       });
     }
   };
+  const navigate = useNavigate();
   return (
     <div className=' w-full h-[100vh] relative flex'>
-      <div className='flex absolute top-[2%] left-[1.3%] gap-[3px]'>
+      <div
+        className='flex absolute top-[2%] left-[1.3%] gap-[3px] cursor-pointer'
+        onClick={() => {
+          navigate('/');
+        }}
+      >
         <LogoSyncVote />
         <div className='text-violet-700 text-[20px] font-bold '>Syncvote</div>
       </div>

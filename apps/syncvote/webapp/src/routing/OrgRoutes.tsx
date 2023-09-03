@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Route } from 'react-router-dom';
 import App from '@App';
 import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
@@ -11,15 +11,21 @@ import { NewVersion } from '@pages/Workflow/Version';
 import NotFound404 from '@pages/NotFound404';
 import WebLayout from '@layout/WebLayout';
 import BluePrint from '@pages/Workflow/BluePrint';
+import RequireAuth from './RequireAuth';
 
 const env = import.meta.env.VITE_ENV;
+
 export default (
   <React.Fragment>
     {env === 'production' ? (
       <>
         <Route
           path='/'
-          element={<App layout={WebLayoutWithoutSider} requiredLogin={true} />}
+          element={
+            <RequireAuth>
+              <App layout={WebLayoutWithoutSider} />
+            </RequireAuth>
+          }
         >
           <Route path=':orgIdString'>
             <Route index element={<BluePrint />} />
@@ -31,7 +37,11 @@ export default (
       <>
         <Route
           path='/'
-          element={<App layout={WebLayoutWithoutSider} requiredLogin={true} />}
+          element={
+            <RequireAuth>
+              <App layout={WebLayoutWithoutSider} />
+            </RequireAuth>
+          }
         >
           <Route path=':orgIdString'>
             <Route path='setting' element={<OrganizationSetting />} />
@@ -47,10 +57,7 @@ export default (
             </Route>
           </Route>
         </Route>
-        <Route
-          path='/'
-          element={<App layout={WebLayout} requiredLogin={true} />}
-        >
+        <Route path='/' element={<App layout={WebLayout} />}>
           <Route path=':orgIdString'>
             <Route index element={<BluePrint />} />
           </Route>
