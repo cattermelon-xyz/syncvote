@@ -32,28 +32,34 @@ interface SortProps {
 const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
 
-  const { data: orgs } = useGetDataHook({
+  const orgs = useGetDataHook({
     cacheOption: true,
     configInfo: config.queryOrgs,
-  });
+  }).data;
 
-  const { data: user } = useGetDataHook({
+  const user = useGetDataHook({
     cacheOption: true,
     configInfo: config.queryUserById,
-  });
+  }).data;
 
-  const { data: presetIcons } = useGetDataHook({
+  const presetIcons = useGetDataHook({
     cacheOption: true,
-    configInfo: config.queryPresetIcon,
-  });
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   const navigate = useNavigate();
   const { orgIdString } = useParams();
   const [loading, setLoading] = useState(true);
-  const org = orgs.find(
-    (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
-  );
-  const data = org;
+
+  let org: any;
+  let data: any;
+  if (orgs) {
+    org = orgs.find(
+      (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
+    );
+    data = org;
+  }
+
   const dispatch = useDispatch();
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({

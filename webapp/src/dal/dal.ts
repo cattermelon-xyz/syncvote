@@ -2,15 +2,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useMemo, useState } from 'react';
 
 export interface ConfigInfo {
-  getterFunction: any;
-  reduxObjectPath: string;
+  dalFunction: any;
+  reduxObjectPath?: string;
 }
 
-interface UseGetDataHookProps<T> {
+interface useGetDataHookProps<T> {
   params?: T;
   configInfo: ConfigInfo;
   cacheOption?: boolean;
   start?: boolean;
+  st?: any;
 }
 
 export function useGetDataHook<T>({
@@ -18,9 +19,9 @@ export function useGetDataHook<T>({
   configInfo,
   cacheOption,
   start,
-}: UseGetDataHookProps<T>) {
+}: useGetDataHookProps<T>) {
   const reduxVar = useSelector(
-    (state: any) => state[configInfo.reduxObjectPath]
+    (state: any) => state[configInfo.reduxObjectPath!]
   );
 
   const clonedParams: T | undefined = structuredClone(params);
@@ -28,10 +29,11 @@ export function useGetDataHook<T>({
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<any>(null);
   const now = new Date().getTime();
+
   useEffect(() => {
     if (start !== false) {
-      if (typeof configInfo.getterFunction === 'function') {
-        configInfo.getterFunction({
+      if (typeof configInfo.dalFunction === 'function') {
+        configInfo.dalFunction({
           params: clonedParams,
           cacheOption,
           dispatch,
@@ -49,4 +51,37 @@ export function useGetDataHook<T>({
   }, [start]);
 
   return { data, error };
+}
+
+export async function useSetData<T>({
+  setData,
+  setError,
+  params,
+  configInfo,
+  dispatch,
+}: {
+  setData?: (data: any) => void;
+  setError?: (error: any) => void;
+  params?: any;
+  configInfo?: any;
+  dispatch?: any;
+}) {
+  const clonedParams: T | undefined = structuredClone(params);
+
+  if (typeof configInfo.dalFunction === 'function') {
+    await configInfo.dalFunction({
+      params: clonedParams,
+      dispatch,
+      onSuccess: (data: any) => {
+        if (setData) {
+          setData(data);
+        }
+      },
+      onError: (error: any) => {
+        if (setError) {
+          setError(error);
+        }
+      },
+    });
+  }
 }

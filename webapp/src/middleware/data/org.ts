@@ -29,6 +29,7 @@ export class GetterOrgFunction {
     reduxVar: any;
   }) {
     let userId;
+
     if (params) {
       userId = params.userId;
     } else {

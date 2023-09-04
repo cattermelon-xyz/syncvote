@@ -5,6 +5,8 @@ import { changeAWorkflowOrg } from '@middleware/data';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { useGetDataHook, useSetData } from '@dal/dal';
+import { ConfigTypes, config } from '@dal/config';
 
 interface MoveToWorkflowModalProps {
   open: boolean;
@@ -24,12 +26,17 @@ const MoveToWorkflowModal: React.FC<MoveToWorkflowModalProps> = ({
   const handleCancel = () => {
     onClose();
   };
+
   const handleOk = async () => {
-    await changeAWorkflowOrg({
-      orgId: orgTo?.id,
-      workflow: workflow,
+    await useSetData({
+      params: {
+        orgId: orgTo?.id,
+        workflow: workflow,
+      },
+      configInfo: config.changeAWorkflowOrg,
       dispatch,
     });
+
     onClose();
   };
 

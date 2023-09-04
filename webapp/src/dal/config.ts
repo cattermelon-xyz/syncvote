@@ -9,6 +9,11 @@ export interface ConfigTypes {
   getWorkflowByStatus: {
     status: string;
   };
+
+  changeAWorkflowOrg: {
+    orgId: string;
+    workflow: any;
+  };
 }
 
 const getterPresetFunction = new GetterPresetFunction();
@@ -22,27 +27,31 @@ interface ConfigObject {
 
 export const config: ConfigObject = {
   queryPresetIcons: {
-    getterFunction: getterPresetFunction.queryPresetIcons,
+    dalFunction: getterPresetFunction.queryPresetIcons,
     reduxObjectPath: 'ui',
   },
 
   queryPresetBanner: {
-    getterFunction: getterPresetFunction.queryPresetBanner,
+    dalFunction: getterPresetFunction.queryPresetBanner,
     reduxObjectPath: 'ui',
   },
 
   queryUserById: {
-    getterFunction: getterUserFunction.queryUserById,
+    dalFunction: getterUserFunction.queryUserById,
     reduxObjectPath: 'orginfo',
   },
 
   queryOrgs: {
-    getterFunction: getterOrgFunction.queryOrgs,
+    dalFunction: getterOrgFunction.queryOrgs,
     reduxObjectPath: 'orginfo',
   },
 
   getWorkflowByStatus: {
-    getterFunction: getterWorkflowFunction.getWorkflowByStatus,
+    dalFunction: getterWorkflowFunction.getWorkflowByStatus,
     reduxObjectPath: 'workflow',
+  },
+
+  changeAWorkflowOrg: {
+    dalFunction: getterWorkflowFunction.changeAWorkflowOrg,
   },
 };

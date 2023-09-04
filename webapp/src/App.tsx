@@ -37,10 +37,6 @@ const App: React.FC<AppProps> = ({ requiredLogin = false, layout }) => {
     registerVoteMachine(UpVote);
   }, []);
 
-  useGetDataHook({
-    cacheOption: false,
-    configInfo: config.queryPresetIcons,
-  });
 
   useGetDataHook({
     cacheOption: false,

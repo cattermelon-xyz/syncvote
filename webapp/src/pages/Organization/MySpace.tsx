@@ -23,6 +23,7 @@ interface DataItem {
 }
 
 const MySpace: React.FC = () => {
+  
   const { data: orgs } = useGetDataHook({
     cacheOption: true,
     configInfo: config.queryOrgs,
@@ -135,7 +136,7 @@ const MySpace: React.FC = () => {
             <ListItem
               handleSort={handleSortSpaceDetail}
               items={
-                filterSpaceByOptions &&
+                filterSpaceByOptions! &&
                 filterSpaceByOptions.map((adminOrg, index) => (
                   <SpaceCard
                     key={index}
@@ -156,7 +157,7 @@ const MySpace: React.FC = () => {
             <ListItem
               handleSort={handleSortWorkflowDetail}
               items={
-                filterWorkflowByOptions &&
+                filterWorkflowByOptions! &&
                 filterWorkflowByOptions.map((workflow, index) => (
                   <WorkflowCard key={index} dataWorkflow={workflow} />
                 ))
