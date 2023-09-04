@@ -65,59 +65,58 @@ const MySpace: React.FC = () => {
     workflows,
     sortWorkflowOptions
   );
+  const fetchData = async () => {
+    setLoading(true);
+    if (orgs) {
+      let adminOrgsData = [];
+      if (env === 'production') {
+        adminOrgsData = orgs;
+      } else {
+        adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+      }
+      setAdminOrgs(adminOrgsData);
+
+      const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
+        adminOrg.workflows.map((workflow: any) => ({
+          ...workflow,
+          org_title: adminOrg.title,
+        }))
+      );
+      // Querry from org
+      setWorkflows(allWorkflows);
+
+      // await getWorkflowFromEditor({
+      //   userId: user.id,
+      //   dispatch,
+      //   onSuccess: (data: any) => {
+      //     console.log('Editor', data);
+      //   },
+      //   onError: (error: any) => {
+      //     console.log(error);
+      //   },
+      // });
+      // await getWorkflowFromEditor({
+      //   userId: user.id,
+      //   dispatch,
+      //   onSuccess: (data: any) => {
+      //     console.log('Editor', data);
+      //   },
+      //   onError: (error: any) => {
+      //     console.log(error);
+      //   },
+      // });
+
+      // Querry workflow from workflow_version_editor
+    }
+    setLoading(false);
+    const url = PublicPageRedirect.getRedirectUrl();
+    if (url) {
+      navigate(url);
+    }
+  };
   // const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      if (orgs) {
-        let adminOrgsData = [];
-        if (env === 'production') {
-          adminOrgsData = orgs;
-        } else {
-          adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
-        }
-        setAdminOrgs(adminOrgsData);
-
-        const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
-          adminOrg.workflows.map((workflow: any) => ({
-            ...workflow,
-            org_title: adminOrg.title,
-          }))
-        );
-        // Querry from org
-        setWorkflows(allWorkflows);
-
-        // await getWorkflowFromEditor({
-        //   userId: user.id,
-        //   dispatch,
-        //   onSuccess: (data: any) => {
-        //     console.log('Editor', data);
-        //   },
-        //   onError: (error: any) => {
-        //     console.log(error);
-        //   },
-        // });
-        // await getWorkflowFromEditor({
-        //   userId: user.id,
-        //   dispatch,
-        //   onSuccess: (data: any) => {
-        //     console.log('Editor', data);
-        //   },
-        //   onError: (error: any) => {
-        //     console.log(error);
-        //   },
-        // });
-
-        // Querry workflow from workflow_version_editor
-      }
-      setLoading(false);
-      const url = PublicPageRedirect.getRedirectUrl();
-      if (url) {
-        navigate(url);
-      }
-    };
-
     if (user) {
       fetchData();
     }

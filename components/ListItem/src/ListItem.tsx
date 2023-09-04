@@ -19,11 +19,18 @@ interface GridColumnProps {
 interface Props {
   items: React.ReactNode[];
   columns: GridColumnProps;
-  title?: string;
+  title?: any;
+  extra?: any;
   handleSort?: (options: { by: any; type: any }) => void;
 }
 
-const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
+const ListItem: React.FC<Props> = ({
+  items,
+  columns,
+  title,
+  handleSort,
+  extra,
+}) => {
   let classes = `w-full grid gap-4 `;
 
   if (columns.xs) classes += `xs:grid-cols-${columns.xs} `;
@@ -73,23 +80,26 @@ const ListItem: React.FC<Props> = ({ items, columns, title, handleSort }) => {
   return (
     <>
       <div className='flex justify-between items-center mb-4 '>
-        <div className='text-md font-semibold'>{title}</div>
-        <Popover content={content} trigger='click' placement='rightTop'>
-          <Button
-            style={{ border: 'None', padding: '5px' }}
-            className='w-[44px] bg-[#F6F6F6]'
-          >
-            {typeSort === 'asc' ? (
-              <SortAscendingOutlined
-                style={{ fontSize: '20px', color: '#6200EE' }}
-              />
-            ) : (
-              <SortDescendingOutlined
-                style={{ fontSize: '20px', color: '#6200EE' }}
-              />
-            )}
-          </Button>
-        </Popover>
+        <div>{title}</div>
+        <Space direction='horizontal' size='small'>
+          {extra}
+          <Popover content={content} trigger='click' placement='rightTop'>
+            <Button
+              style={{ border: 'None', padding: '5px' }}
+              className='w-[44px] bg-[#F6F6F6]'
+            >
+              {typeSort === 'asc' ? (
+                <SortAscendingOutlined
+                  style={{ fontSize: '20px', color: '#6200EE' }}
+                />
+              ) : (
+                <SortDescendingOutlined
+                  style={{ fontSize: '20px', color: '#6200EE' }}
+                />
+              )}
+            </Button>
+          </Popover>
+        </Space>
       </div>
       <div className={classes.trim()}>
         {items && items.map((item, index) => <div key={index}>{item}</div>)}
