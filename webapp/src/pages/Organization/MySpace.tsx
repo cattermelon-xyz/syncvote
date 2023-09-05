@@ -34,9 +34,9 @@ const MySpace: React.FC = () => {
     configInfo: config.queryUserById,
   });
 
-  const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
-  const [workflows, setWorkflows] = useState<DataItem[]>([]);
-  const [loading, setLoading] = useState(false);
+const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
+const [workflows, setWorkflows] = useState<DataItem[]>([]);
+const [loading, setLoading] = useState(false);
 
   const [sortOptions, setSortOption] = useState<SortProps>({
     by: '',
