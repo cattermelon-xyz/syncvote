@@ -6,7 +6,6 @@ import { L } from '@utils/locales/L';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import ListItem from '@components/ListItem/ListItem';
 import { Skeleton } from 'antd';
-import { useDispatch } from 'react-redux';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { useGetDataHook } from '@dal/dal';
 import { ConfigTypes, config } from '@dal/config';
@@ -16,9 +15,16 @@ interface SortProps {
   type: 'asc' | 'des';
 }
 const Home: React.FC = () => {
-  const dispatch = useDispatch();
   let [workflows, setWorkflows] = React.useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [orgsLocal, setOrgsLocal] = useState<any>();
+
+  useEffect(() => {
+    const orgsLocal = JSON.parse(localStorage.getItem('orgsLocal')!);
+    if (orgsLocal) {
+      setOrgsLocal(orgsLocal);
+    }
+  }, []);
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
     by: '',
@@ -55,7 +61,7 @@ const Home: React.FC = () => {
             <ListItem
               handleSort={handleSortWorkflowDetail}
               items={
-                filterWorkflowByOptions &&
+                filterWorkflowByOptions! &&
                 filterWorkflowByOptions?.map((workflow, index) => (
                   <WorkflowCard
                     key={workflow?.id + index}

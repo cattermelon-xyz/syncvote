@@ -42,6 +42,7 @@ export class GetterOrgFunction {
     }
 
     const { lastFetch, orgs } = reduxVar;
+    
     if (
       cacheOption &&
       lastFetch !== -1 &&
@@ -188,6 +189,7 @@ export class GetterOrgFunction {
     }
   }
 }
+
 export const newOrg = async ({
   orgInfo,
   uid,

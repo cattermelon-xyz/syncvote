@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import { useGetDataHook } from '@dal/dal';
 import { config } from '@dal/config';
+import { any } from 'prop-types';
 
 const env = import.meta.env.VITE_ENV;
 
@@ -23,20 +24,31 @@ interface DataItem {
 }
 
 const MySpace: React.FC = () => {
-  
+
   const { data: orgs } = useGetDataHook({
     cacheOption: true,
     configInfo: config.queryOrgs,
   });
+  const now = new Date().getTime();
 
   const { data: user } = useGetDataHook({
     cacheOption: true,
     configInfo: config.queryUserById,
   });
 
-const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
-const [workflows, setWorkflows] = useState<DataItem[]>([]);
-const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    localStorage.setItem(
+      'orgsLocal',
+      JSON.stringify({
+        lasfetch: now,
+        orgs: orgs,
+      })
+    );
+  }, [orgs]);  
+
+  const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
+  const [workflows, setWorkflows] = useState<DataItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [sortOptions, setSortOption] = useState<SortProps>({
     by: '',
@@ -47,6 +59,7 @@ const [loading, setLoading] = useState(false);
     by: '',
     type: 'asc',
   });
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [openModalCreateWorkflow, setOpenModalCreateWorkflow] = useState(

@@ -39,17 +39,17 @@ const App: React.FC<AppProps> = ({ requiredLogin = false, layout }) => {
 
 
   useGetDataHook({
-    cacheOption: false,
+    cacheOption: true,
     configInfo: config.queryPresetBanner,
   });
 
   useGetDataHook({
-    cacheOption: false,
+    cacheOption: true,
     configInfo: config.queryUserById,
   });
 
   useGetDataHook({
-    cacheOption: false,
+    cacheOption: true,
     configInfo: config.queryOrgs,
   });
 

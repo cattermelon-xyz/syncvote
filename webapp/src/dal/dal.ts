@@ -11,7 +11,6 @@ interface useGetDataHookProps<T> {
   configInfo: ConfigInfo;
   cacheOption?: boolean;
   start?: boolean;
-  st?: any;
 }
 
 export function useGetDataHook<T>({

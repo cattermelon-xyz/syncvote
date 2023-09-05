@@ -38,6 +38,7 @@ function Header({ session }: HeaderProps) {
   useEffect(() => {
     setCurrentOrg(orgs.find((org: any) => org.id === orgId));
   }, [orgs, orgId]);
+  
   let currentPage = Pages.UNKNOWN;
   switch (params.pathname) {
     case `/${orgIdString}`:
