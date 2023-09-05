@@ -53,14 +53,14 @@ export function useGetDataHook<T>({
 }
 
 export async function useSetData<T>({
-  setData,
-  setError,
+  onSuccess,
+  onError,
   params,
   configInfo,
   dispatch,
 }: {
-  setData?: (data: any) => void;
-  setError?: (error: any) => void;
+  onSuccess?: (data: any) => void;
+  onError?: (error: any) => void;
   params?: any;
   configInfo?: any;
   dispatch?: any;
@@ -71,16 +71,8 @@ export async function useSetData<T>({
     await configInfo.dalFunction({
       params: clonedParams,
       dispatch,
-      onSuccess: (data: any) => {
-        if (setData) {
-          setData(data);
-        }
-      },
-      onError: (error: any) => {
-        if (setError) {
-          setError(error);
-        }
-      },
+      onSuccess: onSuccess,
+      onError: onError,
     });
   }
 }

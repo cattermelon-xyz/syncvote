@@ -55,21 +55,75 @@ export class GetterUserFunction {
         const presetIcon = profileInfo?.preset_icon_url
           ? `preset:${profileInfo.preset_icon_url}`
           : profileInfo.preset_icon_url;
-        onSuccess(data);
-        dispatch(
-          setUser({
-            id: profileInfo.id,
-            email: profileInfo.email,
-            full_name: profileInfo.full_name,
-            avatar_url: profileInfo.icon_url
-              ? profileInfo.icon_url
-              : presetIcon,
-            about_me: profileInfo.about_me,
-          })
-        );
+
+        const userDataAfterHandle = {
+          id: profileInfo.id,
+          email: profileInfo.email,
+          full_name: profileInfo.full_name,
+          avatar_url: profileInfo.icon_url ? profileInfo.icon_url : presetIcon,
+          about_me: profileInfo.about_me,
+        };
+
+        onSuccess(userDataAfterHandle);
+        dispatch(setUser(userDataAfterHandle));
       }
       dispatch(finishLoading({}));
     }
+  }
+  async updateUserProfile({
+    params,
+    dispatch,
+    onSuccess = () => {},
+    onError = (e: any) => {
+      console.error(e);
+    },
+  }: {
+    params: any;
+    dispatch: any;
+    onSuccess?: () => void;
+    onError?: (error: any) => void;
+  }) {
+    console.log('params', params);
+
+    const { userProfile } = params;
+
+    const newUserProfile = { ...userProfile };
+    dispatch(startLoading({}));
+    const props = [
+      'id',
+      'email',
+      'full_name',
+      'icon_url',
+      'preset_icon_url',
+      'about_me',
+    ];
+    Object.keys(newUserProfile).forEach((key) => {
+      if (props.indexOf(key) === -1) {
+        delete newUserProfile[key];
+      }
+    });
+    if (newUserProfile.icon_url?.indexOf('preset:') === 0) {
+      newUserProfile.preset_icon_url = newUserProfile.icon_url.replace(
+        'preset:',
+        ''
+      );
+      newUserProfile.icon_url = '';
+    }
+    const { error } = await supabase
+      .from('profile')
+      .update(newUserProfile)
+      .eq('id', newUserProfile.id);
+
+    console.log('debug');
+
+    if (!error) {
+      console.log('debug1');
+      onSuccess();
+      dispatch(setUser(newUserProfile));
+    } else {
+      onError(error);
+    }
+    dispatch(finishLoading({}));
   }
 }
 

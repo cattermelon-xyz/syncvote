@@ -6,6 +6,10 @@ import {
 } from '@middleware/data';
 import { ConfigInfo } from './dal';
 export interface ConfigTypes {
+  updateUserProfile: {
+    userProfile: any
+  }
+
   getWorkflowByStatus: {
     status: string;
   };
@@ -53,5 +57,9 @@ export const config: ConfigObject = {
 
   changeAWorkflowOrg: {
     dalFunction: getterWorkflowFunction.changeAWorkflowOrg,
+  },
+
+  updateUserProfile: {
+    dalFunction: getterUserFunction.updateUserProfile,
   },
 };

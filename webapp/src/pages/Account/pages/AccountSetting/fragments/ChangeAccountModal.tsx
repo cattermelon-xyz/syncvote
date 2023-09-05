@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Input } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUserProfile } from '@middleware/data';
+import { useGetDataHook, useSetData } from '@dal/dal';
+import { config } from '@dal/config';
 
 interface ChangeModalProps {
   open: boolean;
@@ -18,7 +20,12 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
   isChangeName,
 }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.orginfo);
+
+  const { data: user } = useGetDataHook({
+    cacheOption: true,
+    configInfo: config.queryUserById,
+  });
+
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [content, setContent] = useState('');
 
@@ -30,8 +37,11 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
     } else {
       newUserProfile.about_me = content;
     }
-    updateUserProfile({
-      userProfile: newUserProfile,
+    await useSetData({
+      params: {
+        userProfile: newUserProfile,
+      },
+      configInfo: config.updateUserProfile,
       dispatch,
       onSuccess: () => {
         Modal.success({
@@ -46,13 +56,24 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
         });
       },
     });
+    // updateUserProfile({
+    //   userProfile: newUserProfile,
+    //   dispatch,
+    //   onSuccess: () => {
+    //     Modal.success({
+    //       title: 'Success',
+    //       content: 'Change information successfully',
+    //     });
+    //   },
+    //   onError: () => {
+    //     Modal.error({
+    //       title: 'Error',
+    //       content: 'Cannot change information',
+    //     });
+    //   },
+    // });
 
     onClose();
-    // setConfirmLoading(true);
-    // setTimeout(() => {
-    //   onClose();
-    //   setConfirmLoading(false);
-    // }, 2000);
   };
   const handleCancel = () => {
     onClose();
