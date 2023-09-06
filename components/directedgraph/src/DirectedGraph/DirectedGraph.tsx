@@ -149,10 +149,10 @@ const Flow = () => {
         data,
         selectedNodeId,
         selectedLayoutId,
-        onChange,
-        onDelete: onDeleteNode,
-        onClose: onConfigPanelClose,
-        onChangeLayout,
+        onChange: () => {},
+        onDelete: () => {},
+        onClose: () => {},
+        onChangeLayout: () => {},
       })}
       <Drawer
         title='Layout Config'
@@ -208,10 +208,11 @@ const Flow = () => {
           <Controls position='bottom-left' showInteractive={false} />
         ) : null}
         <Background color='#aaa' variant={BackgroundVariant.Dots} />
-        <Panel position='top-left'>
-          <Space direction='vertical'>
-            <Space direction='horizontal'>{navPanel}</Space>
-            {/* <Space
+        {navPanel ? (
+          <Panel position='top-left'>
+            <Space direction='vertical'>
+              <Space direction='horizontal'>{navPanel}</Space>
+              {/* <Space
               direction="horizontal"
               size="middle"
               className="p-2 border rounded-md flex items-center bg-white"
@@ -249,8 +250,10 @@ const Flow = () => {
                 );
               })}
             </Space> */}
-          </Space>
-        </Panel>
+            </Space>
+          </Panel>
+        ) : null}
+
         {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
           <>
             <Panel position='bottom-center'>

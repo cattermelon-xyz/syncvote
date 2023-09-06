@@ -22,7 +22,6 @@ const NumberWithPercentageInput = ({
           ? `${(val * 100).toFixed(2)}%`
           : `${val.toLocaleString('en-US')}`;
     }
-    console.log('tmp in convertToStr', tmp);
     return tmp;
   };
   const [str, setStr] = useState<string>(convertToStr(value || 0));

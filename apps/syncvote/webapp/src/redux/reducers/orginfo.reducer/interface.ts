@@ -12,6 +12,7 @@ export interface IOrgInfo {
   profile: IProfile[];
   last_updated: any;
   workflows: any;
+  templates: any;
 }
 
 export interface IProfile {

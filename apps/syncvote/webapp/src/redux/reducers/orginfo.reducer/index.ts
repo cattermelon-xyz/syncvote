@@ -67,13 +67,39 @@ const orgInfoSlice = createSlice({
       }
     },
     addWorkflowToOrg: (state, action) => {
-      console.log('Add workflow to Org');
       const { workflow } = action.payload;
       const orgIndex = state.orgs.findIndex(
         (org: any) => org.id === workflow.owner_org_id
       );
       if (orgIndex !== -1) {
         state.orgs[orgIndex].workflows.push(workflow);
+      }
+    },
+    addTemplateToOrg: (state, action) => {
+      const template = action.payload;
+      const orgIndex = state.orgs.findIndex(
+        (org: any) => org.id === template.owner_org_id
+      );
+      if (orgIndex !== -1) {
+        state.orgs[orgIndex].templates.push(template);
+      }
+    },
+    chageTemplateInfo: (state, action) => {
+      const template = action.payload;
+      const orgIndex = state.orgs.findIndex(
+        (org: IOrgInfo) => org.id === template.owner_org_id
+      );
+
+      if (orgIndex !== -1) {
+        const templateIndex = state.orgs[orgIndex].templates.findIndex(
+          (wf: any) => wf.id === template.id
+        );
+
+        if (templateIndex !== -1) {
+          state.orgs[orgIndex].workflows[templateIndex] = {
+            ...template,
+          };
+        }
       }
     },
     changeWorkflowOrg: (state, action) => {
@@ -167,5 +193,7 @@ export const {
   deleteWorkflow,
   addWorkflowToOrg,
   deleteOrgInfo,
+  addTemplateToOrg,
+  chageTemplateInfo,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;
