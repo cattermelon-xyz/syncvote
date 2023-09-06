@@ -26,13 +26,11 @@ interface DataItem {
 const MySpace: React.FC = () => {
 
   const { data: orgs } = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryOrgs,
   });
   const now = new Date().getTime();
 
   const { data: user } = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryUserById,
   });
 

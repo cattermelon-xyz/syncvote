@@ -33,17 +33,14 @@ const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
 
   const orgs = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryOrgs,
   }).data;
 
   const user = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryUserById,
   }).data;
 
   const presetIcons = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryPresetIcons,
   }).data;
 

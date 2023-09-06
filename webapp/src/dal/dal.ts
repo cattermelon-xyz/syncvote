@@ -16,7 +16,7 @@ interface useGetDataHookProps<T> {
 export function useGetDataHook<T>({
   params,
   configInfo,
-  cacheOption,
+  cacheOption = true,
   start,
 }: useGetDataHookProps<T>) {
   const reduxVar = useSelector(

@@ -22,7 +22,6 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
   const dispatch = useDispatch();
 
   const { data: user } = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryUserById,
   });
 

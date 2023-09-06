@@ -25,13 +25,11 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   let orgs: any;
 
   presetIcons = useGetDataHook({
-    cacheOption: true, 
     configInfo: config.queryPresetIcons,
     // start: open,
   }).data;
 
   orgs = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryOrgs,
     // start: open,
   }).data;

@@ -24,7 +24,6 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
   let org_owner: any;
   
   const { data: orgs } = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryOrgs,
     start: open,
   });

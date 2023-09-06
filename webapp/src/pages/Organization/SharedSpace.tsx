@@ -19,12 +19,10 @@ interface SortProps {
 const SharedSpace: React.FC = () => {
   
   const { data: orgs } = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryOrgs,
   });
 
   const { data: user } = useGetDataHook({
-    cacheOption: true,
     configInfo: config.queryUserById,
   });
 
@@ -91,7 +89,7 @@ const SharedSpace: React.FC = () => {
           <ListItem
             handleSort={handleSortSpaceDetail}
             items={
-              filterSpaceByOptions &&
+              filterSpaceByOptions! &&
               filterSpaceByOptions.map((memberOrg, index) => (
                 <SpaceCard key={index} dataSpace={memberOrg} />
               ))
@@ -108,7 +106,7 @@ const SharedSpace: React.FC = () => {
           <ListItem
             handleSort={handleSortWorkflowDetail}
             items={
-              filterWorkflowByOptions &&
+              filterWorkflowByOptions! &&
               filterWorkflowByOptions.map((workflow, index) => (
                 <WorkflowCard key={index} dataWorkflow={workflow} />
               ))
