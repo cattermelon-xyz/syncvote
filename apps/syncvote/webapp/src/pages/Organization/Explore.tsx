@@ -1,25 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Avatar, Button, Card, Modal, Typography } from 'antd';
-import SearchBar from './fragments/SearchBar';
+import { Button, Input, Typography } from 'antd';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
-import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { ListItem } from 'list-item';
 import { Skeleton } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { getWorkflowByStatus } from '@middleware/data';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { AuthContext } from '@layout/context/AuthContext';
-import ModalEditTemplate from './fragments/ModalEditTemplate';
-import { IOrgInfo, IWorkflow } from '@types';
-import { newTemplate, queryTemplate } from '@middleware/data/template';
-import { Banner } from 'banner';
-import { Icon } from 'icon';
+import ModalEditTemplate from '@/fragments/ModalEditTemplate';
+import { queryTemplate } from '@middleware/data/template';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from 'utils';
 import { TemplateCard } from '@components/Card/TemplateCard';
-const env = import.meta.env.ENV_VITE;
 
 interface SortProps {
   by: string;
@@ -27,12 +19,11 @@ interface SortProps {
 }
 const Home: React.FC = () => {
   const dispatch = useDispatch();
-  const [adminWorkflows, setAdminWorkflows] = React.useState<any[]>([]);
   // TODO: change to templates, setTemplates
-  const [publicWorkflows, setPublicWorkflows] = React.useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const { isAuth } = useContext(AuthContext);
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+  const { orgs } = useSelector((state: any) => state.orginfo);
+  const [canPublishTemplate, setCanPublishTemplate] = useState(false);
   const { templates } = useSelector((state: any) => state.template);
   const [openModal, setOpenModal] = useState(false);
 
@@ -49,64 +40,33 @@ const Home: React.FC = () => {
     templates,
     sortTemplateOptions
   );
-  const fetchDataWorkflow = async () => {
-    setLoading(true);
-    await getWorkflowByStatus({
-      status: 'PUBLIC_COMMUNITY',
-      dispatch,
-      onSuccess: (data: any) => {
-        setPublicWorkflows(data);
-      },
-      onError: (error: any) => {
-        console.log(error);
-      },
-    });
-    setLoading(false);
-  };
-  const fetchAdminWorkflows = async () => {
-    setLoading(true);
-    if (orgs) {
-      let adminOrgsData = [];
-      adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
-      const allWorkflows = adminOrgsData.flatMap((adminOrg: any) =>
-        adminOrg.workflows.map((workflow: any) => ({
-          ...workflow,
-          org_title: adminOrg.title,
-        }))
-      );
-      allWorkflows.map((workflow: any) => {
-        const versions = workflow.versions || [];
-        for (var i = 0; i < versions.length; i++) {
-          if (
-            versions[i].status === 'PUBLISHED' ||
-            versions[i].status === 'PUBLIC_COMMUNITY'
-          ) {
-            workflow.published_version_id = versions[i].id;
-            break;
-          }
-        }
-      });
-      // Querry from org
-      setAdminWorkflows(allWorkflows);
-    } else {
-      // TODO: query orgs here!
-    }
-    setLoading(false);
-  };
+
   const fetchTemplates = async () => {
     setLoading(true);
     await queryTemplate({ dispatch });
     setLoading(false);
   };
   useEffect(() => {
+    for (var i = 0; i < orgs.length; i++) {
+      if (orgs[i].role === 'ADMIN') {
+        for (var j = 0; j < orgs[j].workflows.length; j++) {
+          for (var k = 0; k < orgs[j].workflows[k].versions.length; k++) {
+            if (
+              ['PUBLIC_COMMUNITY', 'PUBLISHED'].indexOf(
+                orgs[j].workflows[j].versions[k]?.status
+              ) !== -1
+            ) {
+              setCanPublishTemplate(true);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }, [orgs]);
+  useEffect(() => {
     fetchTemplates();
   }, []);
-
-  useEffect(() => {
-    // TODO: query all orgs that this user is admin, put all workflow into 1 array
-    fetchDataWorkflow();
-    fetchAdminWorkflows();
-  }, [orgs]);
   const navigate = useNavigate();
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
@@ -114,44 +74,15 @@ const Home: React.FC = () => {
         templateId={-1}
         open={openModal}
         onCancel={() => setOpenModal(false)}
-        onSave={async (toSaveData) => {
-          setOpenModal(false);
-          const { data, error } = await newTemplate({
-            ...toSaveData,
-            dispatch,
-          });
-          if (error) {
-            Modal.error({
-              title: 'Error',
-              content: error,
-            });
-          } else {
-            Modal.success({
-              title: 'Success',
-              content: 'Your template has been published!',
-            });
-          }
-        }}
-        options={{
-          workflows: adminWorkflows
-            .filter((w) => w.published_version_id !== undefined)
-            .map((w: any) => ({
-              value: w.id || -1,
-              label: w.title || '',
-              owner_org_id: w.owner_org_id || -1,
-              icon_url: w.icon_url || '',
-              banner_url: w.banner_url || '',
-              published_version_id: w.published_version_id || -1,
-            })),
-          orgs: orgs.map((o: IOrgInfo) => ({ value: o.id, label: o.title })),
-        }}
       />
       <section className='w-full'>
         <Title level={2} className='text-center'>
           {L('exploreTopTierTemplates')}
         </Title>
-        <SearchBar
-          setWorkflows={(workflow: any) => setPublicWorkflows(workflow)}
+        <Input
+          prefix={<SearchOutlined />}
+          placeholder='Search a template...'
+          className='my-8'
         />
         {loading ? (
           <Skeleton />
@@ -167,7 +98,7 @@ const Home: React.FC = () => {
               }
               columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
               extra={
-                isAuth && adminWorkflows.length > 0 ? (
+                isAuth && canPublishTemplate ? (
                   <Button
                     type='primary'
                     icon={<PlusOutlined />}

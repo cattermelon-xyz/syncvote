@@ -62,12 +62,13 @@ export const newTemplate = async ({
           desc,
           icon_url: iconUrl,
           banner_url: bannerUrl,
-          org_owner_id: orgId,
+          owner_org_id: orgId,
         };
         if (updateTemplateError) {
           errorMsg = 'Cannot update template current_version_id';
         } else {
           dispatch(finishLoading({}));
+          console.log('engage redux');
           dispatch(addTemplate(newTemplate));
           dispatch(addTemplateToOrg(newTemplate));
           return {

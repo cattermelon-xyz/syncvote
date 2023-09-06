@@ -24,7 +24,7 @@ const DeleteWorkflowModal: React.FC<DeleteWorkflowModalProps> = ({
       workflow: { ...workflow },
       dispatch: dispatch,
       onSuccess: (data: any) => {
-        console.log(data);
+        // console.log(data);
       },
     });
     onClose();
