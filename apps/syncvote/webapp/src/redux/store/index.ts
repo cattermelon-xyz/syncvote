@@ -5,6 +5,7 @@ import orginfoReducer from '@redux/reducers/orginfo.reducer';
 import workflowReducer from '@redux/reducers/workflow.reducer';
 import missionReducer from '@redux/reducers/mission.reducer';
 import integrationReducer from '@redux/reducers/integration.reducer';
+import templateReducer from '@redux/reducers/template.reducer';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     workflow: workflowReducer,
     mission: missionReducer,
     integration: integrationReducer,
+    template: templateReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

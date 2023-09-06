@@ -8,6 +8,7 @@ import {
   removeUserOfOrg,
   deleteOrgInfo,
 } from '@redux/reducers/orginfo.reducer';
+import { off } from 'process';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -199,7 +200,7 @@ export const getDataOrgs = async ({
       const presetBanner = org?.preset_banner_url
         ? `preset:${org.preset_banner_url}`
         : org.preset_banner_url;
-      
+
       const workflows = org?.workflows?.map((workflow: any) => {
         const workflowPresetIcon = workflow?.preset_icon_url
           ? `preset:${workflow.preset_icon_url}`
@@ -216,7 +217,7 @@ export const getDataOrgs = async ({
             : workflowPresetBanner,
         };
       });
-      
+
       tmp.push({
         id: org?.id,
         title: org?.title,
@@ -303,12 +304,19 @@ export const queryOrgs = async ({
           created_at,
           last_updated
         )
+      ),
+      templates:template (
+        id,
+        title,
+        owner_org_id,
+        icon_url,
+        banner_url,
+        current_version_id
       )
     )
   `
     )
     .eq('user_id', userId);
-
   if (!error) {
     const tmp: any[] = [];
     data.forEach((d: any) => {
@@ -369,7 +377,6 @@ export const queryOrgs = async ({
             : workflowPresetBanner,
         };
       });
-
       tmp.push({
         id: org?.id,
         role: d.role,
@@ -382,6 +389,7 @@ export const queryOrgs = async ({
         profile: profiles,
         last_updated: org.last_updated,
         workflows: workflows || [],
+        templates: org.templates || [],
       });
     });
     dispatch(setOrgsInfo(tmp));

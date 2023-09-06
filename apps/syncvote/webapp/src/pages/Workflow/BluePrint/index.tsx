@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { LeftOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import WorkflowCard from '../fragments/WorkflowCard';
 import { L } from '@utils/locales/L';
-import { Button, Empty, Modal, Skeleton, Space } from 'antd';
+import { Button, Empty, Modal, Skeleton, Space, Tabs } from 'antd';
 import { ListItem } from 'list-item';
 import { Icon } from 'icon';
 import { Avatar } from 'antd';
@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
 import { emptyStage } from 'directed-graph';
 import NotFound404 from '@pages/NotFound404';
+import { TemplateCard } from '@components/Card/TemplateCard';
 
 // TODO: this file is placed in wrong folder!
 
@@ -36,6 +37,7 @@ interface DataItem {
 
 const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
   const { user } = useSelector((state: any) => state.orginfo);
   const location = useLocation();
   const navigate = useNavigate();
@@ -54,14 +56,25 @@ const BluePrint = () => {
     by: 'Last modified',
     type: 'des',
   });
+  const [sortTemplateOptions, setSortTemplateOptions] = useState<SortProps>({
+    by: 'Last modified',
+    type: 'des',
+  });
 
   const filterWorkflowByOptions = useFilteredData(
     workflows || [],
     sortWorkflowOptions
   );
+  const filterTemplateByOptions = useFilteredData(
+    templates || [],
+    sortTemplateOptions
+  );
 
   const handleSortWorkflowDetail = (options: SortProps) => {
     setSortWorkflowOption(options);
+  };
+  const handleSortTemplate = (options: SortProps) => {
+    setSortTemplateOptions(options);
   };
 
   useEffect(() => {
@@ -71,6 +84,7 @@ const BluePrint = () => {
         org_title: data.title,
       }));
       setWorkflows(workflowsData);
+      setTemplates(data?.templates || []);
       setLoading(false);
     } else {
       queryOrgs({
@@ -180,35 +194,80 @@ const BluePrint = () => {
                 )}
               </div>
             </div>
-            <Button
-              type='primary'
-              icon={<PlusOutlined />}
-              onClick={() => handleNewWorkflow()}
-            >
-              New Workflow
-            </Button>
           </Space>
+
           <div>
             {loading ? (
               <Skeleton />
-            ) : filterWorkflowByOptions &&
-              filterWorkflowByOptions.length > 0 ? (
-              <ListItem
-                handleSort={handleSortWorkflowDetail}
-                items={
-                  filterWorkflowByOptions &&
-                  filterWorkflowByOptions?.map((workflow, index) => (
-                    <WorkflowCard
-                      key={workflow?.id + index}
-                      dataWorkflow={workflow}
-                    />
-                  ))
-                }
-                columns={{ sm: 2, md: 3, xl: 3, '2xl': 3 }}
-                title={L('workflows')}
-              />
             ) : (
-              <Empty />
+              <Tabs
+                items={[
+                  {
+                    key: '1',
+                    label: 'Workflows',
+                    children:
+                      filterWorkflowByOptions &&
+                      filterWorkflowByOptions.length > 0 ? (
+                        <ListItem
+                          handleSort={handleSortWorkflowDetail}
+                          items={
+                            filterWorkflowByOptions &&
+                            filterWorkflowByOptions?.map((workflow, index) => (
+                              <WorkflowCard
+                                key={workflow?.id + index}
+                                dataWorkflow={workflow}
+                              />
+                            ))
+                          }
+                          columns={{ sm: 2, md: 3, xl: 3, '2xl': 3 }}
+                          extra={
+                            <Button
+                              type='primary'
+                              icon={<PlusOutlined />}
+                              onClick={() => handleNewWorkflow()}
+                            >
+                              New Workflow
+                            </Button>
+                          }
+                        />
+                      ) : (
+                        <Empty />
+                      ),
+                  },
+                  {
+                    key: '2',
+                    label: 'Templates',
+                    children:
+                      filterTemplateByOptions &&
+                      filterTemplateByOptions.length > 0 ? (
+                        <ListItem
+                          handleSort={handleSortTemplate}
+                          items={
+                            filterTemplateByOptions &&
+                            filterTemplateByOptions?.map((template, index) => (
+                              <TemplateCard
+                                template={template}
+                                navigate={navigate}
+                              />
+                            ))
+                          }
+                          columns={{ sm: 2, md: 3, xl: 3, '2xl': 3 }}
+                          extra={
+                            <Button
+                              type='primary'
+                              icon={<PlusOutlined />}
+                              disabled
+                            >
+                              New Template
+                            </Button>
+                          }
+                        />
+                      ) : (
+                        <Empty />
+                      ),
+                  },
+                ]}
+              />
             )}
           </div>
         </>

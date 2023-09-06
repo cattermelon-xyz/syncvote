@@ -25,6 +25,7 @@ import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 import { MySpace, OrganizationExplore, SharedSpace } from '@pages/Organization';
 import { min } from 'moment';
 import WebLayout from '@layout/WebLayout';
+import TemplateDetail from '@pages/Template/Detail';
 const env = import.meta.env.VITE_ENV;
 
 const AppRoutes = () => {
@@ -94,6 +95,12 @@ const AppRoutes = () => {
           {EditorRoutes}
           {OrgRoutes}
           {AccountRoutes}
+          <Route path='/' element={<App layout={WebLayoutWithoutSider} />}>
+            <Route
+              path='template/:templateIdString'
+              element={<TemplateDetail />}
+            />
+          </Route>
           {env === 'production' && session !== null ? (
             <Route path='/' element={<App layout={WebLayout} />}>
               <Route index element={<MySpace />} />

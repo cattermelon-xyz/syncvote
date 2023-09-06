@@ -170,11 +170,11 @@ export interface IGraph {
   onResetPosition?: () => void;
   onAddNewNode?: () => void;
   onViewPortChange?: (viewport: any) => void;
-  onChange: (data: ICheckPoint) => void;
-  onDeleteNode: (ckpId: string) => void;
-  onConfigPanelClose: () => void;
-  onConfigEdgePanelClose: () => void;
-  onChangeLayout: (data: IWorkflowVersionLayout) => void;
+  onChange?: (data: ICheckPoint) => void;
+  onDeleteNode?: (ckpId: string) => void;
+  onConfigPanelClose?: () => void;
+  onConfigEdgePanelClose?: () => void;
+  onChangeLayout?: (data: IWorkflowVersionLayout) => void;
 }
 
 export interface IConfigPanel {
