@@ -18,6 +18,7 @@ import { Banner } from 'banner';
 import { Icon } from 'icon';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from 'utils';
+import { TemplateCard } from '@components/Card/TemplateCard';
 const env = import.meta.env.ENV_VITE;
 
 interface SortProps {
@@ -107,8 +108,6 @@ const Home: React.FC = () => {
     fetchAdminWorkflows();
   }, [orgs]);
   const navigate = useNavigate();
-
-  const { presetIcons, presetBanners } = useSelector((state: any) => state.ui);
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
       <ModalEditTemplate
@@ -133,8 +132,6 @@ const Home: React.FC = () => {
             });
           }
         }}
-        presetIcons={presetIcons}
-        presetBanners={presetBanners}
         options={{
           workflows: adminWorkflows
             .filter((w) => w.published_version_id !== undefined)
@@ -165,46 +162,7 @@ const Home: React.FC = () => {
               items={
                 filterTemplateByOptions &&
                 filterTemplateByOptions?.map((template, index) => (
-                  <Card
-                    hoverable={true}
-                    style={{ position: 'relative' }}
-                    className='w-[256px] h-[176px] relative rounded-xl'
-                    onClick={() => {
-                      navigate(
-                        '/template/' +
-                          createIdString(template.title, template.id)
-                      );
-                    }}
-                  >
-                    {
-                      <Banner
-                        presetBanners={presetBanners}
-                        bannerUrl={template.banner_url}
-                        className='w-full h-[86px] rounded-lg m-0'
-                      />
-                    }
-                    {template.icon_url ? (
-                      <Icon
-                        iconUrl={template.icon_url}
-                        size='medium'
-                        presetIcon={[]}
-                      />
-                    ) : (
-                      <Avatar
-                        shape='circle'
-                        style={{
-                          backgroundColor: '#D3D3D3',
-                          position: 'absolute',
-                          top: '78px',
-                          left: '24px',
-                          zIndex: 10,
-                        }}
-                      />
-                    )}
-                    <p className='text-xs text-[#252422] mt-[18px] mb-2 truncate'>
-                      {template.title}
-                    </p>
-                  </Card>
+                  <TemplateCard template={template} navigate={navigate} />
                 ))
               }
               columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}

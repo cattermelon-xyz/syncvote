@@ -2,6 +2,7 @@ import { Modal, Space, Select, Input } from 'antd';
 import { Banner } from 'banner';
 import Icon from 'icon/src/Icon';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { TextEditor } from 'rich-text-editor';
 import { getImageUrl } from 'utils';
 
@@ -27,8 +28,6 @@ type ModalEditTemplateProps = {
     workflows?: WorkflowSelectOption[];
     orgs?: OrgSelectOption[];
   };
-  presetIcons: any;
-  presetBanners?: any;
 };
 
 // templateId === -1 => create new template
@@ -42,8 +41,6 @@ const ModalEditTemplate = ({
     workflows: [],
     orgs: [],
   },
-  presetIcons,
-  presetBanners,
 }: ModalEditTemplateProps) => {
   const [title, setTitle] = useState(template.title || '');
   const [desc, setDesc] = useState(template.desc || '');
@@ -52,6 +49,7 @@ const ModalEditTemplate = ({
   const [orgId, setOrgId] = useState<number | null>(null);
   const [workflowId, setWorkflowId] = useState<number | null>(null);
   const [workflowVersionId, setWorkflowVersionId] = useState(-1);
+  const { presetIcons, presetBanners } = useSelector((state: any) => state.ui);
   const modalTitle =
     templateId === -1
       ? 'Publish a workflow template'
