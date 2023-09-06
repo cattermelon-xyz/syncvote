@@ -24,25 +24,13 @@ interface DataItem {
 }
 
 const MySpace: React.FC = () => {
-
-  const { data: orgs } = useGetDataHook({
+  const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
-  });
-  const now = new Date().getTime();
+  }).data;
 
-  const { data: user } = useGetDataHook({
+  const user = useGetDataHook({
     configInfo: config.queryUserById,
-  });
-
-  useEffect(() => {
-    localStorage.setItem(
-      'orgsLocal',
-      JSON.stringify({
-        lasfetch: now,
-        orgs: orgs,
-      })
-    );
-  }, [orgs]);  
+  }).data;
 
   const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
   const [workflows, setWorkflows] = useState<DataItem[]>([]);

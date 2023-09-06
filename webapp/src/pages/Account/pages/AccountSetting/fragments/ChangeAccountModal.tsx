@@ -21,9 +21,9 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  const { data: user } = useGetDataHook({
+  const user = useGetDataHook({
     configInfo: config.queryUserById,
-  });
+  }).data;
 
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [content, setContent] = useState('');

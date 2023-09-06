@@ -17,14 +17,13 @@ interface SortProps {
 }
 
 const SharedSpace: React.FC = () => {
-  
-  const { data: orgs } = useGetDataHook({
+  const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
-  });
+  }).data;
 
-  const { data: user } = useGetDataHook({
+  const user = useGetDataHook({
     configInfo: config.queryUserById,
-  });
+  }).data;
 
   const [memberOrgs, setMemberOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
