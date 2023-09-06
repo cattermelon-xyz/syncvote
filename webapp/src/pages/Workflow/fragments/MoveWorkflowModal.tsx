@@ -22,12 +22,11 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
   const { presetIcons } = useSelector((state: any) => state.ui);
   let dataOrgs: any;
   let org_owner: any;
-  
-  const { data: orgs } = useGetDataHook({
-    cacheOption: true,
+
+  const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
     start: open,
-  });
+  }).data;
 
   if (orgs) {
     dataOrgs = orgs.filter((org: any) => org.id !== workflow.owner_org_id);

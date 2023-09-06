@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useMemo, useState } from 'react';
+import { checkShouldCache } from '@utils/helpers';
 
 export interface ConfigInfo {
   dalFunction: any;
@@ -16,38 +17,42 @@ interface useGetDataHookProps<T> {
 export function useGetDataHook<T>({
   params,
   configInfo,
-  cacheOption,
+  cacheOption = true,
   start,
 }: useGetDataHookProps<T>) {
   const reduxVar = useSelector(
     (state: any) => state[configInfo.reduxObjectPath!]
   );
 
-  const clonedParams: T | undefined = structuredClone(params);
+  const { lastFetch } = reduxVar;
+
   const dispatch = useDispatch();
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<any>(null);
-  const now = new Date().getTime();
+
+  const shouldCache = checkShouldCache({
+    cacheOption: cacheOption,
+    lastFetch: lastFetch,
+  });
 
   useEffect(() => {
     if (start !== false) {
       if (typeof configInfo.dalFunction === 'function') {
         configInfo.dalFunction({
-          params: clonedParams,
-          cacheOption,
+          params: params,
           dispatch,
-          now,
+          shouldCache,
           onSuccess: (data: any) => {
             setData(data);
           },
           onError: (error: any) => {
             setError(error);
           },
-          reduxVar,
+          reduxVar: structuredClone(reduxVar),
         });
       }
     }
-  }, [start]);
+  }, [start, reduxVar]);
 
   return { data, error };
 }

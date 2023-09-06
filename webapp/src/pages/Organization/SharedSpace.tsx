@@ -17,16 +17,13 @@ interface SortProps {
 }
 
 const SharedSpace: React.FC = () => {
-  
-  const { data: orgs } = useGetDataHook({
-    cacheOption: true,
+  const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
-  });
+  }).data;
 
-  const { data: user } = useGetDataHook({
-    cacheOption: true,
+  const user = useGetDataHook({
     configInfo: config.queryUserById,
-  });
+  }).data;
 
   const [memberOrgs, setMemberOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
@@ -91,7 +88,7 @@ const SharedSpace: React.FC = () => {
           <ListItem
             handleSort={handleSortSpaceDetail}
             items={
-              filterSpaceByOptions &&
+              filterSpaceByOptions! &&
               filterSpaceByOptions.map((memberOrg, index) => (
                 <SpaceCard key={index} dataSpace={memberOrg} />
               ))
@@ -108,7 +105,7 @@ const SharedSpace: React.FC = () => {
           <ListItem
             handleSort={handleSortWorkflowDetail}
             items={
-              filterWorkflowByOptions &&
+              filterWorkflowByOptions! &&
               filterWorkflowByOptions.map((workflow, index) => (
                 <WorkflowCard key={index} dataWorkflow={workflow} />
               ))
