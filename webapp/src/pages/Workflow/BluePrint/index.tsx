@@ -39,10 +39,11 @@ const BluePrint = () => {
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
-
-  const presetIcons = useGetDataHook({
-    configInfo: config.queryPresetIcons,
-  }).data;
+  
+  let presetIcons;
+  // const presetIcons = useGetDataHook({
+  //   configInfo: config.queryPresetIcons,
+  // }).data;
 
   const navigate = useNavigate();
   const { orgIdString } = useParams();
@@ -84,7 +85,7 @@ const BluePrint = () => {
     } else {
     }
   }, [data]);
-  
+
   const [showEditOrg, setShowEditOrg] = useState(false);
   const handleNewWorkflow = async () => {
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);

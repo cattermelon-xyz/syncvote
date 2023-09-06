@@ -21,17 +21,15 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 }) => {
   const navigate = useNavigate();
   const [confirmLoading, setConfirmLoading] = useState(false);
+
   let presetIcons: any;
-  let orgs: any;
+  // const presetIcons = useGetDataHook({
+  //   configInfo: config.queryPresetIcons,
+  // }).data;
 
-  presetIcons = useGetDataHook({
-    configInfo: config.queryPresetIcons,
-    // start: open,
-  }).data;
-
-  orgs = useGetDataHook({
+  const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
-    // start: open,
+    start: open,
   }).data;
 
   const handleOk = async () => {

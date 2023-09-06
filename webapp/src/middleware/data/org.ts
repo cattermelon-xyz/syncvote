@@ -13,17 +13,15 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export class GetterOrgFunction {
   async queryOrgs({
     params,
-    cacheOption,
     dispatch,
-    now,
+    shouldCache,
     onSuccess,
     onError,
     reduxVar,
   }: {
     params?: any;
-    cacheOption?: boolean;
     dispatch: any;
-    now: number;
+    shouldCache: boolean;
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
     reduxVar: any;
@@ -41,13 +39,9 @@ export class GetterOrgFunction {
       }
     }
 
-    const { lastFetch, orgs } = reduxVar;
-    
-    if (
-      cacheOption &&
-      lastFetch !== -1 &&
-      now - lastFetch <= Number(import.meta.env.VITE_CACHED_TIME!)
-    ) {
+    const { orgs } = reduxVar;
+
+    if (shouldCache) {
       onSuccess(orgs);
     } else {
       dispatch(startLoading({}));

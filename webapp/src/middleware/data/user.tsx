@@ -8,17 +8,15 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export class GetterUserFunction {
   async queryUserById({
     params,
-    cacheOption,
     dispatch,
-    now,
+    shouldCache,
     onSuccess,
     onError,
     reduxVar,
   }: {
     params?: any;
-    cacheOption?: boolean;
     dispatch: any;
-    now: number;
+    shouldCache: boolean;
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
     reduxVar: any;
@@ -35,12 +33,8 @@ export class GetterUserFunction {
       }
     }
 
-    const { lastFetch, user } = reduxVar;
-    if (
-      cacheOption &&
-      lastFetch !== -1 &&
-      now - lastFetch <= Number(import.meta.env.VITE_CACHED_TIME!)
-    ) {
+    const { user } = reduxVar;
+    if (shouldCache) {
       onSuccess(user);
     } else {
       dispatch(startLoading({}));

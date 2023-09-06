@@ -10,28 +10,22 @@ export class GetterPresetFunction {
   [key: string]: any;
 
   async queryPresetIcons({
-    cacheOption,
     dispatch,
-    now,
+    shouldCache,
     onSuccess,
     onError,
     reduxVar,
   }: {
     params?: any;
-    cacheOption?: boolean;
     dispatch: any;
-    now: number;
+    shouldCache: boolean;
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
     reduxVar: any;
   }) {
-    const { lastFetch, presetIcons } = reduxVar;
+    const { presetIcons } = reduxVar;
 
-    if (
-      cacheOption &&
-      lastFetch !== -1 &&
-      now - lastFetch <= Number(import.meta.env.VITE_CACHED_TIME!)
-    ) {
+    if (shouldCache) {
       onSuccess(presetIcons);
     } else {
       dispatch(startLoading({}));
@@ -58,27 +52,21 @@ export class GetterPresetFunction {
   }
 
   async queryPresetBanner({
-    cacheOption,
     dispatch,
-    now,
+    shouldCache,
     onSuccess,
     onError,
     reduxVar,
   }: {
     params?: any;
-    cacheOption?: boolean;
     dispatch: any;
-    now: number;
+    shouldCache: boolean;
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
     reduxVar: any;
   }) {
-    const { lastFetch, presetBanners } = reduxVar;
-    if (
-      cacheOption &&
-      lastFetch !== -1 &&
-      now - lastFetch <= Number(import.meta.env.VITE_CACHED_TIME!)
-    ) {
+    const { presetBanners } = reduxVar;
+    if (shouldCache) {
       onSuccess(presetBanners);
     } else {
       dispatch(startLoading({}));

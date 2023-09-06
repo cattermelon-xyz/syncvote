@@ -24,9 +24,8 @@ export class GetterWorkflowFunction {
     onError,
   }: {
     params?: any;
-    cacheOption?: boolean;
     dispatch: any;
-    now: number;
+    shouldCache?: boolean;
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
     reduxVar: any;
@@ -54,14 +53,16 @@ export class GetterWorkflowFunction {
   changeAWorkflowOrg = async ({
     params,
     dispatch,
-    onSuccess,
-    onError,
+    onSuccess = () => {},
+    onError = () => {},
   }: {
     params?: any;
     dispatch: any;
-    onSuccess: (data: any) => void;
-    onError: (error: any) => void;
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
   }) => {
+    console.log('Move');
+
     const { orgId, workflow } = params;
     dispatch(startLoading({}));
     const orgIdFrom = workflow?.owner_org_id;
