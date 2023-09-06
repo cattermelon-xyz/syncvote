@@ -61,15 +61,12 @@ const Detail = () => {
   useEffect(() => {
     if (!template) {
       fetchTemplateData();
-      console.log('fetch template data from server');
     } else {
       if (template.current_version_id) {
         fetchVersionData({ current_version_id: template?.current_version_id });
-        console.log('fetch version data from server');
       }
     }
   }, []);
-  // console.log('versionData: ', versionData);
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
       <Space direction='vertical' size='large' className='w-full'>
