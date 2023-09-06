@@ -1,10 +1,11 @@
+import { newTemplate } from '@middleware/data/template';
+import { IOrgInfo } from '@types';
 import { Modal, Space, Select, Input } from 'antd';
 import { Banner } from 'banner';
 import Icon from 'icon/src/Icon';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { TextEditor } from 'rich-text-editor';
-import { getImageUrl } from 'utils';
 
 type OrgSelectOption = {
   value: number;
@@ -19,37 +20,33 @@ type WorkflowSelectOption = {
   published_version_id?: number;
 };
 type ModalEditTemplateProps = {
-  onSave: (toSaveData: any) => void;
+  onSaved?: (data: any) => void;
   open: boolean;
   onCancel: () => void;
   templateId?: number;
   template?: any;
-  options?: {
-    workflows?: WorkflowSelectOption[];
-    orgs?: OrgSelectOption[];
-  };
+  selectedOrgId?: number;
 };
 
 // templateId === -1 => create new template
 const ModalEditTemplate = ({
-  onSave,
+  onSaved = () => {},
   open = false,
   onCancel,
   templateId = -1,
   template = {},
-  options = {
-    workflows: [],
-    orgs: [],
-  },
+  selectedOrgId,
 }: ModalEditTemplateProps) => {
   const [title, setTitle] = useState(template.title || '');
   const [desc, setDesc] = useState(template.desc || '');
   const [iconUrl, setIconUrl] = useState(template.icon_url || '');
   const [bannerUrl, setBannerUrl] = useState(template.banner_url || '');
-  const [orgId, setOrgId] = useState<number | null>(null);
-  const [workflowId, setWorkflowId] = useState<number | null>(null);
+  const [orgId, setOrgId] = useState<number | undefined>(selectedOrgId);
+  const [workflowId, setWorkflowId] = useState<number | undefined>(undefined);
   const [workflowVersionId, setWorkflowVersionId] = useState(-1);
   const { presetIcons, presetBanners } = useSelector((state: any) => state.ui);
+  const { orgs } = useSelector((state: any) => state.orginfo);
+  const dispatch = useDispatch();
   const modalTitle =
     templateId === -1
       ? 'Publish a workflow template'
@@ -59,10 +56,59 @@ const ModalEditTemplate = ({
     setBannerUrl('');
     setTitle('');
     setDesc('');
-    setOrgId(null);
-    setWorkflowId(null);
+    setOrgId(selectedOrgId);
+    setWorkflowId(undefined);
   };
-
+  const [options, setOptions] = useState<{
+    workflows: WorkflowSelectOption[];
+    orgs: OrgSelectOption[];
+  }>({
+    workflows: [],
+    orgs: [],
+  });
+  const setupOptions = async () => {
+    if (orgs) {
+      let adminOrgsData = [];
+      adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
+      const workflows = adminOrgsData.flatMap((adminOrg: any) =>
+        adminOrg.workflows.map((workflow: any) => ({
+          ...workflow,
+          org_title: adminOrg.title,
+        }))
+      );
+      workflows.map((workflow: any) => {
+        const versions = workflow.versions || [];
+        for (var i = 0; i < versions.length; i++) {
+          if (
+            versions[i].status === 'PUBLISHED' ||
+            versions[i].status === 'PUBLIC_COMMUNITY'
+          ) {
+            workflow.published_version_id = versions[i].id;
+            break;
+          }
+        }
+      });
+      // Querry from org
+      setOptions({
+        workflows: workflows
+          .filter((w: any) => w.published_version_id !== undefined)
+          .map((w: any) => ({
+            value: w.id || -1,
+            label: w.title || '',
+            owner_org_id: w.owner_org_id || -1,
+            icon_url: w.icon_url || '',
+            banner_url: w.banner_url || '',
+            published_version_id: w.published_version_id || -1,
+          })),
+        orgs: orgs.map((o: IOrgInfo) => ({ value: o.id, label: o.title })),
+      });
+    } else {
+      // TODO: query orgs here!
+    }
+  };
+  useEffect(() => {
+    setupOptions();
+  }, [orgs]);
   return (
     <Modal
       title={modalTitle}
@@ -71,8 +117,8 @@ const ModalEditTemplate = ({
         onCancel();
         reset();
       }}
-      onOk={() => {
-        onSave({
+      onOk={async () => {
+        const toSaveData = {
           templateId,
           orgId,
           workflowId,
@@ -81,9 +127,25 @@ const ModalEditTemplate = ({
           iconUrl,
           bannerUrl,
           workflowVersionId,
+        };
+        onCancel();
+        const { data, error } = await newTemplate({
+          dispatch,
+          ...toSaveData,
         });
-        // reset();
-        // onCancel();
+        if (error) {
+          Modal.error({
+            title: 'Error',
+            content: error,
+          });
+        } else {
+          Modal.success({
+            title: 'Success',
+            content: 'Your template has been published!',
+          });
+          onSaved(data);
+        }
+        reset();
       }}
       okText={templateId === -1 ? 'Publish' : 'Save'}
     >
@@ -98,9 +160,10 @@ const ModalEditTemplate = ({
               className='w-full'
               onChange={(value: number) => {
                 setOrgId(value);
-                setWorkflowId(null);
+                setWorkflowId(undefined);
               }}
               value={orgId}
+              disabled={selectedOrgId !== undefined}
             />
           )}
         </Space>

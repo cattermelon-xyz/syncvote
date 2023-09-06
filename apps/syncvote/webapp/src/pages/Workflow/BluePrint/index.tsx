@@ -22,6 +22,7 @@ import EditOrg from '@pages/Organization/home/EditOrg';
 import { emptyStage } from 'directed-graph';
 import NotFound404 from '@pages/NotFound404';
 import { TemplateCard } from '@components/Card/TemplateCard';
+import ModalEditTemplate from '@fragments/ModalEditTemplate';
 
 // TODO: this file is placed in wrong folder!
 
@@ -98,7 +99,7 @@ const BluePrint = () => {
         },
       });
     }
-  }, [data]);
+  }, [orgs]);
   const [showEditOrg, setShowEditOrg] = useState(false);
   const handleNewWorkflow = async () => {
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
@@ -122,8 +123,18 @@ const BluePrint = () => {
       },
     });
   };
+  const [editingTemplateId, setEditingTemplateId] = useState(-1);
+  const [showModalEditTemplate, setShowModalEditTemplate] = useState(false);
   return (
     <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
+      <ModalEditTemplate
+        templateId={editingTemplateId}
+        open={showModalEditTemplate}
+        onCancel={() => {
+          setShowModalEditTemplate(false);
+        }}
+        selectedOrgId={extractIdFromIdString(orgIdString)}
+      />
       <EditOrg
         orgId={data?.id}
         isOpen={showEditOrg}
@@ -256,14 +267,25 @@ const BluePrint = () => {
                             <Button
                               type='primary'
                               icon={<PlusOutlined />}
-                              disabled
+                              onClick={() => setShowModalEditTemplate(true)}
                             >
                               New Template
                             </Button>
                           }
                         />
                       ) : (
-                        <Empty />
+                        <Space className='w-full' direction='vertical'>
+                          <div className='w-full flex flex-col items-end'>
+                            <Button
+                              type='primary'
+                              icon={<PlusOutlined />}
+                              onClick={() => setShowModalEditTemplate(true)}
+                            >
+                              New Template
+                            </Button>
+                          </div>
+                          <Empty />
+                        </Space>
                       ),
                   },
                 ]}
