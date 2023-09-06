@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import reactLogo from './assets/react.svg';
 import { Layout } from 'antd';
-import { emptyStage } from './DirectedGraphComponent/empty';
-import { DirectedGraph } from './DirectedGraphComponent/DirectedGraph';
-import { GraphViewMode } from './DirectedGraphComponent/interface';
-import { registerVoteMachine } from './DirectedGraphComponent/voteMachine';
+import { emptyStage } from './DirectedGraph/empty';
+import { DirectedGraph } from './DirectedGraph/DirectedGraph';
+import { GraphViewMode } from './DirectedGraph/interface';
+import { registerVoteMachine } from './DirectedGraph/voteMachine';
 import { SingleChoice } from 'single-vote';
 import { fakeVersion } from './mockData/fakeVersion';
 
