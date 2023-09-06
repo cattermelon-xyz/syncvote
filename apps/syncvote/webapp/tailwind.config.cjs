@@ -1,6 +1,18 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [],
+  content: [
+    './src/**/*.{js,jsx,ts,tsx,html}',
+    './index.html',
+    '../../../components/DirectedGraph/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../components/RichTextEditor/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../components/Banner/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../components/Icon/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../components/ListItem/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../votemachines/polling/weblib/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../votemachines/singlevote/weblib/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../votemachines/upvote/weblib/src/**/*.{js,jsx,ts,tsx,html}',
+    '../../../votemachines/veto/weblib/src/**/*.{js,jsx,ts,tsx,html}',
+  ],
   presets: [],
   darkMode: 'media', // or 'class'
   theme: {
@@ -1203,17 +1215,4 @@ module.exports = {
   corePlugins: {
     preflight: false,
   },
-  content: [
-    './src/**/*.{js,jsx,ts,tsx,html}',
-    './index.html',
-    '../../../components/DirectedGraph/src/**/*.{js,jsx,ts,tsx,html}',
-    '../../../components/RichTextEditor/src/**/*.{js,jsx,ts,tsx,html}',
-    '../../../components/Banner/src/**/*.{js,jsx,ts,tsx,html}',
-    '../../../components/Icon/src/**/*.{js,jsx,ts,tsx,html}',
-    '../../../components/ListItem/src/**/*.{js,jsx,ts,tsx,html}',
-    '../../../votemachines/polling/weblib/src/**/*.{js,jsx,ts,tsx,html}',
-    '../../../votemachines/singlevote/weblib/src/**/*.{js,jsx,ts,tsx,html}',
-    '../../../votemachines/upvote/weblib/src/**/*.{js,jsx,ts,tsx,html}',
-    '../../../votemachines/veto/weblib/src/**/*.{js,jsx,ts,tsx,html}',
-  ],
 };

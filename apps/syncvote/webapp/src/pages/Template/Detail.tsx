@@ -1,6 +1,7 @@
 import {
   CalendarOutlined,
   CopyOutlined,
+  EyeOutlined,
   FacebookOutlined,
   LinkOutlined,
   TwitterOutlined,
@@ -111,7 +112,14 @@ const Detail = () => {
             Duplicate this workflow
           </Button>
         </Space>
-        <div className='w-[800px] h-[400px] border border-gray-200 border-solid'>
+        <div className='w-[800px] h-[400px] border border-gray-200 border-solid relative'>
+          <Button
+            icon={<EyeOutlined />}
+            type='link'
+            className='absolute bottom-2 right-2 z-50'
+          >
+            View details
+          </Button>
           <DirectedGraph data={versionData} />
         </div>
         <Space
