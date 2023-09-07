@@ -1,4 +1,4 @@
-import { newTemplate } from '@middleware/data/template';
+import { upsertTemplate } from '@middleware/data/template';
 import { IOrgInfo } from '@types';
 import { Modal, Space, Select, Input } from 'antd';
 import { Banner } from 'banner';
@@ -50,14 +50,16 @@ const ModalEditTemplate = ({
   const modalTitle =
     templateId === -1
       ? 'Publish a workflow template'
-      : `Edit ${template.title} template`;
+      : `Edit "${template.title}" template`;
   const reset = () => {
-    setIconUrl('');
-    setBannerUrl('');
-    setTitle('');
-    setDesc('');
-    setOrgId(selectedOrgId);
-    setWorkflowId(undefined);
+    if (templateId === -1) {
+      setIconUrl('');
+      setBannerUrl('');
+      setTitle('');
+      setDesc('');
+      setOrgId(selectedOrgId);
+      setWorkflowId(undefined);
+    }
   };
   const [options, setOptions] = useState<{
     workflows: WorkflowSelectOption[];
@@ -107,6 +109,12 @@ const ModalEditTemplate = ({
     }
   };
   useEffect(() => {
+    setTitle(template.title || '');
+    setIconUrl(template.icon_url || '');
+    setBannerUrl(template.banner_url || '');
+    setDesc(template.desc || '');
+  }, [template]);
+  useEffect(() => {
     setupOptions();
   }, [orgs]);
   return (
@@ -120,7 +128,7 @@ const ModalEditTemplate = ({
       onOk={async () => {
         const toSaveData = {
           templateId,
-          orgId,
+          orgId: orgId || template.owner_org_id,
           workflowId,
           title,
           desc,
@@ -129,19 +137,21 @@ const ModalEditTemplate = ({
           workflowVersionId,
         };
         onCancel();
-        const { data, error } = await newTemplate({
+        const { data, error } = await upsertTemplate({
           dispatch,
           ...toSaveData,
         });
         if (error) {
           Modal.error({
             title: 'Error',
-            content: error,
+            content: error.toString(),
           });
         } else {
           Modal.success({
             title: 'Success',
-            content: 'Your template has been published!',
+            content: templateId
+              ? 'Your template has been saved!'
+              : 'Your template has been published!',
           });
           onSaved(data);
         }
@@ -151,20 +161,22 @@ const ModalEditTemplate = ({
     >
       <Space direction='vertical' size='middle' className='w-full'>
         <Space direction='vertical' size='small' className='w-full'>
-          <div>Choose a workspace</div>
           {template.owner_org_id ? (
-            <Input value={template.org_title} disabled className='w-full' />
+            <></>
           ) : (
-            <Select
-              options={options.orgs}
-              className='w-full'
-              onChange={(value: number) => {
-                setOrgId(value);
-                setWorkflowId(undefined);
-              }}
-              value={orgId}
-              disabled={selectedOrgId !== undefined}
-            />
+            <>
+              <div>Choose a workspace</div>
+              <Select
+                options={options.orgs}
+                className='w-full'
+                onChange={(value: number) => {
+                  setOrgId(value);
+                  setWorkflowId(undefined);
+                }}
+                value={orgId}
+                disabled={selectedOrgId !== undefined}
+              />
+            </>
           )}
         </Space>
         {template.owner_org_id === undefined ? (
@@ -180,7 +192,6 @@ const ModalEditTemplate = ({
                 const w = options.workflows?.find(
                   (w: any) => w.value === value
                 );
-                console.log(w);
                 setWorkflowVersionId(w?.published_version_id || -1);
                 setIconUrl(w?.icon_url ? w.icon_url : '');
                 setBannerUrl(w?.banner_url ? w.banner_url : '');

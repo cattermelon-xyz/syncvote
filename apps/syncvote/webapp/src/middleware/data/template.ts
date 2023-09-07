@@ -1,103 +1,150 @@
-import { addTemplateToOrg } from '@redux/reducers/orginfo.reducer';
-import { addTemplate, setTemplate } from '@redux/reducers/template.reducer';
+import {
+  addTemplateToOrg,
+  changeTemplateInfo,
+  deleteTemplateFromOrg,
+} from '@redux/reducers/orginfo.reducer';
+import {
+  addTemplate,
+  changeTemplate,
+  setTemplates,
+  deleteTemplate as rmTemplateFromRedux,
+} from '@redux/reducers/template.reducer';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { supabase } from 'utils';
 
-export const newTemplate = async ({
+export const upsertTemplate = async ({
   dispatch,
   templateId,
   orgId,
-  workflowId,
   title,
   desc,
   iconUrl,
   bannerUrl,
+  status,
   workflowVersionId,
 }: {
   dispatch: any;
-  templateId: number | undefined;
-  orgId: number | undefined;
-  workflowId: number | undefined;
-  title: string;
-  desc: string;
-  iconUrl: string | undefined;
-  bannerUrl: string | undefined;
-  workflowVersionId: number | undefined;
+  templateId?: number;
+  orgId?: number;
+  title?: string;
+  desc?: string;
+  iconUrl?: string;
+  bannerUrl?: string;
+  status?: boolean;
+  workflowVersionId?: number;
 }) => {
   dispatch(startLoading({}));
   let errorMsg = '';
-  const { data, error } = await supabase
-    .from('template')
-    .insert({
+  if (templateId) {
+    const toUpdate: any = {};
+    title ? (toUpdate.title = title) : null;
+    desc ? (toUpdate.desc = desc) : null;
+    iconUrl ? (toUpdate.icon_url = iconUrl) : null;
+    bannerUrl ? (toUpdate.banner_url = bannerUrl) : null;
+    status !== undefined ? (toUpdate.status = status) : null;
+    const { data, error } = await supabase
+      .from('template')
+      .update(toUpdate)
+      .eq('id', templateId)
+      .select('*');
+    dispatch(finishLoading({}));
+    const toUpdateRedux = {
+      id: templateId,
       owner_org_id: orgId,
-      title,
-      desc,
-      icon_url: iconUrl,
-      banner_url: bannerUrl,
-    })
-    .select('id');
-  if (data) {
-    const templateId: number = data[0].id;
-    const { data: wversion, error: err } = await supabase
-      .from('workflow_version')
-      .select('data')
-      .eq('id', workflowVersionId);
-    if (!err) {
-      const { data: tversion, error: terror } = await supabase
-        .from('template_version')
-        .insert({
-          template_id: templateId,
-          data: wversion[0].data,
-        })
-        .select('id');
-      if (tversion) {
-        const { error: updateTemplateError } = await supabase
-          .from('template')
-          .update({ current_version_id: tversion[0].id })
-          .eq('id', templateId);
-        const newTemplate = {
-          id: templateId,
-          current_version_id: tversion[0].id,
-          title,
-          desc,
-          icon_url: iconUrl,
-          banner_url: bannerUrl,
-          owner_org_id: orgId,
-        };
-        if (updateTemplateError) {
-          errorMsg = 'Cannot update template current_version_id';
-        } else {
-          dispatch(finishLoading({}));
-          console.log('engage redux');
-          dispatch(addTemplate(newTemplate));
-          dispatch(addTemplateToOrg(newTemplate));
-          return {
-            data: newTemplate,
-            error: undefined,
+      ...toUpdate,
+    };
+    dispatch(changeTemplateInfo(toUpdateRedux));
+    dispatch(changeTemplate(toUpdateRedux));
+    return { data, error };
+  } else {
+    const { data, error } = await supabase
+      .from('template')
+      .insert({
+        owner_org_id: orgId,
+        title,
+        desc,
+        icon_url: iconUrl,
+        banner_url: bannerUrl,
+      })
+      .select('id');
+    if (data) {
+      const templateId: number = data[0].id;
+      const { data: wversion, error: err } = await supabase
+        .from('workflow_version')
+        .select('data')
+        .eq('id', workflowVersionId);
+      if (!err) {
+        const { data: tversion, error: terror } = await supabase
+          .from('template_version')
+          .insert({
+            template_id: templateId,
+            data: wversion[0].data,
+          })
+          .select('id');
+        if (tversion) {
+          const { error: updateTemplateError } = await supabase
+            .from('template')
+            .update({ current_version_id: tversion[0].id })
+            .eq('id', templateId);
+          const newTemplate = {
+            id: templateId,
+            current_version_id: tversion[0].id,
+            title,
+            desc,
+            icon_url: iconUrl,
+            banner_url: bannerUrl,
+            owner_org_id: orgId,
           };
+          if (updateTemplateError) {
+            errorMsg = 'Cannot update template current_version_id';
+          } else {
+            dispatch(finishLoading({}));
+            dispatch(addTemplate(newTemplate));
+            dispatch(addTemplateToOrg(newTemplate));
+            return {
+              data: newTemplate,
+              error: undefined,
+            };
+          }
+        } else if (terror) {
+          errorMsg =
+            'Cannot copy data from workflow_version to template_version';
         }
-      } else if (terror) {
-        errorMsg = 'Cannot copy data from workflow_version to template_version';
+      } else {
+        errorMsg = 'Cannot select data from workflow_version';
       }
     } else {
-      errorMsg = 'Cannot select data from workflow_version';
+      errorMsg = 'Cannot insert template';
     }
-  } else {
-    errorMsg = 'Cannot insert template';
+    dispatch(finishLoading({}));
+    return { data: undefined, error: errorMsg };
   }
-  dispatch(finishLoading({}));
-  return { data: undefined, error: errorMsg };
+  return { data: undefined, error: 'Cannot upsert template' };
 };
-
+export const deleteTemplate = async ({
+  dispatch,
+  templateId,
+  orgId,
+}: {
+  dispatch: any;
+  templateId: number;
+  orgId: number;
+}) => {
+  dispatch(startLoading({}));
+  await supabase.from('template').delete().eq('id', templateId);
+  const tmpl = { id: templateId, owner_org_id: orgId };
+  dispatch(deleteTemplateFromOrg(tmpl));
+  dispatch(rmTemplateFromRedux(tmpl));
+  dispatch(finishLoading({}));
+};
 export const queryTemplate = async ({ dispatch }: { dispatch: any }) => {
   dispatch(startLoading({}));
   const { data, error } = await supabase.from('template').select('*');
   if (!error) {
-    dispatch(setTemplate(data));
+    dispatch(setTemplates(data));
   }
   dispatch(finishLoading({}));
 };
-
 export const queryATemplate = async ({
   dispatch,
   templateId,
@@ -120,8 +167,7 @@ export const queryATemplate = async ({
     return { data: undefined, error };
   }
 };
-
-export const queryCurrentTempalateVersion = async ({
+export const queryCurrentTemplateVersion = async ({
   dispatch,
   current_version_id,
 }: {

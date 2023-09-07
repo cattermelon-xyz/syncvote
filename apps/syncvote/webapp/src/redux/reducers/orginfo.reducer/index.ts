@@ -84,59 +84,63 @@ const orgInfoSlice = createSlice({
         state.orgs[orgIndex].templates.push(template);
       }
     },
-    chageTemplateInfo: (state, action) => {
+    changeTemplateInfo: (state, action) => {
       const template = action.payload;
       const orgIndex = state.orgs.findIndex(
         (org: IOrgInfo) => org.id === template.owner_org_id
       );
-
       if (orgIndex !== -1) {
         const templateIndex = state.orgs[orgIndex].templates.findIndex(
           (wf: any) => wf.id === template.id
         );
-
         if (templateIndex !== -1) {
-          state.orgs[orgIndex].workflows[templateIndex] = {
+          state.orgs[orgIndex].templates[templateIndex] = {
+            ...state.orgs[orgIndex].templates[templateIndex],
             ...template,
           };
         }
       }
     },
+    deleteTemplateFromOrg: (state, action) => {
+      const template = action.payload;
+      const orgIndex = state.orgs.findIndex(
+        (org: any) => org.id === template.owner_org_id
+      );
+      if (orgIndex !== -1) {
+        const templateIndex = state.orgs[orgIndex].templates.findIndex(
+          (wf: any) => wf.id === template.id
+        );
+        state.orgs[orgIndex].templates.splice(templateIndex, 1);
+      }
+    },
     changeWorkflowOrg: (state, action) => {
       const { orgIdFrom, workflow } = action.payload;
-
       const orgIndexFrom = state.orgs.findIndex(
         (org: any) => org.id === orgIdFrom
       );
-
       const orgIndexTo = state.orgs.findIndex(
         (org: any) => org.id === workflow.owner_org_id
       );
-
       // Remove workflow from previous org
       if (orgIndexFrom !== -1) {
         state.orgs[orgIndexFrom].workflows = state.orgs[
           orgIndexFrom
         ].workflows.filter((wf: any) => wf.id !== workflow.id);
       }
-
       // Add workflow from next org
       if (orgIndexTo !== -1) {
         state.orgs[orgIndexTo].workflows.push(workflow);
       }
     },
-
     changeWorkflowInfo: (state, action) => {
       const { workflow } = action.payload;
       const orgIndex = state.orgs.findIndex(
         (org: IOrgInfo) => org.id === workflow.owner_org_id
       );
-
       if (orgIndex !== -1) {
         const worfklowIndex = state.orgs[orgIndex].workflows.findIndex(
           (wf: any) => wf.id === workflow.id
         );
-
         if (worfklowIndex !== -1) {
           state.orgs[orgIndex].workflows[worfklowIndex] = {
             ...workflow,
@@ -194,6 +198,7 @@ export const {
   addWorkflowToOrg,
   deleteOrgInfo,
   addTemplateToOrg,
-  chageTemplateInfo,
+  changeTemplateInfo,
+  deleteTemplateFromOrg,
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;

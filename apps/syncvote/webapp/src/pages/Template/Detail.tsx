@@ -6,9 +6,10 @@ import {
   LinkOutlined,
   TwitterOutlined,
 } from '@ant-design/icons';
+import parse from 'html-react-parser';
 import {
   queryATemplate,
-  queryCurrentTempalateVersion,
+  queryCurrentTemplateVersion,
 } from '@middleware/data/template';
 import { Button, Modal, Space, Tag } from 'antd';
 import { DirectedGraph, emptyStage } from 'directed-graph';
@@ -35,7 +36,7 @@ const Detail = () => {
   }: {
     current_version_id: number;
   }) => {
-    const { data, error } = (await queryCurrentTempalateVersion({
+    const { data, error } = (await queryCurrentTemplateVersion({
       dispatch,
       current_version_id,
     })) || { data: undefined, error: undefined };
@@ -123,13 +124,13 @@ const Detail = () => {
           direction='horizontal'
           className='w-full justify-between items-start'
         >
-          <div className='flex'>
-            <div className='font-bold'>Template description</div>
-            <div>{template?.desc}</div>
+          <div>
+            <div className='font-bold mb-2 text-md'>Template description</div>
+            <div>{parse(template?.desc || '')}</div>
           </div>
           <Space direction='vertical' className='full'>
             <Space direction='vertical'>
-              <div className='font-bold'>Tags</div>
+              <div className='font-bold text-md'>Tags</div>
               <div className='flex inline'>
                 <Tag>Governance</Tag>
                 <Tag>Decision-making</Tag>
@@ -137,7 +138,7 @@ const Detail = () => {
               </div>
             </Space>
             <Space direction='vertical'>
-              <div className='font-bold'>Share</div>
+              <div className='font-bold text-md'>Share</div>
               <Space direction='horizontal'>
                 <Button icon={<LinkOutlined />} shape='round' />
                 <Button icon={<TwitterOutlined />} shape='round' />

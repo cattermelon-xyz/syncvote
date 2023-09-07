@@ -9,20 +9,14 @@ import { Icon } from 'icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
-import {
-  insertWorkflowAndVersion,
-  queryOrgs,
-  queryWorkflow,
-  upsertAnOrg,
-} from '@middleware/data';
+import { insertWorkflowAndVersion, queryOrgs } from '@middleware/data';
 import { randomIcon } from '@utils/helpers';
 import { createIdString, extractIdFromIdString } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
 import { emptyStage } from 'directed-graph';
 import NotFound404 from '@pages/NotFound404';
-import { TemplateCard } from '@components/Card/TemplateCard';
-import ModalEditTemplate from '@fragments/ModalEditTemplate';
+import TemplateList from '@fragments/TemplateList';
 
 // TODO: this file is placed in wrong folder!
 
@@ -40,7 +34,6 @@ const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [templates, setTemplates] = useState<any[]>([]);
   const { user } = useSelector((state: any) => state.orginfo);
-  const location = useLocation();
   const navigate = useNavigate();
   const { presetIcons } = useSelector((state: any) => state.ui);
   const { orgIdString } = useParams();
@@ -57,35 +50,26 @@ const BluePrint = () => {
     by: 'Last modified',
     type: 'des',
   });
-  const [sortTemplateOptions, setSortTemplateOptions] = useState<SortProps>({
-    by: 'Last modified',
-    type: 'des',
-  });
-
   const filterWorkflowByOptions = useFilteredData(
     workflows || [],
     sortWorkflowOptions
-  );
-  const filterTemplateByOptions = useFilteredData(
-    templates || [],
-    sortTemplateOptions
   );
 
   const handleSortWorkflowDetail = (options: SortProps) => {
     setSortWorkflowOption(options);
   };
-  const handleSortTemplate = (options: SortProps) => {
-    setSortTemplateOptions(options);
-  };
 
   useEffect(() => {
     if (data) {
-      const workflowsData = data?.workflows?.map((workflow: any) => ({
+      const org = orgs.find(
+        (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
+      );
+      const workflowsData = org?.workflows?.map((workflow: any) => ({
         ...workflow,
-        org_title: data.title,
+        org_title: org.title,
       }));
       setWorkflows(workflowsData);
-      setTemplates(data?.templates || []);
+      setTemplates(org?.templates || []);
       setLoading(false);
     } else {
       queryOrgs({
@@ -123,18 +107,8 @@ const BluePrint = () => {
       },
     });
   };
-  const [editingTemplateId, setEditingTemplateId] = useState(-1);
-  const [showModalEditTemplate, setShowModalEditTemplate] = useState(false);
   return (
     <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
-      <ModalEditTemplate
-        templateId={editingTemplateId}
-        open={showModalEditTemplate}
-        onCancel={() => {
-          setShowModalEditTemplate(false);
-        }}
-        selectedOrgId={extractIdFromIdString(orgIdString)}
-      />
       <EditOrg
         orgId={data?.id}
         isOpen={showEditOrg}
@@ -248,45 +222,12 @@ const BluePrint = () => {
                   {
                     key: '2',
                     label: 'Templates',
-                    children:
-                      filterTemplateByOptions &&
-                      filterTemplateByOptions.length > 0 ? (
-                        <ListItem
-                          handleSort={handleSortTemplate}
-                          items={
-                            filterTemplateByOptions &&
-                            filterTemplateByOptions?.map((template, index) => (
-                              <TemplateCard
-                                template={template}
-                                navigate={navigate}
-                              />
-                            ))
-                          }
-                          columns={{ sm: 2, md: 3, xl: 3, '2xl': 3 }}
-                          extra={
-                            <Button
-                              type='primary'
-                              icon={<PlusOutlined />}
-                              onClick={() => setShowModalEditTemplate(true)}
-                            >
-                              New Template
-                            </Button>
-                          }
-                        />
-                      ) : (
-                        <Space className='w-full' direction='vertical'>
-                          <div className='w-full flex flex-col items-end'>
-                            <Button
-                              type='primary'
-                              icon={<PlusOutlined />}
-                              onClick={() => setShowModalEditTemplate(true)}
-                            >
-                              New Template
-                            </Button>
-                          </div>
-                          <Empty />
-                        </Space>
-                      ),
+                    children: (
+                      <TemplateList
+                        templates={templates}
+                        orgId={extractIdFromIdString(orgIdString)}
+                      />
+                    ),
                   },
                 ]}
               />
