@@ -15,13 +15,16 @@ import { Button, Modal, Space, Tag } from 'antd';
 import { DirectedGraph, emptyStage } from 'directed-graph';
 import Icon from 'icon/src/Icon';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { extractIdFromIdString } from 'utils';
+import ModalWorkflowFromTemplate from '@fragments/ModalWorkflowFromTemplate';
+import { AuthContext } from '@layout/context/AuthContext';
 
 const Detail = () => {
   const { templateIdString } = useParams();
+  const { isAuth } = useContext(AuthContext);
   const id = extractIdFromIdString(templateIdString);
   const { templates } = useSelector((state: any) => state.template) || [];
   const { orgs } = useSelector((state: any) => state.orginfo) || [];
@@ -68,8 +71,16 @@ const Detail = () => {
       }
     }
   }, []);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
+      <ModalWorkflowFromTemplate
+        template={template}
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+      />
       <Space direction='vertical' size='large' className='w-full'>
         <Space
           direction='horizontal'
@@ -106,7 +117,15 @@ const Detail = () => {
               </Space>
             </Space>
           </Space>
-          <Button icon={<CopyOutlined />} type='primary'>
+          <Button
+            icon={<CopyOutlined />}
+            type='primary'
+            onClick={() => setIsModalOpen(true)}
+            disabled={!isAuth}
+            title={
+              !isAuth ? 'You need to login to duplicate this workflow' : ''
+            }
+          >
             Duplicate this workflow
           </Button>
         </Space>
