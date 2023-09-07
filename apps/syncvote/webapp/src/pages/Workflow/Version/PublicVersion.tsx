@@ -1,10 +1,7 @@
 import {
-  CloseCircleFilled,
   CloseOutlined,
   FullscreenExitOutlined,
   FullscreenOutlined,
-  LeftOutlined,
-  LoadingOutlined,
 } from '@ant-design/icons';
 import { GrDocumentText } from 'react-icons/gr';
 import parse from 'html-react-parser';
@@ -37,9 +34,6 @@ import { supabase } from 'utils';
 import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
 import { getDataReactionCount } from '@middleware/data/reaction';
-import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
-import { HiMiniFire } from 'react-icons/hi2';
-import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import { GraphViewMode } from 'directed-graph';
 import { Banner } from 'banner';
 import { Icon } from 'icon';
@@ -48,7 +42,6 @@ import Google from '@assets/icons/svg-icons/Google';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
-import NotFound404 from '@pages/NotFound404';
 import './public-version.scss';
 
 export const PublicVersion = () => {

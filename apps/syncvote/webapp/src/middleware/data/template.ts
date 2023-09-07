@@ -35,7 +35,7 @@ export const upsertTemplate = async ({
 }) => {
   dispatch(startLoading({}));
   let errorMsg = '';
-  if (templateId) {
+  if (templateId !== -1) {
     const toUpdate: any = {};
     title ? (toUpdate.title = title) : null;
     desc ? (toUpdate.desc = desc) : null;

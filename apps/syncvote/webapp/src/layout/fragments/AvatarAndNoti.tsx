@@ -24,6 +24,7 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
   const [openPopover, setOpenPopover] = useState(false);
   const { presetIcons } = useSelector((state: any) => state.ui);
   const { isAuth } = useContext(AuthContext);
+  console.log(user?.avatar_url);
 
   const handleOpenChange = (newOpen: boolean) => {
     setOpenPopover(newOpen);
