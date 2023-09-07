@@ -95,6 +95,7 @@ const Icon = ({
   editable,
   children,
   presetIcon,
+  className = '',
 }: {
   iconUrl?: string;
   size?: 'small' | 'medium' | 'large' | 'xlarge';
@@ -102,6 +103,7 @@ const Icon = ({
   editable?: boolean;
   children?: React.ReactNode;
   presetIcon: any;
+  className?: string;
 }) => {
   const [uploading, setUploading] = useState(false);
   const filePath =
@@ -169,7 +171,10 @@ const Icon = ({
   return (
     <>
       {url ? (
-        <div className='relative block' style={{ width: getSize(size) }}>
+        <div
+          className={`relative block ${className}`}
+          style={{ width: getSize(size) }}
+        >
           <Avatar
             size={getSize(size)}
             src={
@@ -193,7 +198,7 @@ const Icon = ({
         </div>
       ) : (
         <div
-          className='relative block'
+          className={`relative block ${className}`}
           style={{ position: 'relative', width: getSize(size) }}
         >
           {children ? (

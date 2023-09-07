@@ -308,9 +308,11 @@ export const queryOrgs = async ({
       templates:template (
         id,
         title,
+        desc,
         owner_org_id,
         icon_url,
         banner_url,
+        status,
         current_version_id
       )
     )
