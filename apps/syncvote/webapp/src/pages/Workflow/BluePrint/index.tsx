@@ -64,7 +64,6 @@ const BluePrint = () => {
       const org = orgs.find(
         (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
       );
-      console.log('org.templates ', org.templates);
       const workflowsData = org?.workflows?.map((workflow: any) => ({
         ...workflow,
         org_title: org.title,

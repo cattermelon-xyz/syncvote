@@ -65,7 +65,9 @@ export const TemplateCard = ({
             >
               {title}
             </div>
-            {status === false ? <EyeInvisibleOutlined /> : null}
+            {status === false ? (
+              <EyeInvisibleOutlined className='ml-1' />
+            ) : null}
           </div>
           {canEdit ? (
             <Popover
