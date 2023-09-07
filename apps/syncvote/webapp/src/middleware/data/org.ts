@@ -313,6 +313,7 @@ export const queryOrgs = async ({
         icon_url,
         banner_url,
         status,
+        created_at,
         current_version_id
       )
     )

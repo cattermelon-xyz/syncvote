@@ -11,16 +11,17 @@ import {
   queryATemplate,
   queryCurrentTemplateVersion,
 } from '@middleware/data/template';
-import { Button, Modal, Space, Tag } from 'antd';
+import { Button, Modal, Skeleton, Space, Tag } from 'antd';
 import { DirectedGraph, emptyStage } from 'directed-graph';
 import Icon from 'icon/src/Icon';
 import moment from 'moment';
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { extractIdFromIdString } from 'utils';
 import ModalWorkflowFromTemplate from '@fragments/ModalWorkflowFromTemplate';
 import { AuthContext } from '@layout/context/AuthContext';
+import { version } from 'os';
 
 const Detail = () => {
   const { templateIdString } = useParams();
@@ -31,7 +32,7 @@ const Detail = () => {
   const [template, setTemplate] = useState<any>(
     templates.find((tmpl: any) => tmpl.id === id)
   );
-
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const [versionData, setVersionData] = useState(emptyStage);
   const fetchVersionData = async ({
@@ -39,6 +40,7 @@ const Detail = () => {
   }: {
     current_version_id: number;
   }) => {
+    setLoading(true);
     const { data, error } = (await queryCurrentTemplateVersion({
       dispatch,
       current_version_id,
@@ -46,6 +48,7 @@ const Detail = () => {
     if (data) {
       setVersionData(data.data);
     }
+    setLoading(false);
     // console.log('data from server: ', data);
   };
   const fetchTemplateData = async () => {
@@ -71,6 +74,7 @@ const Detail = () => {
       }
     }
   }, []);
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
@@ -134,10 +138,21 @@ const Detail = () => {
             icon={<EyeOutlined />}
             type='link'
             className='absolute bottom-2 right-2 z-50'
+            onClick={() => navigate('/template/detail/' + templateIdString)}
           >
             View details
           </Button>
-          <DirectedGraph data={versionData} />
+          <DirectedGraph
+            data={versionData}
+            selectedLayoutId={versionData?.cosmetic?.defaultLayout?.horizontal}
+            className={loading ? 'opacity-0' : ''}
+          />
+          <Skeleton
+            active
+            className={`absolute top-5 left-5 ${
+              loading ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
         </div>
         <Space
           direction='horizontal'

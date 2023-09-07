@@ -26,6 +26,8 @@ import { MySpace, OrganizationExplore, SharedSpace } from '@pages/Organization';
 import { min } from 'moment';
 import WebLayout from '@layout/WebLayout';
 import TemplateDetail from '@pages/Template/Detail';
+import { TemplateViewData } from '@pages/Template/ViewData';
+import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 const env = import.meta.env.VITE_ENV;
 
 const AppRoutes = () => {
@@ -99,6 +101,12 @@ const AppRoutes = () => {
             <Route
               path='template/:templateIdString'
               element={<TemplateDetail />}
+            />
+          </Route>
+          <Route path='/' element={<App layout={NoHeaderAppLayout} />}>
+            <Route
+              path='template/detail/:templateIdString'
+              element={<TemplateViewData />}
             />
           </Route>
           {env === 'production' && session !== null ? (

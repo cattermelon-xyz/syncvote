@@ -17,7 +17,14 @@ const templateSlice = createSlice({
       state.templates = action.payload;
     },
     addTemplate: (state, action) => {
-      state.templates.push(action.payload);
+      const idx = state.templates.findIndex(
+        (tmpl) => tmpl.id === action.payload.id
+      );
+      if (idx === -1) {
+        state.templates.push(action.payload);
+      } else {
+        state.templates[idx] = { ...state.templates[idx], ...action.payload };
+      }
     },
     changeTemplate: (state, action) => {
       const idx = state.templates.findIndex(

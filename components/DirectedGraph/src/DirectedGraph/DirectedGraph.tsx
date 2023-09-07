@@ -149,10 +149,10 @@ const Flow = () => {
         data,
         selectedNodeId,
         selectedLayoutId,
-        onChange: () => {},
-        onDelete: () => {},
-        onClose: () => {},
-        onChangeLayout: () => {},
+        onChange: onChange || (() => {}),
+        onDelete: onDeleteNode || (() => {}),
+        onClose: onConfigPanelClose || (() => {}),
+        onChangeLayout: onChangeLayout || (() => {}),
       })}
       <Drawer
         title='Layout Config'
@@ -311,7 +311,7 @@ export const DirectedGraph = (props: IGraph) => {
         // minWidth: '800px',
         backgroundColor: 'white',
       }}
-      className='h-full directed-graph'
+      className={`h-full directed-graph ${props.className || ''}`}
     >
       <GraphContext.Provider value={props}>
         <ReactFlowProvider>

@@ -154,7 +154,11 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
             <Button
               type='primary'
               icon={<PlusOutlined />}
-              onClick={() => setShowModalEditTemplate(true)}
+              onClick={() => {
+                setEditingTemplateId(-1);
+                setSelectedTemplate({});
+                setShowModalEditTemplate(true);
+              }}
               disabled={!canPublishTemplate}
             >
               New Template
