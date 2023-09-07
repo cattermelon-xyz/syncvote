@@ -229,7 +229,21 @@ export const queryWorkflow = async ({
     onError(error);
   }
 };
-
+export const queryWorkflowVersionData = async ({
+  dispatch,
+  versionId,
+}: {
+  dispatch: any;
+  versionId: number;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('workflow_version')
+    .select('data')
+    .eq('id', versionId);
+  dispatch(finishLoading({}));
+  return { data, error };
+};
 export const queryWorkflowVersion = async ({
   orgId,
   onLoad,
