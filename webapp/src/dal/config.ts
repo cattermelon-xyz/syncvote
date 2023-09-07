@@ -3,12 +3,12 @@ import {
   GetterUserFunction,
   GetterWorkflowFunction,
   GetterPresetFunction,
-} from '@middleware/data';
-import { ConfigInfo } from './dal';
+} from "@middleware/data";
+import { ConfigInfo } from "./dal";
 export interface ConfigTypes {
   updateUserProfile: {
-    userProfile: any
-  }
+    userProfile: any;
+  };
 
   getWorkflowByStatus: {
     status: string;
@@ -32,27 +32,27 @@ interface ConfigObject {
 export const config: ConfigObject = {
   queryPresetIcons: {
     dalFunction: getterPresetFunction.queryPresetIcons,
-    reduxObjectPath: 'ui',
+    reduxObjectPath: "ui",
   },
 
   queryPresetBanner: {
     dalFunction: getterPresetFunction.queryPresetBanner,
-    reduxObjectPath: 'ui',
+    reduxObjectPath: "ui",
   },
 
   queryUserById: {
     dalFunction: getterUserFunction.queryUserById,
-    reduxObjectPath: 'orginfo',
+    reduxObjectPath: "orginfo",
   },
 
   queryOrgs: {
     dalFunction: getterOrgFunction.queryOrgs,
-    reduxObjectPath: 'orginfo',
+    reduxObjectPath: "orginfo",
   },
 
   getWorkflowByStatus: {
     dalFunction: getterWorkflowFunction.getWorkflowByStatus,
-    reduxObjectPath: 'workflow',
+    reduxObjectPath: "workflow",
   },
 
   changeAWorkflowOrg: {
@@ -61,5 +61,25 @@ export const config: ConfigObject = {
 
   updateUserProfile: {
     dalFunction: getterUserFunction.updateUserProfile,
+  },
+
+  deleteOrg: {
+    dalFunction: getterOrgFunction.deleteOrg,
+  },
+
+  queryUserByEmail: {
+    dalFunction: getterUserFunction.queryUserByEmail,
+  },
+
+  inviteExistingMember: {
+    dalFunction: getterUserFunction.inviteExistingMember,
+  },
+
+  inviteUserByEmail: {
+    dalFunction: getterUserFunction.inviteUserByEmail,
+  },
+
+  removeMemberOfOrg: {
+    dalFunction: getterOrgFunction.removeMemberOfOrg,
   },
 };
