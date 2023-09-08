@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateUserProfile } from '@middleware/data';
+import { updateUserProfile } from '@dal/data';
 
 interface ChangeModalProps {
   open: boolean;

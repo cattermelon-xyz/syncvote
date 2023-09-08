@@ -4,7 +4,7 @@ import {
   setMissions as setReducerMissions,
   changeMission,
   setLastFetch,
-} from '@redux/reducers/mission.reducer';
+} from '@dal/redux/reducers/mission.reducer';
 import { supabase } from 'utils';
 import { IMission } from '@types';
 

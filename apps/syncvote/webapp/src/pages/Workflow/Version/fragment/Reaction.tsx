@@ -4,7 +4,7 @@ import {
   insertReaction,
   deleteReaction,
   getDataReactionByUser,
-} from '@middleware/data/reaction';
+} from '@dal/data/reaction';
 import {
   NotificationInstance,
   NotificationPlacement,

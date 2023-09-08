@@ -6,7 +6,7 @@ import { IOrgInfo, IProfile } from './interface';
 
 const initialState: {
   orgs: IOrgInfo[];
-  lastFetch: number;
+lastFetch: number;
   user: IProfile;
 } = {
   orgs: [],
@@ -200,5 +200,6 @@ export const {
   addTemplateToOrg,
   changeTemplateInfo,
   deleteTemplateFromOrg,
+
 } = orgInfoSlice.actions;
 export default orgInfoSlice.reducer;

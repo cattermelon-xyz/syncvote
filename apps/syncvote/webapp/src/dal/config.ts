@@ -1,0 +1,132 @@
+import {
+  OrgFunctionClass,
+  UserFunctionClass,
+  WorkflowFunctionClass,
+  PresetFunctionClass,
+} from '@dal/data';
+
+import { ConfigInfo } from 'utils';
+import { CommentFunctionClass } from './data/comment';
+import { TemplateFunctionClass } from './data/template';
+import { TagFunctionClass } from './data/tag';
+
+export interface ConfigTypes {
+  updateUserProfile: {
+    userProfile: any;
+  };
+
+  getWorkflowByStatus: {
+    status: string;
+  };
+
+  changeAWorkflowOrg: {
+    orgId: string;
+    workflow: any;
+  };
+}
+const commentFunction = new CommentFunctionClass();
+const presetFunction = new PresetFunctionClass();
+const userFunction = new UserFunctionClass();
+const orgFunction = new OrgFunctionClass();
+const workflowFunction = new WorkflowFunctionClass();
+const templateFunction = new TemplateFunctionClass();
+const tagFunction = new TagFunctionClass();
+
+interface ConfigObject {
+  [key: string]: ConfigInfo;
+}
+
+export const config: ConfigObject = {
+  
+  queryTag: {
+    dalFunction: tagFunction.queryTag,
+    reduxObjectPath: 'preset',
+  },
+
+  queryTemplate: {
+    dalFunction: templateFunction.queryTemplate,
+    reduxObjectPath: 'template',
+  },
+
+  addComment: {
+    dalFunction: commentFunction.addComment,
+  },
+
+  getDataComment: {
+    dalFunction: commentFunction.getDataComment,
+  },
+
+  getDataReply: {
+    dalFunction: commentFunction.getDataReply,
+  },
+
+  queryPresetIcons: {
+    dalFunction: presetFunction.queryPresetIcons,
+    reduxObjectPath: 'preset',
+  },
+
+  queryPresetBanners: {
+    dalFunction: presetFunction.queryPresetBanners,
+    reduxObjectPath: 'preset',
+  },
+
+  queryUserById: {
+    dalFunction: userFunction.queryUserById,
+    reduxObjectPath: 'orginfo',
+  },
+
+  queryOrgs: {
+    dalFunction: orgFunction.queryOrgs,
+    reduxObjectPath: 'orginfo',
+  },
+
+  getWorkflowByStatus: {
+    dalFunction: workflowFunction.getWorkflowByStatus,
+    reduxObjectPath: 'workflow',
+  },
+
+  changeAWorkflowOrg: {
+    dalFunction: workflowFunction.changeAWorkflowOrg,
+  },
+
+  updateUserProfile: {
+    dalFunction: userFunction.updateUserProfile,
+  },
+
+  deleteOrg: {
+    dalFunction: orgFunction.deleteOrg,
+  },
+
+  queryUserByEmail: {
+    dalFunction: userFunction.queryUserByEmail,
+  },
+
+  inviteExistingMember: {
+    dalFunction: userFunction.inviteExistingMember,
+  },
+
+  inviteUserByEmail: {
+    dalFunction: userFunction.inviteUserByEmail,
+  },
+
+  removeMemberOfOrg: {
+    dalFunction: orgFunction.removeMemberOfOrg,
+  },
+
+  upsertAnOrg: {
+    dalFunction: orgFunction.upsertAnOrg,
+  },
+
+  insertWorkflowAndVersion: {
+    dalFunction: workflowFunction.insertWorkflowAndVersion,
+  },
+
+  deleteAWorkflow: {
+    dalFunction: workflowFunction.deleteAWorkflow,
+  },
+
+  queryWorkflow: {
+    dalFunction: workflowFunction,
+    reduxObjectPath: 'workflow',
+  },
+};

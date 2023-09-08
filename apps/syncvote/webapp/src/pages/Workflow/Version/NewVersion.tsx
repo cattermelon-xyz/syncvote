@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { shouldUseCachedData } from '@utils/helpers';
 import { createIdString, extractIdFromIdString } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
+import { queryWorkflow, upsertWorkflowVersion } from '@dal/data';
 import { DirectedGraph, emptyStage } from 'directed-graph';
 import { SaveOutlined } from '@ant-design/icons';
 import { GraphViewMode } from 'directed-graph';

@@ -1,19 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import { Card, Button, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateUserProfile } from '@middleware/data';
+import { updateUserProfile } from '@dal/data';
 import { Modal } from 'antd';
 import ChangeModal from '@pages/Account/pages/AccountSetting/fragments/ChangeAccountModal';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 const AccountSetting = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.orginfo);
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data || [];
+  
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url);
   const [openModal, setOpenModal] = useState(false);
   const [isChangeName, setIsChangeName] = useState(false);
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data || [];
 
   useEffect(() => {
     setAvatarUrl(user?.avatar_url);

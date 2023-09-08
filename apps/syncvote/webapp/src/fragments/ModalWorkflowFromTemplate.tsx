@@ -2,7 +2,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import {
   insertWorkflowAndVersion,
   queryWorkflowVersionData,
-} from '@middleware/data';
+} from '@dal/data';
 import { L } from '@utils/locales/L';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { on } from 'events';

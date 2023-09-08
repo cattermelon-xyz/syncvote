@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import { L } from '@utils/locales/L';
 import { useDispatch, useSelector } from 'react-redux';
-import { upsertAnOrg } from '@middleware/data';
+import { upsertAnOrg } from '@dal/data';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 interface ModalChangeWorkSpaceProps {
   visible: boolean;
@@ -19,7 +21,11 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
   const dispatch = useDispatch();
   const [iconUrl, setIconUrl] = useState(dataSpace?.icon_url);
   const [title, setTitle] = useState(dataSpace?.title);
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data || [];
+  
   const handleCancel = () => {
     onClose();
   };

@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import languageReducer from '@redux/reducers/language.reducer';
 import uiReducer from '@redux/reducers/ui.reducer';
-import orginfoReducer from '@redux/reducers/orginfo.reducer';
-import workflowReducer from '@redux/reducers/workflow.reducer';
-import missionReducer from '@redux/reducers/mission.reducer';
-import integrationReducer from '@redux/reducers/integration.reducer';
-import templateReducer from '@redux/reducers/template.reducer';
+import orginfoReducer from '@dal/redux/reducers/orginfo.reducer';
+import workflowReducer from '@dal/redux/reducers/workflow.reducer';
+import missionReducer from '@dal/redux/reducers/mission.reducer';
+import integrationReducer from '@dal/redux/reducers/integration.reducer';
+import templateReducer from '@dal/redux/reducers/template.reducer';
+import presetReducer from '@dal/redux/reducers/preset.reducer';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     mission: missionReducer,
     integration: integrationReducer,
     template: templateReducer,
+    preset: presetReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

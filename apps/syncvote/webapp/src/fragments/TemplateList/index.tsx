@@ -7,7 +7,7 @@ import { Button, Empty, Space, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import ModalEditTemplate from '@fragments/ModalEditTemplate';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteTemplate, upsertTemplate } from '@middleware/data/template';
+import { deleteTemplate, upsertTemplate } from '@dal/data/template';
 
 // interface ITemplate {
 //   id?: number;

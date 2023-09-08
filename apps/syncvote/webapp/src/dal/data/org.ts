@@ -7,10 +7,304 @@ import {
   addUserToOrg,
   removeUserOfOrg,
   deleteOrgInfo,
-} from '@redux/reducers/orginfo.reducer';
+} from '@dal/redux/reducers/orginfo.reducer';
 import { off } from 'process';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export class OrgFunctionClass {
+  async queryOrgs({
+    params,
+    dispatch,
+    shouldCache,
+    onSuccess,
+    onError,
+    reduxDataReturn,
+  }: {
+    params?: any;
+    dispatch: any;
+    shouldCache: boolean;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+    reduxDataReturn: any;
+  }) {
+    let userId;
+
+    if (params) {
+      userId = params.userId;
+    } else {
+      const session = (await supabase.auth.getSession()).data.session;
+      if (session) {
+        userId = session.user.id;
+      } else {
+        onError('Session is null');
+      }
+    }
+
+    const { orgs } = reduxDataReturn;
+
+    if (shouldCache) {
+      onSuccess(orgs);
+    } else {
+      dispatch(startLoading({}));
+      // TODO: add email in table profile, use ref in profile to select user
+      // TODO: query list of user
+      const { data, error } = await supabase
+        .from('user_org')
+        .select(
+          `
+        role,
+        org (
+          id,
+          title,
+          desc,
+          icon_url,
+          banner_url,
+          preset_icon_url,
+          preset_banner_url,
+          org_size,
+          org_type,
+          last_updated,
+          user_org(
+            role,
+            profile (
+              id,
+              email,
+              full_name,
+              icon_url,
+              preset_icon_url,
+              confirm_email_at
+            )
+          ),
+          workflows:workflow (
+            id,
+            title,
+            owner_org_id,
+            icon_url,
+            banner_url,
+            preset_icon_url,
+            preset_banner_url,
+            versions: workflow_version(
+              id, 
+              data,
+              preview_image_url,
+              status,
+              created_at,
+              last_updated
+            )
+          )
+        )
+      `
+        )
+        .eq('user_id', userId);
+
+      if (!error) {
+        const tmp: any[] = [];
+        data.forEach((d: any) => {
+          const org: any = d?.org || {
+            id: '',
+            title: '',
+            desc: '',
+          };
+          const presetIcon = org?.preset_icon_url
+            ? `preset:${org.preset_icon_url}`
+            : org.preset_icon_url;
+          const presetBanner = org?.preset_banner_url
+            ? `preset:${org.preset_banner_url}`
+            : org.preset_banner_url;
+
+          const profiles =
+            org.user_org?.map((user: any) => {
+              const presetIconProfile = user.profile?.preset_icon_url
+                ? `preset:${user.profile.preset_icon_url}`
+                : user.profile.preset_icon_url;
+
+              return {
+                id: user.profile.id,
+                email: user.profile.email,
+                full_name: user.profile.full_name,
+                avatar_url: user.profile.icon_url
+                  ? user.profile.icon_url
+                  : presetIconProfile,
+                about_me: user.profile.about_me,
+                role: user.role,
+                confirm_email_at: user.profile.confirm_email_at,
+              };
+            }) || [];
+
+          profiles.sort((a: any, b: any) => {
+            if (a.role === 'ADMIN' && b.role !== 'ADMIN') {
+              return -1;
+            } else if (b.role === 'ADMIN' && a.role !== 'ADMIN') {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+
+          const workflows = org?.workflows?.map((workflow: any) => {
+            const workflowPresetIcon = workflow?.preset_icon_url
+              ? `preset:${workflow.preset_icon_url}`
+              : workflow.preset_icon_url;
+            const workflowPresetBanner = workflow?.preset_banner_url
+              ? `preset:${workflow.preset_banner_url}`
+              : workflow.preset_banner_url;
+
+            return {
+              ...workflow,
+              icon_url: workflow.icon_url
+                ? workflow.icon_url
+                : workflowPresetIcon,
+              banner_url: workflow.banner_url
+                ? workflow.banner_url
+                : workflowPresetBanner,
+            };
+          });
+
+          tmp.push({
+            id: org?.id,
+            role: d.role,
+            title: org?.title,
+            desc: org.desc,
+            icon_url: org.icon_url ? org.icon_url : presetIcon,
+            banner_url: org.banner_url ? org.banner_url : presetBanner,
+            org_size: org.org_size,
+            org_type: org.org_type,
+            profile: profiles,
+            last_updated: org.last_updated,
+            workflows: workflows || [],
+          });
+        });
+        dispatch(setOrgsInfo(tmp));
+        dispatch(setLastFetch({}));
+        onSuccess(tmp);
+      } else {
+        onError(error);
+      }
+      dispatch(finishLoading({}));
+    }
+  }
+
+  async deleteOrg({
+    params,
+    dispatch,
+    onSuccess,
+    onError = () => {},
+  }: {
+    params: { orgId: number };
+    dispatch: any;
+    onSuccess: () => void;
+    onError?: (data: any) => void;
+  }) {
+    const { orgId } = params;
+    const { error } = await supabase.from('org').delete().eq('id', orgId);
+    const { data, error: errorQuery } = await supabase
+      .from('org')
+      .select('id')
+      .eq('id', orgId);
+
+    if (error || data?.length != 0) {
+      onError(error);
+    } else {
+      dispatch(deleteOrgInfo({ id: orgId }));
+      onSuccess();
+    }
+  }
+
+  async removeMemberOfOrg({
+    params,
+    dispatch,
+    onSuccess,
+    onError = (e: any) => {
+      console.error(e);
+    },
+  }: {
+    params: { orgId: number; userId: string };
+    dispatch: any;
+    onSuccess: () => void;
+    onError?: (error: any) => void;
+  }) {
+    const { orgId, userId } = params;
+    const { error } = await supabase
+      .from('user_org')
+      .delete()
+      .eq('org_id', orgId)
+      .eq('user_id', userId);
+    if (error) {
+      onError(error);
+    } else {
+      dispatch(removeUserOfOrg({ orgId: orgId, userId: userId }));
+      onSuccess();
+    }
+  }
+
+  async upsertAnOrg({
+    params,
+    onSuccess,
+    onError = (error) => {
+      console.error(error); // eslint-disable-line
+    },
+    dispatch,
+  }: {
+    params: { org: any };
+    onSuccess: (data: any) => void;
+    onError?: (data: any) => void;
+    dispatch: any;
+  }) {
+    const { org } = params;
+    const newOrg = { ...org };
+    dispatch(startLoading({}));
+    const props = [
+      'id',
+      'title',
+      'desc',
+      'org_size',
+      'org_type',
+      'icon_url',
+      'banner_url',
+      'preset_icon_url',
+      'preset_banner_url',
+    ];
+
+    Object.keys(newOrg).forEach((key) => {
+      if (props.indexOf(key) === -1) {
+        delete newOrg[key];
+      }
+    });
+    if (newOrg.id < 0) {
+      // invalid id, probably a new mission
+      delete newOrg.id;
+    }
+    if (newOrg.icon_url?.indexOf('preset:') === 0) {
+      newOrg.preset_icon_url = newOrg.icon_url.replace('preset:', '');
+      newOrg.icon_url = '';
+    }
+    if (newOrg.banner_url?.indexOf('preset:') === 0) {
+      newOrg.preset_banner_url = newOrg.banner_url.replace('preset:', '');
+      newOrg.banner_url = '';
+    }
+    const { data, error } = await supabase.from('org').upsert(newOrg).select();
+    dispatch(finishLoading({}));
+    if (data) {
+      const newData = [...data];
+      data.forEach((d: any, index: number) => {
+        newData[index].icon_url = d.preset_icon_url
+          ? `preset:${d.preset_icon_url}`
+          : d.icon_url;
+        newData[index].banner_url = d.preset_banner_url
+          ? `preset:${d.preset_banner_url}`
+          : d.banner_url;
+        delete newData[index].preset_icon_url;
+        delete newData[index].preset_banner_url;
+      });
+      dispatch(changeOrgInfo(newData[0]));
+      dispatch(setLastFetch({}));
+      onSuccess(newData);
+    } else if (error) {
+      onError(error);
+    }
+  }
+}
 
 export const newOrg = async ({
   orgInfo,

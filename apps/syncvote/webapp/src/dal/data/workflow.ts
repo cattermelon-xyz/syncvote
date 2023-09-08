@@ -5,20 +5,291 @@ import {
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
-  // deleteWorkflow,
-  // deleteWorkflow,
   deleteWorkflowVersion,
-} from '@redux/reducers/workflow.reducer';
+} from '@dal/redux/reducers/workflow.reducer';
 import {
   changeWorkflowOrg,
   changeWorkflowInfo,
   deleteWorkflow,
   addWorkflowToOrg,
-} from '@redux/reducers/orginfo.reducer';
+} from '@dal/redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
 import { supabase, subtractArray } from 'utils';
-import { log } from 'console';
-import { version } from 'os';
+
+export class WorkflowFunctionClass {
+  async getWorkflowByStatus({
+    params,
+    dispatch,
+    onSuccess,
+    onError,
+  }: {
+    params?: any;
+    dispatch: any;
+    shouldCache?: boolean;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+    reduxDataReturn: any;
+  }) {
+    const { status } = params;
+
+    dispatch(startLoading({}));
+    const { data, error } = await supabase.from('workflow').select(`*,
+           versions: workflow_version(id, status),
+           infoOrg: org(title)
+           `);
+    if (error) {
+      onError(error);
+    } else {
+      if (data) {
+        const workflowData = data.filter(
+          (worfklow) => worfklow?.versions[0]?.status === status
+        );
+        onSuccess(workflowData);
+      }
+    }
+    dispatch(finishLoading({}));
+  }
+
+  changeAWorkflowOrg = async ({
+    params,
+    dispatch,
+    onSuccess = () => {},
+    onError = () => {},
+  }: {
+    params?: any;
+    dispatch: any;
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
+  }) => {
+    console.log('Move');
+
+    const { orgId, workflow } = params;
+    dispatch(startLoading({}));
+    const orgIdFrom = workflow?.owner_org_id;
+
+    const { data, error } = await supabase
+      .from('workflow')
+      .update({ owner_org_id: orgId })
+      .eq('id', workflow?.id).select(`id,
+            title,
+            owner_org_id,
+            icon_url,
+            banner_url,
+            preset_icon_url,
+            preset_banner_url,
+            versions: workflow_version(
+              id,
+              status,
+              created_at,
+              last_updated
+            )`);
+
+    if (data) {
+      dispatch(changeWorkflowOrg({ orgIdFrom: orgIdFrom, workflow: data[0] }));
+      onSuccess(data);
+    } else {
+      onError(error);
+    }
+    dispatch(finishLoading({}));
+  };
+
+  insertWorkflowAndVersion = async ({
+    params,
+    dispatch,
+    onError,
+    onSuccess,
+  }: {
+    params: any;
+    dispatch: any;
+    onError: (error: any) => void;
+    onSuccess: (data: any) => void;
+  }) => {
+    dispatch(startLoading({}));
+    const {
+      title,
+      desc,
+      owner_org_id: orgId,
+      emptyStage,
+      iconUrl,
+      authority: userId,
+    } = params;
+
+    let icon_url, preset_icon_url; // eslint-disable-line
+    if (iconUrl.startsWith('preset:')) {
+      preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
+    } else {
+      icon_url = iconUrl; // eslint-disable-line
+    }
+
+    const { data, error } = await supabase
+      .from('workflow')
+      .insert({
+        title,
+        desc,
+        icon_url,
+        preset_icon_url,
+        owner_org_id: orgId,
+        authority: userId,
+      })
+      .select();
+
+    if (data) {
+      const insertedId = data[0].id;
+      const toInsert = {
+        workflow_id: insertedId,
+        status: 'DRAFT',
+        data: emptyStage,
+      };
+      const { data: versions, error: err } = await supabase
+        .from('workflow_version')
+        .insert(toInsert)
+        .select();
+      dispatch(finishLoading({}));
+      dispatch(
+        changeWorkflow({
+          id: insertedId,
+          title,
+          desc,
+          icon_url: iconUrl,
+          banner_url: '',
+          owner_org_id: orgId,
+          workflow_version: !err ? versions : [],
+        })
+      );
+      dispatch(finishLoading({}));
+
+      if (!error && versions) {
+        const image_name = `${data[0].id}_${versions[0].id}`;
+
+        const { data: d, error: e } = await supabase
+          .from('workflow_version')
+          .update({
+            preview_image_url: `https://uafmqopjujmosmilsefw.supabase.co/storage/v1/object/public/preview_image/${image_name}.jpg`,
+          })
+          .eq('id', versions[0].id)
+          .select();
+
+        onSuccess({ versions, insertedId });
+        dispatch(
+          addWorkflowToOrg({
+            workflow: {
+              id: insertedId,
+              title,
+              desc,
+              icon_url: iconUrl,
+              banner_url: '',
+              owner_org_id: orgId,
+              workflow_version: versions,
+              versions: versions,
+            },
+          })
+        );
+      }
+    }
+    if (error) {
+      onError(error);
+    }
+  };
+
+  deleteAWorkflow = async ({
+    params,
+    dispatch,
+    onSuccess = () => {},
+    onError = (error: any) => {
+      console.log(error);
+    },
+  }: {
+    params: any;
+    dispatch: any;
+    onSuccess?: (data: any) => void;
+    onError?: (data: any) => void;
+  }) => {
+    const { workflow } = params;
+    const { data, error } = await supabase
+      .from('workflow')
+      .delete()
+      .eq('id', workflow.id)
+      .select('*');
+    dispatch(finishLoading({}));
+
+    if (!error) {
+      dispatch(deleteWorkflow({ workflow: workflow }));
+      onSuccess(data);
+    } else {
+      onError(error);
+    }
+  };
+
+  queryWorkflow = async ({
+    params,
+    dispatch,
+    onSuccess = () => {},
+    onError = (error) => {
+      console.error(error); // eslint-disable-line
+    },
+    shouldCache,
+    reduxDataReturn,
+  }: {
+    params?: any;
+    dispatch: any;
+    shouldCache: boolean;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+    reduxDataReturn: any;
+  }) => {
+    const { orgId } = params;
+    const { workflows } = reduxDataReturn;
+    dispatch(startLoading({}));
+    if (shouldCache) {
+      onSuccess(workflows);
+    } else {
+      const { data, error } = await supabase
+        .from('workflow')
+        .select('*, workflow_version ( * ), tag_workflow ( tag (*))')
+        .eq('owner_org_id', orgId)
+        .order('created_at', { ascending: false });
+      dispatch(finishLoading({}));
+      if (data) {
+        const wfList = Array.isArray(data) ? data : [data];
+        const newData: any[] = [];
+        wfList.forEach((d: any, index: number) => {
+          newData[index] = { ...structuredClone(d) };
+          const presetIcon =
+            d.preset_icon_url && d.preset_icon_url !== ''
+              ? `preset:${d.preset_icon_url}`
+              : d.icon_url;
+          const presetBanner =
+            d.preset_banner_url && d.preset_banner_url !== ''
+              ? `preset:${d.preset_banner_url}`
+              : d.bann_url;
+          newData[index].icon_url =
+            d.icon_url && d.icon_url !== '' ? d.icon_url : presetIcon;
+          newData[index].banner_url =
+            d.banner_url && d.banner_url !== '' ? d.banner_url : presetBanner;
+          delete newData[index].preset_icon_url;
+          delete newData[index].preset_banner_url;
+          newData[index].workflow_version =
+            [...newData[index].workflow_version] || [];
+          const tags: ITag[] = [];
+          newData[index].tag_workflow.map((itm: any) => {
+            tags.push({
+              value: itm.tag.id,
+              label: itm.tag.label,
+            });
+          });
+          delete newData[index].tag_workflow;
+          newData[index].tags = [...tags];
+        });
+        // TODO: is the data match the interface?
+        dispatch(setWorkflows(newData));
+        dispatch(setLastFetch({}));
+        onSuccess(newData);
+      } else if (error) {
+        onError(error);
+      }
+    }
+  };
+}
 
 export const insertWorkflowAndVersion = async ({
   dispatch,

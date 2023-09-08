@@ -1,10 +1,12 @@
-import { CiCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import {Icon} from 'icon';
-import { queryVersionHistory } from '@middleware/data';
+import {  ClockCircleOutlined } from '@ant-design/icons';
+import { Icon } from 'icon';
+import { queryVersionHistory } from '@dal/data';
 import { Divider, Modal, Space } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 type VersionHistoryDialogProps = {
   workflow: any;
@@ -16,7 +18,11 @@ const VersionHistoryDialog = (props: VersionHistoryDialogProps) => {
   const { workflow, visible, onCancel } = props;
   const [historicalVersions, setHistoricalVersions] = useState([]);
   const dispatch = useDispatch();
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data || [];
+  
   useEffect(() => {
     const versionId = workflow?.workflow_version[0]?.id;
     if (versionId) {

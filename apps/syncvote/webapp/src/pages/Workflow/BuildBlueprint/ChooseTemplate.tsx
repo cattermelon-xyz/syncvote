@@ -4,13 +4,14 @@ import Button from '@components/Button/Button';
 import { PlusOutlined } from '@ant-design/icons';
 import { Input, Modal, Space } from 'antd';
 import { Icon } from 'icon';
-import { supabase } from 'utils';
+import { supabase, useGetDataHook } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import { extractIdFromIdString } from 'utils';
 import { emptyStage } from 'directed-graph';
-import { insertWorkflowAndVersion } from '@middleware/data';
+import { insertWorkflowAndVersion } from '@dal/data';
 import { version } from 'os';
+import { config } from '@dal/config';
 
 const env = import.meta.env.VITE_ENV;
 
@@ -25,7 +26,11 @@ const ChooseTemplate = () => {
   const [desc, setDesc] = useState('');
   const [iconUrl, setIconUrl] = useState('');
   const handleNavigate = () => {};
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data || [];
+
   // TODO: use utils/data in here
   const handleSave = async () => {
     // Cannot test because dont have create workflow button

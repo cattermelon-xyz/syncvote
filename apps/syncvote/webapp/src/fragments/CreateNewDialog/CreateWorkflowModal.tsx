@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { useSelector, useDispatch } from 'react-redux';
-import { getDataOrgs } from '@middleware/data';
 import { PlusOutlined } from '@ant-design/icons';
-import {Icon} from 'icon';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from 'utils';
+import { createIdString, useGetDataHook } from 'utils';
+import { config } from '@dal/config';
+import { Icon } from 'icon';
 
 interface CreateWorkflowModalProps {
   open: boolean;
@@ -20,30 +19,19 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   setOpenCreateWorkspaceModal,
 }) => {
   const navigate = useNavigate();
-  const { user } = useSelector((state: any) => state.orginfo);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const dispatch = useDispatch();
-  const [offset, setOffset] = useState(0);
-  const limit = 5;
-  const [dataOrgs, setDataOrgs] = useState<any>([]);
-  const { presetIcons } = useSelector((state: any) => state.ui);
 
-  const loadWorkflowData = async (offset: any, limit: any) => {
-    if (user?.id !== null) {
-      await getDataOrgs({
-        userId: user?.id,
-        dispatch: dispatch,
-        onSuccess: (data: any) => {
-          setDataOrgs(data);
-        },
-      });
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data || [];
 
-      setOffset(offset);
-    }
-  };
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+    start: open,
+  }).data || [];
 
   const handleOk = async () => {
-    const org = dataOrgs.find((org: any) => org.id === value);
+    const org = orgs.find((org: any) => org.id === value);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
     navigate(`${orgIdString}/new-workflow/`);
   };
@@ -59,12 +47,6 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   const onChange = (e: RadioChangeEvent) => {
     setValue(e.target.value);
   };
-
-  const createNewWorkSpace = () => {};
-
-  useEffect(() => {
-    loadWorkflowData(offset, limit);
-  }, [user]);
 
   return (
     <Modal
@@ -86,42 +68,46 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 
       <Space className='h-60 overflow-scroll py-2 w-full' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {dataOrgs.map((org: any, index: any) => (
-            <div
-              className='flex h-12 items-center radio cursor-pointer select-none'
-              key={index}
-              style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
-              onMouseEnter={() => setHovered(index)}
-              onMouseLeave={() => setHovered(null)}
-              onClick={() => {
-                if (value) {
-                  if (value === org?.id) {
-                    setValue(null);
-                  } else {
-                    setValue(org?.id);
-                  }
-                } else {
-                  setValue(org?.id);
-                }
-              }}
-            >
-              {hovered === index || org.id === value ? (
-                <Space className='p-3'>
-                  <Radio value={org.id} className='w-6 h-6' />
-                  <div className='text-base'>{org?.title}</div>
-                </Space>
-              ) : (
-                <Space className='p-3'>
-                  <Icon
-                    presetIcon={presetIcons}
-                    iconUrl={org.icon_url ? org.icon_url : ''}
-                    size='medium'
-                  />
-                  <div className='ml-2 text-base'>{org?.title}</div>
-                </Space>
-              )}
+          {orgs && (
+            <div>
+              {orgs.map((org: any, index: any) => (
+                <div
+                  className='flex h-12 items-center radio cursor-pointer select-none'
+                  key={index}
+                  style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
+                  onMouseEnter={() => setHovered(index)}
+                  onMouseLeave={() => setHovered(null)}
+                  onClick={() => {
+                    if (value) {
+                      if (value === org?.id) {
+                        setValue(null);
+                      } else {
+                        setValue(org?.id);
+                      }
+                    } else {
+                      setValue(org?.id);
+                    }
+                  }}
+                >
+                  {hovered === index || org.id === value ? (
+                    <Space className='p-3'>
+                      <Radio value={org.id} className='w-6 h-6' />
+                      <div className='text-base'>{org?.title}</div>
+                    </Space>
+                  ) : (
+                    <Space className='p-3'>
+                      <Icon
+                        presetIcon={presetIcons}
+                        iconUrl={org.icon_url ? org.icon_url : ''}
+                        size='medium'
+                      />
+                      <div className='ml-2 text-base'>{org?.title}</div>
+                    </Space>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </Radio.Group>
       </Space>
 

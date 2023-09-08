@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Space, Button, Input, Alert, Dropdown } from 'antd';
-// import { queryOrgByIdForInvite } from '@middleware/data';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   queryUserByEmail,
   inviteExistingMember,
   inviteUserByEmail,
   removeMemberOfOrg,
-} from '@middleware/data';
-import {Icon} from 'icon';
+} from '@dal/data';
+import { Icon } from 'icon';
 import { IProfile } from '@types';
 import { LinkOutlined, DownOutlined } from '@ant-design/icons';
 import { unsecuredCopyToClipboard } from '@utils/helpers';
-import { createIdString } from 'utils';
+import { createIdString, useGetDataHook } from 'utils';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import type { MenuProps } from 'antd';
+import { config } from '@dal/config';
 
 interface ModalInviteOfSpaceCardProps {
   visible: boolean;
@@ -34,17 +34,17 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const { orgs, user } = useSelector((state: any) => state.orginfo);
   const org = orgs.find((tmp: any) => tmp.id === dataSpace.id);
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons =
+    useGetDataHook({
+      configInfo: config.queryPresetIcons,
+    }).data || [];
 
   useEffect(() => {
     if (visible) {
       setUsersInOrg(org.profile);
     }
   }, [dataSpace.id, visible, org]);
-
-  useEffect(() => {
-    console.log('usersInOrg', usersInOrg);
-  }, [usersInOrg]);
 
   const handleInvite = async () => {
     setIsLoading(true);

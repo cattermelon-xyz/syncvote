@@ -10,9 +10,10 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from 'utils';
+import { supabase, useGetDataHook } from 'utils';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { AuthContext } from '@layout/context/AuthContext';
+import { config } from '@dal/config';
 
 interface AvatarAndNotiProps {
   user?: any;
@@ -22,9 +23,12 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openPopover, setOpenPopover] = useState(false);
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data || [];
+
   const { isAuth } = useContext(AuthContext);
-  console.log(user?.avatar_url);
 
   const handleOpenChange = (newOpen: boolean) => {
     setOpenPopover(newOpen);

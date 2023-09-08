@@ -10,7 +10,7 @@ import parse from 'html-react-parser';
 import {
   queryATemplate,
   queryCurrentTemplateVersion,
-} from '@middleware/data/template';
+} from '@dal/data/template';
 import { Button, Modal, Skeleton, Space, Tag } from 'antd';
 import { DirectedGraph, emptyStage } from 'directed-graph';
 import Icon from 'icon/src/Icon';

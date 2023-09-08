@@ -1,61 +1,36 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Button, Input, Typography } from 'antd';
+import React from 'react';
+import { Typography } from 'antd';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
-import { ListItem } from 'list-item';
-import { Skeleton } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { useFilteredData } from '@utils/hooks/useFilteredData';
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { AuthContext } from '@layout/context/AuthContext';
-import ModalEditTemplate from '@/fragments/ModalEditTemplate';
-import { queryTemplate } from '@middleware/data/template';
-import { useNavigate } from 'react-router-dom';
 import TemplateList from '@fragments/TemplateList';
 import SearchWithTag from '@fragments/SearchWithTag';
-import { TagObject } from '@middleware/data/tag';
+import { TagObject } from '@dal/data/tag';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
-interface SortProps {
-  by: string;
-  type: 'asc' | 'des';
-}
 const Home: React.FC = () => {
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
-  const { isAuth } = useContext(AuthContext);
-  const { templates } = useSelector((state: any) => state.template);
+  const templates =
+    useGetDataHook({
+      configInfo: config.queryTemplate,
+    }).data || [];
 
-  const fetchTemplates = async () => {
-    setLoading(true);
-    await queryTemplate({ dispatch });
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
-  const navigate = useNavigate();
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
       <section className='w-full'>
         <Title level={2} className='text-center'>
           {L('exploreTopTierTemplates')}
         </Title>
-        <SearchWithTag
+        {/* <SearchWithTag
           tagTo={TagObject.TEMPLATE}
           onResult={(result: any) => {
             console.log(result);
           }}
-        />
-        {loading ? (
-          <Skeleton />
-        ) : (
-          <>
-            <TemplateList
-              templates={templates.filter((tmpl: any) => tmpl.status === true)}
-            />
-          </>
-        )}
+        /> */}
+        <>
+          <TemplateList
+            templates={templates.filter((tmpl: any) => tmpl.status === true)}
+          />
+        </>
       </section>
     </div>
   );

@@ -20,7 +20,7 @@ import { Icon } from 'icon';
 import {
   queryATemplate,
   queryCurrentTemplateVersion,
-} from '@middleware/data/template';
+} from '@dal/data/template';
 import Header from './Header';
 import moment from 'moment';
 

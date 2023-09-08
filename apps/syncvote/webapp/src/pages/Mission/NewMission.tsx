@@ -1,4 +1,4 @@
-import { queryWorkflow, upsertAMission } from '@middleware/data';
+import { queryWorkflow, upsertAMission } from '@dal/data';
 import { createIdString, extractIdFromIdString } from 'utils';
 import { shouldUseCachedData } from '@utils/helpers';
 import { Modal, Space, Button } from 'antd';

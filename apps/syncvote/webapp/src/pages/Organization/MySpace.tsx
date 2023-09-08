@@ -2,11 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Dropdown, MenuProps, Space, Typography } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector } from 'react-redux';
-import {
-  getWorkflowFromEditor,
-  queryOrgsAndWorkflowForHome,
-} from '@middleware/data';
-import { useDispatch } from 'react-redux';
 import SpaceCard from '@pages/Organization/fragments/SpaceCard';
 import { ListItem } from 'list-item';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
@@ -17,6 +12,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import CreateSpaceModal from '@/fragments/CreateNewDialog/CreateSpaceModal';
 import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 const env = import.meta.env.VITE_ENV;
 
 interface SortProps {
@@ -30,7 +27,21 @@ interface DataItem {
 }
 
 const MySpace: React.FC = () => {
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+  const orgs =
+    useGetDataHook({
+      configInfo: config.queryOrgs,
+    }).data || [];
+
+  const user =
+    useGetDataHook({
+      configInfo: config.queryUserById,
+    }).data || [];
+
+  const presetIcons =
+    useGetDataHook({
+      configInfo: config.queryPresetIcons,
+    }).data || [];
+
   const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
   const [workflows, setWorkflows] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(false);

@@ -13,8 +13,8 @@ import {
   LogoutOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
-import { createIdString, getImageUrl } from 'utils';
-import {Banner} from 'banner';
+import { createIdString, getImageUrl, useGetDataHook } from 'utils';
+import { Banner } from 'banner';
 import ChangeNameWorkflowModal from './ChangeNameWorkflowModal';
 import DeleteWorkflowModal from './DeleteWorkflowModal';
 import DuplicateWorkflowModal from './DuplicateWorkflowModal';
@@ -22,8 +22,9 @@ import MoveWorkflowModal from './MoveWorkflowModal';
 import MoveToWorkflowModal from './MoveToWorkflowModal';
 import { useDispatch, useSelector } from 'react-redux';
 import ShareModal from '../Version/fragment/ShareModal';
-import { upsertWorkflowVersion } from '@middleware/data';
+import { upsertWorkflowVersion } from '@dal/data';
 import PreviewWorkflowModal from './PreviewWorkflowModal';
+import { config } from '@dal/config';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
@@ -36,7 +37,11 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 }) => {
   const isMyWorkSpacePage = location.pathname === '/my-workspaces';
   const isSharedWorkSpacePage = location.pathname === '/shared-workspaces';
-  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
+
+  const presetBanners = useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  }).data || [];
+
   const dispatch = useDispatch();
   const [openModalChangeName, setOpenModalChangeName] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);

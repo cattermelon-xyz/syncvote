@@ -1,7 +1,7 @@
 import PlusIcon from '@assets/icons/svg-icons/PlusIcon';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import SortButton from '@components/SortButton/SortButton';
-import { createIdString, getImageUrl, supabase } from 'utils';
+import { createIdString, getImageUrl, supabase, useGetDataHook } from 'utils';
 import NewOrgFrm from './NewOrgFrm';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
@@ -9,8 +9,7 @@ import { L } from '@utils/locales/L';
 import { useNavigate } from 'react-router-dom';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
-import { SearchOutlined, SortAscendingOutlined } from '@ant-design/icons';
-import { Input, Tag, Space, Button, Popover } from 'antd';
+import { Input, Tag, Space } from 'antd';
 
 const { Search } = Input;
 const { CheckableTag } = Tag;
@@ -29,20 +28,9 @@ const listTag = [
 ];
 
 const ListHome = () => {
-  const [shouldShowForm, setShouldShowForm] = useState(false);
-  const { orgs } = useSelector((state: any) => state.orginfo);
-  const { presetBanners } = useSelector((state: any) => state.ui);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const dispatch = useDispatch();
-  const presetBanner = presetBanners[15]
-    ? getImageUrl({
-        filePath: presetBanners[15],
-        isPreset: true,
-        type: 'banner',
-      })
-    : null;
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDataWorkflow = async () => {
@@ -105,7 +93,7 @@ const ListHome = () => {
         </Space>
         <SortButton />
       </div>
-      <div className="grid 2xl:grid-cols-4 xl:grid-cols-3 gap-y-6 w-full justify-items-center">
+      <div className='grid 2xl:grid-cols-4 xl:grid-cols-3 gap-y-6 w-full justify-items-center'>
         {workflows &&
           workflows.map((workflow, index) => (
             <WorkflowCard

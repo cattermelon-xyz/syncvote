@@ -1,12 +1,13 @@
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { insertWorkflowAndVersion } from '@middleware/data';
+import { insertWorkflowAndVersion } from '@dal/data';
 import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from 'icon';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from 'utils';
+import { createIdString, useGetDataHook } from 'utils';
 import { useState } from 'react';
+import { config } from '@dal/config';
 
 interface DuplicateWorkflowModalProps {
   open: boolean;
@@ -22,7 +23,11 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { orgs, user } = useSelector((state: any) => state.orginfo);
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data || [];
+
   const handleCancel = () => {
     onClose();
   };

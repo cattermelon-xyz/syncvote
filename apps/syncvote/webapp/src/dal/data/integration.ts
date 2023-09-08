@@ -1,17 +1,18 @@
-import {
-  finishLoading, startLoading,
-} from '@redux/reducers/ui.reducer';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import {
   setWeb2Integrations,
   deleteWeb2Integration as deleteWeb2IntegrationReducer,
   setLastFetch,
-} from '@redux/reducers/integration.reducer';
+} from '@dal/redux/reducers/integration.reducer';
 import { supabase } from 'utils';
 
 export const queryWeb2Integration = async ({
-  orgId, onLoad, onError = (error) => {
+  orgId,
+  onLoad,
+  onError = (error) => {
     console.error(error); // eslint-disable-line
-  }, dispatch,
+  },
+  dispatch,
 }: {
   orgId: number;
   onLoad: (data: any) => void;
@@ -19,14 +20,22 @@ export const queryWeb2Integration = async ({
   dispatch: any;
 }) => {
   dispatch(startLoading({}));
-  const { data, error } = await supabase.from('web2_key').select('*').eq('org_id', orgId).order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from('web2_key')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false });
   dispatch(finishLoading({}));
   if (data) {
-    const newData:any[] = [];
+    const newData: any[] = [];
     data.forEach((d) => {
       const newd = structuredClone(d);
-      newd.icon_url = d.preset_icon_url ? `preset:${d.preset_icon_url}` : d.icon_url;
-      newd.banner_url = d.preset_banner_url ? `preset:${d.preset_banner_url}` : d.banner_url;
+      newd.icon_url = d.preset_icon_url
+        ? `preset:${d.preset_icon_url}`
+        : d.icon_url;
+      newd.banner_url = d.preset_banner_url
+        ? `preset:${d.preset_banner_url}`
+        : d.banner_url;
       delete newd.preset_icon_url;
       delete newd.preset_banner_url;
       newData.push(newd);
@@ -52,9 +61,12 @@ export const queryWeb2Integration = async ({
   }
 };
 export const deleteWeb2Integration = async ({
-  id, onLoad, onError = (error) => {
+  id,
+  onLoad,
+  onError = (error) => {
     console.error(error); // eslint-disable-line
-  }, dispatch,
+  },
+  dispatch,
 }: {
   id: string;
   onLoad: (data: any) => void;
