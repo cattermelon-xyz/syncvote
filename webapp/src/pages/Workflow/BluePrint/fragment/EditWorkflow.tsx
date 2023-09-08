@@ -2,6 +2,8 @@ import { SaveOutlined } from '@ant-design/icons';
 import Banner from '@components/Banner/Banner';
 import TextEditor from '@components/Editor/TextEditor';
 import Icon from '@components/Icon/Icon';
+import { config } from '@dal/config';
+import { useGetDataHook } from '@dal/dal';
 import { updateAWorkflowTag } from '@dal/data';
 import { newTag, queryTag } from '@dal/data/tag';
 import { ITag, IWorkflow } from '@types';
@@ -57,7 +59,11 @@ const EditWorkflow = ({
   const [desc, setDesc] = useState(workflowDesc);
   const [iconUrl, setIconUrl] = useState(workflowIcon);
   const [status, setStatus] = useState(workflow?.workflow_version[0]?.status);
-  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
+
+  const presetBanners = useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  }).data;
+  
   const tags: ITag[] = useSelector((state: any) => state.ui.tags) || [];
   const dispatch = useDispatch();
   const { presetIcons } = useSelector((state: any) => state.ui);

@@ -35,8 +35,8 @@ export const config: ConfigObject = {
     reduxObjectPath: 'preset',
   },
 
-  queryPresetBanner: {
-    dalFunction: presetFunction.queryPresetBanner,
+  queryPresetBanners: {
+    dalFunction: presetFunction.queryPresetBanners,
     reduxObjectPath: 'preset',
   },
 
@@ -89,5 +89,8 @@ export const config: ConfigObject = {
 
   insertWorkflowAndVersion: {
     dalFunction: workflowFunction.insertWorkflowAndVersion,
+  },
+  deleteAWorkflow: {
+    dalFunction: workflowFunction.deleteAWorkflow,
   },
 };

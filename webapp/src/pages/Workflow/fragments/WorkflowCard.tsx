@@ -24,6 +24,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import ShareModal from '../Version/fragment/ShareModal';
 import { upsertWorkflowVersion } from '@dal/data';
 import PreviewWorkflowModal from './PreviewWorkflowModal';
+import { useGetDataHook } from '@dal/dal';
+import { config } from '@dal/config';
 
 interface WorkflowCardProps {
   dataWorkflow: any;
@@ -36,7 +38,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 }) => {
   const isMyWorkSpacePage = location.pathname === '/my-workspaces';
   const isSharedWorkSpacePage = location.pathname === '/shared-workspaces';
-  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
   const dispatch = useDispatch();
   const [openModalChangeName, setOpenModalChangeName] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -48,6 +49,12 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   const [orgTo, setOrgTo] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const navigate = useNavigate();
+
+  const presetBanners = useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  }).data;
+
+  console.log(presetBanners);
 
   useEffect(() => {
     if (!isMyWorkSpacePage && !isSharedWorkSpacePage) {

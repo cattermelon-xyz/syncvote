@@ -2,6 +2,8 @@ import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
 import { deleteAWorkflow } from '@dal/data';
 import { useDispatch } from 'react-redux';
+import { useSetData } from '@dal/dal';
+import { config } from '@dal/config';
 
 interface DeleteWorkflowModalProps {
   open: boolean;
@@ -20,13 +22,13 @@ const DeleteWorkflowModal: React.FC<DeleteWorkflowModalProps> = ({
   };
 
   const handleOk = async () => {
-    await deleteAWorkflow({
-      workflow: { ...workflow },
+    
+    await useSetData({
+      params: { workflow },
       dispatch: dispatch,
-      onSuccess: (data: any) => {
-        console.log(data);
-      },
+      configInfo: config.deleteAWorkflow,
     });
+
     onClose();
   };
 
