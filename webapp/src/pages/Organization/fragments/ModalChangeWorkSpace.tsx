@@ -4,6 +4,8 @@ import Icon from '@components/Icon/Icon';
 import { L } from '@utils/locales/L';
 import { useDispatch, useSelector } from 'react-redux';
 import { upsertAnOrg } from '@dal/data';
+import { useGetDataHook, useSetData } from '@dal/dal';
+import { config } from '@dal/config';
 
 interface ModalChangeWorkSpaceProps {
   visible: boolean;
@@ -19,7 +21,11 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
   const dispatch = useDispatch();
   const [iconUrl, setIconUrl] = useState(dataSpace?.icon_url);
   const [title, setTitle] = useState(dataSpace?.title);
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+
   const handleCancel = () => {
     onClose();
   };
@@ -30,13 +36,16 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
   };
 
   const handleChangeSpaceInfo = async () => {
-    upsertAnOrg({
-      org: {
-        ...dataSpace,
-        icon_url: iconUrl,
-        title: title,
+    await useSetData({
+      params: {
+        org: {
+          ...dataSpace,
+          icon_url: iconUrl,
+          title: title,
+        },
       },
-      onLoad: (data) => {
+      configInfo: config.upsertAnOrg,
+      onSuccess: (data) => {
         Modal.success({
           title: 'Success',
           content: 'Change avatar successfully',
@@ -64,13 +73,15 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
       okText={L('save')}
       cancelButtonProps={{ style: { display: 'none' } }}
     >
-      <Icon
-        presetIcon={presetIcons}
-        size='xlarge'
-        editable
-        iconUrl={iconUrl}
-        onUpload={handleChangeIcon}
-      />
+      {presetIcons && (
+        <Icon
+          presetIcon={presetIcons}
+          size='xlarge'
+          editable
+          iconUrl={iconUrl}
+          onUpload={handleChangeIcon}
+        />
+      )}
       <div className='mt-4'>
         <Input
           value={title}

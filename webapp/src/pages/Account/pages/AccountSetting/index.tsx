@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateUserProfile } from '@dal/data';
 import { Modal } from 'antd';
 import ChangeModal from '@pages/Account/pages/AccountSetting/fragments/ChangeAccountModal';
+import { useGetDataHook, useSetData } from '@dal/dal';
+import { config } from '@dal/config';
 
 const AccountSetting = () => {
   const dispatch = useDispatch();
@@ -13,7 +15,9 @@ const AccountSetting = () => {
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url);
   const [openModal, setOpenModal] = useState(false);
   const [isChangeName, setIsChangeName] = useState(false);
-  const { presetIcons } = useSelector((state: any) => state.ui);
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   useEffect(() => {
     setAvatarUrl(user?.avatar_url);
@@ -63,12 +67,14 @@ const AccountSetting = () => {
     <>
       <div className='flex w-1/3 mt-12 gap-8 items-start'>
         <Space>
-          <Icon
-            presetIcon={presetIcons}
-            editable={true}
-            iconUrl={avatarUrl}
-            onUpload={handleChangeAvatar}
-          />
+          {presetIcons && (
+            <Icon
+              presetIcon={presetIcons}
+              editable={true}
+              iconUrl={avatarUrl}
+              onUpload={handleChangeAvatar}
+            />
+          )}
         </Space>
         <Card className='w-full'>
           <Space direction='vertical' size='large'>

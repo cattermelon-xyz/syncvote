@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Space, Button, Input, Alert, Dropdown } from "antd";
-// import { queryOrgByIdForInvite } from '@middleware/data';
 import { useDispatch, useSelector } from "react-redux";
-import {
-  queryUserByEmail,
-  inviteExistingMember,
-  inviteUserByEmail,
-  removeMemberOfOrg,
-} from "@dal/data";
 import Icon from "@components/Icon/Icon";
 import { IProfile, IOrgInfo } from "@types";
 import { LinkOutlined, DownOutlined } from "@ant-design/icons";

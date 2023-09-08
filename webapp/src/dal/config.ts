@@ -82,6 +82,10 @@ export const config: ConfigObject = {
   removeMemberOfOrg: {
     dalFunction: orgFunction.removeMemberOfOrg,
   },
+  
+  upsertAnOrg: {
+    dalFunction: orgFunction.upsertAnOrg,
+  },
 
   insertWorkflowAndVersion: {
     dalFunction: workflowFunction.insertWorkflowAndVersion,
