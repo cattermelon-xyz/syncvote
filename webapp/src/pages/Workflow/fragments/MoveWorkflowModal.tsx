@@ -84,7 +84,7 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
 
       <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {dataOrgs != null && (
+          {dataOrgs  && (
             <>
               {dataOrgs.map((org: any, index: any) => (
                 <div

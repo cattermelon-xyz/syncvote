@@ -12,7 +12,7 @@ import Veto from '@votemachines/Veto';
 import UpVote from '@votemachines/UpVote';
 import { AuthContext } from '@layout/context/AuthContext';
 import { useGetDataHook } from '@dal/dal';
-import { ConfigTypes, config } from '@dal/config';
+import { config } from '@dal/config';
 interface AppProps {
   requiredLogin?: boolean;
   layout: any;
@@ -37,9 +37,9 @@ const App: React.FC<AppProps> = ({ requiredLogin = false, layout }) => {
     registerVoteMachine(UpVote);
   }, []);
 
-  // useGetDataHook({
-  //   configInfo: config.queryPresetBanner,
-  // });
+  useGetDataHook({
+    configInfo: config.queryPresetBanner,
+  });
 
   useGetDataHook({
     configInfo: config.queryUserById,

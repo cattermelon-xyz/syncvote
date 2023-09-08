@@ -17,14 +17,6 @@ interface SortProps {
 const Home: React.FC = () => {
   let [workflows, setWorkflows] = React.useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [orgsLocal, setOrgsLocal] = useState<any>();
-
-  useEffect(() => {
-    const orgsLocal = JSON.parse(localStorage.getItem('orgsLocal')!);
-    if (orgsLocal) {
-      setOrgsLocal(orgsLocal);
-    }
-  }, []);
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
     by: '',

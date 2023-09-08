@@ -7,6 +7,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { createIdString } from '@utils/helpers';
 import { useState } from 'react';
+import { useGetDataHook, useSetData } from '@dal/dal';
+import { config } from '@dal/config';
 
 interface DuplicateWorkflowModalProps {
   open: boolean;
@@ -21,7 +23,15 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
   const { presetIcons } = useSelector((state: any) => state.ui);
   const handleCancel = () => {
     onClose();
@@ -38,15 +48,18 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
       iconUrl: workflow.icon_url,
       authority: user.id,
     };
-    insertWorkflowAndVersion({
-      dispatch: dispatch,
-      props: props,
+
+    await useSetData({
+      onSuccess: (data: any) => {
+        const { versions, insertedId } = data;
+        navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      },
       onError: (error) => {
         Modal.error({ content: error.message });
       },
-      onSuccess: (versions, insertedId) => {
-        navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
-      },
+      params: props,
+      configInfo: config.insertWorkflowAndVersion,
+      dispatch,
     });
     onClose();
   };
@@ -77,31 +90,35 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
 
       <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {orgs.map((org: any, index: any) => (
-            <div
-              className='flex h-12 items-center radio'
-              key={index}
-              style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
-              onMouseEnter={() => setHovered(index)}
-              onMouseLeave={() => setHovered(null)}
-            >
-              {hovered === index || org.id === value ? (
-                <Space className='p-3'>
-                  <Radio value={org.id} className='w-6 h-6' />
-                  <div className='text-base'>{org?.title}</div>
-                </Space>
-              ) : (
-                <Space className='p-3'>
-                  <Icon
-                    presetIcon={presetIcons}
-                    iconUrl={org.icon_url ? org.icon_url : ''}
-                    size='medium'
-                  />
-                  <div className='ml-2 text-base'>{org?.title}</div>
-                </Space>
-              )}
-            </div>
-          ))}
+          {orgs && (
+            <>
+              {orgs.map((org: any, index: any) => (
+                <div
+                  className='flex h-12 items-center radio'
+                  key={index}
+                  style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
+                  onMouseEnter={() => setHovered(index)}
+                  onMouseLeave={() => setHovered(null)}
+                >
+                  {hovered === index || org.id === value ? (
+                    <Space className='p-3'>
+                      <Radio value={org.id} className='w-6 h-6' />
+                      <div className='text-base'>{org?.title}</div>
+                    </Space>
+                  ) : (
+                    <Space className='p-3'>
+                      <Icon
+                        presetIcon={presetIcons}
+                        iconUrl={org.icon_url ? org.icon_url : ''}
+                        size='medium'
+                      />
+                      <div className='ml-2 text-base'>{org?.title}</div>
+                    </Space>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
         </Radio.Group>
       </Space>
 

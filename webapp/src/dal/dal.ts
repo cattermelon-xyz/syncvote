@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { checkShouldCache } from '@utils/helpers';
 
 export interface ConfigInfo {
@@ -20,11 +20,11 @@ export function useGetDataHook<T>({
   cacheOption = true,
   start,
 }: useGetDataHookProps<T>) {
-  const reduxVar = useSelector(
+  const reduxDataReturn = useSelector(
     (state: any) => state[configInfo.reduxObjectPath!]
   );
 
-  const { lastFetch } = reduxVar;
+  const { lastFetch } = reduxDataReturn;
 
   const dispatch = useDispatch();
   const [data, setData] = useState<any>(null);
@@ -48,11 +48,11 @@ export function useGetDataHook<T>({
           onError: (error: any) => {
             setError(error);
           },
-          reduxVar: structuredClone(reduxVar),
+          reduxVar: structuredClone(reduxDataReturn),
         });
       }
     }
-  }, [start, reduxVar]);
+  }, [start, reduxDataReturn]);
 
   return { data, error };
 }

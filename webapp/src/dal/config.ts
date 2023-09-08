@@ -1,10 +1,10 @@
 import {
-  GetterOrgFunction,
-  GetterUserFunction,
-  GetterWorkflowFunction,
-  GetterPresetFunction,
-} from "@middleware/data";
-import { ConfigInfo } from "./dal";
+  OrgFunctionClass,
+  UserFunctionClass,
+  WorkflowFunctionClass,
+  PresetFunctionClass,
+} from '@middleware/data';
+import { ConfigInfo } from './dal';
 export interface ConfigTypes {
   updateUserProfile: {
     userProfile: any;
@@ -20,10 +20,10 @@ export interface ConfigTypes {
   };
 }
 
-const getterPresetFunction = new GetterPresetFunction();
-const getterUserFunction = new GetterUserFunction();
-const getterOrgFunction = new GetterOrgFunction();
-const getterWorkflowFunction = new GetterWorkflowFunction();
+const presetFunction = new PresetFunctionClass();
+const userFunction = new UserFunctionClass();
+const orgFunction = new OrgFunctionClass();
+const workflowFunction = new WorkflowFunctionClass();
 
 interface ConfigObject {
   [key: string]: ConfigInfo;
@@ -31,55 +31,59 @@ interface ConfigObject {
 
 export const config: ConfigObject = {
   queryPresetIcons: {
-    dalFunction: getterPresetFunction.queryPresetIcons,
-    reduxObjectPath: "ui",
+    dalFunction: presetFunction.queryPresetIcons,
+    reduxObjectPath: 'preset',
   },
 
   queryPresetBanner: {
-    dalFunction: getterPresetFunction.queryPresetBanner,
-    reduxObjectPath: "ui",
+    dalFunction: presetFunction.queryPresetBanner,
+    reduxObjectPath: 'preset',
   },
 
   queryUserById: {
-    dalFunction: getterUserFunction.queryUserById,
-    reduxObjectPath: "orginfo",
+    dalFunction: userFunction.queryUserById,
+    reduxObjectPath: 'orginfo',
   },
 
   queryOrgs: {
-    dalFunction: getterOrgFunction.queryOrgs,
-    reduxObjectPath: "orginfo",
+    dalFunction: orgFunction.queryOrgs,
+    reduxObjectPath: 'orginfo',
   },
 
   getWorkflowByStatus: {
-    dalFunction: getterWorkflowFunction.getWorkflowByStatus,
-    reduxObjectPath: "workflow",
+    dalFunction: workflowFunction.getWorkflowByStatus,
+    reduxObjectPath: 'workflow',
   },
 
   changeAWorkflowOrg: {
-    dalFunction: getterWorkflowFunction.changeAWorkflowOrg,
+    dalFunction: workflowFunction.changeAWorkflowOrg,
   },
 
   updateUserProfile: {
-    dalFunction: getterUserFunction.updateUserProfile,
+    dalFunction: userFunction.updateUserProfile,
   },
 
   deleteOrg: {
-    dalFunction: getterOrgFunction.deleteOrg,
+    dalFunction: orgFunction.deleteOrg,
   },
 
   queryUserByEmail: {
-    dalFunction: getterUserFunction.queryUserByEmail,
+    dalFunction: userFunction.queryUserByEmail,
   },
 
   inviteExistingMember: {
-    dalFunction: getterUserFunction.inviteExistingMember,
+    dalFunction: userFunction.inviteExistingMember,
   },
 
   inviteUserByEmail: {
-    dalFunction: getterUserFunction.inviteUserByEmail,
+    dalFunction: userFunction.inviteUserByEmail,
   },
 
   removeMemberOfOrg: {
-    dalFunction: getterOrgFunction.removeMemberOfOrg,
+    dalFunction: orgFunction.removeMemberOfOrg,
+  },
+
+  insertWorkflowAndVersion: {
+    dalFunction: workflowFunction.insertWorkflowAndVersion,
   },
 };

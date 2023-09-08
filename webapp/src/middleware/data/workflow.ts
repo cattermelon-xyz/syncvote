@@ -5,18 +5,18 @@ import {
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
-} from '@redux/reducers/workflow.reducer';
+} from '@dal/redux/reducers/workflow.reducer';
 import {
   changeWorkflowOrg,
   changeWorkflowInfo,
   deleteWorkflow,
   addWorkflowToOrg,
-} from '@redux/reducers/orginfo.reducer';
+} from '@dal/redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
 import { supabase } from '@utils/supabaseClient';
 import { subtractArray } from '@utils/helpers';
 
-export class GetterWorkflowFunction {
+export class WorkflowFunctionClass {
   async getWorkflowByStatus({
     params,
     dispatch,
@@ -91,6 +91,104 @@ export class GetterWorkflowFunction {
       onError(error);
     }
     dispatch(finishLoading({}));
+  };
+
+  insertWorkflowAndVersion = async ({
+    params,
+    dispatch,
+    onError,
+    onSuccess,
+  }: {
+    params: any;
+    dispatch: any;
+    onError: (error: any) => void;
+    onSuccess: (data: any) => void;
+  }) => {
+    dispatch(startLoading({}));
+    const {
+      title,
+      desc,
+      owner_org_id: orgId,
+      emptyStage,
+      iconUrl,
+      authority: userId,
+    } = params;
+
+    let icon_url, preset_icon_url; // eslint-disable-line
+    if (iconUrl.startsWith('preset:')) {
+      preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
+    } else {
+      icon_url = iconUrl; // eslint-disable-line
+    }
+
+    const { data, error } = await supabase
+      .from('workflow')
+      .insert({
+        title,
+        desc,
+        icon_url,
+        preset_icon_url,
+        owner_org_id: orgId,
+        authority: userId,
+      })
+      .select();
+
+    if (data) {
+      const insertedId = data[0].id;
+      const toInsert = {
+        workflow_id: insertedId,
+        status: 'DRAFT',
+        data: emptyStage,
+      };
+      const { data: versions, error: err } = await supabase
+        .from('workflow_version')
+        .insert(toInsert)
+        .select();
+      dispatch(finishLoading({}));
+      dispatch(
+        changeWorkflow({
+          id: insertedId,
+          title,
+          desc,
+          icon_url: iconUrl,
+          banner_url: '',
+          owner_org_id: orgId,
+          workflow_version: !err ? versions : [],
+        })
+      );
+      dispatch(finishLoading({}));
+
+      if (!error && versions) {
+        const image_name = `${data[0].id}_${versions[0].id}`;
+
+        const { data: d, error: e } = await supabase
+          .from('workflow_version')
+          .update({
+            preview_image_url: `https://uafmqopjujmosmilsefw.supabase.co/storage/v1/object/public/preview_image/${image_name}.jpg`,
+          })
+          .eq('id', versions[0].id)
+          .select();
+
+        onSuccess({ versions, insertedId });
+        dispatch(
+          addWorkflowToOrg({
+            workflow: {
+              id: insertedId,
+              title,
+              desc,
+              icon_url: iconUrl,
+              banner_url: '',
+              owner_org_id: orgId,
+              workflow_version: versions,
+              versions: versions,
+            },
+          })
+        );
+      }
+    }
+    if (error) {
+      onError(error);
+    }
   };
 }
 export const insertWorkflowAndVersion = async ({

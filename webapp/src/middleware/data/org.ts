@@ -7,10 +7,10 @@ import {
   addUserToOrg,
   removeUserOfOrg,
   deleteOrgInfo,
-} from "@redux/reducers/orginfo.reducer";
+} from "@dal/redux/reducers/orginfo.reducer";
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-export class GetterOrgFunction {
+export class OrgFunctionClass {
   async queryOrgs({
     params,
     dispatch,

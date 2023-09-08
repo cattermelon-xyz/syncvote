@@ -1,9 +1,5 @@
-import {
-  finishLoading,
-  startLoading,
-  setTags,
-  insertTag,
-} from '@redux/reducers/ui.reducer';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { setTags, insertTag } from '@dal/redux/reducers/preset.reducer';
 import { supabase } from '@utils/supabaseClient';
 
 // TODO: should store the last time of update

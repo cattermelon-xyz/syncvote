@@ -1,8 +1,8 @@
 import { Modal, Image, Empty, Skeleton } from 'antd';
-import { L } from '@utils/locales/L';
-import { useSelector } from 'react-redux';
 import { createIdString } from '@utils/helpers';
 import { useNavigate } from 'react-router-dom';
+import { useGetDataHook } from '@dal/dal';
+import { config } from '@dal/config';
 
 interface PreviewWorkflowModalProps {
   open: boolean;
@@ -15,7 +15,11 @@ const PreviewWorkflowModal: React.FC<PreviewWorkflowModalProps> = ({
   onClose,
   workflow,
 }) => {
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
   const handleCancel = () => {
     onClose();
   };
