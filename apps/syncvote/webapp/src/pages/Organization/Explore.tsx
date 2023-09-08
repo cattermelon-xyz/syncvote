@@ -12,6 +12,8 @@ import ModalEditTemplate from '@/fragments/ModalEditTemplate';
 import { queryTemplate } from '@middleware/data/template';
 import { useNavigate } from 'react-router-dom';
 import TemplateList from '@fragments/TemplateList';
+import SearchWithTag from '@fragments/SearchWithTag';
+import { TagObject } from '@middleware/data/tag';
 
 interface SortProps {
   by: string;
@@ -39,10 +41,11 @@ const Home: React.FC = () => {
         <Title level={2} className='text-center'>
           {L('exploreTopTierTemplates')}
         </Title>
-        <Input
-          prefix={<SearchOutlined />}
-          placeholder='Search a template...'
-          className='my-8'
+        <SearchWithTag
+          tagTo={TagObject.TEMPLATE}
+          onResult={(result: any) => {
+            console.log(result);
+          }}
         />
         {loading ? (
           <Skeleton />
