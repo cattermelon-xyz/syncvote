@@ -1,7 +1,6 @@
 import { Button, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
 import Icon from '@components/Icon/Icon';
 import { useGetDataHook } from '@dal/dal';
 import { config } from '@dal/config';
@@ -19,14 +18,18 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
   workflow,
   openMoveToModal,
 }) => {
-  const { presetIcons } = useSelector((state: any) => state.ui);
-  let dataOrgs: any;
-  let org_owner: any;
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+    start: open,
+  }).data;
 
   const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
     start: open,
   }).data;
+
+  let dataOrgs: any;
+  let org_owner: any;
 
   if (orgs) {
     dataOrgs = orgs.filter((org: any) => org.id !== workflow.owner_org_id);
@@ -84,7 +87,7 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
 
       <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {dataOrgs  && (
+          {dataOrgs && (
             <>
               {dataOrgs.map((org: any, index: any) => (
                 <div

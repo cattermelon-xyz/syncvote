@@ -180,7 +180,7 @@ export const EditVersion = () => {
       }
       setWeb2IntegrationsState(web2Integrations);
     }
-    
+
     canUserEditWorkflowVersion({
       workflowVersionId: versionId,
       onResult: (canEdit: boolean) => {

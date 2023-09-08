@@ -40,10 +40,9 @@ const BluePrint = () => {
     configInfo: config.queryUserById,
   }).data;
   
-  let presetIcons;
-  // const presetIcons = useGetDataHook({
-  //   configInfo: config.queryPresetIcons,
-  // }).data;
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   const navigate = useNavigate();
   const { orgIdString } = useParams();

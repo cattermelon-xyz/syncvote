@@ -22,10 +22,9 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   const navigate = useNavigate();
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  let presetIcons: any;
-  // const presetIcons = useGetDataHook({
-  //   configInfo: config.queryPresetIcons,
-  // }).data;
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
@@ -70,7 +69,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 
       <Space className='h-60 overflow-scroll py-2 w-full' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {orgs  && (
+          {orgs && (
             <div>
               {orgs.map((org: any, index: any) => (
                 <div
