@@ -1,6 +1,6 @@
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { insertWorkflowAndVersion } from '@middleware/data';
+import { insertWorkflowAndVersion } from '@dal/data';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from '@components/Icon/Icon';
 import { PlusOutlined } from '@ant-design/icons';

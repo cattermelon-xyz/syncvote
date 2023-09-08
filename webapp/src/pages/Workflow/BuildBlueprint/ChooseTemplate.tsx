@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import { extractIdFromIdString } from '@utils/helpers';
 import { emptyStage } from '@components/DirectedGraph';
-import { insertWorkflowAndVersion } from '@middleware/data';
+import { insertWorkflowAndVersion } from '@dal/data';
 
 const env = import.meta.env.VITE_ENV;
 

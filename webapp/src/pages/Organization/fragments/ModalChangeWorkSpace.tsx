@@ -3,7 +3,7 @@ import { Modal, Input } from 'antd';
 import Icon from '@components/Icon/Icon';
 import { L } from '@utils/locales/L';
 import { useDispatch, useSelector } from 'react-redux';
-import { upsertAnOrg } from '@middleware/data';
+import { upsertAnOrg } from '@dal/data';
 
 interface ModalChangeWorkSpaceProps {
   visible: boolean;

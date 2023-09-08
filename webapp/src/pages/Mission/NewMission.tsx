@@ -1,4 +1,4 @@
-import { queryWorkflow, upsertAMission } from '@middleware/data';
+import { queryWorkflow, upsertAMission } from '@dal/data';
 import {
   createIdString,
   extractIdFromIdString,

@@ -3,7 +3,7 @@ import { Input, Button, Form } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { L } from '@utils/locales/L';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
-import { changePassword } from '@middleware/data';
+import { changePassword } from '@dal/data';
 import { Modal } from 'antd';
 
 type FieldType = {

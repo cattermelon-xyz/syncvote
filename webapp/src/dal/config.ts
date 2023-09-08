@@ -3,7 +3,7 @@ import {
   UserFunctionClass,
   WorkflowFunctionClass,
   PresetFunctionClass,
-} from '@middleware/data';
+} from '@dal/data';
 import { ConfigInfo } from './dal';
 export interface ConfigTypes {
   updateUserProfile: {

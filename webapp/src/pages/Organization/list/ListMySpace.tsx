@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SpaceCard from '@pages/Organization/fragments/SpaceCard';
 import { useSelector } from 'react-redux';
-import { queryOrgsAndWorkflowForHome } from '@middleware/data';
+import { queryOrgsAndWorkflowForHome } from '@dal/data';
 import { useDispatch } from 'react-redux';
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';

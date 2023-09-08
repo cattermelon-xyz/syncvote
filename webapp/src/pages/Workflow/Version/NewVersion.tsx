@@ -7,7 +7,7 @@ import {
   shouldUseCachedData,
 } from '@utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
-import { queryWorkflow, upsertWorkflowVersion } from '@middleware/data';
+import { queryWorkflow, upsertWorkflowVersion } from '@dal/data';
 import { DirectedGraph, emptyStage } from '@components/DirectedGraph';
 import { SaveOutlined } from '@ant-design/icons';
 import { GraphViewMode } from '@types';

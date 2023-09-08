@@ -1,6 +1,6 @@
 import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
-import { deleteAWorkflow } from '@middleware/data';
+import { deleteAWorkflow } from '@dal/data';
 import { useDispatch } from 'react-redux';
 
 interface DeleteWorkflowModalProps {

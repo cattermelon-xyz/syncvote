@@ -3,7 +3,7 @@ import { L } from '@utils/locales/L';
 import { Input, Space, Tag } from 'antd';
 import SortButton from '@components/SortButton/SortButton';
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { getWorkflowByStatus, searchWorflow } from '@middleware/data';
+import { getWorkflowByStatus, searchWorflow } from '@dal/data';
 import { useDispatch } from 'react-redux';
 import { error } from 'console';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';

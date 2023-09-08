@@ -2,7 +2,7 @@ import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
 import Input from '@components/Input/Input';
 import { useState } from 'react';
-import { updateAWorkflowInfo } from '@middleware/data';
+import { updateAWorkflowInfo } from '@dal/data';
 import { useDispatch } from 'react-redux';
 
 interface ChangeNameWorkflowModalProps {

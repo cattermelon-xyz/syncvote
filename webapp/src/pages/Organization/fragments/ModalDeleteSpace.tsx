@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "antd";
 import { L } from "@utils/locales/L";
-import { deleteOrg } from "@middleware/data";
+import { deleteOrg } from "@dal/data";
 import { useDispatch } from "react-redux";
 import { useSetData } from "@dal/dal";
 import { config } from "@dal/config";

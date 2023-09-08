@@ -2,7 +2,7 @@ import {
   inviteUserByEmail,
   queryUserByEmail,
   inviteExistingMember,
-} from "@middleware/data";
+} from "@dal/data";
 import { extractIdFromIdString } from "@utils/helpers";
 import { Button, Drawer, Input, Modal, Space } from "antd";
 import { useState } from "react";

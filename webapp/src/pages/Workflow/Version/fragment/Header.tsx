@@ -27,7 +27,7 @@ import {
   deleteAWorkflow,
   updateAWorkflowInfo,
   upsertWorkflowVersion,
-} from '@middleware/data';
+} from '@dal/data';
 import moment from 'moment';
 import VersionHistoryDialog from './VersionHistoryDialog';
 import ShareModal from './ShareModal';
