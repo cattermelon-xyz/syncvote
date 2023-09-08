@@ -38,7 +38,11 @@ const App: React.FC<AppProps> = ({ requiredLogin = false, layout }) => {
   }, []);
 
   useGetDataHook({
-    configInfo: config.queryPresetBanner,
+    configInfo: config.queryPresetIcons,
+  });
+
+  useGetDataHook({
+    configInfo: config.queryPresetBanners,
   });
 
   useGetDataHook({

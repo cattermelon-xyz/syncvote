@@ -52,7 +52,7 @@ export class PresetFunctionClass {
     }
   }
 
-  async queryPresetBanner({
+  async queryPresetBanners({
     dispatch,
     shouldCache,
     onSuccess,

@@ -26,7 +26,7 @@ import {
   Result,
 } from 'antd';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { FiCalendar, FiHome, FiLink, FiUser, FiDownload } from 'react-icons/fi';
 import { MdChatBubbleOutline } from 'react-icons/md';
@@ -37,9 +37,6 @@ import { supabase } from '@utils/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
 import { getDataReactionCount } from '@dal/data/reaction';
-import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
-import { HiMiniFire } from 'react-icons/hi2';
-import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import { GraphViewMode } from '@types';
 import Banner from '@components/Banner/Banner';
 import Icon from '@components/Icon/Icon';
@@ -48,8 +45,9 @@ import Google from '@assets/icons/svg-icons/Google';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
-import NotFound404 from '@pages/NotFound404';
 import './public-version.scss';
+import { useGetDataHook } from '@dal/dal';
+import { config } from '@dal/config';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -76,7 +74,6 @@ export const PublicVersion = () => {
     session?.user?.user_metadata ? false : true
   );
   const [downloadImageStatus, setDownloadImageStatus] = useState(false);
-  const [isMarkerShown, setIsMarkerShown] = useState(false);
   const handleSession = async (_session: Session | null) => {
     setSession(_session);
     setShowRegisterInvitation(_session?.user?.user_metadata ? false : true);
@@ -103,7 +100,14 @@ export const PublicVersion = () => {
     // TODO: move this to IGraph interface to drill selectedEdge into children components
     setSelectedEdgeId(edge.id);
   };
-  const { presetIcons, presetBanners } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+
+  const presetBanners = useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  }).data;
 
   const isFullScreen = searchParams.get('view') === 'full' ? true : false;
 

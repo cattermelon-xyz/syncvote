@@ -190,6 +190,35 @@ export class WorkflowFunctionClass {
       onError(error);
     }
   };
+
+  deleteAWorkflow = async ({
+    params,
+    dispatch,
+    onSuccess = () => {},
+    onError = (error: any) => {
+      console.log(error);
+    },
+  }: {
+    params: any;
+    dispatch: any;
+    onSuccess?: (data: any) => void;
+    onError?: (data: any) => void;
+  }) => {
+    const { workflow } = params;
+    const { data, error } = await supabase
+      .from('workflow')
+      .delete()
+      .eq('id', workflow.id)
+      .select('*');
+    dispatch(finishLoading({}));
+
+    if (!error) {
+      dispatch(deleteWorkflow({ workflow: workflow }));
+      onSuccess(data);
+    } else {
+      onError(error);
+    }
+  };
 }
 export const insertWorkflowAndVersion = async ({
   dispatch,
@@ -644,18 +673,19 @@ export const updateAWorkflowTag = async ({
 };
 
 export const deleteAWorkflow = async ({
-  workflow,
+  params,
   dispatch,
-  onSuccess,
+  onSuccess = () => {},
   onError = (error: any) => {
     console.log(error);
   },
 }: {
-  workflow: any;
+  params: any;
   dispatch: any;
-  onSuccess: (data: any) => void;
+  onSuccess?: (data: any) => void;
   onError?: (data: any) => void;
 }) => {
+  const { workflow } = params;
   const { data, error } = await supabase
     .from('workflow')
     .delete()
