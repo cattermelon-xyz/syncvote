@@ -3,6 +3,7 @@
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 import { IPresetType } from './interface';
+import { stat } from 'fs';
 
 const initialState: {
   loading: boolean;
@@ -11,7 +12,6 @@ const initialState: {
   templates: any[];
   initialized: boolean;
   tags: any[];
-  // TODO: define Profile & fetch from server
 } = {
   loading: false,
   presetIcons: [],
@@ -40,13 +40,20 @@ const globalUISlice = createSlice({
     setPresetBanners: (state, action) => {
       state.presetBanners = action.payload;
     },
-    setTags: (state, action) => {
-      state.tags = action.payload.map((t: any) => ({
-        value: t.id,
-        label: t.label,
-      }));
+    insertTags: (state, action) => {
+      action.payload.forEach((payloadTag: any) => {
+        if (state.tags.findIndex((t) => t.value === payloadTag.id) === -1) {
+          state.tags.push({
+            value: payloadTag.id,
+            label: payloadTag.label,
+            count_template: payloadTag.count_template,
+            count_workflow: payloadTag.count_workflow,
+            count_mission: payloadTag.count_mission,
+          });
+        }
+      });
     },
-    insertTag: (state, action) => {
+    newTag: (state, action) => {
       const idx = state.tags.findIndex(
         (t: any) => t.value === action.payload.id
       );
@@ -54,6 +61,9 @@ const globalUISlice = createSlice({
         state.tags.push({
           value: action.payload.id,
           label: action.payload.label,
+          count_template: 0,
+          count_workflow: 0,
+          count_mission: 0,
         });
       }
     },
@@ -86,8 +96,8 @@ export const {
   finishLoading,
   setPresetIcons,
   setPresetBanners,
-  setTags,
-  insertTag,
+  insertTags,
+  newTag,
   reset,
   resetAll,
   setTemplates,
