@@ -27,7 +27,7 @@ export function useGetDataHook<T>({
   const { lastFetch } = reduxDataReturn;
 
   const dispatch = useDispatch();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>([]);
   const [error, setError] = useState<any>(null);
 
   const shouldCache = checkShouldCache({
@@ -54,7 +54,7 @@ export function useGetDataHook<T>({
     }
   }, [start, reduxDataReturn]);
 
-  return { data, error };
+  return { data: data || [], error };
 }
 
 export async function useSetData<T>({
