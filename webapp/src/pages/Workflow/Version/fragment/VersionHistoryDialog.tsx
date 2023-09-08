@@ -1,6 +1,6 @@
 import { CiCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import Icon from '@components/Icon/Icon';
-import { queryVersionHistory } from '@middleware/data';
+import { queryVersionHistory } from '@dal/data';
 import { Divider, Modal, Space } from 'antd';
 import moment from 'moment';
 import { useEffect, useState } from 'react';

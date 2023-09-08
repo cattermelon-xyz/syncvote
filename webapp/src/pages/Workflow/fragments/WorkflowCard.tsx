@@ -22,7 +22,7 @@ import MoveWorkflowModal from './MoveWorkflowModal';
 import MoveToWorkflowModal from './MoveToWorkflowModal';
 import { useDispatch, useSelector } from 'react-redux';
 import ShareModal from '../Version/fragment/ShareModal';
-import { upsertWorkflowVersion } from '@middleware/data';
+import { upsertWorkflowVersion } from '@dal/data';
 import PreviewWorkflowModal from './PreviewWorkflowModal';
 
 interface WorkflowCardProps {

@@ -20,7 +20,7 @@ import {
   queryWeb2Integration,
   queryWorkflow,
   upsertWorkflowVersion,
-} from '@middleware/data';
+} from '@dal/data';
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import { Button, Drawer, Modal, Skeleton, Space, Typography } from 'antd';

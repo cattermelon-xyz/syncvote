@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createIdString, extractIdFromIdString, shouldUseCachedData } from '@utils/helpers';
 import { Tag } from 'antd';
 import moment from 'moment';
-import { queryWorkflow } from '@middleware/data';
+import { queryWorkflow } from '@dal/data';
 
 const ChooseWorkflow = () => {
   const navigate = useNavigate();

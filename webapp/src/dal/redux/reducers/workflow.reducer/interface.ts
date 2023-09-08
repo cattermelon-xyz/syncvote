@@ -1,5 +1,5 @@
 import { IWorkflowVersionData } from '@types';
-import { ITag } from '../ui.reducer/interface';
+import { ITag } from '../preset.reducer/interface';
 
 export interface IWorkflowVersion {
   id?: number;

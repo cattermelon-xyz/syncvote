@@ -13,7 +13,7 @@ import {
 import { IProfile } from '@types';
 import { useEffect, useState } from 'react';
 import InviteMember from './InviteMember';
-import { deleteOrg, upsertAnOrg } from '@middleware/data';
+import { deleteOrg, upsertAnOrg } from '@dal/data';
 import { useDispatch } from 'react-redux';
 // TODO: consider move this to src/fragments
 

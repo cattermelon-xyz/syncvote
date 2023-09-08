@@ -10,7 +10,7 @@ import {
   insertNewEditor,
   isEmailExisted,
   queryVersionEditor,
-} from '@middleware/data';
+} from '@dal/data';
 import { IWorkflow } from '@types';
 import { createIdString } from '@utils/helpers';
 import {

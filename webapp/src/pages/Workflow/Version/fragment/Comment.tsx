@@ -8,7 +8,7 @@ import {
   getDataReply,
   getDataComment,
   CommentType,
-} from '@middleware/data/comment';
+} from '@dal/data/comment';
 import { useDispatch, useSelector } from 'react-redux';
 import type {
   NotificationInstance,

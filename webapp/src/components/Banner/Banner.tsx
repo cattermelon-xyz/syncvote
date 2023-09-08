@@ -80,28 +80,32 @@ const Banner = ({
               label: 'Library',
               children: (
                 <div className='grid grid-cols-3 mt-4 h-[300px] overflow-y-scroll gap-2 p-1'>
-                  {presetBanners.map((banner: any) => (
-                    <div
-                      key={banner}
-                      className='flex items-center w-[167px] h-[100px] p-1 cursor-pointer bg-center outline-violet-500 hover:outline rounded-md bg-cover'
-                      onClick={() => {
-                        setShouldShowModal(false);
-                        onChange
-                          ? onChange({
+                  {presetBanners && (
+                    <>
+                      {presetBanners.map((banner: any) => (
+                        <div
+                          key={banner}
+                          className='flex items-center w-[167px] h-[100px] p-1 cursor-pointer bg-center outline-violet-500 hover:outline rounded-md bg-cover'
+                          onClick={() => {
+                            setShouldShowModal(false);
+                            onChange
+                              ? onChange({
+                                  filePath: banner,
+                                  isPreset: true,
+                                })
+                              : null;
+                          }}
+                          style={{
+                            backgroundImage: `url(${getImageUrl({
                               filePath: banner,
                               isPreset: true,
-                            })
-                          : null;
-                      }}
-                      style={{
-                        backgroundImage: `url(${getImageUrl({
-                          filePath: banner,
-                          isPreset: true,
-                          type: 'banner',
-                        })})`,
-                      }}
-                    ></div>
-                  ))}
+                              type: 'banner',
+                            })})`,
+                          }}
+                        ></div>
+                      ))}
+                    </>
+                  )}
                 </div>
               ),
             },

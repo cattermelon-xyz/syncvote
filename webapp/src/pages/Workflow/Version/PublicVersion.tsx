@@ -13,7 +13,7 @@ import {
   queryOrgByOrgId,
   queryWeb2Integration,
   queryWorkflowVersion,
-} from '@middleware/data';
+} from '@dal/data';
 import { extractIdFromIdString } from '@utils/helpers';
 import {
   Button,
@@ -36,7 +36,7 @@ import Comment from './fragment/Comment';
 import { supabase } from '@utils/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
-import { getDataReactionCount } from '@middleware/data/reaction';
+import { getDataReactionCount } from '@dal/data/reaction';
 import { FaRegFaceGrinHearts, FaRegFaceSurprise } from 'react-icons/fa6';
 import { HiMiniFire } from 'react-icons/hi2';
 import { AiFillLike, AiFillDislike } from 'react-icons/ai';

@@ -7,7 +7,7 @@ import {
   inviteExistingMember,
   inviteUserByEmail,
   removeMemberOfOrg,
-} from "@middleware/data";
+} from "@dal/data";
 import Icon from "@components/Icon/Icon";
 import { IProfile, IOrgInfo } from "@types";
 import { LinkOutlined, DownOutlined } from "@ant-design/icons";

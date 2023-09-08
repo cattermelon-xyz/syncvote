@@ -70,7 +70,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 
       <Space className='h-60 overflow-scroll py-2 w-full' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {orgs != null && (
+          {orgs  && (
             <div>
               {orgs.map((org: any, index: any) => (
                 <div

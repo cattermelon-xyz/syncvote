@@ -9,7 +9,7 @@ import {
 import Input from '@components/Input/Input';
 import Button from '@components/Button/Button';
 import { useDispatch } from 'react-redux';
-import { newOrg } from '@middleware/data';
+import { newOrg } from '@dal/data';
 import { useSelector } from 'react-redux';
 import { Modal } from 'antd';
 

@@ -3,7 +3,7 @@ import Icon from '@components/Icon/Icon';
 import { Card, Button, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateUserProfile } from '@middleware/data';
+import { updateUserProfile } from '@dal/data';
 import { Modal } from 'antd';
 import ChangeModal from '@pages/Account/pages/AccountSetting/fragments/ChangeAccountModal';
 

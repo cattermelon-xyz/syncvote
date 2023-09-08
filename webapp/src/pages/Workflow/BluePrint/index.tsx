@@ -9,7 +9,7 @@ import Icon from '@components/Icon/Icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
-import { insertWorkflowAndVersion } from '@middleware/data';
+import { insertWorkflowAndVersion } from '@dal/data';
 import {
   createIdString,
   extractIdFromIdString,
