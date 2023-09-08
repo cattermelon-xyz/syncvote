@@ -1,16 +1,20 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
-import { useDispatch, useSelector } from 'react-redux';
 import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
 import { Button, Space } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import { AuthContext } from '@layout/context/AuthContext';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 function Header() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state: any) => state.orginfo);
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+  
   const { isAuth } = useContext(AuthContext);
   return (
     <>

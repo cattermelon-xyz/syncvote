@@ -31,14 +31,21 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
   const [email, setEmail] = useState('');
   const [usersInOrg, setUsersInOrg] = useState<IProfile[]>();
   const dispatch = useDispatch();
+
   const [isLoading, setIsLoading] = useState(false);
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
   const org = orgs.find((tmp: any) => tmp.id === dataSpace.id);
 
-  const presetIcons =
-    useGetDataHook({
-      configInfo: config.queryPresetIcons,
-    }).data || [];
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   useEffect(() => {
     if (visible) {

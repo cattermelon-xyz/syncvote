@@ -23,12 +23,13 @@ const NewOrgFrm = ({ onSubmit }: { onSubmit: () => void }) => {
   const [icon_url, setIconUrl] = useState(''); //eslint-disable-line
   const dispatch = useDispatch();
 
-  const presetIcons =
-    useGetDataHook({
-      configInfo: config.queryPresetIcons,
-    }).data || [];
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
-  const { user } = useSelector((state: any) => state.orginfo);
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
 
   return (
     <>

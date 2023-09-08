@@ -12,7 +12,7 @@ const Home: React.FC = () => {
   const templates =
     useGetDataHook({
       configInfo: config.queryTemplate,
-    }).data || [];
+    }).data;
 
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>

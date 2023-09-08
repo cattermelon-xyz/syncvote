@@ -63,19 +63,19 @@ const EditWorkflow = ({
   const presetBanners =
     useGetDataHook({
       configInfo: config.queryPresetBanners,
-    }).data || [];
+    }).data;
 
   const tags: ITag[] =
     useGetDataHook({
       configInfo: config.queryTag,
-    }).data || [];
+    }).data;
 
   const dispatch = useDispatch();
 
   const presetIcons =
     useGetDataHook({
       configInfo: config.queryPresetIcons,
-    }).data || [];
+    }).data;
 
   useEffect(() => {
     setTitle(workflow?.title);

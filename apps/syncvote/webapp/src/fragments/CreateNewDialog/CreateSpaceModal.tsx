@@ -18,7 +18,11 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   open,
   onClose,
 }) => {
-  const { user } = useSelector((state: any) => state.orginfo);
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+  
   const [title, setTitle] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [icon_url, setIconUrl] = useState(''); //eslint-disable-line
@@ -28,7 +32,7 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   const handleOk = async () => {
     onClose();

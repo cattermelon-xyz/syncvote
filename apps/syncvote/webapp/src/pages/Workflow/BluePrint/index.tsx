@@ -38,14 +38,14 @@ const BluePrint = () => {
   const user =
     useGetDataHook({
       configInfo: config.queryUserById,
-    }).data || [];
+    }).data;
 
   const navigate = useNavigate();
 
   const presetIcons =
     useGetDataHook({
       configInfo: config.queryPresetIcons,
-    }).data || [];
+    }).data;
 
   const { orgIdString } = useParams();
 
@@ -54,7 +54,7 @@ const BluePrint = () => {
   const orgs =
     useGetDataHook({
       configInfo: config.queryOrgs,
-    }).data || [];
+    }).data;
 
   const org = orgs.find(
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)

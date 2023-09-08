@@ -17,8 +17,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 import GoogleIcon from '@assets/icons/svg-icons/GoogleIcon';
 import { L } from '@utils/locales/L';
-import { supabase } from 'utils';
+import { supabase, useGetDataHook } from 'utils';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { config } from '@dal/config';
 const env = import.meta.env.VITE_ENV;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -42,7 +43,15 @@ function getItem(
 }
 
 function PublicHeader(session: any) {
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+  
   const handleClearStore = () => {};
   const navigate = useNavigate();
 

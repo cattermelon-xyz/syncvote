@@ -5,11 +5,12 @@ import {
   EyeInvisibleOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
+import { config } from '@dal/config';
 import { Button, Card, Popover, Space } from 'antd';
 import { Banner } from 'banner';
 import Icon from 'icon/src/Icon';
 import { useSelector } from 'react-redux';
-import { createIdString } from 'utils';
+import { createIdString, useGetDataHook } from 'utils';
 
 export const TemplateCard = ({
   template,
@@ -27,7 +28,11 @@ export const TemplateCard = ({
   publishClickHandler?: any;
 }) => {
   const { title, id, icon_url, banner_url, owner_org_id, status } = template;
-  const { orgs } = useSelector((state: any) => state.orginfo);
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
   const canEdit =
     orgs.find((org: any) => org.id === owner_org_id)?.role === 'ADMIN';
   return (

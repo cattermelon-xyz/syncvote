@@ -15,7 +15,7 @@ const Meta = ({
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
   
   return (
     <Space direction='vertical' size='large' className='w-full'>

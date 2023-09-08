@@ -50,17 +50,17 @@ const ModalEditTemplate = ({
   const presetIcons =
     useGetDataHook({
       configInfo: config.queryPresetIcons,
-    }).data || [];
+    }).data;
 
   const presetBanners =
     useGetDataHook({
       configInfo: config.queryPresetBanners,
-    }).data || [];
+    }).data;
 
   const orgs =
     useGetDataHook({
       configInfo: config.queryOrgs,
-    }).data || [];
+    }).data;
 
   const dispatch = useDispatch();
   const modalTitle =

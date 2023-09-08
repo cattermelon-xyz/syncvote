@@ -14,7 +14,7 @@ const AccountSetting = () => {
 
   const user = useGetDataHook({
     configInfo: config.queryUserById,
-  }).data || [];
+  }).data;
   
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url);
   const [openModal, setOpenModal] = useState(false);
@@ -22,7 +22,7 @@ const AccountSetting = () => {
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   useEffect(() => {
     setAvatarUrl(user?.avatar_url);

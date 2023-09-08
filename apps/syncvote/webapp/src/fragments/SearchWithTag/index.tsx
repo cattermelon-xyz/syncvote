@@ -23,7 +23,7 @@ const SearchWithTag = ({
     useGetDataHook({
       params: { tagTo: tagTo },
       configInfo: config.queryTag,
-    }).data || [];
+    }).data;
 
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 

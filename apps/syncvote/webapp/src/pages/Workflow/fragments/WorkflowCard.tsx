@@ -40,7 +40,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
 
   const presetBanners = useGetDataHook({
     configInfo: config.queryPresetBanners,
-  }).data || [];
+  }).data;
 
   const dispatch = useDispatch();
   const [openModalChangeName, setOpenModalChangeName] = useState(false);

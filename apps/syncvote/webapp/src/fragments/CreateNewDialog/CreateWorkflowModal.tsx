@@ -23,12 +23,12 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
     start: open,
-  }).data || [];
+  }).data;
 
   const handleOk = async () => {
     const org = orgs.find((org: any) => org.id === value);

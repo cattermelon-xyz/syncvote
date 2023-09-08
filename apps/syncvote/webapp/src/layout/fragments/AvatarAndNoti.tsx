@@ -26,7 +26,7 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   const { isAuth } = useContext(AuthContext);
 

@@ -4,13 +4,14 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { extractIdFromIdString, getImageUrl } from 'utils';
+import { extractIdFromIdString, getImageUrl, useGetDataHook } from 'utils';
 import { Avatar, Button } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { useState, useEffect, useContext } from 'react';
 import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
 import { AuthContext } from '@layout/context/AuthContext';
 import { TbBolt } from 'react-icons/tb';
+import { config } from '@dal/config';
 
 type HeaderProps = {
   session: any;
@@ -26,8 +27,15 @@ enum Pages {
 function Header({ session }: HeaderProps) {
   const params = useLocation();
   // const token = window.localStorage.getItem('isConnectWallet');
-  const dispatch = useDispatch();
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+  
   const navigate = useNavigate();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);

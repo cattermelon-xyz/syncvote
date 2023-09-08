@@ -18,17 +18,22 @@ import moment from 'moment';
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { extractIdFromIdString } from 'utils';
+import { extractIdFromIdString, useGetDataHook } from 'utils';
 import ModalWorkflowFromTemplate from '@fragments/ModalWorkflowFromTemplate';
 import { AuthContext } from '@layout/context/AuthContext';
 import { version } from 'os';
+import { config } from '@dal/config';
 
 const Detail = () => {
   const { templateIdString } = useParams();
   const { isAuth } = useContext(AuthContext);
   const id = extractIdFromIdString(templateIdString);
   const { templates } = useSelector((state: any) => state.template) || [];
-  const { orgs } = useSelector((state: any) => state.orginfo) || [];
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
   const [template, setTemplate] = useState<any>(
     templates.find((tmpl: any) => tmpl.id === id)
   );

@@ -155,7 +155,7 @@ const Comment = ({
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   return (
     <>

@@ -24,7 +24,7 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
   
   const handleCancel = () => {
     onClose();

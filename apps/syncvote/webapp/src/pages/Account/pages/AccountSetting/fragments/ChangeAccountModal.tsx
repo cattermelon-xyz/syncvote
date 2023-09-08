@@ -3,6 +3,8 @@ import { Modal, Input } from 'antd';
 import { L } from '@utils/locales/L';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUserProfile } from '@dal/data';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 interface ChangeModalProps {
   open: boolean;
@@ -18,7 +20,11 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
   isChangeName,
 }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.orginfo);
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+  
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [content, setContent] = useState('');
 

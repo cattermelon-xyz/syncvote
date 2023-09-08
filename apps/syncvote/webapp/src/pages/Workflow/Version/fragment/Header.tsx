@@ -68,7 +68,7 @@ function Header({
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   const handleSaveWorkflowInfo = async ({
     title,

@@ -17,7 +17,11 @@ const env = import.meta.env.VITE_ENV;
 
 const ChooseTemplate = () => {
   // document.title = 'Create new Workflow';
-  const { user } = useSelector((state: any) => state.orginfo);
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
@@ -29,7 +33,7 @@ const ChooseTemplate = () => {
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   // TODO: use utils/data in here
   const handleSave = async () => {

@@ -21,7 +21,7 @@ const VersionHistoryDialog = (props: VersionHistoryDialogProps) => {
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
   
   useEffect(() => {
     const versionId = workflow?.workflow_version[0]?.id;

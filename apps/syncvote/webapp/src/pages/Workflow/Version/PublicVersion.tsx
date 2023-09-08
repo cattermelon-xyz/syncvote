@@ -100,11 +100,11 @@ export const PublicVersion = () => {
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   const presetBanners = useGetDataHook({
     configInfo: config.queryPresetBanners,
-  }).data || [];
+  }).data;
 
   const isFullScreen = searchParams.get('view') === 'full' ? true : false;
 

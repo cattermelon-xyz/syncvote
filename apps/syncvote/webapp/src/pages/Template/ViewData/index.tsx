@@ -6,7 +6,7 @@ import {
 import { GrDocumentText } from 'react-icons/gr';
 import parse from 'html-react-parser';
 import { DirectedGraph, emptyStage } from 'directed-graph';
-import { extractIdFromIdString } from 'utils';
+import { extractIdFromIdString, useGetDataHook } from 'utils';
 import { Button, Layout, Space, Empty, Modal, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,9 +23,13 @@ import {
 } from '@dal/data/template';
 import Header from './Header';
 import moment from 'moment';
+import { config } from '@dal/config';
 
 export const TemplateViewData = () => {
-  const { orgs } = useSelector((state: any) => state.orginfo);
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
   const { templateIdString } = useParams();
   const templateId = extractIdFromIdString(templateIdString);
   const [template, setTemplate] = useState<any>({});

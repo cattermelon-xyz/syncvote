@@ -7,9 +7,14 @@ import { L } from '@utils/locales/L';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import { useParams } from 'react-router-dom';
 import SortButton from '@components/SortButton/SortButton';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 const ListSharedSpaces = () => {
-  const { user } = useSelector((state: any) => state.orginfo);
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
   const [adminOrgs, setAdminOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
 

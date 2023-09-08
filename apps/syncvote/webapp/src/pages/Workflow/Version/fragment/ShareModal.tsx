@@ -46,7 +46,7 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   const { orgIdString, versionIdString } = useParams();
   const publicUrl = `${baseUrl}/public/${orgIdString}/${createIdString(

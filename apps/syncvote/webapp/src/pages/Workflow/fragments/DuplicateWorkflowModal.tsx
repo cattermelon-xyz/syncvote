@@ -22,11 +22,18 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
-  }).data || [];
+  }).data;
 
   const handleCancel = () => {
     onClose();

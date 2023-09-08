@@ -6,9 +6,14 @@ import { useDispatch } from 'react-redux';
 import { L } from '@utils/locales/L';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';
 import SortButton from '@components/SortButton/SortButton';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 const ListMySpace = () => {
-  const { user } = useSelector((state: any) => state.orginfo);
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
   const [adminOrgs, setAdminOrgs] = useState<any[]>([]);
   const [workflows, setWorkflows] = useState<any[]>([]);
 
