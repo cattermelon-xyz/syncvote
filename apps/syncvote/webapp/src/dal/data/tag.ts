@@ -34,7 +34,6 @@ export class TagFunctionClass {
     const tagTo = params?.tagTo;
 
     const { tags } = reduxDataReturn;
-    console.log(tags);
 
     dispatch(startLoading({}));
     const { data, error } = await supabase
@@ -44,8 +43,8 @@ export class TagFunctionClass {
       .limit(10);
     dispatch(finishLoading({}));
     if (!error) {
-      dispatch(insertTags(data));
-      dispatch(setLastFetch({}));
+      // dispatch(insertTags(data));
+      // dispatch(setLastFetch({}));
       onSuccess(
         data.map((t: any) => ({
           value: t.id,

@@ -240,6 +240,7 @@ export class WorkflowFunctionClass {
     const { orgId } = params;
     const { workflows } = reduxDataReturn;
     dispatch(startLoading({}));
+    
     if (shouldCache) {
       onSuccess(workflows);
     } else {
@@ -500,6 +501,7 @@ export const queryWorkflow = async ({
     onError(error);
   }
 };
+
 export const queryWorkflowVersionData = async ({
   dispatch,
   versionId,
@@ -515,6 +517,7 @@ export const queryWorkflowVersionData = async ({
   dispatch(finishLoading({}));
   return { data, error };
 };
+
 export const queryWorkflowVersion = async ({
   orgId,
   onLoad,

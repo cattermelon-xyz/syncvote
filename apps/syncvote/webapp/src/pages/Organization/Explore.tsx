@@ -9,6 +9,7 @@ import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
 
 const Home: React.FC = () => {
+  
   const templates =
     useGetDataHook({
       configInfo: config.queryTemplate,
@@ -20,12 +21,12 @@ const Home: React.FC = () => {
         <Title level={2} className='text-center'>
           {L('exploreTopTierTemplates')}
         </Title>
-        {/* <SearchWithTag
+        <SearchWithTag
           tagTo={TagObject.TEMPLATE}
           onResult={(result: any) => {
             console.log(result);
           }}
-        /> */}
+        />
         <>
           <TemplateList
             templates={templates.filter((tmpl: any) => tmpl.status === true)}

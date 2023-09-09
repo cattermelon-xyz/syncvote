@@ -2,8 +2,6 @@
 /* eslint-disable max-len */
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
-import { IPresetType } from './interface';
-import { stat } from 'fs';
 
 const initialState: {
   loading: boolean;

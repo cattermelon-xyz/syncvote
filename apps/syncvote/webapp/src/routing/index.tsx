@@ -27,12 +27,10 @@ const AppRoutes = () => {
 
   useGetDataHook({
     configInfo: config.queryPresetIcons,
-    st: 'index.tsx',
   });
 
   useGetDataHook({
     configInfo: config.queryPresetBanners,
-    st: 'haha.tsx',
   });
 
   useGetDataHook({
@@ -41,6 +39,7 @@ const AppRoutes = () => {
 
   useGetDataHook({
     configInfo: config.queryOrgs,
+    cacheOption: false,
   });
 
   useEffect(() => {

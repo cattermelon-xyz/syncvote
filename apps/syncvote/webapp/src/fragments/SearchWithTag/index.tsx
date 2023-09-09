@@ -19,6 +19,7 @@ const SearchWithTag = ({
   tagTo = TagObject.TEMPLATE,
   onResult,
 }: SearchWithTagProps) => {
+
   const tags: ITag[] =
     useGetDataHook({
       params: { tagTo: tagTo },
@@ -26,7 +27,6 @@ const SearchWithTag = ({
     }).data;
 
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
-
   const [inputSearchText, setInputSearchText] = useState('');
   const [toSearch, setToSearch] = useState('');
   const [loading, setLoading] = useState(false);
