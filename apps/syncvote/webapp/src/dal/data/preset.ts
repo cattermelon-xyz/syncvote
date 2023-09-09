@@ -5,9 +5,9 @@ import {
 } from '@dal/redux/reducers/preset.reducer';
 import { supabase } from 'utils';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+import { deepEqual } from '@utils/helpers';
 
 export class PresetFunctionClass {
-
   async queryPresetIcons({
     dispatch,
     shouldCache,
@@ -41,9 +41,13 @@ export class PresetFunctionClass {
         data.forEach((d) => {
           tmp.push(d.name);
         });
-        dispatch(setPresetIcons(tmp));
-        dispatch(setLastFetch({}));
-        onSuccess(data);
+        if (deepEqual(tmp, presetIcons)) {
+          onSuccess(presetIcons);
+        } else {
+          dispatch(setPresetIcons(tmp));
+          dispatch(setLastFetch({}));
+          onSuccess(data);
+        }
       } else {
         onError(error);
       }
@@ -84,9 +88,13 @@ export class PresetFunctionClass {
         data.forEach((d) => {
           tmp.push(d.name);
         });
-        dispatch(setPresetBanners(tmp));
-        dispatch(setLastFetch({}));
-        onSuccess(data);
+        if (deepEqual(tmp, presetBanners)) {
+          onSuccess(presetBanners);
+        } else {
+          dispatch(setPresetBanners(tmp));
+          dispatch(setLastFetch({}));
+          onSuccess(data);
+        }
       } else {
         onError(error);
       }

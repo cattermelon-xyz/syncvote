@@ -7,6 +7,7 @@ import {
 } from '@dal/redux/reducers/preset.reducer';
 
 import { supabase } from 'utils';
+import { deepEqual } from '@utils/helpers';
 
 export enum TagObject {
   TEMPLATE = 'template',
@@ -35,27 +36,36 @@ export class TagFunctionClass {
 
     const { tags } = reduxDataReturn;
 
-    dispatch(startLoading({}));
-    const { data, error } = await supabase
-      .from('tag_view')
-      .select()
-      .order('count_' + tagTo, { ascending: false })
-      .limit(10);
-    dispatch(finishLoading({}));
-    if (!error) {
-      // dispatch(insertTags(data));
-      // dispatch(setLastFetch({}));
-      onSuccess(
-        data.map((t: any) => ({
+    if (shouldCache) {
+      onSuccess(tags);
+    } else {
+      dispatch(startLoading({}));
+      const { data, error } = await supabase
+        .from('tag_view')
+        .select()
+        .order('count_' + tagTo, { ascending: false })
+        .limit(10);
+      dispatch(finishLoading({}));
+
+      if (!error) {
+        const dataSetRedux = data.map((t: any) => ({
           value: t.id,
           label: t.label,
           count_template: t.count_template,
           count_workflow: t.count_workflow,
           count_mission: t.count_mission,
-        }))
-      );
-    } else {
-      onError(error);
+        }));
+
+        if (deepEqual(dataSetRedux, tags)) {
+          onSuccess(tags);
+        } else {
+          dispatch(insertTags(data));
+          dispatch(setLastFetch({}));
+          onSuccess(dataSetRedux);
+        }
+      } else {
+        onError(error);
+      }
     }
   };
 

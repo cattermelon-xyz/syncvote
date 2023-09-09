@@ -9,6 +9,7 @@ import {
   deleteOrgInfo,
 } from '@dal/redux/reducers/orginfo.reducer';
 import { off } from 'process';
+import { deepEqual } from '@utils/helpers';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -175,9 +176,14 @@ export class OrgFunctionClass {
             workflows: workflows || [],
           });
         });
-        dispatch(setOrgsInfo(tmp));
-        dispatch(setLastFetch({}));
-        onSuccess(tmp);
+
+        if (deepEqual(orgs, tmp)) {
+          onSuccess(orgs);
+        } else {
+          dispatch(setOrgsInfo(tmp));
+          dispatch(setLastFetch({}));
+          onSuccess(tmp);
+        }
       } else {
         onError(error);
       }

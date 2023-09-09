@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Empty, Space, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import ModalEditTemplate from '@fragments/ModalEditTemplate';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { deleteTemplate, upsertTemplate } from '@dal/data/template';
 import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';

@@ -39,7 +39,6 @@ const AppRoutes = () => {
 
   useGetDataHook({
     configInfo: config.queryOrgs,
-    cacheOption: false,
   });
 
   useEffect(() => {

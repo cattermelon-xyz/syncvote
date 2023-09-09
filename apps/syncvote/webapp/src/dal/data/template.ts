@@ -11,6 +11,7 @@ import {
   setLastFetch,
 } from '@dal/redux/reducers/template.reducer';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { deepEqual } from '@utils/helpers';
 import { supabase } from 'utils';
 
 export class TemplateFunctionClass {
@@ -36,9 +37,13 @@ export class TemplateFunctionClass {
       dispatch(startLoading({}));
       const { data, error } = await supabase.from('template').select('*');
       if (!error) {
-        dispatch(setLastFetch({}));
-        dispatch(setTemplates(data));
-        onSuccess(data);
+        if (deepEqual(data, templates)) {
+          onSuccess(templates);
+        } else {
+          dispatch(setLastFetch({}));
+          dispatch(setTemplates(data));
+          onSuccess(data);
+        }
       } else {
         onError(error);
       }

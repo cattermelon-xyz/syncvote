@@ -37,14 +37,13 @@ interface ConfigObject {
 }
 
 export const config: ConfigObject = {
-  
   queryTag: {
-    dalFunction: tagFunction.queryTag,
+    dalFunction: tagFunction.queryTag, // done
     reduxObjectPath: 'preset',
   },
 
   queryTemplate: {
-    dalFunction: templateFunction.queryTemplate,
+    dalFunction: templateFunction.queryTemplate, // done
     reduxObjectPath: 'template',
   },
 
@@ -61,22 +60,22 @@ export const config: ConfigObject = {
   },
 
   queryPresetIcons: {
-    dalFunction: presetFunction.queryPresetIcons,
+    dalFunction: presetFunction.queryPresetIcons, // done
     reduxObjectPath: 'preset',
   },
 
   queryPresetBanners: {
-    dalFunction: presetFunction.queryPresetBanners,
+    dalFunction: presetFunction.queryPresetBanners, // done
     reduxObjectPath: 'preset',
   },
 
   queryUserById: {
-    dalFunction: userFunction.queryUserById,
+    dalFunction: userFunction.queryUserById, // done
     reduxObjectPath: 'orginfo',
   },
 
   queryOrgs: {
-    dalFunction: orgFunction.queryOrgs,
+    dalFunction: orgFunction.queryOrgs, // done
     reduxObjectPath: 'orginfo',
   },
 
@@ -126,7 +125,7 @@ export const config: ConfigObject = {
   },
 
   queryWorkflow: {
-    dalFunction: workflowFunction,
+    dalFunction: workflowFunction.queryWorkflow,
     reduxObjectPath: 'workflow',
   },
 };

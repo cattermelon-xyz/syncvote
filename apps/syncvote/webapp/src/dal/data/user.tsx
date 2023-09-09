@@ -1,7 +1,12 @@
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { supabase } from 'utils';
-import { setUser, addUserToOrg } from '@dal/redux/reducers/orginfo.reducer';
+import {
+  setUser,
+  addUserToOrg,
+  setLastFetch,
+} from '@dal/redux/reducers/orginfo.reducer';
 import { addMemberToOrg } from './org';
+import { deepEqual } from '@utils/helpers';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -32,7 +37,7 @@ export class UserFunctionClass {
         onError('Session is null');
       }
     }
-    
+
     const { user } = reduxDataReturn;
     if (shouldCache) {
       onSuccess(user);
@@ -42,6 +47,7 @@ export class UserFunctionClass {
         .from('profile')
         .select('id, email, full_name, icon_url,preset_icon_url, about_me')
         .eq('id', userId);
+      dispatch(finishLoading({}));
       if (error) {
         onError(error);
       } else {
@@ -58,10 +64,14 @@ export class UserFunctionClass {
           about_me: profileInfo.about_me,
         };
 
-        onSuccess(userDataAfterHandle);
-        dispatch(setUser(userDataAfterHandle));
+        if (deepEqual(user, userDataAfterHandle)) {
+          onSuccess(user);
+        } else {
+          onSuccess(userDataAfterHandle);
+          dispatch(setUser(userDataAfterHandle));
+          dispatch(setLastFetch({}));
+        }
       }
-      dispatch(finishLoading({}));
     }
   }
   async updateUserProfile({
@@ -144,6 +154,7 @@ export class UserFunctionClass {
       onSuccess(data);
     }
   }
+
   async inviteExistingMember({
     params,
     dispatch,

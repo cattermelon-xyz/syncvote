@@ -9,7 +9,6 @@ import { config } from '@dal/config';
 import { Button, Card, Popover, Space } from 'antd';
 import { Banner } from 'banner';
 import Icon from 'icon/src/Icon';
-import { useSelector } from 'react-redux';
 import { createIdString, useGetDataHook } from 'utils';
 
 export const TemplateCard = ({

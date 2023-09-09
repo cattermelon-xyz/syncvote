@@ -15,6 +15,7 @@ import {
 } from '@dal/redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
 import { supabase, subtractArray } from 'utils';
+import { deepEqual } from '@utils/helpers';
 
 export class WorkflowFunctionClass {
   async getWorkflowByStatus({
@@ -240,7 +241,7 @@ export class WorkflowFunctionClass {
     const { orgId } = params;
     const { workflows } = reduxDataReturn;
     dispatch(startLoading({}));
-    
+
     if (shouldCache) {
       onSuccess(workflows);
     } else {
@@ -282,9 +283,13 @@ export class WorkflowFunctionClass {
           newData[index].tags = [...tags];
         });
         // TODO: is the data match the interface?
-        dispatch(setWorkflows(newData));
-        dispatch(setLastFetch({}));
-        onSuccess(newData);
+        if (deepEqual(newData, workflows)) {
+          onSuccess(workflows);
+        } else {
+          dispatch(setWorkflows(newData));
+          dispatch(setLastFetch({}));
+          onSuccess(newData);
+        }
       } else if (error) {
         onError(error);
       }
