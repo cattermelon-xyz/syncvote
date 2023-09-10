@@ -114,4 +114,16 @@ export const config: ConfigObject = {
     dalFunction: workflowFunction.queryWorkflow,
     reduxObjectPath: 'workflow',
   },
+
+  newOrg: {
+    dalFunction: orgFunction.newOrg,
+  },
+
+  upsertTemplate: {
+    dalFunction: templateFunction.upsertTemplate,
+  },
+
+  deleteTemplate: {
+    dalFunction: templateFunction.deleteTemplate,
+  },
 };

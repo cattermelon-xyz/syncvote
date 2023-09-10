@@ -25,17 +25,17 @@ const ModalDeleteSpace: React.FC<ModalDeleteSpaceProps> = ({
       orgId: dataSpace.id,
       dispatch,
       onSuccess: () => {
-        Modal.success({
-          title: 'Success',
-          content: 'Delete workspace successfully',
-        });
+        // Modal.success({
+        //   title: 'Success',
+        //   content: 'Delete workspace successfully',
+        // });
         onClose();
       },
       onError: () => {
-        Modal.error({
-          title: 'Error',
-          content: 'Failed to delete workspace',
-        });
+        // Modal.error({
+        //   title: 'Error',
+        //   content: 'Failed to delete workspace',
+        // });
         onClose();
       },
     });

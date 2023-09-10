@@ -27,20 +27,19 @@ interface DataItem {
 }
 
 const MySpace: React.FC = () => {
-  const orgs =
-    useGetDataHook({
-      configInfo: config.queryOrgs,
-    }).data;
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
 
-  const user =
-    useGetDataHook({
-      configInfo: config.queryUserById,
-    }).data;
+  console.log(orgs);
 
-  const presetIcons =
-    useGetDataHook({
-      configInfo: config.queryPresetIcons,
-    }).data;
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
   const [workflows, setWorkflows] = useState<DataItem[]>([]);

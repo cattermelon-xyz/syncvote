@@ -6,7 +6,7 @@ import Input from '@components/Input/Input';
 import { useSelector, useDispatch } from 'react-redux';
 import { newOrg } from '@dal/data';
 import { useNavigate } from 'react-router-dom';
-import { createIdString, useGetDataHook } from 'utils';
+import { createIdString, useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
 
 interface CreateSpaceModalProps {
@@ -18,17 +18,15 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   open,
   onClose,
 }) => {
-
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
-  
+
   const [title, setTitle] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [icon_url, setIconUrl] = useState(''); //eslint-disable-line
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userId = user.id;
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
@@ -37,31 +35,33 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   const handleOk = async () => {
     onClose();
 
-    await newOrg({
-      orgInfo: {
-        title,
-        icon_url,
+    await useSetData({
+      params: {
+        orgInfo: {
+          title,
+          icon_url,
+        },
+        uid: user.id,
       },
-      uid: userId,
+      configInfo: config.newOrg,
       onSuccess: async (org: any) => {
         setTitle('');
         setIconUrl('');
-        Modal.success({
-          title: 'Success',
-          content: 'Create organization successfully',
-        });
+        // Modal.success({
+        //   title: 'Success',
+        //   content: 'Create organization successfully',
+        // });
         const orgIdString = createIdString(`${org.title}`, `${org.id}`);
 
-        navigate(`/my-spaces/${orgIdString}`);
+        navigate(`/${orgIdString}`);
       },
-
-      dispatch,
       onError: () => {
-        Modal.error({
-          title: 'Error',
-          content: 'Create organization failed',
-        });
+        // Modal.error({
+        //   title: 'Error',
+        //   content: 'Create organization failed',
+        // });
       },
+      dispatch: dispatch,
     });
   };
 
