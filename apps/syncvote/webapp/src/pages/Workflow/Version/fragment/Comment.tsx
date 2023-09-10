@@ -3,8 +3,13 @@ import { Avatar, Button, Input, List, Space } from 'antd';
 import { FiSend } from 'react-icons/fi';
 import VirtualList from 'rc-virtual-list';
 
-import { getDataReply, getDataComment, CommentType } from '@dal/data/comment';
-import { useDispatch } from 'react-redux';
+import {
+  addComment,
+  getDataReply,
+  getDataComment,
+  CommentType,
+} from '@dal/data/comment';
+import { useDispatch, useSelector } from 'react-redux';
 import type {
   NotificationInstance,
   NotificationPlacement,
@@ -14,8 +19,6 @@ import moment from 'moment';
 import { CloseOutlined, LeftOutlined } from '@ant-design/icons';
 import ReactionBox from './Reaction';
 import { Icon } from 'icon';
-import { useGetDataHook, useSetData } from 'utils';
-import { config } from '@dal/config';
 
 const Comment = ({
   where,
@@ -106,14 +109,7 @@ const Comment = ({
     };
 
     if (commentInsert.text !== '') {
-      await useSetData({
-        params: {
-          commentInsert: commentInsert,
-        },
-        configInfo: config.addComment,
-        dispatch: dispatch,
-      });
-      // await addComment({ commentInsert, dispatch });
+      await addComment({ commentInsert, dispatch });
       if (item) {
         setOffsetReply(0);
         setDataReply([]);
@@ -152,10 +148,7 @@ const Comment = ({
       placement,
     });
   };
-
-  const presetIcons = useGetDataHook({
-    configInfo: config.queryPresetIcons,
-  }).data;
+  const { presetIcons } = useSelector((state: any) => state.ui);
 
   return (
     <>

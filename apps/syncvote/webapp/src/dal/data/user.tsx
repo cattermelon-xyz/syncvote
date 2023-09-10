@@ -74,6 +74,7 @@ export class UserFunctionClass {
       }
     }
   }
+
   async updateUserProfile({
     params,
     dispatch,
@@ -129,6 +130,7 @@ export class UserFunctionClass {
     }
     dispatch(finishLoading({}));
   }
+
   async queryUserByEmail({
     params,
     dispatch,
@@ -215,6 +217,7 @@ export class UserFunctionClass {
     }
     // dispatch(finishLoading({}));
   }
+  
   async inviteUserByEmail({
     params,
     dispatch,

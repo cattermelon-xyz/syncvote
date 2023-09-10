@@ -161,6 +161,7 @@ export const upsertTemplate = async ({
   }
   return { data: undefined, error: 'Cannot upsert template' };
 };
+
 export const deleteTemplate = async ({
   dispatch,
   templateId,
@@ -209,6 +210,7 @@ export const queryATemplate = async ({
     return { data: undefined, error };
   }
 };
+
 export const queryCurrentTemplateVersion = async ({
   dispatch,
   current_version_id,
