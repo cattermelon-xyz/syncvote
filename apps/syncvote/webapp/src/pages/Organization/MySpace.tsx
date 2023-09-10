@@ -30,8 +30,6 @@ const MySpace: React.FC = () => {
     configInfo: config.queryOrgs,
   }).data;
 
-  console.log(orgs);
-
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;

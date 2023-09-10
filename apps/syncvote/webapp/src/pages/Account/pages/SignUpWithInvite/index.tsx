@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import { Input, Button, Form } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { L } from '@utils/locales/L';
@@ -16,6 +15,7 @@ function SignUpWithInvite() {
   const email = currentUrl.searchParams.get('email');
 
   const onFinish = (values: any) => {
+    // This function dont need use dal
     changePassword({
       password: values.password,
       onSuccess: () => {
