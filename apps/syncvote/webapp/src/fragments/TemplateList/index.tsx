@@ -27,10 +27,6 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
     configInfo: config.queryOrgs,
   }).data;
 
-  const orgs = useGetDataHook({
-    configInfo: config.queryOrgs,
-  }).data;
-
   const [sortTemplateOptions, setSortTemplateOptions] = useState<SortProps>({
     by: 'Last modified',
     type: 'des',

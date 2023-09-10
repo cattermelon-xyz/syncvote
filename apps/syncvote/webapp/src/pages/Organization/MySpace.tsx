@@ -14,8 +14,6 @@ import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
-import { useGetDataHook } from 'utils';
-import { config } from '@dal/config';
 const env = import.meta.env.VITE_ENV;
 
 interface SortProps {
