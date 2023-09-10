@@ -6,7 +6,6 @@ import {
 } from '@dal/data';
 
 import { ConfigInfo } from 'utils';
-import { CommentFunctionClass } from './data/comment';
 import { TemplateFunctionClass } from './data/template';
 import { TagFunctionClass } from './data/tag';
 
@@ -24,7 +23,6 @@ export interface ConfigTypes {
     workflow: any;
   };
 }
-const commentFunction = new CommentFunctionClass();
 const presetFunction = new PresetFunctionClass();
 const userFunction = new UserFunctionClass();
 const orgFunction = new OrgFunctionClass();
@@ -45,18 +43,6 @@ export const config: ConfigObject = {
   queryTemplate: {
     dalFunction: templateFunction.queryTemplate, // done
     reduxObjectPath: 'template',
-  },
-
-  addComment: {
-    dalFunction: commentFunction.addComment,
-  },
-
-  getDataComment: {
-    dalFunction: commentFunction.getDataComment,
-  },
-
-  getDataReply: {
-    dalFunction: commentFunction.getDataReply,
   },
 
   queryPresetIcons: {
