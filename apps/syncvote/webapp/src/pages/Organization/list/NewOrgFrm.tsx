@@ -1,5 +1,5 @@
 import { L } from '@utils/locales/L';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import { useState } from 'react';
 import {
   OrgPresetBanner,
@@ -9,9 +9,11 @@ import {
 import Input from '@components/Input/Input';
 import Button from '@components/Button/Button';
 import { useDispatch } from 'react-redux';
-import { newOrg } from '@middleware/data';
+import { newOrg } from '@dal/data';
 import { useSelector } from 'react-redux';
 import { Modal } from 'antd';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 const NewOrgFrm = ({ onSubmit }: { onSubmit: () => void }) => {
   const [title, setTitle] = useState('');
@@ -20,9 +22,14 @@ const NewOrgFrm = ({ onSubmit }: { onSubmit: () => void }) => {
   const [org_type, setOrgType] = useState(OrgType[0]); //eslint-disable-line
   const [icon_url, setIconUrl] = useState(''); //eslint-disable-line
   const dispatch = useDispatch();
-  const { presetIcons } = useSelector((state: any) => state.ui);
 
-  const { user } = useSelector((state: any) => state.orginfo);
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
 
   return (
     <>

@@ -1,8 +1,9 @@
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import { Input, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { IMission } from '@types';
-import { useSelector } from 'react-redux';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 const Meta = ({
   currentMission,
@@ -11,7 +12,11 @@ const Meta = ({
   currentMission: IMission;
   setCurrentMission: (data: any) => void;
 }) => {
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+  
   return (
     <Space direction='vertical' size='large' className='w-full'>
       <Space direction='vertical' className='w-full'>

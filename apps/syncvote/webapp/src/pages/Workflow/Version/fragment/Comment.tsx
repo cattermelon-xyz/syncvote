@@ -8,7 +8,7 @@ import {
   getDataReply,
   getDataComment,
   CommentType,
-} from '@middleware/data/comment';
+} from '@dal/data/comment';
 import { useDispatch, useSelector } from 'react-redux';
 import type {
   NotificationInstance,
@@ -18,7 +18,7 @@ import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
 import { CloseOutlined, LeftOutlined } from '@ant-design/icons';
 import ReactionBox from './Reaction';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 
 const Comment = ({
   where,

@@ -2,12 +2,14 @@ import { SaveOutlined } from '@ant-design/icons';
 import { Banner } from 'banner';
 import { TextEditor } from 'rich-text-editor';
 import { Icon } from 'icon';
-import { updateAWorkflowTag } from '@middleware/data';
-import { newTag, queryTag } from '@middleware/data/tag';
+import { updateAWorkflowTag } from '@dal/data';
+import { newTag } from '@dal/data/tag';
 import { ITag, IWorkflow } from '@types';
 import { Drawer, Input, Select, SelectProps, Space, Switch } from 'antd';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 const EditWorkflow = ({
   open,
@@ -57,20 +59,32 @@ const EditWorkflow = ({
   const [desc, setDesc] = useState(workflowDesc);
   const [iconUrl, setIconUrl] = useState(workflowIcon);
   const [status, setStatus] = useState(workflow?.workflow_version[0]?.status);
-  const presetBanners = useSelector((state: any) => state.ui.presetBanners);
-  const tags: ITag[] = useSelector((state: any) => state.ui.tags) || [];
+
+  const presetBanners =
+    useGetDataHook({
+      configInfo: config.queryPresetBanners,
+    }).data;
+
+  const tags: ITag[] =
+    useGetDataHook({
+      configInfo: config.queryTag,
+    }).data;
+
   const dispatch = useDispatch();
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons =
+    useGetDataHook({
+      configInfo: config.queryPresetIcons,
+    }).data;
+
   useEffect(() => {
     setTitle(workflow?.title);
     setDesc(workflow?.desc);
     setIconUrl(workflow?.icon_url);
     setStatus(workflow?.workflow_version[0]?.status);
     setExistedTags(workflow?.tags || []);
-    if (tags.length === 0) {
-      queryTag({ dispatch });
-    }
-  }, [open, tags]);
+  }, [open]);
+
   const options: SelectProps['options'] = tags;
   const [existedTags, setExistedTags] = useState(workflow?.tags || []);
   const allTags = [...tags];

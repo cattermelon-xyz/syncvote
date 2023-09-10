@@ -1,5 +1,5 @@
 import { IWorkflowVersionData } from 'directed-graph';
-import { ITag } from '../ui.reducer/interface';
+import { ITag } from '@dal/redux/reducers/preset.reducer/interface';
 
 export interface IWorkflowVersion {
   id?: number;

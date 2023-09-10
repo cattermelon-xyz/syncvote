@@ -2,15 +2,55 @@ import {
   addTemplateToOrg,
   changeTemplateInfo,
   deleteTemplateFromOrg,
-} from '@redux/reducers/orginfo.reducer';
+} from '@dal/redux/reducers/orginfo.reducer';
 import {
   addTemplate,
   changeTemplate,
   setTemplates,
   deleteTemplate as rmTemplateFromRedux,
-} from '@redux/reducers/template.reducer';
+  setLastFetch,
+} from '@dal/redux/reducers/template.reducer';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { deepEqual } from '@utils/helpers';
 import { supabase } from 'utils';
+
+export class TemplateFunctionClass {
+  async queryTemplate({
+    dispatch,
+    shouldCache,
+    onSuccess = () => {},
+    onError = () => {},
+    reduxDataReturn,
+  }: {
+    params?: any;
+    dispatch: any;
+    shouldCache: boolean;
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
+    reduxDataReturn: any;
+  }) {
+    const { templates } = reduxDataReturn;
+
+    if (shouldCache) {
+      onSuccess(templates);
+    } else {
+      dispatch(startLoading({}));
+      const { data, error } = await supabase.from('template').select('*');
+      if (!error) {
+        if (deepEqual(data, templates)) {
+          onSuccess(templates);
+        } else {
+          dispatch(setLastFetch({}));
+          dispatch(setTemplates(data));
+          onSuccess(data);
+        }
+      } else {
+        onError(error);
+      }
+      dispatch(finishLoading({}));
+    }
+  }
+}
 
 export const upsertTemplate = async ({
   dispatch,
@@ -121,6 +161,7 @@ export const upsertTemplate = async ({
   }
   return { data: undefined, error: 'Cannot upsert template' };
 };
+
 export const deleteTemplate = async ({
   dispatch,
   templateId,
@@ -137,6 +178,7 @@ export const deleteTemplate = async ({
   dispatch(rmTemplateFromRedux(tmpl));
   dispatch(finishLoading({}));
 };
+
 export const queryTemplate = async ({ dispatch }: { dispatch: any }) => {
   dispatch(startLoading({}));
   const { data, error } = await supabase.from('template').select('*');
@@ -145,6 +187,7 @@ export const queryTemplate = async ({ dispatch }: { dispatch: any }) => {
   }
   dispatch(finishLoading({}));
 };
+
 export const queryATemplate = async ({
   dispatch,
   templateId,
@@ -167,6 +210,7 @@ export const queryATemplate = async ({
     return { data: undefined, error };
   }
 };
+
 export const queryCurrentTemplateVersion = async ({
   dispatch,
   current_version_id,

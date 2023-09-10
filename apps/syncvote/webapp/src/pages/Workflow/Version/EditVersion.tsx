@@ -20,7 +20,7 @@ import {
   queryWeb2Integration,
   queryWorkflow,
   upsertWorkflowVersion,
-} from '@middleware/data';
+} from '@dal/data';
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { shouldUseCachedData } from '@utils/helpers';
 import { extractIdFromIdString } from 'utils';
@@ -28,7 +28,6 @@ import { Button, Drawer, Modal, Skeleton, Space, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import EditInfo from './fragment/EditInfo';
 import {
   GraphViewMode,
   IWorkflowVersionCosmetic,

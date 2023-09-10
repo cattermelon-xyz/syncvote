@@ -5,14 +5,10 @@ import {
   LinkOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import {Icon} from 'icon';
-import {
-  insertNewEditor,
-  isEmailExisted,
-  queryVersionEditor,
-} from '@middleware/data';
+import { Icon } from 'icon';
+import { insertNewEditor, isEmailExisted, queryVersionEditor } from '@dal/data';
 import { IWorkflow } from '@types';
-import { createIdString } from 'utils';
+import { createIdString, useGetDataHook } from 'utils';
 import {
   Alert,
   Button,
@@ -27,6 +23,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { config } from '@dal/config';
 const env = import.meta.env.VITE_ENV;
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -46,7 +43,11 @@ const InviteTab = ({ workflow }: { workflow: IWorkflow }) => {
   const [emailExisted, setEmailExisted] = useState('');
   const dispatch = useDispatch();
   const versionId = workflow?.workflow_version[0]?.id;
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+
   const { orgIdString, versionIdString } = useParams();
   const publicUrl = `${baseUrl}/public/${orgIdString}/${createIdString(
     workflow.title || '',

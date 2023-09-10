@@ -9,14 +9,15 @@ import { Icon } from 'icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
-import { insertWorkflowAndVersion, queryOrgs } from '@middleware/data';
+import { insertWorkflowAndVersion } from '@dal/data';
 import { randomIcon } from '@utils/helpers';
-import { createIdString, extractIdFromIdString } from 'utils';
+import { createIdString, extractIdFromIdString, useGetDataHook } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
 import { emptyStage } from 'directed-graph';
 import NotFound404 from '@pages/NotFound404';
 import TemplateList from '@fragments/TemplateList';
+import { config } from '@dal/config';
 
 // TODO: this file is placed in wrong folder!
 
@@ -33,15 +34,32 @@ interface DataItem {
 const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [templates, setTemplates] = useState<any[]>([]);
-  const { user } = useSelector((state: any) => state.orginfo);
+
+  const user =
+    useGetDataHook({
+      configInfo: config.queryUserById,
+    }).data;
+
   const navigate = useNavigate();
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons =
+    useGetDataHook({
+      configInfo: config.queryPresetIcons,
+    }).data;
+
   const { orgIdString } = useParams();
+
   const [loading, setLoading] = useState(true);
-  const { orgs } = useSelector((state: any) => state.orginfo);
+
+  const orgs =
+    useGetDataHook({
+      configInfo: config.queryOrgs,
+    }).data;
+
   const org = orgs.find(
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
   );
+
   // const data = location.state?.dataSpace || org;
   const data = org;
   const dispatch = useDispatch();
@@ -71,17 +89,6 @@ const BluePrint = () => {
       setWorkflows(workflowsData);
       setTemplates(org?.templates || []);
       setLoading(false);
-    } else {
-      queryOrgs({
-        filter: {},
-        dispatch: dispatch,
-        onSuccess: (data: any) => {
-          setLoading(false);
-        },
-        onError: (error: any) => {
-          setLoading(false);
-        },
-      });
     }
   }, [orgs]);
   const [showEditOrg, setShowEditOrg] = useState(false);

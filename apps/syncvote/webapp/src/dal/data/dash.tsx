@@ -1,18 +1,23 @@
-import { finishLoading, startLoading } from '../../redux/reducers/ui.reducer';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 
 const BASE_URL = 'https://decisiontree.herokuapp.com';
 
 // TODO: update redux
 export const create = async ({
-  json, title, desc, onSuccess, onError = (error:any) => {
+  json,
+  title,
+  desc,
+  onSuccess,
+  onError = (error: any) => {
     console.error(error);
-  }, dispatch,
-}:{
+  },
+  dispatch,
+}: {
   json: any;
   title: string;
   desc: string;
-  onSuccess: (data:any) => void;
-  onError?: (error:any) => void;
+  onSuccess: (data: any) => void;
+  onError?: (error: any) => void;
   dispatch: any;
 }) => {
   const toSend = {

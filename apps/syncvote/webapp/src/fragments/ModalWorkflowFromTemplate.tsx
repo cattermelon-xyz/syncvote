@@ -1,8 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
-import {
-  insertWorkflowAndVersion,
-  queryWorkflowVersionData,
-} from '@middleware/data';
+import { config } from '@dal/config';
+import { insertWorkflowAndVersion, queryWorkflowVersionData } from '@dal/data';
 import { L } from '@utils/locales/L';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { on } from 'events';
@@ -10,7 +8,7 @@ import Icon from 'icon/src/Icon';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from 'utils';
+import { createIdString, useGetDataHook } from 'utils';
 // TODO: should merge with DuplicationWorkflowModal to avoid code duplication
 const ModalWorkflowFromTemplate = ({
   template,
@@ -22,7 +20,15 @@ const ModalWorkflowFromTemplate = ({
   onClose: any;
 }) => {
   const modalTitle = `Duplicate "${template?.title}"`;
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
   const dispatch = useDispatch();
   const handleOk = async () => {
     const org = orgs.find((org: any) => org.id === orgId);

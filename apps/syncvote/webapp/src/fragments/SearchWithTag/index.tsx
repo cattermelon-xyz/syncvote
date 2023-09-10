@@ -1,8 +1,10 @@
 import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
-import { TagObject, queryTag } from '@middleware/data/tag';
+import { config } from '@dal/config';
+import { TagObject } from '@dal/data/tag';
+import { ITag } from '@types';
 import { Input, Modal, Space, Tag } from 'antd';
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useState } from 'react';
+import { useGetDataHook } from 'utils';
 
 type SearchWithTagProps = {
   className?: string;
@@ -17,19 +19,14 @@ const SearchWithTag = ({
   tagTo = TagObject.TEMPLATE,
   onResult,
 }: SearchWithTagProps) => {
-  const [tags, setTags] = useState<any[]>([]);
+
+  const tags: ITag[] =
+    useGetDataHook({
+      params: { tagTo: tagTo },
+      configInfo: config.queryTag,
+    }).data;
+
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
-  const dispatch = useDispatch();
-  const fetchTags = async () => {
-    const { data, error } = await queryTag({ dispatch, tagTo });
-    if (data) {
-      setTags(data || []);
-    } else {
-      Modal.error({
-        content: error?.message || 'Cannot load tags',
-      });
-    }
-  };
   const [inputSearchText, setInputSearchText] = useState('');
   const [toSearch, setToSearch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,14 +42,13 @@ const SearchWithTag = ({
         return t.count_template;
     }
   };
-  useEffect(() => {
-    fetchTags();
-  }, []);
+
   const search = ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
     // TODO: change to search api
     setLoading(false);
   };
+  
   return (
     <Space className={`flex w-full my-8 ${className}`} direction='vertical'>
       <Input

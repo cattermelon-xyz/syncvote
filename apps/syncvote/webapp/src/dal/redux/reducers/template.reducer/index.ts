@@ -13,6 +13,9 @@ const templateSlice = createSlice({
   name: 'template',
   initialState,
   reducers: {
+    setLastFetch: (state, action) => {
+      state.lastFetch = new Date().getTime();
+    },
     setTemplates: (state, action) => {
       state.templates = action.payload;
     },
@@ -45,6 +48,11 @@ const templateSlice = createSlice({
   },
 });
 
-export const { setTemplates, addTemplate, changeTemplate, deleteTemplate } =
-  templateSlice.actions;
+export const {
+  setTemplates,
+  addTemplate,
+  changeTemplate,
+  deleteTemplate,
+  setLastFetch,
+} = templateSlice.actions;
 export default templateSlice.reducer;

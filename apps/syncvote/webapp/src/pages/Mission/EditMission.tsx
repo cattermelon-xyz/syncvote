@@ -5,13 +5,13 @@ import {
   deleteMission,
   queryAMission,
   queryWeb2Integration,
-} from '@middleware/data';
+} from '@dal/data';
 import { shouldUseCachedData } from '@utils/helpers';
 import { extractIdFromIdString } from 'utils';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IMission } from '@types';
-import { create } from '@middleware/data/dash';
+import { create } from '@dal/data/dash';
 
 import MissionData from './fragments/MissionData';
 

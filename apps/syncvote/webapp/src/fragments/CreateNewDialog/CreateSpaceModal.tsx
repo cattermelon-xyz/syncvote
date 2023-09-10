@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
 import Input from '@components/Input/Input';
 import { useSelector, useDispatch } from 'react-redux';
-import { newOrg } from '@middleware/data';
+import { newOrg } from '@dal/data';
 import { useNavigate } from 'react-router-dom';
-import { createIdString } from 'utils';
+import { createIdString, useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 interface CreateSpaceModalProps {
   open: boolean;
@@ -17,14 +18,21 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   open,
   onClose,
 }) => {
-  const { user } = useSelector((state: any) => state.orginfo);
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+  
   const [title, setTitle] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [icon_url, setIconUrl] = useState(''); //eslint-disable-line
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userId = user.id;
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   const handleOk = async () => {
     onClose();

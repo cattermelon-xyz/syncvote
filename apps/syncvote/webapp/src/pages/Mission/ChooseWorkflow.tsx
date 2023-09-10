@@ -6,7 +6,7 @@ import { shouldUseCachedData } from '@utils/helpers';
 import { createIdString, extractIdFromIdString } from 'utils';
 import { Tag } from 'antd';
 import moment from 'moment';
-import { queryWorkflow } from '@middleware/data';
+import { queryWorkflow } from '@dal/data';
 
 const ChooseWorkflow = () => {
   const navigate = useNavigate();

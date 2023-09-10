@@ -1,7 +1,7 @@
 import { L } from '@utils/locales/L';
 import { useNavigate, useParams } from 'react-router-dom';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
-import { supabase } from 'utils';
+import { supabase, useGetDataHook } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from 'utils';
 import { Button, Divider, Modal, Popover, Space } from 'antd';
@@ -27,12 +27,13 @@ import {
   deleteAWorkflow,
   updateAWorkflowInfo,
   upsertWorkflowVersion,
-} from '@middleware/data';
+} from '@dal/data';
 import moment from 'moment';
 import VersionHistoryDialog from './VersionHistoryDialog';
 import ShareModal from './ShareModal';
 import { GraphViewMode } from 'directed-graph';
 import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
+import { config } from '@dal/config';
 const env = import.meta.env.VITE_ENV;
 
 type HeaderProps = {
@@ -64,7 +65,11 @@ function Header({
   const handleClearStore = () => {};
   const [showWorkflowPanel, setShowWorkflowPanel] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const { presetIcons } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+
   const handleSaveWorkflowInfo = async ({
     title,
     desc,

@@ -1,4 +1,5 @@
-import { upsertTemplate } from '@middleware/data/template';
+import { config } from '@dal/config';
+import { upsertTemplate } from '@dal/data/template';
 import { IOrgInfo } from '@types';
 import { Modal, Space, Select, Input } from 'antd';
 import { Banner } from 'banner';
@@ -6,6 +7,7 @@ import Icon from 'icon/src/Icon';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TextEditor } from 'rich-text-editor';
+import { useGetDataHook } from 'utils';
 
 type OrgSelectOption = {
   value: number;
@@ -44,8 +46,22 @@ const ModalEditTemplate = ({
   const [orgId, setOrgId] = useState<number | undefined>(selectedOrgId);
   const [workflowId, setWorkflowId] = useState<number | undefined>(undefined);
   const [workflowVersionId, setWorkflowVersionId] = useState(-1);
-  const { presetIcons, presetBanners } = useSelector((state: any) => state.ui);
-  const { orgs } = useSelector((state: any) => state.orginfo);
+
+  const presetIcons =
+    useGetDataHook({
+      configInfo: config.queryPresetIcons,
+    }).data;
+
+  const presetBanners =
+    useGetDataHook({
+      configInfo: config.queryPresetBanners,
+    }).data;
+
+  const orgs =
+    useGetDataHook({
+      configInfo: config.queryOrgs,
+    }).data;
+
   const dispatch = useDispatch();
   const modalTitle =
     templateId === -1

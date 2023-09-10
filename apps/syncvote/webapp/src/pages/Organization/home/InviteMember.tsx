@@ -2,12 +2,13 @@ import {
   inviteUserByEmail,
   queryUserByEmail,
   inviteExistingMember,
-} from "@middleware/data";
-import { extractIdFromIdString } from "utils";
-import { Button, Drawer, Input, Modal, Space } from "antd";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+} from '@dal/data';
+import { extractIdFromIdString, useGetDataHook } from 'utils';
+import { Button, Drawer, Input, Modal, Space } from 'antd';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { config } from '@dal/config';
 
 const InviteMember = ({
   visible,
@@ -16,11 +17,19 @@ const InviteMember = ({
   visible: boolean;
   setVisible: (visible: boolean) => void;
 }) => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
   const org = orgs.find((tmp: any) => tmp.id === orgId);
   const handleInvite = async () => {
     queryUserByEmail({
@@ -41,14 +50,14 @@ const InviteMember = ({
             dispatch,
             onSuccess: () => {
               Modal.success({
-                title: "Success",
-                content: "Invite user successfully",
+                title: 'Success',
+                content: 'Invite user successfully',
               });
             },
             onError: () => {
               Modal.error({
-                title: "Error",
-                content: "Cannot invite user",
+                title: 'Error',
+                content: 'Cannot invite user',
               });
             },
           });
@@ -75,8 +84,8 @@ const InviteMember = ({
       },
       onError: () => {
         Modal.error({
-          title: "Error",
-          content: "Cannot retrieve user data",
+          title: 'Error',
+          content: 'Cannot retrieve user data',
         });
       },
     });
@@ -86,28 +95,28 @@ const InviteMember = ({
       open={visible}
       onClose={() => {
         setVisible(false);
-        setEmail("");
+        setEmail('');
       }}
-      title="Invite a member"
+      title='Invite a member'
     >
-      <Space direction="vertical" size="large" className="w-full">
-        <Space direction="vertical" size="small" className="w-full">
+      <Space direction='vertical' size='large' className='w-full'>
+        <Space direction='vertical' size='small' className='w-full'>
           <div>Input user email</div>
           <Input
-            placeholder="Email"
+            placeholder='Email'
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
             }}
-            className="w-full"
+            className='w-full'
           />
         </Space>
         <Space
-          direction="horizontal"
-          size="small"
-          className="w-full flex justify-end"
+          direction='horizontal'
+          size='small'
+          className='w-full flex justify-end'
         >
-          <Button type="default" className="w-full" onClick={handleInvite}>
+          <Button type='default' className='w-full' onClick={handleInvite}>
             Invite
           </Button>
         </Space>

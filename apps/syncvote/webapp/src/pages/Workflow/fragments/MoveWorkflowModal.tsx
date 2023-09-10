@@ -1,8 +1,9 @@
-import { Button, Modal, Radio, RadioChangeEvent, Space } from 'antd';
+import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {Icon} from 'icon';
+import { Icon } from 'icon';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 interface MoveWorkflowModalProps {
   open: boolean;
@@ -17,9 +18,18 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
   workflow,
   openMoveToModal,
 }) => {
-  const { presetIcons } = useSelector((state: any) => state.ui);
+  const presetIcons =
+    useGetDataHook({
+      configInfo: config.queryPresetIcons,
+    }).data;
+
   const [dataOrgs, setDataOrgs] = useState<any>([]);
-  const { orgs, user } = useSelector((state: any) => state.orginfo);
+
+  const orgs =
+    useGetDataHook({
+      configInfo: config.queryOrgs,
+    }).data;
+
   const [org_owner, setOrgOwner] = useState<any>();
 
   useEffect(() => {

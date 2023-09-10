@@ -6,8 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Empty, Space, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import ModalEditTemplate from '@fragments/ModalEditTemplate';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteTemplate, upsertTemplate } from '@middleware/data/template';
+import { useDispatch } from 'react-redux';
+import { deleteTemplate, upsertTemplate } from '@dal/data/template';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 // interface ITemplate {
 //   id?: number;
@@ -31,7 +33,10 @@ interface SortProps {
  * This component include both list of TemplateCard and PublishTemplate button
  */
 const TemplateList = ({ templates, orgId }: TemplateListProps) => {
-  const { orgs } = useSelector((state: any) => state.orginfo);
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
   const [sortTemplateOptions, setSortTemplateOptions] = useState<SortProps>({
     by: 'Last modified',
     type: 'des',

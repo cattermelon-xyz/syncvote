@@ -10,76 +10,51 @@ import AccountRoutes from './AccountRoutes';
 import EditorRoutes from './EditorRoutes';
 import { AuthContext } from '@layout/context/AuthContext';
 import { useEffect, useState } from 'react';
-import { supabase } from 'utils';
+import { supabase, useGetDataHook } from 'utils';
 import { Session } from '@supabase/supabase-js';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  queryOrgs,
-  queryPresetBanner,
-  queryPresetIcon,
-  queryUserById,
-} from '@middleware/data';
-import { shouldUseCachedData } from '@utils/helpers';
 import LoadingPage from '@pages/LoadingPage';
 import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 import { MySpace, OrganizationExplore, SharedSpace } from '@pages/Organization';
-import { min } from 'moment';
 import WebLayout from '@layout/WebLayout';
 import TemplateDetail from '@pages/Template/Detail';
 import { TemplateViewData } from '@pages/Template/ViewData';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
+import { config } from '@dal/config';
 const env = import.meta.env.VITE_ENV;
 
 const AppRoutes = () => {
   const [session, setSession] = useState<Session | null | false>(false);
-  const { presetIcons, presetBanners, initialized } = useSelector(
-    (state: any) => state.ui
-  );
-  const { lastFetch } = useSelector((state: any) => state.orginfo);
-  const dispatch = useDispatch();
-  const handleSession = async (_session: Session | null | false) => {
-    setSession(_session);
-    if (_session !== null) {
-      queryPresetBanner({
-        dispatch,
-        presetBanners,
-      });
-      queryPresetIcon({
-        dispatch,
-        presetIcons,
-      });
-      const { user } = _session as Session;
-      if (!shouldUseCachedData(lastFetch)) {
-        queryOrgs({
-          filter: {
-            userId: user.id,
-          },
-          onSuccess: () => {},
-          dispatch,
-        });
-      }
-      if (initialized === false && user !== null) {
-        queryUserById({
-          userId: user.id,
-          onSuccess: () => {},
-          dispatch,
-        });
-      }
-    }
-  };
+
+  useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  });
+
+  useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  });
+
+  useGetDataHook({
+    configInfo: config.queryUserById,
+  });
+
+  useGetDataHook({
+    configInfo: config.queryOrgs,
+  });
+
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session: _session } }) => {
-      await handleSession(_session);
+      setSession(_session);
     });
     supabase.auth.onAuthStateChange((event, newSession) => {
       if (
         (session !== null && newSession === null) ||
         (session === null && newSession !== null)
       ) {
-        handleSession(newSession);
+        setSession(newSession);
       }
     });
   }, []);
+
   return session === false ? (
     <BrowserRouter basename='/'>
       <Routes>

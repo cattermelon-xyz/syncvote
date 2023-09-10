@@ -10,8 +10,8 @@ import {
   queryOrgByOrgId,
   queryWeb2Integration,
   queryWorkflowVersion,
-} from '@middleware/data';
-import { extractIdFromIdString } from 'utils';
+} from '@dal/data';
+import { extractIdFromIdString, useGetDataHook } from 'utils';
 import {
   Button,
   Layout,
@@ -33,7 +33,7 @@ import Comment from './fragment/Comment';
 import { supabase } from 'utils';
 import { Session } from '@supabase/supabase-js';
 import moment from 'moment';
-import { getDataReactionCount } from '@middleware/data/reaction';
+import { getDataReactionCount } from '@dal/data/reaction';
 import { GraphViewMode } from 'directed-graph';
 import { Banner } from 'banner';
 import { Icon } from 'icon';
@@ -43,6 +43,7 @@ import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import './public-version.scss';
+import { config } from '@dal/config';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -96,7 +97,14 @@ export const PublicVersion = () => {
     // TODO: move this to IGraph interface to drill selectedEdge into children components
     setSelectedEdgeId(edge.id);
   };
-  const { presetIcons, presetBanners } = useSelector((state: any) => state.ui);
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+
+  const presetBanners = useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  }).data;
 
   const isFullScreen = searchParams.get('view') === 'full' ? true : false;
 
