@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Dropdown, MenuProps, Space, Typography } from 'antd';
 import { L } from '@utils/locales/L';
-import { useSelector } from 'react-redux';
 import SpaceCard from '@pages/Organization/fragments/SpaceCard';
 import { ListItem } from 'list-item';
 import WorkflowCard from '@pages/Workflow/fragments/WorkflowCard';

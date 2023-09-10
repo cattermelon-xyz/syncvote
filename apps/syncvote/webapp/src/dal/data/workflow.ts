@@ -162,7 +162,7 @@ export class WorkflowFunctionClass {
       if (!error && versions) {
         const image_name = `${data[0].id}_${versions[0].id}`;
 
-        const { data: d, error: e } = await supabase
+        await supabase
           .from('workflow_version')
           .update({
             preview_image_url: `https://uafmqopjujmosmilsefw.supabase.co/storage/v1/object/public/preview_image/${image_name}.jpg`,

@@ -1,14 +1,13 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { config } from '@dal/config';
-import { insertWorkflowAndVersion, queryWorkflowVersionData } from '@dal/data';
+import { queryWorkflowVersionData } from '@dal/data';
 import { L } from '@utils/locales/L';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
-import { on } from 'events';
 import Icon from 'icon/src/Icon';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { createIdString, useGetDataHook } from 'utils';
+import { createIdString, useGetDataHook, useSetData } from 'utils';
 // TODO: should merge with DuplicationWorkflowModal to avoid code duplication
 const ModalWorkflowFromTemplate = ({
   template,
@@ -34,10 +33,13 @@ const ModalWorkflowFromTemplate = ({
     const org = orgs.find((org: any) => org.id === orgId);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
     onClose();
+
+    // this function don't need use dal
     const { data, error } = await queryWorkflowVersionData({
       dispatch,
       versionId: template.current_version_id,
     });
+
     if (data) {
       const versionData = data[0].data;
       const props = {
@@ -48,16 +50,30 @@ const ModalWorkflowFromTemplate = ({
         iconUrl: template.icon_url,
         authority: user.id,
       };
-      insertWorkflowAndVersion({
+
+      await useSetData({
+        params: props,
+        configInfo: config.insertWorkflowAndVersion,
         dispatch: dispatch,
-        props: props,
         onError: (error) => {
           Modal.error({ content: error.message });
         },
-        onSuccess: (versions, insertedId) => {
+        onSuccess: (data) => {
+          const { versions, insertedId } = data;
           navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
         },
       });
+
+      // insertWorkflowAndVersion({
+      //   dispatch: dispatch,
+      //   props: props,
+      //   onError: (error) => {
+      //     Modal.error({ content: error.message });
+      //   },
+      //   onSuccess: (versions, insertedId) => {
+      //     navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      //   },
+      // });
     } else {
       Modal.error({ content: error?.message });
     }
