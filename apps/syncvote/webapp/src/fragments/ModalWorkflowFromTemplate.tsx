@@ -1,11 +1,12 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { config } from '@dal/config';
-import { insertWorkflowAndVersion, queryWorkflowVersionData } from '@dal/data';
+import { queryCurrentTemplateVersion } from '@dal/data/template';
+import { insertWorkflowAndVersion } from '@dal/data';
 import { L } from '@utils/locales/L';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { on } from 'events';
 import Icon from 'icon/src/Icon';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { createIdString, useGetDataHook } from 'utils';
@@ -34,12 +35,12 @@ const ModalWorkflowFromTemplate = ({
     const org = orgs.find((org: any) => org.id === orgId);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
     onClose();
-    const { data, error } = await queryWorkflowVersionData({
+    const { data, error } = await queryCurrentTemplateVersion({
       dispatch,
-      versionId: template.current_version_id,
+      current_version_id: template?.current_version_id,
     });
     if (data) {
-      const versionData = data[0].data;
+      const versionData = data?.data;
       const props = {
         title: 'Duplicate of ' + template?.title,
         desc: template?.desc,
