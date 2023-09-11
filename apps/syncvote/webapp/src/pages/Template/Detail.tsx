@@ -21,7 +21,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { extractIdFromIdString, useGetDataHook } from 'utils';
 import ModalWorkflowFromTemplate from '@fragments/ModalWorkflowFromTemplate';
 import { AuthContext } from '@layout/context/AuthContext';
-import { version } from 'os';
 import { config } from '@dal/config';
 
 const Detail = () => {

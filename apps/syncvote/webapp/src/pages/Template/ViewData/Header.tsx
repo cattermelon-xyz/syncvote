@@ -5,16 +5,19 @@ import { Button, Space } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { useContext } from 'react';
 import { AuthContext } from '@layout/context/AuthContext';
-import { useGetDataHook } from 'utils';
+import { extractIdFromIdString, useGetDataHook } from 'utils';
 import { config } from '@dal/config';
 
 function Header() {
   const navigate = useNavigate();
+  
+  const { templateIdString } = useParams();
+  const id = extractIdFromIdString(templateIdString);
 
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
-  
+
   const { isAuth } = useContext(AuthContext);
   return (
     <>
@@ -50,7 +53,7 @@ function Header() {
             disabled={!isAuth}
             title={!isAuth ? 'Login to create workflow' : ''}
           >
-            Dupplicate this workflow
+            Duplicate this workflow
           </Button>
           <AvatarAndNoti user={user} />
         </Space>
