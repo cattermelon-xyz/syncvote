@@ -8,6 +8,7 @@ import { SingleChoice } from 'single-vote';
 import { Polling } from 'polling';
 import { Veto } from 'veto';
 import { UpVote } from 'upvote';
+import { DocInput } from 'doc-input';
 import { AuthContext } from '@layout/context/AuthContext';
 
 function App({ layout }: { layout: any }) {
@@ -21,8 +22,9 @@ function App({ layout }: { layout: any }) {
     registerVoteMachine(Polling);
     registerVoteMachine(Veto);
     registerVoteMachine(UpVote);
+    registerVoteMachine(DocInput);
   }, [session]);
-  
+
   const Layout: any = layout;
   return (
     <Layout>

@@ -2,6 +2,7 @@ import {
   ClockCircleOutlined,
   SettingOutlined,
   TwitterOutlined,
+  CaretRightOutlined,
 } from '@ant-design/icons';
 import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
@@ -108,6 +109,11 @@ const Node = memo(
           {duration > 0 ? (
             <div className='absolute -top-8 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
               {displayDelayDuration(moment.duration(duration))}
+            </div>
+          ) : null}
+          {id === 'root' ? (
+            <div className='absolute -left-9 bg-violet-100 py-1 px-2 rounded-md text-blue-500'>
+              <CaretRightOutlined />
             </div>
           ) : null}
           <div

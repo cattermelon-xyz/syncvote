@@ -45,6 +45,10 @@
       "path": "../votemachines/veto/weblib"
     },
     {
+      "name": "doc-input",
+      "path": "../votemachines/docinput/weblib"
+    },
+    {
       "name": "utils",
       "path": "../utils"
     }
