@@ -36,6 +36,7 @@ const Detail = () => {
   const [template, setTemplate] = useState<any>(
     templates.find((tmpl: any) => tmpl.id === id)
   );
+  
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const [versionData, setVersionData] = useState(emptyStage);
