@@ -46,19 +46,18 @@ const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
       onSuccess: async (org: any) => {
         setTitle('');
         setIconUrl('');
-        // Modal.success({
-        //   title: 'Success',
-        //   content: 'Create organization successfully',
-        // });
+        Modal.success({
+          title: 'Success',
+          content: 'Create organization successfully',
+        });
         const orgIdString = createIdString(`${org.title}`, `${org.id}`);
-
         navigate(`/${orgIdString}`);
       },
       onError: () => {
-        // Modal.error({
-        //   title: 'Error',
-        //   content: 'Create organization failed',
-        // });
+        Modal.error({
+          title: 'Error',
+          content: 'Create organization failed',
+        });
       },
       dispatch: dispatch,
     });
