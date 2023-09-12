@@ -294,6 +294,60 @@ export class WorkflowFunctionClass {
       }
     }
   };
+
+  updateAWorkflowTag = async ({
+    prams,
+    dispatch,
+    onSuccess,
+    onError = () => {},
+  }: {
+    prams: { workflow: IWorkflow; newTags: ITag[] };
+    dispatch: any;
+    onSuccess: (data: any) => void;
+    onError?: (data: any) => void;
+  }) => {
+    const { workflow, newTags } = prams;
+    const oldSetOfTagIds = workflow.tags?.map((t) => t.value) || [];
+    const toInsert = subtractArray({
+      minuend: newTags.map((t) => t.value),
+      subtrahend: oldSetOfTagIds,
+    });
+    const toDelete = subtractArray({
+      minuend: oldSetOfTagIds,
+      subtrahend: newTags.map((t) => t.value),
+    });
+    dispatch(startLoading({}));
+    if (toInsert.length > 0) {
+      const toInsertObjects = toInsert.map((tagId) => {
+        return {
+          workflow_id: workflow.id,
+          tag_id: tagId,
+        };
+      });
+      const { data, error } = await supabase
+        .from('tag_workflow')
+        .insert(toInsertObjects);
+      if (!error) {
+        dispatch(changeWorkflow({ ...workflow, tags: newTags }));
+      } else {
+        onError(error);
+      }
+    }
+    if (toDelete.length > 0) {
+      const { data, error } = await supabase
+        .from('tag_workflow')
+        .delete()
+        .in('tag_id', toDelete)
+        .eq('workflow_id', workflow.id);
+      if (!error) {
+        dispatch(changeWorkflow({ ...workflow, tags: newTags }));
+      } else {
+        onError(error);
+      }
+    }
+    onSuccess({});
+    dispatch(finishLoading({}));
+  };
 }
 
 export const insertWorkflowAndVersion = async ({

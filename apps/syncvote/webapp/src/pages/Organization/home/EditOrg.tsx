@@ -1,7 +1,6 @@
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Button,
-  Divider,
   Drawer,
   Input,
   Modal,
@@ -13,8 +12,9 @@ import {
 import { IProfile } from '@types';
 import { useEffect, useState } from 'react';
 import InviteMember from './InviteMember';
-import { deleteOrg, upsertAnOrg } from '@dal/data';
 import { useDispatch } from 'react-redux';
+import { useSetData } from 'utils';
+import { config } from '@dal/config';
 // TODO: consider move this to src/fragments
 
 const EditOrg = ({
@@ -109,14 +109,16 @@ const EditOrg = ({
           <Button
             type='default'
             onClick={() => {
-              upsertAnOrg({
-                org: {
-                  id: orgId,
-                  title: title,
-                  desc: desc,
+              useSetData({
+                params: {
+                  org: {
+                    id: orgId,
+                    title: title,
+                    desc: desc,
+                  },
                 },
-                dispatch,
-                onLoad: () => {
+                configInfo: config.upsertAnOrg,
+                onSuccess: () => {
                   Modal.success({
                     title: 'Saved!',
                     content: 'Your changes have been saved.',
@@ -130,6 +132,7 @@ const EditOrg = ({
                   });
                   onSaved();
                 },
+                dispatch: dispatch,
               });
             }}
           >
@@ -139,8 +142,11 @@ const EditOrg = ({
             title='Delete workspace'
             description='Are you sure to delete this workspace and all of its content?'
             onConfirm={() => {
-              deleteOrg({
-                orgId,
+              useSetData({
+                params: {
+                  orgId: orgId,
+                },
+                configInfo: config.deleteOrg,
                 dispatch,
                 onSuccess: () => {
                   Modal.info({

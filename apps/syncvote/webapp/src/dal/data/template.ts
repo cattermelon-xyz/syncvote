@@ -51,7 +51,7 @@ export class TemplateFunctionClass {
     }
   }
 
-  upsertTemplate = async ({
+  async upsertTemplate({
     dispatch,
     params,
     onSuccess = () => {},
@@ -70,7 +70,7 @@ export class TemplateFunctionClass {
     };
     onSuccess?: (data: any) => void;
     onError?: (data: any) => void;
-  }) => {
+  }) {
     dispatch(startLoading({}));
 
     const {
@@ -169,12 +169,11 @@ export class TemplateFunctionClass {
         onError(errorMsg);
       }
     }
-  };
+  }
 
-  deleteTemplate = async ({
+  async deleteTemplate({
     dispatch,
     params,
-    onSuccess = () => {},
     onError = () => {},
   }: {
     params: {
@@ -184,7 +183,7 @@ export class TemplateFunctionClass {
     dispatch: any;
     onSuccess?: (data: any) => void;
     onError?: (data: any) => void;
-  }) => {
+  }) {
     const { templateId, orgId } = params;
 
     dispatch(startLoading({}));
@@ -202,7 +201,36 @@ export class TemplateFunctionClass {
     }
 
     dispatch(finishLoading({}));
-  };
+  }
+
+  async queryATemplate({
+    dispatch,
+    params,
+    onSuccess = () => {},
+    onError = () => {},
+  }: {
+    params: { templateId: number };
+    dispatch: any;
+    shouldCache: boolean;
+    onSuccess?: (data: any) => void;
+    onError?: (error: any) => void;
+    reduxDataReturn: any;
+  }) {
+    const { templateId } = params;
+
+    dispatch(startLoading({}));
+    const { data, error } = await supabase
+      .from('template')
+      .select('*')
+      .eq('id', templateId);
+    if (!error) {
+      dispatch(addTemplate(data[0]));
+      onSuccess(data[0]);
+    } else {
+      onError(error);
+    }
+    dispatch(finishLoading({}));
+  }
 }
 
 export const upsertTemplate = async ({
