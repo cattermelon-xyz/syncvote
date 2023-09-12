@@ -84,16 +84,20 @@ export interface IVoteMachine {
   abstract: ({
     checkpoint,
     data,
+    graphData,
   }: {
     checkpoint: ICheckPoint | undefined;
     data: any;
+    graphData?: IWorkflowVersionData;
   }) => JSX.Element | null;
   explain: ({
     checkpoint,
     data,
+    graphData,
   }: {
     checkpoint: ICheckPoint | undefined;
     data: any;
+    graphData?: IWorkflowVersionData;
   }) => JSX.Element;
   validate: ({ checkpoint }: { checkpoint: ICheckPoint | undefined }) => {
     isValid: boolean;
@@ -144,9 +148,18 @@ export interface IWorkflowVersionCosmetic {
   };
   layouts: IWorkflowVersionLayout[];
 }
+
+export interface IDoc {
+  id: string;
+  title: string;
+  description: string;
+  template: string;
+}
+
 export interface IWorkflowVersionData {
   start: string;
   checkpoints: ICheckPoint[];
+  docs?: IDoc[];
   cosmetic?: IWorkflowVersionCosmetic;
 }
 
@@ -169,10 +182,13 @@ export interface IGraph {
   onNodeChanged?: (data: any) => void; // new name: onReactFlowNodeChanged
   onCosmeticChanged?: (changed: IWorkflowVersionCosmetic) => void;
   onResetPosition?: () => void;
-  onAddNewNode?: () => void;
   onViewPortChange?: (viewport: any) => void;
+  onAddNewNode?: () => void;
   onChange?: (data: ICheckPoint) => void;
   onDeleteNode?: (ckpId: string) => void;
+  onAddNewDoc?: (newdoc: IDoc) => void;
+  onChangeDoc?: (doc: IDoc) => void;
+  onDeleteDoc?: (docId: string) => void;
   onConfigPanelClose?: () => void;
   onConfigEdgePanelClose?: () => void;
   onChangeLayout?: (data: IWorkflowVersionLayout) => void;

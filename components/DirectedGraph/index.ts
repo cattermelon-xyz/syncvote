@@ -6,6 +6,7 @@ export * from './src/DirectedGraph/renderVoteMachineConfigPanel';
 export * from './src/DirectedGraph/empty';
 export * from './src/DirectedGraph/interface';
 export * from './src/DirectedGraph/utils';
+export * from './src/DirectedGraph/context';
 export * from './src/DirectedGraph/components/NavConfigPanel';
 export { default as NavConfigPanel } from './src/DirectedGraph/components/NavConfigPanel';
 export { default as CollapsiblePanel } from './src/DirectedGraph/components/CollapsiblePanel';

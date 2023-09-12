@@ -1,6 +1,11 @@
 import { Space, Switch, Button, Alert, Input, Select, Modal } from 'antd';
-import { useState } from 'react';
-import { ICheckPoint, IVoteMachineConfigProps } from 'directed-graph';
+import { useContext, useState } from 'react';
+import {
+  GraphContext,
+  ICheckPoint,
+  IDoc,
+  IVoteMachineConfigProps,
+} from 'directed-graph';
 import {
   DelayUnit,
   NavConfigPanel,
@@ -16,6 +21,7 @@ import { TextEditor } from 'rich-text-editor';
 import parse from 'html-react-parser';
 import { MdDeleteOutline } from 'react-icons/md';
 import NewDocActionDrawer from './NewDocActionDrawer';
+import { FaInfo } from 'react-icons/fa6';
 
 /**
  *
@@ -48,7 +54,8 @@ export default (props: IVoteMachineConfigProps) => {
     resultDescription,
   } = props;
   const { docs, options } = data;
-  console.log('docs: ', docs);
+  const { data: graphData } = useContext(GraphContext);
+  const predefinedDocs: IDoc[] = graphData.docs || [];
   const delays = props.delays || Array(options?.length).fill(0);
   const delayUnits =
     props.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
@@ -217,14 +224,34 @@ export default (props: IVoteMachineConfigProps) => {
         <CollapsiblePanel title='Document Action'>
           <Space direction='vertical' className='w-full' size='large'>
             {docs.map((doc: DocInput.IDoc, index: number) => {
+              const predefinedDoc: any =
+                predefinedDocs.find((p: any) => p.id === doc.id) || {};
               return (
-                <Space direction='vertical' size='small' className='w-full'>
-                  <Space
-                    direction='horizontal'
-                    className='flex w-full items-center'
-                  >
-                    <MdDeleteOutline
-                      className='text-red-500 cursor-pointer'
+                <Space
+                  direction='horizontal'
+                  className='flex w-full items-center justify-between p-2'
+                  key={index}
+                >
+                  <div className='px-1 flex items-center'>
+                    {doc.action}{' '}
+                    <Button
+                      type='link'
+                      className='ml-2'
+                      onClick={() =>
+                        Modal.info({
+                          title: 'Document description & Guideline',
+                          content: parse(predefinedDoc.description),
+                        })
+                      }
+                    >
+                      {predefinedDoc.title ? predefinedDoc.title : doc.id}
+                    </Button>
+                  </div>
+                  <Space direction='horizontal' size='large'>
+                    <Button
+                      danger
+                      shape='circle'
+                      icon={<MdDeleteOutline />}
                       onClick={() => {
                         const docs = structuredClone(data.docs);
                         docs.splice(index, 1);
@@ -236,12 +263,18 @@ export default (props: IVoteMachineConfigProps) => {
                         });
                       }}
                     />
-                    <div className='p-1 bg-violet-100'>
-                      {doc.action}{' '}
-                      <span className='text-violet-500'>{doc.id}</span>
-                    </div>
+                    <Button
+                      shape='circle'
+                      icon={<FaInfo />}
+                      onClick={() =>
+                        Modal.info({
+                          title: 'Description',
+                          content: parse(doc.description),
+                        })
+                      }
+                      disabled={!doc.description}
+                    />
                   </Space>
-                  <div className='w-full'>{parse(doc.description)}</div>
                 </Space>
               );
             })}

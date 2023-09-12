@@ -10,14 +10,21 @@ import ReactFlow, {
   getTransformForBounds,
 } from 'reactflow';
 import { toPng } from 'html-to-image';
-import React, { useEffect, useCallback, useState, useContext } from 'react';
-import { Button, Drawer, Modal, Space } from 'antd';
+import React, {
+  useEffect,
+  useCallback,
+  useState,
+  useContext,
+  version,
+} from 'react';
+import { Badge, Button, Drawer, Modal, Space } from 'antd';
 import {
   BulbOutlined,
   CloseCircleOutlined,
   CloseOutlined,
   PlusOutlined,
   SyncOutlined,
+  PaperClipOutlined,
 } from '@ant-design/icons';
 import 'reactflow/dist/style.css';
 import { buildATree } from './buildATree';
@@ -25,12 +32,18 @@ import MultipleDirectNode from './CustomNodes/MultipleDiretionNode';
 import SelfConnectingEdge from './CustomEdges/SelfConnectingEdge';
 import BezierCustomEdge from './CustomEdges/BezierCustomEdge';
 import SmoothCustomEdge from './CustomEdges/SmoothCustomEdge';
-import { GraphViewMode, IGraph, IWorkflowVersionLayout } from './interface';
+import {
+  GraphViewMode,
+  IDoc,
+  IGraph,
+  IWorkflowVersionLayout,
+} from './interface';
 import CosmeticConfigPanel from './CosmeticConfigPanel';
 import QuickStartDialog from './QuickStartDialog';
 import { GraphContext } from './context';
 import EdgeConfigPanel from './EdgeConfigPanel';
 import { renderVoteMachineConfigPanel } from './renderVoteMachineConfigPanel';
+import DocsConfigPanel from './DocsConfigPanel';
 
 const nodeTypes = { ...MultipleDirectNode.getType() };
 const edgeTypes = {
@@ -75,6 +88,7 @@ const Flow = () => {
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
+  const [isDocsShown, setIsDocsShown] = useState(false);
   useOnViewportChange({
     onChange: useCallback((viewport: any) => {
       onViewPortChange ? onViewPortChange(viewport) : null;
@@ -104,6 +118,7 @@ const Flow = () => {
     hideAttribution: true,
   };
   const layouts: IWorkflowVersionLayout[] = data?.cosmetic?.layouts || [];
+  const docs: IDoc[] = data?.docs || [];
   // const defaultLayout = data?.cosmetic?.default;
   const [showCosmeticPanel, setShowCosmeticPanel] = useState(false);
   const [showQuickStartDialog, setShowQuickStartDialog] = useState(false);
@@ -154,6 +169,10 @@ const Flow = () => {
         onClose: onConfigPanelClose || (() => {}),
         onChangeLayout: onChangeLayout || (() => {}),
       })}
+      <DocsConfigPanel
+        open={isDocsShown}
+        onClose={() => setIsDocsShown(false)}
+      />
       <Drawer
         title='Layout Config'
         open={showCosmeticPanel}
@@ -259,18 +278,26 @@ const Flow = () => {
             <Panel position='bottom-center'>
               <Space direction='horizontal'>
                 <div
-                  className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer'
-                  style={{ backgroundColor: '#F4F0FA' }}
+                  className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100'
+                  onClick={() => setIsDocsShown(true)}
+                  title='List of document'
+                >
+                  <PaperClipOutlined />
+                  <Badge count={docs.length ? docs.length : 0} />
+                </div>
+                <div
+                  className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100'
                   onClick={onResetPosition}
+                  title="Reset the graph's position"
                 >
                   <SyncOutlined />
                 </div>
                 <div
-                  className={`flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer`}
-                  style={{ backgroundColor: '#F4F0FA' }}
+                  className={`flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100`}
                   onClick={() => {
                     onAddNewNode ? onAddNewNode() : null;
                   }}
+                  title='Add a new node'
                 >
                   <PlusOutlined />
                 </div>

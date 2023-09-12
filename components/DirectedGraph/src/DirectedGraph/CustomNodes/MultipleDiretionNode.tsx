@@ -102,7 +102,7 @@ const Node = memo(
           isConnectable={isConnectable}
         />
         <div
-          className={`rounded-md text-base hover:opacity-30 ${selected} ${
+          className={`rounded-md text-base ${selected} ${
             data.isEnd ? 'bg-zinc-700 text-white' : ''
           }`}
         >
@@ -116,27 +116,28 @@ const Node = memo(
               <CaretRightOutlined />
             </div>
           ) : null}
-          <div
-            className={`p-2 font-bold`}
-            style={style.title ? style.title : {}}
-          >
-            {data.label
-              ? typeof data.label === 'string'
-                ? parse(
-                    data.label.length > 30
-                      ? data.label.substr(0, 30) + '...'
-                      : data.label
-                  )
-                : data.label
-              : 'untitled'}
-          </div>
-          {data.abstract ? (
-            <div style={style.content ? style.content : {}} className='py-2'>
-              {data.abstract}
+          <div className='hover:opacity-50'>
+            <div
+              className={`p-2 font-bold`}
+              style={style.title ? style.title : {}}
+            >
+              {data.label
+                ? typeof data.label === 'string'
+                  ? parse(
+                      data.label.length > 30
+                        ? data.label.substr(0, 30) + '...'
+                        : data.label
+                    )
+                  : data.label
+                : 'untitled'}
             </div>
-          ) : null}
+            {data.abstract ? (
+              <div style={style.content ? style.content : {}} className='py-2'>
+                {data.abstract}
+              </div>
+            ) : null}
 
-          {/* {data.triggers && data.triggers.length > 0 ? (
+            {/* {data.triggers && data.triggers.length > 0 ? (
             <div className="text-xs flex justify-center gap-0.5 p-2">
               {data.triggers.map((trigger: any) => {
                 const icon = getIcon(trigger.provider, trigger.id);
@@ -155,6 +156,7 @@ const Node = memo(
               {parse(description)}
             </div>
           ) : null} */}
+          </div>
         </div>
       </>
     );

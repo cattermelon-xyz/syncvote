@@ -7,12 +7,16 @@ import {
   IVoteMachineGetLabelProps,
   displayDuration,
   SideNote,
+  GraphContext,
+  IWorkflowVersionData,
+  IDoc,
 } from 'directed-graph';
 import ConfigPanel from './ConfigPanel';
 import { DocInput, DocInput as Interface } from './interface';
 import { DocInput as Funcs } from './funcs';
 import parse from 'html-react-parser';
-import { Space } from 'antd';
+import { Button, Modal, Space } from 'antd';
+import { FaInfo } from 'react-icons/fa6';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
@@ -57,9 +61,11 @@ const getIcon = () => {
 const explain = ({
   checkpoint,
   data,
+  graphData,
 }: {
   checkpoint: ICheckPoint | undefined;
   data: Interface.IData;
+  graphData?: IWorkflowVersionData;
 }) => {
   if (!checkpoint) {
     return <></>;
@@ -67,6 +73,7 @@ const explain = ({
   const noOfOptions = checkpoint.children ? checkpoint.children.length : 0;
   const optionsDescription = checkpoint.optionsDescription;
   const docs = data.docs || [];
+  const predefinedDocs = graphData?.docs || [];
   const renderOption = ({
     data,
     index,
@@ -117,17 +124,46 @@ const explain = ({
             </ul>
           </li>
         ) : null}
-        {/* {docs.map((doc: DocInput.IDoc, index: number) => {
+        {docs.map((doc: DocInput.IDoc, index: number) => {
+          const predefinedDoc: any =
+            predefinedDocs.find((p: any) => p.id === doc.id) || {};
           return (
-            <Space direction='vertical' size='small' className='w-full'>
-              <div className='text-violet-500 '>
-                {doc.action} {doc.id}
+            <Space
+              direction='horizontal'
+              size='small'
+              className='w-full'
+              key={index}
+            >
+              <div className='flex items-center'>
+                {doc.action}{' '}
+                <Button
+                  type='link'
+                  onClick={() =>
+                    Modal.info({
+                      title: 'Description & Guideline',
+                      content: predefinedDoc.description
+                        ? parse(predefinedDoc.description)
+                        : 'No description provided',
+                    })
+                  }
+                >
+                  {predefinedDoc.title ? predefinedDoc.title : doc.id}
+                </Button>
               </div>
-
-              <div className='w-full'>{parse(doc.description)}</div>
+              <Button
+                shape='circle'
+                icon={<FaInfo />}
+                onClick={() =>
+                  Modal.info({
+                    title: 'Description',
+                    content: parse(doc.description),
+                  })
+                }
+                disabled={!doc.description}
+              />
             </Space>
           );
-        })} */}
+        })}
         <SideNote value={optionsDescription} />
       </ul>
     </>
@@ -137,19 +173,28 @@ const explain = ({
 const abstract = ({
   checkpoint,
   data,
+  graphData,
 }: {
   checkpoint: ICheckPoint | undefined;
   data: DocInput.IData;
+  graphData?: IWorkflowVersionData;
 }) => {
   const { docs } = data;
+  const predefinedDocs: IDoc[] = graphData?.docs || [];
   return docs && docs.length > 0 ? (
     <div className='p-2'>
       {docs.map((doc: DocInput.IDoc, index: number) => {
         if (index < 3) {
+          const predefinedDoc: any = predefinedDocs.find(
+            (p: any) => p.id === doc.id
+          ) || { id: doc.id };
           return (
-            <div>
+            <div key={index}>
               <div>
-                {doc.action} <span className='text-violet-500'>{doc.id}</span>
+                {doc.action}{' '}
+                <span className='text-violet-500'>
+                  {predefinedDoc.title ? predefinedDoc.title : predefinedDoc.id}
+                </span>
               </div>
             </div>
           );

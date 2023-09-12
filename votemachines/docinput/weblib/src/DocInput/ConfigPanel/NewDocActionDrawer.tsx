@@ -1,7 +1,8 @@
 import { Modal, Space, Input, Select } from 'antd';
 import { TextEditor } from 'rich-text-editor';
 import { DocInput } from '../interface';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { GraphContext, IDoc } from 'directed-graph';
 
 const NewDocActionDrawer = ({
   open,
@@ -19,15 +20,17 @@ const NewDocActionDrawer = ({
     action: DocInput.DocAction.NONE,
     description: '',
   });
+  const { data: graphData } = useContext(GraphContext);
+  const predefinedDocs = graphData.docs || [];
   return (
     <Modal
       title='Add new Document action'
       open={open}
       onCancel={() => onCancel()}
       onOk={() => {
-        if (newDoc.id === '') {
+        if (newDoc.id === '' || newDoc.action === DocInput.DocAction.NONE) {
           Modal.error({
-            content: 'id cannot be empty!',
+            content: 'Doc and Action cannot be empty!',
           });
           return;
         }
@@ -47,12 +50,17 @@ const NewDocActionDrawer = ({
       }}
     >
       <Space direction='vertical' className='w-full' size='middle'>
-        <Input
+        <Select
           value={newDoc.id}
-          placeholder='id of the document'
+          options={predefinedDocs.map((d: IDoc) => {
+            return {
+              value: d.id,
+              label: d.title,
+            };
+          })}
           className='w-full'
-          onChange={(e: any) => {
-            setNewDoc({ ...newDoc, id: e.target.value });
+          onChange={(val: string) => {
+            setNewDoc({ ...newDoc, id: val });
           }}
         />
         <Select
