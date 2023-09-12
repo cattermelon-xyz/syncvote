@@ -93,12 +93,22 @@ export class OrgFunctionClass {
               created_at,
               last_updated
             )
+          ),
+          templates:template (
+            id,
+            title,
+            desc,
+            owner_org_id,
+            icon_url,
+            banner_url,
+            status,
+            created_at,
+            current_version_id
           )
         )
       `
         )
         .eq('user_id', userId);
-
       if (!error) {
         const tmp: any[] = [];
         data.forEach((d: any) => {
@@ -161,7 +171,6 @@ export class OrgFunctionClass {
                 : workflowPresetBanner,
             };
           });
-
           tmp.push({
             id: org?.id,
             role: d.role,
@@ -174,16 +183,12 @@ export class OrgFunctionClass {
             profile: profiles,
             last_updated: org.last_updated,
             workflows: workflows || [],
+            templates: org.templates || [],
           });
         });
-
-        if (deepEqual(orgs, tmp)) {
-          onSuccess(orgs);
-        } else {
-          dispatch(setOrgsInfo(tmp));
-          dispatch(setLastFetch({}));
-          onSuccess(tmp);
-        }
+        dispatch(setOrgsInfo(tmp));
+        dispatch(setLastFetch({}));
+        onSuccess(tmp);
       } else {
         onError(error);
       }
