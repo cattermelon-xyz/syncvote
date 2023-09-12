@@ -21,7 +21,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { extractIdFromIdString, useGetDataHook } from 'utils';
 import ModalWorkflowFromTemplate from '@fragments/ModalWorkflowFromTemplate';
 import { AuthContext } from '@layout/context/AuthContext';
-import { version } from 'os';
 import { config } from '@dal/config';
 
 const Detail = () => {
@@ -37,6 +36,7 @@ const Detail = () => {
   const [template, setTemplate] = useState<any>(
     templates.find((tmpl: any) => tmpl.id === id)
   );
+  
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const [versionData, setVersionData] = useState(emptyStage);
