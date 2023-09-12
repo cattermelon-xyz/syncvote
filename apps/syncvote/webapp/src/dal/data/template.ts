@@ -105,6 +105,7 @@ export const upsertTemplate = async ({
         desc,
         icon_url: iconUrl,
         banner_url: bannerUrl,
+        status: true,
       })
       .select('id');
     if (data) {
