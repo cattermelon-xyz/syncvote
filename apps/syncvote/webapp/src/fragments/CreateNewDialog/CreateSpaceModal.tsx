@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
 import { Icon } from 'icon';
-import { Icon } from 'icon';
 import Input from '@components/Input/Input';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';

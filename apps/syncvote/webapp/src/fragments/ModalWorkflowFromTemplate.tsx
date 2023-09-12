@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { config } from '@dal/config';
-import { queryWorkflowVersionData } from '@dal/data';
+import { queryCurrentTemplateVersion } from '@dal/data/template';
 import { L } from '@utils/locales/L';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import Icon from 'icon/src/Icon';
@@ -20,21 +20,12 @@ const ModalWorkflowFromTemplate = ({
 }) => {
   const modalTitle = `Duplicate "${template?.title}"`;
 
-  const orgs = useGetDataHook({
-    configInfo: config.queryOrgs,
-  }).data;
-
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
 
-
   const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
-  }).data;
-
-  const user = useGetDataHook({
-    configInfo: config.queryUserById,
   }).data;
 
   const dispatch = useDispatch();

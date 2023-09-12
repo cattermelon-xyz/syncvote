@@ -5,15 +5,12 @@ import {
   changeWorkflow,
   setLastFetch,
   changeWorkflowVersion,
-  deleteWorkflowVersion,
-} from '@dal/redux/reducers/workflow.reducer';
 } from '@dal/redux/reducers/workflow.reducer';
 import {
   changeWorkflowOrg,
   changeWorkflowInfo,
   deleteWorkflow,
   addWorkflowToOrg,
-} from '@dal/redux/reducers/orginfo.reducer';
 } from '@dal/redux/reducers/orginfo.reducer';
 import { IWorkflow } from '@types';
 import { supabase, subtractArray } from 'utils';
