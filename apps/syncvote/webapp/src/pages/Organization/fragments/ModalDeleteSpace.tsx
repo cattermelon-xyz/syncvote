@@ -3,6 +3,8 @@ import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
 import { deleteOrg } from '@dal/data';
 import { useDispatch } from 'react-redux';
+import { useSetData } from 'utils';
+import { config } from '@dal/config';
 
 interface ModalDeleteSpaceProps {
   visible: boolean;
@@ -21,21 +23,24 @@ const ModalDeleteSpace: React.FC<ModalDeleteSpaceProps> = ({
   };
 
   const handleOk = async () => {
-    deleteOrg({
-      orgId: dataSpace.id,
+    await useSetData({
+      params: {
+        orgId: dataSpace.id,
+      },
+      configInfo: config.deleteOrg,
       dispatch,
       onSuccess: () => {
-        // Modal.success({
-        //   title: 'Success',
-        //   content: 'Delete workspace successfully',
-        // });
+        Modal.success({
+          title: 'Success',
+          content: 'Delete workspace successfully',
+        });
         onClose();
       },
       onError: () => {
-        // Modal.error({
-        //   title: 'Error',
-        //   content: 'Failed to delete workspace',
-        // });
+        Modal.error({
+          title: 'Error',
+          content: 'Failed to delete workspace',
+        });
         onClose();
       },
     });
