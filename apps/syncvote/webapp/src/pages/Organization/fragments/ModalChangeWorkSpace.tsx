@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
 import { Icon } from 'icon';
+import { Icon } from 'icon';
 import { L } from '@utils/locales/L';
 import { useDispatch } from 'react-redux';
 import { useGetDataHook, useSetData } from 'utils';

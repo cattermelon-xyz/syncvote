@@ -28,20 +28,27 @@ const ModalWorkflowFromTemplate = ({
     configInfo: config.queryUserById,
   }).data;
 
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
   const dispatch = useDispatch();
   const handleOk = async () => {
     const org = orgs.find((org: any) => org.id === orgId);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
     onClose();
-
-    // this function don't need use dal
-    const { data, error } = await queryWorkflowVersionData({
+    const { data, error } = await queryCurrentTemplateVersion({
       dispatch,
-      versionId: template.current_version_id,
+      current_version_id: template?.current_version_id,
     });
 
     if (data) {
-      const versionData = data[0].data;
+      const versionData = data?.data;
       const props = {
         title: 'Duplicate of ' + template?.title,
         desc: template?.desc,
