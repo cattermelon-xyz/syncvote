@@ -104,6 +104,7 @@ const ContextTab = () => {
   const summary = getVoteMachine(selectedNode?.vote_machine_type)?.explain({
     checkpoint: selectedNode,
     data: selectedNode?.data,
+    graphData: data,
   });
   const vmValidation = getVoteMachine(
     selectedNode?.vote_machine_type

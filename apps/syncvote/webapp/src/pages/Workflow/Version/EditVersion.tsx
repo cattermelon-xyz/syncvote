@@ -9,6 +9,7 @@ import {
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
 import {
   DirectedGraph,
+  IDoc,
   defaultLayout,
   emptyCosmetic,
   emptyStage,
@@ -114,6 +115,7 @@ export const EditVersion = () => {
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
+  const [showDocs, setShownDocs] = useState(false);
   const extractWorkflowFromList = (wfList: any) => {
     let extractedVersion = extractVersion({
       workflows: wfList,
@@ -433,6 +435,46 @@ export const EditVersion = () => {
       y: (-viewport.y + 250) / viewport.zoom,
     });
   };
+  const onAddNewDoc = (doc: IDoc) => {
+    console.log('add new doc: ', doc);
+    const newData = structuredClone(version?.data);
+    if (!newData.docs) {
+      newData.docs = [];
+    }
+    newData.docs.push({ ...doc, id: `doc-${new Date().getTime()}` });
+    console.log('newData: ', newData);
+    setVersion({
+      ...version,
+      data: newData,
+    });
+  };
+  const onDeleteDoc = (docId: string) => {
+    const newData = structuredClone(version?.data);
+    if (newData.docs) {
+      const idx = newData.docs.findIndex((d: IDoc) => d.id === docId);
+      if (idx !== -1) {
+        newData.docs.splice(docId, 1);
+        console.log('newData: ', newData);
+        setVersion({
+          ...version,
+          data: newData,
+        });
+      }
+    }
+  };
+  const onChangeDoc = (changedDoc: IDoc) => {
+    const newData = structuredClone(version?.data);
+    if (newData.docs) {
+      const idx = newData.docs.findIndex((d: IDoc) => d.id === changedDoc.id);
+      if (idx !== -1) {
+        newData.docs[idx] = structuredClone(changedDoc);
+        setVersion({
+          ...version,
+          data: newData,
+        });
+      }
+    }
+  };
   const markers =
     version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
       ?.markers || [];
@@ -634,6 +676,9 @@ export const EditVersion = () => {
                     onResetPosition={onResetPosition}
                     onAddNewNode={onAddNewNode}
                     onViewPortChange={onViewPortChange}
+                    onAddNewDoc={onAddNewDoc}
+                    onChangeDoc={onChangeDoc}
+                    onDeleteDoc={onDeleteDoc}
                   />
                 </div>
               )}
