@@ -3,6 +3,7 @@ import {
   IWorkflowVersionData,
   IWorkflowVersionCosmetic,
   IWorkflowVersionLayout,
+  IDoc,
 } from './interface';
 
 const rootCheckPoint: ICheckPoint = {
@@ -46,5 +47,13 @@ export const emptyLayout: IWorkflowVersionLayout = {
 export const emptyStage: IWorkflowVersionData = {
   checkpoints: [rootCheckPoint],
   cosmetic: emptyCosmetic,
+  docs: [],
   start: 'root',
+};
+
+export const emptyDoc: IDoc = {
+  id: '',
+  title: '',
+  description: '',
+  template: '',
 };

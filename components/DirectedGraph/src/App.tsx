@@ -4,8 +4,6 @@ import { Layout } from 'antd';
 import { emptyStage } from './DirectedGraph/empty';
 import { DirectedGraph } from './DirectedGraph/DirectedGraph';
 import { GraphViewMode } from './DirectedGraph/interface';
-import { registerVoteMachine } from './DirectedGraph/voteMachine';
-import { SingleChoice } from 'single-vote';
 import { fakeVersion } from './mockData/fakeVersion';
 
 function App() {
@@ -15,11 +13,6 @@ function App() {
   const [version, setVersion] = useState<any>(fakeVersion);
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
   const [isVoteMachineRegistered, setIsVoteMachineRegistered] = useState(false);
-
-  useEffect(() => {
-    registerVoteMachine(SingleChoice);
-    setIsVoteMachineRegistered(true);
-  }, []);
 
   return (
     <div className='App h-screen'>

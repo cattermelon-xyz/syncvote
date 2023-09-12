@@ -279,7 +279,11 @@ export const buildATree = ({
           raw: checkpoint,
           triggers: checkpoint.triggers,
           selected: checkpoint.id === selectedNodeId,
-          abstract: vm?.abstract({ checkpoint, data: checkpoint.data }),
+          abstract: vm?.abstract({
+            checkpoint,
+            data: checkpoint.data,
+            graphData: data,
+          }),
         },
         x: checkpoint.x,
         y: checkpoint.y,

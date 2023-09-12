@@ -9,6 +9,7 @@
     "votemachines/singlevote/weblib",
     "votemachines/upvote/weblib",
     "votemachines/veto/weblib",
+    "votemachines/docinput/weblib",
     "utils"
   ]
 }

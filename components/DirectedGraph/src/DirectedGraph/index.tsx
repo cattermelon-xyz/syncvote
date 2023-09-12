@@ -4,5 +4,6 @@ export * from './DirectedGraph';
 export * from './voteMachine';
 export * from './renderVoteMachineConfigPanel';
 export * from './empty';
+export * from './context';
 
 export type { icp as ICheckPoint };
