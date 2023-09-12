@@ -131,4 +131,12 @@ export const config: ConfigObject = {
   updateAWorkflowTag: {
     dalFunction: workflowFunction.updateAWorkflowTag,
   },
+
+  updateAWorkflowInfo: {
+    dalFunction: workflowFunction.updateAWorkflowInfo,
+  },
+
+  upsertWorkflowVersion: {
+    dalFunction: workflowFunction.upsertWorkflowVersion,
+  },
 };

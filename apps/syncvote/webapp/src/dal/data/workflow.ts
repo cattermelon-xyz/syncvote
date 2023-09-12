@@ -348,6 +348,134 @@ export class WorkflowFunctionClass {
     onSuccess({});
     dispatch(finishLoading({}));
   };
+
+  async updateAWorkflowInfo({
+    params,
+    dispatch,
+    onSuccess,
+    onError = () => {},
+  }: {
+    params: any;
+    dispatch: any;
+    onSuccess: (data: any) => void;
+    onError?: (data: any) => void;
+  }) {
+    dispatch(startLoading({}));
+    const { id, title, desc, iconUrl, bannerUrl } = params;
+    let icon_url, preset_icon_url; // eslint-disable-line
+    let banner_url, preset_banner_url;
+    if (iconUrl?.startsWith('preset:')) {
+      preset_icon_url = iconUrl.replace('preset:', ''); // eslint-disable-line
+      icon_url = '';
+    } else {
+      preset_icon_url = '';
+      icon_url = iconUrl; // eslint-disable-line
+    }
+    if (bannerUrl?.startsWith('preset:')) {
+      preset_banner_url = bannerUrl.replace('preset:', ''); // eslint-disable-line
+      banner_url = '';
+    } else {
+      preset_banner_url = '';
+      banner_url = bannerUrl; // eslint-disable-line
+    }
+    const toUpdate: any = {};
+    if (title) toUpdate.title = title;
+    if (desc) toUpdate.desc = desc;
+    if (icon_url !== undefined) toUpdate.icon_url = icon_url;
+    if (banner_url !== undefined) toUpdate.banner_url = banner_url;
+    if (preset_icon_url !== undefined)
+      toUpdate.preset_icon_url = preset_icon_url;
+    if (preset_banner_url !== undefined)
+      toUpdate.preset_banner_url = preset_banner_url;
+    const { data, error } = await supabase
+      .from('workflow')
+      .update(toUpdate)
+      .eq('id', id).select(`*, versions: workflow_version(
+        id, 
+        data,
+        preview_image_url,
+        status,
+        created_at,
+        last_updated
+      )`);
+    dispatch(finishLoading({}));
+    if (data) {
+      const newData = structuredClone(data);
+      data.forEach((d: any, index: number) => {
+        const presetIcon = d.preset_icon_url
+          ? `preset:${d.preset_icon_url}`
+          : d.icon_url;
+        const presetBanner = d.preset_banner_url
+          ? `preset:${d.preset_banner_url}`
+          : d.banner_url;
+        newData[index].icon_url = d.icon_url ? d.icon_url : presetIcon;
+        newData[index].banner_url = d.banner_url ? d.banner_url : presetBanner;
+        delete newData[index].preset_icon_url;
+        delete newData[index].preset_banner_url;
+      });
+      dispatch(changeWorkflowInfo({ workflow: newData[0] }));
+      dispatch(changeWorkflow(newData[0]));
+      onSuccess(newData);
+    } else {
+      onError(error);
+    }
+  }
+
+  async upsertWorkflowVersion({
+    dispatch,
+    params,
+    onSuccess = () => {},
+    onError = (error: any) => {
+      console.error(error);
+    }, // es-lint-disable-line
+  }: {
+    params: {
+      versionId: number;
+      workflowId: number;
+      version?: string;
+      status?: string;
+      versionData?: any;
+      recommended?: boolean;
+      mode?: 'data' | 'info' | undefined;
+    };
+    dispatch: any;
+    onSuccess?: (data: any) => void;
+    onError?: (data: any) => void;
+  }) {
+    dispatch(startLoading({}));
+    const {
+      versionId,
+      workflowId,
+      version,
+      status,
+      versionData,
+      recommended,
+      mode,
+    } = params;
+    const toUpsert: any = {
+      id: versionId !== -1 ? versionId : undefined,
+      workflow_id: workflowId,
+    };
+    if (!mode || mode === 'data') {
+      toUpsert.data = versionData;
+    }
+    if (!mode || mode === 'info') {
+      version ? (toUpsert.version = version) : null;
+      status ? (toUpsert.status = status) : null;
+      recommended ? (toUpsert.recommended = recommended) : null;
+    }
+    const { data, error } = await supabase
+      .from('workflow_version')
+      .upsert(toUpsert)
+      .select();
+    if (data) {
+      dispatch(changeWorkflowVersion(data[0]));
+      onSuccess(data[0]);
+    } else {
+      onError(error);
+    }
+    dispatch(finishLoading({}));
+  }
 }
 
 export const insertWorkflowAndVersion = async ({

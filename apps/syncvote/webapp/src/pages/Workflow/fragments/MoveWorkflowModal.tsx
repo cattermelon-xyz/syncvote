@@ -1,9 +1,9 @@
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { useEffect, useState } from 'react';
-import { Icon } from 'icon';
-import { useGetDataHook } from 'utils';
+import { useState } from 'react';
 import { config } from '@dal/config';
+import { useGetDataHook } from 'utils';
+import { Icon } from 'icon';
 
 interface MoveWorkflowModalProps {
   open: boolean;
@@ -18,30 +18,23 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
   workflow,
   openMoveToModal,
 }) => {
-  const presetIcons =
-    useGetDataHook({
-      configInfo: config.queryPresetIcons,
-    }).data;
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+    start: open,
+  }).data;
 
-  const [dataOrgs, setDataOrgs] = useState<any>([]);
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+    start: open,
+  }).data;
 
-  const orgs =
-    useGetDataHook({
-      configInfo: config.queryOrgs,
-    }).data;
+  let dataOrgs: any;
+  let org_owner: any;
 
-  const [org_owner, setOrgOwner] = useState<any>();
-
-  useEffect(() => {
-    const dataOrgs = orgs.filter(
-      (org: any) => org.id !== workflow.owner_org_id
-    );
-    setDataOrgs(dataOrgs);
-
-    const org_owner = orgs.find((org: any) => org.id === workflow.owner_org_id);
-
-    setOrgOwner(org_owner);
-  }, [orgs]);
+  if (orgs) {
+    dataOrgs = orgs.filter((org: any) => org.id !== workflow.owner_org_id);
+    org_owner = orgs.find((org: any) => org.id === workflow.owner_org_id);
+  }
 
   const handleCancel = () => {
     onClose();
@@ -94,42 +87,46 @@ const MoveWorkflowModal: React.FC<MoveWorkflowModalProps> = ({
 
       <Space className='h-60 w-full overflow-y-scroll' direction='vertical'>
         <Radio.Group onChange={onChange} value={value} className='w-full'>
-          {dataOrgs.map((org: any, index: any) => (
-            <div
-              className='flex h-12 items-center radio cursor-pointer'
-              key={index}
-              style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
-              onMouseEnter={() => setHovered(index)}
-              onMouseLeave={() => setHovered(null)}
-              onClick={() => {
-                if (value) {
-                  if (value === org?.id) {
-                    setValue(null);
-                  } else {
-                    setValue(org?.id);
-                  }
-                } else {
-                  setValue(org?.id);
-                }
-              }}
-            >
-              {hovered === index || org?.id === value ? (
-                <Space className='p-3'>
-                  <Radio value={org.id} className='w-6 h-6' />
-                  <div className='text-base'>{org?.title}</div>
-                </Space>
-              ) : (
-                <Space className='p-3'>
-                  <Icon
-                    presetIcon={presetIcons}
-                    iconUrl={org.icon_url ? org.icon_url : ''}
-                    size='medium'
-                  />
-                  <div className='ml-2 text-base'>{org?.title}</div>
-                </Space>
-              )}
-            </div>
-          ))}
+          {dataOrgs && (
+            <>
+              {dataOrgs.map((org: any, index: any) => (
+                <div
+                  className='flex h-12 items-center radio cursor-pointer'
+                  key={index}
+                  style={{ backgroundColor: org.id === value ? '#f6f6f6' : '' }}
+                  onMouseEnter={() => setHovered(index)}
+                  onMouseLeave={() => setHovered(null)}
+                  onClick={() => {
+                    if (value) {
+                      if (value === org?.id) {
+                        setValue(null);
+                      } else {
+                        setValue(org?.id);
+                      }
+                    } else {
+                      setValue(org?.id);
+                    }
+                  }}
+                >
+                  {hovered === index || org?.id === value ? (
+                    <Space className='p-3'>
+                      <Radio value={org.id} className='w-6 h-6' />
+                      <div className='text-base'>{org?.title}</div>
+                    </Space>
+                  ) : (
+                    <Space className='p-3'>
+                      <Icon
+                        presetIcon={presetIcons}
+                        iconUrl={org.icon_url ? org.icon_url : ''}
+                        size='medium'
+                      />
+                      <div className='ml-2 text-base'>{org?.title}</div>
+                    </Space>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
         </Radio.Group>
       </Space>
     </Modal>

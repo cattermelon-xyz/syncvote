@@ -1,11 +1,11 @@
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { insertWorkflowAndVersion } from '@dal/data';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Icon } from 'icon';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { createIdString, useGetDataHook } from 'utils';
+import { createIdString, useGetDataHook, useSetData } from 'utils';
 import { useState } from 'react';
 import { config } from '@dal/config';
 
@@ -50,15 +50,18 @@ const DuplicateWorkflowModal: React.FC<DuplicateWorkflowModalProps> = ({
       iconUrl: workflow.icon_url,
       authority: user.id,
     };
-    insertWorkflowAndVersion({
-      dispatch: dispatch,
-      props: props,
-      onError: (error) => {
-        Modal.error({ content: error.message });
-      },
-      onSuccess: (versions, insertedId) => {
+
+    await useSetData({
+      onSuccess: (data: any) => {
+        const { versions, insertedId } = data;
         navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
       },
+      onError: (error: any) => {
+        Modal.error({ content: error.message });
+      },
+      params: props,
+      configInfo: config.insertWorkflowAndVersion,
+      dispatch: dispatch,
     });
     onClose();
   };
