@@ -23,9 +23,7 @@ function Header() {
     configInfo: config.queryTemplate,
   }).data;
 
-  const [template, setTemplate] = useState<any>(
-    templates.find((tmpl: any) => tmpl.id === id)
-  );
+  const template = templates.find((tmpl: any) => tmpl.id === id);
 
   const { isAuth } = useContext(AuthContext);
   return (
