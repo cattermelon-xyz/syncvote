@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Icon } from 'icon';
 import { Card, Button, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateUserProfile } from '@dal/data';
+import { useDispatch } from 'react-redux';
 import { Modal } from 'antd';
 import ChangeModal from '@pages/Account/pages/AccountSetting/fragments/ChangeAccountModal';
-import { useGetDataHook } from 'utils';
+import { useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
 
 const AccountSetting = () => {
@@ -14,8 +13,8 @@ const AccountSetting = () => {
 
   const user = useGetDataHook({
     configInfo: config.queryUserById,
-  }).data;
-  
+  }).data;  
+
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url);
   const [openModal, setOpenModal] = useState(false);
   const [isChangeName, setIsChangeName] = useState(false);
@@ -28,17 +27,20 @@ const AccountSetting = () => {
     setAvatarUrl(user?.avatar_url);
   }, [user]);
 
-  const handleChangeAvatar = (obj: any) => {
+  const handleChangeAvatar = async (obj: any) => {
     const newAvatarUrl = obj.isPreset ? `preset:${obj.filePath}` : obj.filePath;
 
     setAvatarUrl(newAvatarUrl);
 
-    updateUserProfile({
-      userProfile: {
-        ...user,
-        icon_url: newAvatarUrl,
+    await useSetData({
+      params: {
+        userProfile: {
+          ...user,
+          icon_url: newAvatarUrl,
+        },
       },
-      dispatch,
+      configInfo: config.updateUserProfile,
+      dispatch: dispatch,
       onSuccess: () => {
         // dispatch(
         //   setUser({
@@ -58,6 +60,32 @@ const AccountSetting = () => {
         });
       },
     });
+
+    // updateUserProfile({
+    //   userProfile: {
+    //     ...user,
+    //     icon_url: newAvatarUrl,
+    //   },
+    //   dispatch,
+    //   onSuccess: () => {
+    //     // dispatch(
+    //     //   setUser({
+    //     //     ...user,
+    //     //     avatar_url: newAvatarUrl,
+    //     //   })
+    //     // );
+    //     Modal.success({
+    //       title: 'Success',
+    //       content: 'Change avatar successfully',
+    //     });
+    //   },
+    //   onError: () => {
+    //     Modal.error({
+    //       title: 'Error',
+    //       content: 'Cannot change avatar',
+    //     });
+    //   },
+    // });
   };
 
   const showModal = () => {

@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
 import { Icon } from 'icon';
 import { L } from '@utils/locales/L';
-import { useDispatch, useSelector } from 'react-redux';
-import { upsertAnOrg } from '@dal/data';
-import { useGetDataHook } from 'utils';
+import { useDispatch } from 'react-redux';
+import { useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
 
 interface ModalChangeWorkSpaceProps {
@@ -25,7 +24,7 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
-  
+
   const handleCancel = () => {
     onClose();
   };
@@ -36,20 +35,23 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
   };
 
   const handleChangeSpaceInfo = async () => {
-    upsertAnOrg({
-      org: {
-        ...dataSpace,
-        icon_url: iconUrl,
-        title: title,
+    await useSetData({
+      params: {
+        org: {
+          ...dataSpace,
+          icon_url: iconUrl,
+          title: title,
+        },
       },
-      onLoad: (data) => {
+      configInfo: config.upsertAnOrg,
+      onSuccess: () => {
         Modal.success({
           title: 'Success',
           content: 'Change avatar successfully',
         });
         onClose();
       },
-      onError: (error) => {
+      onError: () => {
         // Lưu ý thêm tham số error
         Modal.error({
           title: 'Error',
@@ -57,8 +59,32 @@ const ModalChangeWorkSpace: React.FC<ModalChangeWorkSpaceProps> = ({
         });
         onClose();
       },
-      dispatch,
+      dispatch: dispatch,
     });
+
+    // upsertAnOrg({
+    //   org: {
+    //     ...dataSpace,
+    //     icon_url: iconUrl,
+    //     title: title,
+    //   },
+    //   onLoad: (data) => {
+    //     Modal.success({
+    //       title: 'Success',
+    //       content: 'Change avatar successfully',
+    //     });
+    //     onClose();
+    //   },
+    //   onError: (error) => {
+    //     // Lưu ý thêm tham số error
+    //     Modal.error({
+    //       title: 'Error',
+    //       content: 'Cannot change avatar',
+    //     });
+    //     onClose();
+    //   },
+    //   dispatch,
+    // });
   };
 
   return (

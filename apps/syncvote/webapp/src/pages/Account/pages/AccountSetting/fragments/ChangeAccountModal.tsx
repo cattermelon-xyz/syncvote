@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, Input } from 'antd';
 import { L } from '@utils/locales/L';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateUserProfile } from '@dal/data';
-import { useGetDataHook } from 'utils';
+import { useDispatch } from 'react-redux';
+import { useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
 
 interface ChangeModalProps {
@@ -24,7 +23,7 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
-  
+
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [content, setContent] = useState('');
 
@@ -36,9 +35,13 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
     } else {
       newUserProfile.about_me = content;
     }
-    updateUserProfile({
-      userProfile: newUserProfile,
-      dispatch,
+
+    await useSetData({
+      params: {
+        userProfile: newUserProfile,
+      },
+      configInfo: config.updateUserProfile,
+      dispatch: dispatch,
       onSuccess: () => {
         Modal.success({
           title: 'Success',
@@ -52,6 +55,23 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
         });
       },
     });
+
+    // updateUserProfile({
+    //   userProfile: newUserProfile,
+    //   dispatch,
+    //   onSuccess: () => {
+    //     Modal.success({
+    //       title: 'Success',
+    //       content: 'Change information successfully',
+    //     });
+    //   },
+    //   onError: () => {
+    //     Modal.error({
+    //       title: 'Error',
+    //       content: 'Cannot change information',
+    //     });
+    //   },
+    // });
 
     onClose();
     // setConfirmLoading(true);

@@ -1,14 +1,12 @@
-import { SaveOutlined } from '@ant-design/icons';
 import { Banner } from 'banner';
 import { TextEditor } from 'rich-text-editor';
 import { Icon } from 'icon';
-import { updateAWorkflowTag } from '@dal/data';
 import { newTag } from '@dal/data/tag';
 import { ITag, IWorkflow } from '@types';
 import { Drawer, Input, Select, SelectProps, Space, Switch } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useGetDataHook } from 'utils';
+import { useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
 
 const EditWorkflow = ({
@@ -60,22 +58,19 @@ const EditWorkflow = ({
   const [iconUrl, setIconUrl] = useState(workflowIcon);
   const [status, setStatus] = useState(workflow?.workflow_version[0]?.status);
 
-  const presetBanners =
-    useGetDataHook({
-      configInfo: config.queryPresetBanners,
-    }).data;
+  const presetBanners = useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  }).data;
 
-  const tags: ITag[] =
-    useGetDataHook({
-      configInfo: config.queryTag,
-    }).data;
+  const tags: ITag[] = useGetDataHook({
+    configInfo: config.queryTag,
+  }).data;
 
   const dispatch = useDispatch();
 
-  const presetIcons =
-    useGetDataHook({
-      configInfo: config.queryPresetIcons,
-    }).data;
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   useEffect(() => {
     setTitle(workflow?.title);
@@ -116,11 +111,12 @@ const EditWorkflow = ({
         newTags.push(newTagData);
       }
     }
-    await updateAWorkflowTag({
-      workflow,
-      dispatch,
-      newTags,
-      onSuccess: (data) => {
+
+    await useSetData({
+      params: { workflow: workflow, newTags: newTags },
+      configInfo: config.updateAWorkflowTag,
+      dispatch: dispatch,
+      onSuccess: () => {
         setOpen(true);
       },
     });

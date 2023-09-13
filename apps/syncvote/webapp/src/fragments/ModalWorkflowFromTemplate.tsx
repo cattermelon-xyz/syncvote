@@ -1,15 +1,13 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { config } from '@dal/config';
 import { queryCurrentTemplateVersion } from '@dal/data/template';
-import { insertWorkflowAndVersion } from '@dal/data';
 import { L } from '@utils/locales/L';
 import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
-import { on } from 'events';
 import Icon from 'icon/src/Icon';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { createIdString, useGetDataHook } from 'utils';
+import { createIdString, useGetDataHook, useSetData } from 'utils';
 // TODO: should merge with DuplicationWorkflowModal to avoid code duplication
 const ModalWorkflowFromTemplate = ({
   template,
@@ -22,12 +20,12 @@ const ModalWorkflowFromTemplate = ({
 }) => {
   const modalTitle = `Duplicate "${template?.title}"`;
 
-  const orgs = useGetDataHook({
-    configInfo: config.queryOrgs,
-  }).data;
-
   const user = useGetDataHook({
     configInfo: config.queryUserById,
+  }).data;
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
   }).data;
 
   const dispatch = useDispatch();
@@ -39,6 +37,7 @@ const ModalWorkflowFromTemplate = ({
       dispatch,
       current_version_id: template?.current_version_id,
     });
+
     if (data) {
       const versionData = data?.data;
       const props = {
@@ -49,16 +48,30 @@ const ModalWorkflowFromTemplate = ({
         iconUrl: template.icon_url,
         authority: user.id,
       };
-      insertWorkflowAndVersion({
+
+      await useSetData({
+        params: props,
+        configInfo: config.insertWorkflowAndVersion,
         dispatch: dispatch,
-        props: props,
         onError: (error) => {
           Modal.error({ content: error.message });
         },
-        onSuccess: (versions, insertedId) => {
+        onSuccess: (data) => {
+          const { versions, insertedId } = data;
           navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
         },
       });
+
+      // insertWorkflowAndVersion({
+      //   dispatch: dispatch,
+      //   props: props,
+      //   onError: (error) => {
+      //     Modal.error({ content: error.message });
+      //   },
+      //   onSuccess: (versions, insertedId) => {
+      //     navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      //   },
+      // });
     } else {
       Modal.error({ content: error?.message });
     }

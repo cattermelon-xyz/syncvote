@@ -8,7 +8,6 @@ import {
   removeUserOfOrg,
   deleteOrgInfo,
 } from '@dal/redux/reducers/orginfo.reducer';
-import { off } from 'process';
 import { deepEqual } from '@utils/helpers';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -109,6 +108,7 @@ export class OrgFunctionClass {
       `
         )
         .eq('user_id', userId);
+
       if (!error) {
         const tmp: any[] = [];
         data.forEach((d: any) => {
@@ -171,6 +171,7 @@ export class OrgFunctionClass {
                 : workflowPresetBanner,
             };
           });
+
           tmp.push({
             id: org?.id,
             role: d.role,
@@ -186,9 +187,14 @@ export class OrgFunctionClass {
             templates: org.templates || [],
           });
         });
-        dispatch(setOrgsInfo(tmp));
-        dispatch(setLastFetch({}));
-        onSuccess(tmp);
+
+        if (deepEqual(orgs, tmp)) {
+          onSuccess(orgs);
+        } else {
+          dispatch(setOrgsInfo(tmp));
+          dispatch(setLastFetch({}));
+          onSuccess(tmp);
+        }
       } else {
         onError(error);
       }
@@ -314,6 +320,66 @@ export class OrgFunctionClass {
     } else if (error) {
       onError(error);
     }
+  }
+
+  async newOrg({
+    params,
+    onSuccess = () => {},
+    onError = () => {},
+    dispatch,
+  }: {
+    params: {
+      orgInfo: {
+        title: string;
+        desc?: string;
+        icon_url: string;
+        org_size?: string;
+        org_type?: string;
+        preset_banner_url?: string;
+      };
+      uid: string;
+    };
+    onSuccess?: (data: any) => void;
+    onError?: (data: any) => void;
+    dispatch: any;
+  }) {
+    const { orgInfo, uid } = params;
+    dispatch(startLoading({}));
+
+    try {
+      const url =
+        'https://uafmqopjujmosmilsefw.supabase.co/functions/v1/new-org';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${supabaseAnonKey}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          orgInfo,
+          uid,
+        }),
+      });
+      const result = await response.json();
+      if (result) {
+        const data = result[0];
+        const info = structuredClone(orgInfo);
+        dispatch(
+          changeOrgInfo({
+            id: data.id,
+            role: 'ADMIN',
+            ...info,
+          })
+        );
+        dispatch(setLastFetch({}));
+        onSuccess(data);
+      } else {
+        onError(new Error("Can't create organization"));
+      }
+    } catch (error) {
+      onError(error);
+    }
+    dispatch(finishLoading({}));
   }
 }
 
