@@ -4,7 +4,8 @@ import { TagObject } from '@dal/data/tag';
 import { ITag } from '@types';
 import { Input, Modal, Space, Tag } from 'antd';
 import { useState } from 'react';
-import { useGetDataHook } from 'utils';
+import { useGetDataHook, useSetData } from 'utils';
+import { useDispatch } from 'react-redux';
 
 type SearchWithTagProps = {
   className?: string;
@@ -19,13 +20,12 @@ const SearchWithTag = ({
   tagTo = TagObject.TEMPLATE,
   onResult,
 }: SearchWithTagProps) => {
+  const tags: ITag[] = useGetDataHook({
+    params: { tagTo: tagTo },
+    configInfo: config.queryTag,
+  }).data;
 
-  const tags: ITag[] =
-    useGetDataHook({
-      params: { tagTo: tagTo },
-      configInfo: config.queryTag,
-    }).data;
-
+  const dispatch = useDispatch();
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [inputSearchText, setInputSearchText] = useState('');
   const [toSearch, setToSearch] = useState('');
@@ -43,12 +43,29 @@ const SearchWithTag = ({
     }
   };
 
-  const search = ({ tags, text }: { tags: any[]; text: string }) => {
+  const search = async ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
     // TODO: change to search api
+    await useSetData({
+      params: {
+        inputSearch: text,
+      },
+      configInfo: config.searchTemplate,
+      dispatch,
+      onSuccess: (data) => {
+        onResult(data);
+        setLoading(false);
+      },
+      onError: () => {
+        Modal.error({
+          title: 'Error',
+          content: 'Search failed',
+        });
+      },
+    });
     setLoading(false);
   };
-  
+
   return (
     <Space className={`flex w-full my-8 ${className}`} direction='vertical'>
       <Input

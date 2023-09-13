@@ -50,6 +50,38 @@ export class TemplateFunctionClass {
       dispatch(finishLoading({}));
     }
   }
+
+  async searchTemplate({
+    params,
+    dispatch,
+    onSuccess,
+    onError = (error) => {
+      console.log(error);
+    },
+  }: {
+    params: { inputSearch: string };
+    dispatch: any;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+  }) {
+    dispatch(startLoading({}));
+    const { inputSearch } = params;
+    const { data, error } = await supabase
+      .from('template')
+      .select(`*`)
+      .eq('status', true)
+      .textSearch('title', `'${inputSearch}'`);
+
+    if (error) {
+      onError(error);
+    } else {
+      if (data) {
+        onSuccess(data);
+      }
+    }
+
+    dispatch(finishLoading({}));
+  }
 }
 
 export const upsertTemplate = async ({

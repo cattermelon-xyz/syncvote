@@ -45,6 +45,10 @@ export const config: ConfigObject = {
     reduxObjectPath: 'template',
   },
 
+  searchTemplate: {
+    dalFunction: templateFunction.searchTemplate,
+  },
+
   queryPresetIcons: {
     dalFunction: presetFunction.queryPresetIcons, // done
     reduxObjectPath: 'preset',
