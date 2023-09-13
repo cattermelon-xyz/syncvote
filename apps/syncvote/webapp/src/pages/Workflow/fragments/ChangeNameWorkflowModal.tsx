@@ -2,8 +2,9 @@ import { Modal } from 'antd';
 import { L } from '@utils/locales/L';
 import Input from '@components/Input/Input';
 import { useState } from 'react';
-import { updateAWorkflowInfo } from '@dal/data';
 import { useDispatch } from 'react-redux';
+import { useSetData } from 'utils';
+import { config } from '@dal/config';
 
 interface ChangeNameWorkflowModalProps {
   open: boolean;
@@ -24,19 +25,18 @@ const ChangeNameWorkflowModal: React.FC<ChangeNameWorkflowModalProps> = ({
   };
 
   const handleOk = async () => {
-    await updateAWorkflowInfo({
-      info: {
+    await useSetData({
+      params: {
         id: workflow?.id,
         title: inputValue,
         desc: workflow?.desc,
         iconUrl: workflow?.icon_url,
         bannerUrl: workflow?.banner_url,
       },
+      configInfo: config.updateAWorkflowInfo,
       dispatch: dispatch,
-      onSuccess: (data: any) => {
-        // console.log(data);
-      },
     });
+
     onClose();
   };
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

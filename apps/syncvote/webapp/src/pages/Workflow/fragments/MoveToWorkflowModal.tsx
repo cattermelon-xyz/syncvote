@@ -1,9 +1,7 @@
-import { Button, Checkbox, Modal, Radio, RadioChangeEvent, Space } from 'antd';
+import { Checkbox, Modal, Space } from 'antd';
 import { L } from '@utils/locales/L';
-import { useEffect, useState } from 'react';
 import { changeAWorkflowOrg } from '@dal/data';
-import { useDispatch, useSelector } from 'react-redux';
-import {Icon} from 'icon';
+import { useDispatch } from 'react-redux';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 interface MoveToWorkflowModalProps {

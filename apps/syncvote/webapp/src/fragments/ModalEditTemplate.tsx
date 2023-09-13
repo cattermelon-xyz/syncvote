@@ -1,13 +1,12 @@
 import { config } from '@dal/config';
-import { upsertTemplate } from '@dal/data/template';
 import { IOrgInfo } from '@types';
 import { Modal, Space, Select, Input } from 'antd';
 import { Banner } from 'banner';
 import Icon from 'icon/src/Icon';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { TextEditor } from 'rich-text-editor';
-import { useGetDataHook } from 'utils';
+import { useGetDataHook, useSetData } from 'utils';
 
 type OrgSelectOption = {
   value: number;
@@ -47,20 +46,20 @@ const ModalEditTemplate = ({
   const [workflowId, setWorkflowId] = useState<number | undefined>(undefined);
   const [workflowVersionId, setWorkflowVersionId] = useState(-1);
 
-  const presetIcons =
-    useGetDataHook({
-      configInfo: config.queryPresetIcons,
-    }).data;
+  const [data, setData] = useState(null);
+  const [error, setError] = useState('');
 
-  const presetBanners =
-    useGetDataHook({
-      configInfo: config.queryPresetBanners,
-    }).data;
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
-  const orgs =
-    useGetDataHook({
-      configInfo: config.queryOrgs,
-    }).data;
+  const presetBanners = useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  }).data;
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
 
   const dispatch = useDispatch();
   const modalTitle =
@@ -152,11 +151,26 @@ const ModalEditTemplate = ({
           bannerUrl,
           workflowVersionId,
         };
+
         onCancel();
-        const { data, error } = await upsertTemplate({
-          dispatch,
-          ...toSaveData,
+
+        await useSetData({
+          params: toSaveData,
+          configInfo: config.upsertTemplate,
+          dispatch: dispatch,
+          onSuccess: (data: any) => {
+            setData(data);
+          },
+          onError: (error: any) => {
+            setError(error);
+          },
         });
+
+        // const { data, error } = await upsertTemplate({
+        //   dispatch,
+        //   ...toSaveData,
+        // });
+
         if (error) {
           Modal.error({
             title: 'Error',

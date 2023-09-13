@@ -11,7 +11,7 @@ import { Icon } from 'icon';
 import { IProfile } from '@types';
 import { LinkOutlined, DownOutlined } from '@ant-design/icons';
 import { unsecuredCopyToClipboard } from '@utils/helpers';
-import { createIdString, useGetDataHook } from 'utils';
+import { createIdString, useGetDataHook, useSetData } from 'utils';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import type { MenuProps } from 'antd';
 import { config } from '@dal/config';
@@ -59,7 +59,7 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
     queryUserByEmail({
       email,
       dispatch,
-      onSuccess: (data: any) => {
+      onSuccess: async (data: any) => {
         if (data?.length > 0) {
           const presetIcon = data[0]?.preset_icon_url
             ? `preset:${data[0].preset_icon_url}`
@@ -70,11 +70,14 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
             to_email: email,
             full_name: data[0].full_name,
             avatar_url: data[0].icon_url ? data[0].icon_url : presetIcon,
-            org_title: org.title,
+            org_title: org?.title,
             inviter: user.full_name,
           };
-          inviteExistingMember({
-            data: idata,
+          await useSetData({
+            params: {
+              data: idata,
+            },
+            configInfo: config.inviteExistingMember,
             dispatch,
             onSuccess: () => {
               setIsLoading(false);
@@ -93,9 +96,12 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
             },
           });
         } else {
-          inviteUserByEmail({
-            email,
-            orgId: dataSpace.id,
+          await useSetData({
+            params: {
+              email: email,
+              orgId: dataSpace.id,
+            },
+            configInfo: config.inviteUserByEmail,
             dispatch,
             onSuccess: () => {
               setIsLoading(false);
@@ -131,10 +137,10 @@ const ModalInviteOfSpaceCard: React.FC<ModalInviteOfSpaceCardProps> = ({
     unsecuredCopyToClipboard(fullURL);
   };
 
-  const handleRemoveMember = (orgId: number, userId: string) => {
-    removeMemberOfOrg({
-      orgId,
-      userId,
+  const handleRemoveMember = async (orgId: number, userId: string) => {
+    await useSetData({
+      params: { orgId, userId },
+      configInfo: config.removeMemberOfOrg,
       dispatch,
       onSuccess: () => {
         Modal.success({
