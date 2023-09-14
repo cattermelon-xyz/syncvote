@@ -10,7 +10,7 @@ const renderParticipation = (participation: IParticipant | undefined) => {
   let rs = null;
   if (!participation || (participation.type && !participation.data)) {
     // rs = <div className='text-red-500'>Missing participation setup</div>;
-    rs = 'Other identity';
+    rs = 'Custom';
   } else {
     const { type, data: pdata } = participation;
     const identities = (pdata as string[]) || [];
@@ -48,6 +48,7 @@ const renderParticipation = (participation: IParticipant | undefined) => {
           <span className='text-violet-500 mx-1'>
             <TokenInput address={(pdata as IToken)?.address || ''} />
           </span>
+          holders
           {(pdata as IToken)?.min ? (
             <>
               {' '}
@@ -88,10 +89,8 @@ const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
             <span>
               {/* {participation.type === 'token'
                 ? `Token holder`
-                : `Other identity`} */}
-              <span className='text-violet-500'>
-                {renderParticipation(participation)}
-              </span>
+                : `Custom`} */}
+              <span>{renderParticipation(participation)}</span>
               <SideNote value={participationDescription} />
             </span>
           </li>

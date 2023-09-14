@@ -43,7 +43,7 @@ const VotingPartipation = () => {
             label: (
               <div className='flex items-center'>
                 <FiUserCheck className='mr-2' />
-                Other identity
+                Custom
               </div>
             ),
             value: 'identity',
