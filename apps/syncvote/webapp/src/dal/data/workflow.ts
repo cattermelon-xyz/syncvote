@@ -296,17 +296,17 @@ export class WorkflowFunctionClass {
   };
 
   updateAWorkflowTag = async ({
-    prams,
+    params,
     dispatch,
     onSuccess,
     onError = () => {},
   }: {
-    prams: { workflow: IWorkflow; newTags: ITag[] };
+    params: { workflow: IWorkflow; newTags: ITag[] };
     dispatch: any;
     onSuccess: (data: any) => void;
     onError?: (data: any) => void;
   }) => {
-    const { workflow, newTags } = prams;
+    const { workflow, newTags } = params;
     const oldSetOfTagIds = workflow.tags?.map((t) => t.value) || [];
     const toInsert = subtractArray({
       minuend: newTags.map((t) => t.value),

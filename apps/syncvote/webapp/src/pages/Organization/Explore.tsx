@@ -19,7 +19,6 @@ const Home: React.FC = () => {
     if (dataTemplates) {
       setTemplates(dataTemplates);
     }
-    console.log('templates', templates);
   }, [dataTemplates]);
 
   return (
@@ -35,9 +34,11 @@ const Home: React.FC = () => {
           }}
         />
         <>
-          <TemplateList
-            templates={templates.filter((tmpl: any) => tmpl.status === true)}
-          />
+          {templates && (
+            <TemplateList
+              templates={templates.filter((tmpl: any) => tmpl.status === true)}
+            />
+          )}
         </>
       </section>
     </div>

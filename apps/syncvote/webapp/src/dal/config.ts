@@ -127,13 +127,18 @@ export const config: ConfigObject = {
     dalFunction: templateFunction.deleteTemplate,
   },
 
+  updateAWorkflowTag: {
+    dalFunction: workflowFunction.updateAWorkflowTag,
+  },
+
+
   queryATemplate: {
     dalFunction: templateFunction.queryATemplate,
     reduxObjectPath: 'template',
   },
 
-  updateAWorkflowTag: {
-    dalFunction: workflowFunction.updateAWorkflowTag,
+  updateATemplateTag: {
+    dalFunction: templateFunction.updateATemplateTag,
   },
 
   updateAWorkflowInfo: {
