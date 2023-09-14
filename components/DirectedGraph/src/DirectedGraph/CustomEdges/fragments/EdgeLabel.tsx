@@ -23,14 +23,13 @@ const EdgeLabel = ({
   const optIdx = (data?.children || []).findIndex(
     (child: any) => child === target
   );
-  const delay =
-    optIdx !== -1 && data?.data.delays ? data?.data.delays[optIdx] : 0;
+  const delay = optIdx !== -1 && data?.delays ? data?.delays[optIdx] : 0;
   const delayUnit =
-    optIdx !== -1 && data?.data.delayUnits
-      ? data?.data.delayUnits[optIdx]
+    optIdx !== -1 && data?.delayUnits
+      ? data?.delayUnits[optIdx]
       : DelayUnit.MINUTE;
   const delayNote =
-    optIdx !== -1 && data?.data.delayNotes ? data?.data.delayNotes[optIdx] : '';
+    optIdx !== -1 && data?.delayNotes ? data?.delayNotes[optIdx] : '';
   return (
     <div
       style={{
@@ -43,7 +42,7 @@ const EdgeLabel = ({
         ...labelStyle,
         // backgroundColor: "beige"
       }}
-      className='nopan text-center rounded-md p-2'
+      className='nopan text-center rounded-md p-2 bg-white'
     >
       {parseInt(delay) > 0 ? (
         <Popover trigger='hover' content={parse(delayNote)}>
