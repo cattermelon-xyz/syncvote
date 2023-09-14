@@ -20,6 +20,7 @@ import TemplateDetail from '@pages/Template/Detail';
 import { TemplateViewData } from '@pages/Template/ViewData';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { config } from '@dal/config';
+import DocDetail from '@pages/Mission/DocDetail';
 const env = import.meta.env.VITE_ENV;
 
 const AppRoutes = () => {
@@ -76,6 +77,12 @@ const AppRoutes = () => {
             <Route
               path='template/:templateIdString'
               element={<TemplateDetail />}
+            />
+          </Route>
+          <Route path='/' element={<App layout={WebLayoutWithoutSider} />}>
+            <Route
+              path='doc/:orgIdString/:workflowIdString/:versionIdString/:docId'
+              element={<DocDetail />}
             />
           </Route>
           <Route path='/' element={<App layout={NoHeaderAppLayout} />}>
