@@ -3,6 +3,7 @@ import {
   CollapsiblePanel,
   ResultCalculator,
   NavConfigPanel,
+  SideNote,
 } from 'directed-graph';
 import { Veto as Interface } from './interface';
 import { Alert, Space, Switch } from 'antd';
@@ -102,6 +103,14 @@ export default (props: IVoteMachineConfigProps) => {
               onChange({
                 children: replaceHandler(val, idx),
                 data: { ...data, fallback: val.id },
+              });
+            }}
+          />
+          <SideNote
+            value={optionsDescription}
+            setValue={(val: string) => {
+              onChange({
+                optionsDescription: val,
               });
             }}
           />
