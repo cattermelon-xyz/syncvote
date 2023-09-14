@@ -38,7 +38,7 @@ const renderParticipation = (participation: IParticipant | undefined) => {
             <span className='text-violet-500 mx-1'>
               {((pdata as string[]) || []).length}
             </span>
-            can participate in the voting process.
+            can participate in the voting/proposal process.
           </span>
         </Popover>
       );
@@ -67,25 +67,15 @@ const renderParticipation = (participation: IParticipant | undefined) => {
 };
 
 const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
-  const {
-    proposerDescription,
-    participation,
-    participationDescription,
-    votingLocation,
-  } = checkpoint;
+  const { participation, participationDescription, votingLocation } =
+    checkpoint;
   return (
     <>
       <div className='text-zinc-400'>General info</div>
       <ul className='list-disc ml-4'>
-        {proposerDescription ? (
-          <li>
-            Who can propose:{' '}
-            <span className='text-violet-500'>{proposerDescription}</span>
-          </li>
-        ) : null}
         {participation ? (
           <li>
-            Who can vote:{' '}
+            Who can participate:{' '}
             <span>
               {/* {participation.type === 'token'
                 ? `Token holder`

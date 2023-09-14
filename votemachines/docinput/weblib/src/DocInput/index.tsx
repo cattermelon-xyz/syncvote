@@ -108,15 +108,15 @@ const explain = ({
   };
   const p1 = (
     <>
-      <div className='text-zinc-400'>Voting format</div>
+      <div className='text-zinc-400'>Format</div>
       <ul className='list-disc ml-4'>
         <li>
-          Voting method: <span className='text-violet-500'>Document Input</span>
-          , only applicant can interact
+          With <span className='text-violet-500'>Document Input</span>,
+          participants can submit documents
         </li>
         {noOfOptions ? (
           <li>
-            Voting options:{' '}
+            Options to choose:{' '}
             <ul className='flex flex-col gap-1'>
               {data.options.map((option: string, index: number) => {
                 return <li key={index}>{renderOption({ data, index })}</li>;
@@ -124,48 +124,56 @@ const explain = ({
             </ul>
           </li>
         ) : null}
-        {docs.map((doc: DocInput.IDoc, index: number) => {
-          const predefinedDoc: any =
-            predefinedDocs.find((p: any) => p.id === doc.id) || {};
-          return (
-            <Space
-              direction='horizontal'
-              size='small'
-              className='w-full'
-              key={index}
-            >
-              <div className='flex items-center'>
-                {doc.action}{' '}
-                <Button
-                  type='link'
-                  onClick={() =>
-                    Modal.info({
-                      title: 'Description & Guideline',
-                      content: predefinedDoc.description
-                        ? parse(predefinedDoc.description)
-                        : 'No description provided',
-                    })
-                  }
-                >
-                  {predefinedDoc.title ? predefinedDoc.title : doc.id}
-                </Button>
-              </div>
-              <Button
-                shape='circle'
-                icon={<FaInfo />}
-                onClick={() =>
-                  Modal.info({
-                    title: 'Description',
-                    content: parse(doc.description),
-                  })
-                }
-                disabled={!doc.description}
-              />
-            </Space>
-          );
-        })}
-        <SideNote value={optionsDescription} />
       </ul>
+      <ul className='list-disc ml-4'>
+        <li>Action on Document</li>
+        <ul>
+          {docs.map((doc: DocInput.IDoc, index: number) => {
+            const predefinedDoc: any =
+              predefinedDocs.find((p: any) => p.id === doc.id) || {};
+            return (
+              <li>
+                <Space
+                  direction='horizontal'
+                  size='small'
+                  className='w-full'
+                  key={index}
+                >
+                  <div className='flex items-center'>
+                    {doc.action}{' '}
+                    <Button
+                      type='link'
+                      onClick={() =>
+                        Modal.info({
+                          title: 'Description & Guideline',
+                          content: predefinedDoc.description
+                            ? parse(predefinedDoc.description)
+                            : 'No description provided',
+                        })
+                      }
+                    >
+                      {predefinedDoc.title ? predefinedDoc.title : doc.id}
+                    </Button>
+                  </div>
+                  <Button
+                    shape='circle'
+                    icon={<FaInfo />}
+                    onClick={() =>
+                      Modal.info({
+                        title: 'Description',
+                        content: parse(doc.description),
+                      })
+                    }
+                    disabled={!doc.description}
+                  />
+                </Space>
+              </li>
+            );
+          })}
+        </ul>
+      </ul>
+
+      <SideNote value={optionsDescription} />
     </>
   );
   return p1;

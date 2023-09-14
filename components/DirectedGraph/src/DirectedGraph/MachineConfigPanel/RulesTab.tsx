@@ -90,19 +90,6 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
         </CollapsiblePanel>
         {!selectedNode?.isEnd ? (
           <CollapsiblePanel title='Participants'>
-            <Space direction='vertical' size='small' className='w-full'>
-              <div>Who can propose</div>
-              <Input
-                value={selectedNode?.proposerDescription}
-                onChange={(e) => {
-                  const newNode = structuredClone(selectedNode);
-                  if (newNode) {
-                    newNode.proposerDescription = e.target.value;
-                    onChange(newNode);
-                  }
-                }}
-              />
-            </Space>
             <VotingPartipation />
             <SideNote
               value={selectedNode?.participationDescription}
