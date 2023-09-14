@@ -20,7 +20,7 @@ const EdgeConfigPanel = ({
   const targetNode: any =
     nodes.find((node: any) => node.id === selectedEdge.target) || {};
   const label = selectedEdge.label; // reactjs element
-  const selectedEdgeData = selectedEdge?.data?.data || {};
+  const selectedEdgeData = selectedEdge?.data || {};
   const target = selectedEdge?.target || '';
 
   const optIdx = (selectedEdge?.data?.children || []).findIndex(

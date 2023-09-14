@@ -1,8 +1,8 @@
-import { Divider, Input, Popover, Space } from 'antd';
+import { Button, Divider, Input, Popover, Space } from 'antd';
 import { Markers } from '../markers';
 import { GraphPanelContext } from '../context';
 import { useContext } from 'react';
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined, ClearOutlined } from '@ant-design/icons';
 
 const MarkerEditNode = () => {
   const { data, selectedLayoutId, selectedNodeId, onChangeLayout } =
@@ -141,6 +141,30 @@ const MarkerEditNode = () => {
         }
       }}
       disabled={style?.title?.backgroundColor === '#fff'}
+      suffix={
+        <Button
+          icon={<ClearOutlined />}
+          title='Clear style'
+          onClick={() => {
+            const tmp = structuredClone(selectedLayout);
+            if (tmp) {
+              if (tmp.nodes) {
+                const idx = tmp.nodes.findIndex(
+                  (node: any) => node.id === selectedNode?.id
+                );
+                if (idx !== -1) {
+                  tmp.nodes[idx].style = undefined;
+                }
+              }
+              onChangeLayout
+                ? onChangeLayout({
+                    ...tmp,
+                  })
+                : null;
+            }
+          }}
+        />
+      }
     />
   );
 };

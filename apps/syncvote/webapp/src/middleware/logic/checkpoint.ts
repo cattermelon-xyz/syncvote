@@ -45,7 +45,7 @@ export const changeVersion = ({
   if (changedCheckPointData.triggers) {
     newData.checkpoints[index].triggers = changedCheckPointData.triggers;
   }
-  if (changedCheckPointData.duration) {
+  if (changedCheckPointData.hasOwnProperty('duration')) {
     newData.checkpoints[index].duration = changedCheckPointData.duration;
   }
   newData.checkpoints[index].isEnd = changedCheckPointData.isEnd === true;

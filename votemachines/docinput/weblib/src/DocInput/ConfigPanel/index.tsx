@@ -94,6 +94,7 @@ export default (props: IVoteMachineConfigProps) => {
     onChange({
       data: {
         options: [...options.slice(0, index), ...options.slice(index + 1)],
+        docs,
       },
       children: [...children.slice(0, index), ...children.slice(index + 1)],
       delays: [...delays.slice(0, index), ...delays.slice(index + 1)],
@@ -223,7 +224,7 @@ export default (props: IVoteMachineConfigProps) => {
         </CollapsiblePanel>
         <CollapsiblePanel title='Document Action'>
           <Space direction='vertical' className='w-full' size='large'>
-            {docs.map((doc: DocInput.IDoc, index: number) => {
+            {docs?.map((doc: DocInput.IDoc, index: number) => {
               const predefinedDoc: any =
                 predefinedDocs.find((p: any) => p.id === doc.id) || {};
               return (
