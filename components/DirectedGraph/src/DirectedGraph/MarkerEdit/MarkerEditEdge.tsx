@@ -1,8 +1,9 @@
-import { Input, Popover, Space } from 'antd';
+import { Button, Input, Popover, Space } from 'antd';
 import { Markers } from '../markers';
 import { GraphContext } from '../context';
 import { useContext } from 'react';
 import { GraphViewMode } from '../interface';
+import { ClearOutlined } from '@ant-design/icons';
 
 const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
   const { data, selectedLayoutId, onChangeLayout, viewMode } =
@@ -100,7 +101,7 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
           <div
             className='w-[24px] h-[24px] rounded-md border cursor-pointer mr-2'
             style={{
-              backgroundColor: style?.stroke,
+              backgroundColor: style?.stroke || '#000',
             }}
           ></div>
         </Popover>
@@ -135,8 +136,39 @@ const MarkerEditEdge = ({ selectedEdge }: { selectedEdge: any }) => {
             : null;
         }
       }}
+      suffix={
+        <Button
+          icon={<ClearOutlined />}
+          onClick={() => {
+            if (viewMode === GraphViewMode.VIEW_ONLY) {
+              return;
+            }
+            const tmp = structuredClone(selectedLayout);
+            if (tmp) {
+              const edges = tmp?.edges;
+              if (edges) {
+                const idx = edges.findIndex(
+                  (node: any) => node.id === selectedEdge?.id
+                );
+                if (idx !== -1) {
+                  edges[idx].style = undefined;
+                  edges[idx].labelStyle = undefined;
+                }
+              }
+              onChangeLayout
+                ? onChangeLayout({
+                    ...tmp,
+                  })
+                : null;
+            }
+          }}
+        />
+      }
       disabled={
-        style?.stroke === '#fff' || viewMode === GraphViewMode.VIEW_ONLY
+        style?.stroke === '#fff' ||
+        style?.stroke === '#000' ||
+        style === undefined ||
+        viewMode === GraphViewMode.VIEW_ONLY
       }
     />
   );
