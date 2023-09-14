@@ -32,7 +32,13 @@ const VotingDuration = () => {
       {/* {`Voting duration (${duration ? moment.duration(duration,
           'seconds').humanize() : 'missing'})`} */}
       <Space direction='vertical'>
-        <div>{moment.duration(duration, 'seconds').humanize()}</div>
+        <div>
+          {duration ? (
+            <>apprx. {moment.duration(duration, 'seconds').humanize()}</>
+          ) : (
+            <span className='text-red-500'>Duration is missing</span>
+          )}
+        </div>
         <Space direction='horizontal' className='w-full flex justify-between'>
           <Input
             addonAfter='Days'
