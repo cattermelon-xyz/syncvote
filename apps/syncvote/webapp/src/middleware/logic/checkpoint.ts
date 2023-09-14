@@ -67,10 +67,6 @@ export const changeVersion = ({
     newData.checkpoints[index].participationDescription =
       changedCheckPointData.participationDescription;
   }
-  if (changedCheckPointData.hasOwnProperty('proposerDescription')) {
-    newData.checkpoints[index].proposerDescription =
-      changedCheckPointData.proposerDescription;
-  }
   if (changedCheckPointData.hasOwnProperty('quorum')) {
     newData.checkpoints[index].quorum = changedCheckPointData.quorum;
   }
