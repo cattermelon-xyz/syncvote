@@ -8,7 +8,7 @@ import {
 import { Icon } from 'icon';
 import { insertNewEditor, isEmailExisted, queryVersionEditor } from '@dal/data';
 import { IWorkflow } from '@types';
-import { createIdString, useGetDataHook } from 'utils';
+import { createIdString, extractIdFromIdString, useGetDataHook } from 'utils';
 import {
   Alert,
   Button,
@@ -21,9 +21,11 @@ import {
   Typography,
 } from 'antd';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { config } from '@dal/config';
+import ModalEditTemplate from '@fragments/ModalEditTemplate';
+import { ModalChooseTemplate } from '@fragments/ModalChooseTemplate';
 const env = import.meta.env.VITE_ENV;
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -356,6 +358,110 @@ const PublishTab = ({
   );
 };
 
+const PublishTemplate = ({ workflow }: { workflow: any }) => {
+  const { orgIdString } = useParams();
+  const orgId = extractIdFromIdString(orgIdString);
+  const [showModalEditTemplate, setShowModalEditTemplate] = useState(false);
+  const [showModalChooseTemplate, setShowModalChooseTemplate] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>({});
+  const [editingTemplateId, setEditingTemplateId] = useState(-1);
+
+  return (
+    <>
+      <Space direction='vertical' className='w-full'>
+        <ModalEditTemplate
+          templateId={editingTemplateId}
+          open={showModalEditTemplate}
+          onCancel={() => {
+            setShowModalEditTemplate(false);
+          }}
+          template={selectedTemplate}
+          selectedOrgId={orgId}
+          workflow={workflow}
+        />
+
+        <ModalChooseTemplate
+          open={showModalChooseTemplate}
+          onOk={(template: any) => {
+            setEditingTemplateId(template.id);
+            setSelectedTemplate(template);
+            setShowModalEditTemplate(true);
+            setShowModalChooseTemplate(false);
+          }}
+          onCancel={() => {
+            setShowModalChooseTemplate(false);
+          }}
+        />
+        <>
+          {/* <Input className='w-full h-28' value={''}>
+            'Publish a version of this file to the Community for the public to
+            duplicate and use'
+          </Input> */}
+          <Input
+            className='w-full h-28'
+            prefix={
+              <div className='flex-col'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                >
+                  <path
+                    d='M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z'
+                    stroke='#6200EE'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                  <path
+                    d='M2 12H22'
+                    stroke='#6200EE'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                  <path
+                    d='M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2V2Z'
+                    stroke='#6200EE'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
+                </svg>
+                <br />
+                <span className='text-[#6200EE]'>
+                  Publish a version of this file to the Community for the public
+                  to <br /> duplicate and use
+                </span>
+              </div>
+            }
+          />
+          <div className='flex'>
+            <Button
+              className='bg-[#6200EE] text-[#E3E3E2] h-10 w-1/2 mr-8'
+              onClick={() => {
+                setShowModalChooseTemplate(true);
+              }}
+            >
+              Replace another template
+            </Button>
+            <Button
+              className='bg-[#6200EE] text-[#E3E3E2] h-10 w-1/2'
+              onClick={() => {
+                setShowModalEditTemplate(true);
+              }}
+            >
+              Publish a new template
+            </Button>
+          </div>
+        </>
+      </Space>
+    </>
+  );
+};
+
 const ShareModal = ({
   workflow,
   showShareModal,
@@ -387,6 +493,11 @@ const ShareModal = ({
                 setShowShareModal={setShowShareModal}
               />
             ),
+          },
+          {
+            key: '3',
+            label: 'Community',
+            children: <PublishTemplate workflow={workflow} />,
           },
         ]
       : [

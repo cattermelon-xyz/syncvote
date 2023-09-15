@@ -97,6 +97,25 @@ export class TemplateFunctionClass {
         .update(toUpdate)
         .eq('id', templateId)
         .select('*');
+
+      console.log(templateId);
+
+      if (workflowVersionId) {
+        const { data: wversion, error: err } = await supabase
+          .from('workflow_version')
+          .select('data')
+          .eq('id', workflowVersionId);
+
+        if (wversion) {
+          await supabase
+            .from('template_version')
+            .update({
+              data: wversion[0].data,
+            })
+            .eq('template_id', templateId);
+          console.log('Success');
+        }
+      }
       dispatch(finishLoading({}));
       const toUpdateRedux = {
         id: templateId,
@@ -123,6 +142,7 @@ export class TemplateFunctionClass {
           .from('workflow_version')
           .select('data')
           .eq('id', workflowVersionId);
+
         if (!err) {
           const { data: tversion, error: terror } = await supabase
             .from('template_version')
@@ -408,4 +428,60 @@ export const queryCurrentTemplateVersion = async ({
     return { data: data[0], error };
   }
   return { data: undefined, error };
+};
+
+export const queryATemplateForWorkflow = async ({
+  params,
+  dispatch,
+  onSuccess = () => {},
+  onError = (error: any) => {
+    console.log(error);
+  },
+}: {
+  params: { workflowId: number };
+  dispatch: any;
+  onSuccess?: (data: any) => void;
+  onError?: (error: any) => void;
+}) => {
+  const { workflowId } = params;
+
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('template')
+    .select('*')
+    .eq('owner_workflow_id', workflowId);
+  if (!error) {
+    onSuccess(data[0]);
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
+};
+
+export const queryTemplateVersionForWorkflow = async ({
+  params,
+  dispatch,
+  onSuccess = () => {},
+  onError = (error: any) => {
+    console.log(error);
+  },
+}: {
+  params: { templateId: number };
+  dispatch: any;
+  onSuccess?: (data: any) => void;
+  onError?: (error: any) => void;
+}) => {
+  const { templateId } = params;
+
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('template_version')
+    .select('*')
+    .eq('template_id', templateId);
+  if (!error) {
+    onSuccess(data);
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
 };

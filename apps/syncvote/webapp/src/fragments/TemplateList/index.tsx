@@ -144,7 +144,7 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
                     params: {
                       templateId: template.id,
                       orgId: template.owner_org_id,
-                      status: false,
+                      status: true,
                     },
                     configInfo: config.upsertTemplate,
                     dispatch: dispatch,

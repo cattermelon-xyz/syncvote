@@ -27,6 +27,7 @@ type ModalEditTemplateProps = {
   templateId?: number;
   template?: any;
   selectedOrgId?: number;
+  workflow?: any;
 };
 
 // templateId === -1 => create new template
@@ -37,13 +38,16 @@ const ModalEditTemplate = ({
   templateId = -1,
   template = {},
   selectedOrgId,
+  workflow,
 }: ModalEditTemplateProps) => {
   const [title, setTitle] = useState(template.title || '');
   const [desc, setDesc] = useState(template.desc || '');
   const [iconUrl, setIconUrl] = useState(template.icon_url || '');
   const [bannerUrl, setBannerUrl] = useState(template.banner_url || '');
   const [orgId, setOrgId] = useState<number | undefined>(selectedOrgId);
-  const [workflowId, setWorkflowId] = useState<number | undefined>(undefined);
+  const [workflowId, setWorkflowId] = useState<number | undefined>(
+    workflow?.id || undefined
+  );
   const [workflowVersionId, setWorkflowVersionId] = useState(-1);
 
   const [data, setData] = useState(null);
@@ -66,14 +70,17 @@ const ModalEditTemplate = ({
     templateId === -1
       ? 'Publish a workflow template'
       : `Edit "${template.title}" template`;
+
   const reset = () => {
     if (templateId === -1) {
-      setIconUrl('');
-      setBannerUrl('');
-      setTitle('');
+      if (!workflow) {
+        setIconUrl('');
+        setBannerUrl('');
+        setTitle('');
+        setOrgId(selectedOrgId);
+        setWorkflowId(undefined);
+      }
       setDesc('');
-      setOrgId(selectedOrgId);
-      setWorkflowId(undefined);
     }
   };
   const [options, setOptions] = useState<{
@@ -83,8 +90,28 @@ const ModalEditTemplate = ({
     workflows: [],
     orgs: [],
   });
+
   const setupOptions = async () => {
     if (orgs) {
+      if (workflow) {
+        const w = { ...workflow };
+        const versions = w.workflow_version || [];
+
+        for (var i = 0; i < versions.length; i++) {
+          if (
+            versions[i].status === 'PUBLISHED' ||
+            versions[i].status === 'PUBLIC_COMMUNITY'
+          ) {
+            w.published_version_id = versions[i].id;
+            break;
+          }
+        }
+
+        setWorkflowVersionId(w?.published_version_id || -1);
+        setIconUrl(w?.icon_url ? w.icon_url : '');
+        setBannerUrl(w?.banner_url ? w.banner_url : '');
+        setTitle('Template of ' + w?.title);
+      }
       let adminOrgsData = [];
       adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
       const workflows = adminOrgsData.flatMap((adminOrg: any) =>
@@ -93,6 +120,7 @@ const ModalEditTemplate = ({
           org_title: adminOrg.title,
         }))
       );
+
       workflows.map((workflow: any) => {
         const versions = workflow.versions || [];
         for (var i = 0; i < versions.length; i++) {
@@ -105,6 +133,7 @@ const ModalEditTemplate = ({
           }
         }
       });
+
       // Querry from org
       setOptions({
         workflows: workflows
@@ -123,12 +152,14 @@ const ModalEditTemplate = ({
       // TODO: query orgs here!
     }
   };
+
   useEffect(() => {
     setTitle(template.title || '');
     setIconUrl(template.icon_url || '');
     setBannerUrl(template.banner_url || '');
     setDesc(template.desc || '');
   }, [template]);
+
   useEffect(() => {
     setupOptions();
   }, [orgs]);
@@ -152,6 +183,8 @@ const ModalEditTemplate = ({
           workflowVersionId,
         };
 
+        console.log(workflowVersionId);
+
         onCancel();
 
         await useSetData({
@@ -165,11 +198,6 @@ const ModalEditTemplate = ({
             setError(error);
           },
         });
-
-        // const { data, error } = await upsertTemplate({
-        //   dispatch,
-        //   ...toSaveData,
-        // });
 
         if (error) {
           Modal.error({
@@ -228,6 +256,7 @@ const ModalEditTemplate = ({
                 setTitle('Template of ' + w?.label);
               }}
               value={workflowId}
+              disabled={workflowId !== undefined}
             />
           </Space>
         ) : null}
