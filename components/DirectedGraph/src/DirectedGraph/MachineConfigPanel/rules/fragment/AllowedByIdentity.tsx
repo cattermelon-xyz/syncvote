@@ -7,7 +7,7 @@ import {
   MoreOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { Button, Drawer, Input, Modal, Popover, Space } from 'antd';
+import { Button, Checkbox, Drawer, Input, Modal, Popover, Space } from 'antd';
 import { useState } from 'react';
 
 const MoreButton = ({
@@ -65,6 +65,15 @@ const AddNewDrawer = ({
   addIdentity: (identity: string) => void;
 }) => {
   const [newIdentity, setNewIdentity] = useState('');
+  // TODO: verify gmail, eth and sol address
+  // example:
+  // ---
+  // import {PublicKey} from '@solana/web3.js'
+  // const owner = new PublicKey("DS2tt4BX7YwCw7yrDNwbAdnYrxjeCPeGJbHmZEYC8RTb");
+  // console.log(PublicKey.isOnCurve(owner.toBytes())); // true
+  // ---
+  // import { isAddress } from 'web3-validator';
+  // isAddress('blah');
   return (
     <Drawer
       open={addNewDrawerVisibility}
@@ -75,7 +84,7 @@ const AddNewDrawer = ({
     >
       <Space direction='vertical' size='small' className='w-full'>
         <div className='text-sm'>
-          Identity can be an address, a gmail or twitter account
+          Supported identity: gmail account, Ethereum and Solana public key
         </div>
         <Input
           placeholder='Identity'
@@ -109,7 +118,25 @@ const AllowedByIdentity = (props: AllowedByIdentityProps) => {
   const [addNewDrawerVisibility, setAddNewDrawerVisibility] = useState(false);
   return (
     <Space direction='vertical' size='middle' className='w-full'>
-      <div className='text-sm'>List of identity</div>
+      <Space direction='horizontal' className='flex justify-between'>
+        <div className='text-sm'>List of identity</div>
+        <div className='flex gap-2'>
+          <Checkbox
+            checked={identity.indexOf('proposer') !== -1}
+            onClick={() => {
+              const newIdentity = [...identity];
+              const index = newIdentity.indexOf('proposer');
+              if (index === -1) {
+                newIdentity.unshift('proposer');
+              } else {
+                newIdentity.splice(index, 1);
+              }
+              setIdentity(newIdentity);
+            }}
+          />
+          Include proposer?
+        </div>
+      </Space>
       <Space direction='vertical' size='small' className='w-full'>
         {identity.map((id, index) => (
           <div className='w-full flex justify-between flex-row' key={id}>
@@ -122,24 +149,29 @@ const AllowedByIdentity = (props: AllowedByIdentityProps) => {
                 setIdentity(newIdentity);
               }}
               suffix={
-                <CloseCircleOutlined
-                  onClick={() => {
-                    const newIdentity = [...identity];
-                    newIdentity.splice(index, 1);
-                    setIdentity(newIdentity);
-                  }}
-                />
+                id !== 'proposer' ? (
+                  <CloseCircleOutlined
+                    onClick={() => {
+                      const newIdentity = [...identity];
+                      newIdentity.splice(index, 1);
+                      setIdentity(newIdentity);
+                    }}
+                  />
+                ) : null
               }
+              disabled={id === 'proposer'}
             />
-            <MoreButton
-              txt={id}
-              editable={editable}
-              remove={() => {
-                const newIdentity = [...identity];
-                newIdentity.splice(index, 1);
-                setIdentity(newIdentity);
-              }}
-            />
+            {id !== 'proposer' ? (
+              <MoreButton
+                txt={id}
+                editable={editable}
+                remove={() => {
+                  const newIdentity = [...identity];
+                  newIdentity.splice(index, 1);
+                  setIdentity(newIdentity);
+                }}
+              />
+            ) : null}
           </div>
         ))}
       </Space>

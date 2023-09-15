@@ -13,7 +13,6 @@ export interface ICheckPoint {
   triggers?: any[];
   participation?: IParticipant;
   participationDescription?: string;
-  proposerDescription?: string;
   note?: string;
   quorum?: number;
   includedAbstain?: boolean;
