@@ -45,6 +45,10 @@ export const config: ConfigObject = {
     reduxObjectPath: 'template',
   },
 
+  searchTemplate: {
+    dalFunction: templateFunction.searchTemplate,
+  },
+
   queryPresetIcons: {
     dalFunction: presetFunction.queryPresetIcons, // done
     reduxObjectPath: 'preset',
@@ -123,13 +127,18 @@ export const config: ConfigObject = {
     dalFunction: templateFunction.deleteTemplate,
   },
 
+  updateAWorkflowTag: {
+    dalFunction: workflowFunction.updateAWorkflowTag,
+  },
+
+
   queryATemplate: {
     dalFunction: templateFunction.queryATemplate,
     reduxObjectPath: 'template',
   },
 
-  updateAWorkflowTag: {
-    dalFunction: workflowFunction.updateAWorkflowTag,
+  updateATemplateTag: {
+    dalFunction: templateFunction.updateATemplateTag,
   },
 
   updateAWorkflowInfo: {

@@ -3,8 +3,10 @@ import { config } from '@dal/config';
 import { TagObject } from '@dal/data/tag';
 import { ITag } from '@types';
 import { Input, Modal, Space, Tag } from 'antd';
-import { useState } from 'react';
-import { useGetDataHook } from 'utils';
+import { useEffect, useState } from 'react';
+import { useGetDataHook, useSetData } from 'utils';
+import { useDispatch } from 'react-redux';
+import { ITemplate } from '@dal/redux/reducers/template.reducer/interface';
 
 type SearchWithTagProps = {
   className?: string;
@@ -19,13 +21,23 @@ const SearchWithTag = ({
   tagTo = TagObject.TEMPLATE,
   onResult,
 }: SearchWithTagProps) => {
+  const tags: ITag[] = useGetDataHook({
+    params: { tagTo: tagTo },
+    configInfo: config.queryTag,
+  }).data;
 
-  const tags: ITag[] =
-    useGetDataHook({
-      params: { tagTo: tagTo },
-      configInfo: config.queryTag,
-    }).data;
+  let data: any;
+  switch (tagTo) {
+    case TagObject.TEMPLATE:
+      data = useGetDataHook({
+        configInfo: config.queryTemplate,
+      }).data;
+      break;
+    default:
+      break;
+  }
 
+  const dispatch = useDispatch();
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [inputSearchText, setInputSearchText] = useState('');
   const [toSearch, setToSearch] = useState('');
@@ -43,12 +55,59 @@ const SearchWithTag = ({
     }
   };
 
-  const search = ({ tags, text }: { tags: any[]; text: string }) => {
+  useEffect(() => {
+    if (!inputSearchText && selectedTagIds.length === 0) {
+      onResult(data);
+    }
+  }, [inputSearchText, selectedTagIds, onResult, data]);
+
+  const search = async ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
     // TODO: change to search api
+    if (text) {
+      switch (tagTo) {
+        case TagObject.TEMPLATE:
+          await useSetData({
+            params: {
+              inputSearch: text,
+            },
+            configInfo: config.searchTemplate,
+            dispatch,
+            onSuccess: (data) => {
+              onResult(data);
+              setLoading(false);
+            },
+            onError: () => {
+              Modal.error({
+                title: 'Error',
+                content: 'Search failed',
+              });
+            },
+          });
+          break;
+        default:
+          break;
+      }
+    } else {
+      let result;
+      switch (tagTo) {
+        case TagObject.TEMPLATE:
+          result = data.filter(
+            (item: ITemplate) =>
+              item.status === true &&
+              tags.every((tag) =>
+                item.tags?.map((tag) => tag.value).includes(tag)
+              )
+          );
+          break;
+        default:
+          break;
+      }
+      onResult(result);
+    }
     setLoading(false);
   };
-  
+
   return (
     <Space className={`flex w-full my-8 ${className}`} direction='vertical'>
       <Input
