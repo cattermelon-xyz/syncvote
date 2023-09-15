@@ -1,12 +1,14 @@
 import { config } from '@dal/config';
-import { IOrgInfo } from '@types';
-import { Modal, Space, Select, Input } from 'antd';
+import { IOrgInfo, ITag } from '@types';
+import { Modal, Space, Select, Input, SelectProps } from 'antd';
 import { Banner } from 'banner';
 import Icon from 'icon/src/Icon';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { TextEditor } from 'rich-text-editor';
 import { useGetDataHook, useSetData } from 'utils';
+import { newTag } from '@dal/data/tag';
+import AddAndRemoveTag from './AddAndRemoveTag';
 
 type OrgSelectOption = {
   value: number;
@@ -49,6 +51,7 @@ const ModalEditTemplate = ({
     workflow?.id || undefined
   );
   const [workflowVersionId, setWorkflowVersionId] = useState(-1);
+  const dispatch = useDispatch();
 
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -65,7 +68,6 @@ const ModalEditTemplate = ({
     configInfo: config.queryOrgs,
   }).data;
 
-  const dispatch = useDispatch();
   const modalTitle =
     templateId === -1
       ? 'Publish a workflow template'
@@ -299,6 +301,7 @@ const ModalEditTemplate = ({
                 setValue={(str: string) => setDesc(str)}
               />
             </Space>
+            {templateId !== -1 && <AddAndRemoveTag templateId={templateId} />}
           </Space>
         </Space>
       </Space>

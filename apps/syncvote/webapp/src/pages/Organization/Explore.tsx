@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography } from 'antd';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
@@ -9,11 +9,17 @@ import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
 
 const Home: React.FC = () => {
-  
-  const templates =
-    useGetDataHook({
-      configInfo: config.queryTemplate,
-    }).data;
+  const [templates, setTemplates] = useState([]);
+
+  const dataTemplates = useGetDataHook({
+    configInfo: config.queryTemplate,
+  }).data;
+
+  useEffect(() => {
+    if (dataTemplates) {
+      setTemplates(dataTemplates);
+    }
+  }, [dataTemplates]);
 
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
@@ -24,13 +30,15 @@ const Home: React.FC = () => {
         <SearchWithTag
           tagTo={TagObject.TEMPLATE}
           onResult={(result: any) => {
-            console.log(result);
+            setTemplates(result);
           }}
         />
         <>
-          <TemplateList
-            templates={templates.filter((tmpl: any) => tmpl.status === true)}
-          />
+          {templates && (
+            <TemplateList
+              templates={templates.filter((tmpl: any) => tmpl.status === true)}
+            />
+          )}
         </>
       </section>
     </div>

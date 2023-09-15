@@ -12,7 +12,9 @@ import {
 } from '@dal/redux/reducers/template.reducer';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { deepEqual } from '@utils/helpers';
-import { supabase } from 'utils';
+import { supabase, subtractArray } from 'utils';
+import { ITemplate } from '@dal/redux/reducers/template.reducer/interface';
+import { ITag } from '@dal/redux/reducers/preset.reducer/interface';
 
 export class TemplateFunctionClass {
   async queryTemplate({
@@ -35,14 +37,31 @@ export class TemplateFunctionClass {
       onSuccess(templates);
     } else {
       dispatch(startLoading({}));
-      const { data, error } = await supabase.from('template').select('*');
+      const { data, error } = await supabase
+        .from('template')
+        .select('*, tag_template ( tag (*))');
       if (!error) {
-        if (deepEqual(data, templates)) {
+        const tpList = Array.isArray(data) ? data : [data];
+        const newData: any[] = [];
+        tpList.forEach((d: any, index: number) => {
+          newData[index] = { ...structuredClone(d) };
+          const tags: ITag[] = [];
+          newData[index].tag_template.map((itm: any) => {
+            tags.push({
+              value: itm.tag.id,
+              label: itm.tag.label,
+            });
+          });
+          delete newData[index].tag_template;
+          newData[index].tags = [...tags];
+        });
+
+        if (deepEqual(newData, templates)) {
           onSuccess(templates);
         } else {
           dispatch(setLastFetch({}));
-          dispatch(setTemplates(data));
-          onSuccess(data);
+          dispatch(setTemplates(newData));
+          onSuccess(newData);
         }
       } else {
         onError(error);
@@ -251,6 +270,94 @@ export class TemplateFunctionClass {
     }
     dispatch(finishLoading({}));
   }
+
+  async searchTemplate({
+    params,
+    dispatch,
+    onSuccess,
+    onError = (error) => {
+      console.log(error);
+    },
+  }: {
+    params: { inputSearch: string };
+    dispatch: any;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+  }) {
+    dispatch(startLoading({}));
+    const { inputSearch } = params;
+    const { data, error } = await supabase
+      .from('template')
+      .select(`*`)
+      .eq('status', true)
+      .textSearch('title', `'${inputSearch}'`);
+
+    if (error) {
+      onError(error);
+    } else {
+      if (data) {
+        onSuccess(data);
+      }
+    }
+
+    dispatch(finishLoading({}));
+  }
+
+  async updateATemplateTag({
+    params,
+    dispatch,
+    onSuccess,
+    onError = () => {},
+  }: {
+    params: { template: ITemplate; newTags: ITag[] };
+    dispatch: any;
+    onSuccess: (data: any) => void;
+    onError?: (data: any) => void;
+  }) {
+    const { template, newTags } = params;
+    const oldSetOfTagIds = template.tags?.map((t) => t.value) || [];
+    const toInsert = subtractArray({
+      minuend: newTags.map((t) => t.value),
+      subtrahend: oldSetOfTagIds,
+    });
+    const toDelete = subtractArray({
+      minuend: oldSetOfTagIds,
+      subtrahend: newTags.map((t) => t.value),
+    });
+    dispatch(startLoading({}));
+    if (toInsert.length > 0) {
+      const toInsertObjects = toInsert.map((tagId) => {
+        return {
+          template_id: template.id,
+          tag_id: tagId,
+        };
+      });
+      const { data, error } = await supabase
+        .from('tag_template')
+        .insert(toInsertObjects);
+      if (!error) {
+        dispatch(changeTemplateInfo({ ...template, tags: newTags }));
+        dispatch(changeTemplate({ ...template, tags: newTags }));
+      } else {
+        onError(error);
+      }
+    }
+    if (toDelete.length > 0) {
+      const { data, error } = await supabase
+        .from('tag_template')
+        .delete()
+        .in('tag_id', toDelete)
+        .eq('template_id', template.id);
+      if (!error) {
+        dispatch(changeTemplateInfo({ ...template, tags: newTags }));
+        dispatch(changeTemplate({ ...template, tags: newTags }));
+      } else {
+        onError(error);
+      }
+    }
+    onSuccess({});
+    dispatch(finishLoading({}));
+  }
 }
 
 export const upsertTemplate = async ({
@@ -398,7 +505,7 @@ export const queryATemplate = async ({
   dispatch(startLoading({}));
   const { data, error } = await supabase
     .from('template')
-    .select('*')
+    .select('*, tag_template ( tag (*))')
     .eq('id', templateId);
   if (!error) {
     dispatch(addTemplate(data[0]));

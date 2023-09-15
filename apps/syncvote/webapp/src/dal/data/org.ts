@@ -9,6 +9,7 @@ import {
   deleteOrgInfo,
 } from '@dal/redux/reducers/orginfo.reducer';
 import { deepEqual } from '@utils/helpers';
+import { ITag } from '@types';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -102,7 +103,8 @@ export class OrgFunctionClass {
             banner_url,
             status,
             created_at,
-            current_version_id
+            current_version_id,
+            tag_template ( tag (*))
           )
         )
       `
@@ -172,6 +174,21 @@ export class OrgFunctionClass {
             };
           });
 
+          const templates = org?.templates.map((template: any) => {
+            const tags: ITag[] = [];
+            template.tag_template.map((itm: any) => {
+              tags.push({
+                value: itm.tag.id,
+                label: itm.tag.label,
+              });
+            });
+            delete template.tag_template;
+            template.tags = [...tags];
+            return {
+              ...template,
+            };
+          });
+
           tmp.push({
             id: org?.id,
             role: d.role,
@@ -184,7 +201,7 @@ export class OrgFunctionClass {
             profile: profiles,
             last_updated: org.last_updated,
             workflows: workflows || [],
-            templates: org.templates || [],
+            templates: templates || [],
           });
         });
 
