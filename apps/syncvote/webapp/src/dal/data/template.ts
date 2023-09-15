@@ -116,6 +116,25 @@ export class TemplateFunctionClass {
         .update(toUpdate)
         .eq('id', templateId)
         .select('*');
+
+      console.log(templateId);
+
+      if (workflowVersionId) {
+        const { data: wversion, error: err } = await supabase
+          .from('workflow_version')
+          .select('data')
+          .eq('id', workflowVersionId);
+
+        if (wversion) {
+          await supabase
+            .from('template_version')
+            .update({
+              data: wversion[0].data,
+            })
+            .eq('template_id', templateId);
+          console.log('Success');
+        }
+      }
       dispatch(finishLoading({}));
       const toUpdateRedux = {
         id: templateId,
@@ -142,6 +161,7 @@ export class TemplateFunctionClass {
           .from('workflow_version')
           .select('data')
           .eq('id', workflowVersionId);
+
         if (!err) {
           const { data: tversion, error: terror } = await supabase
             .from('template_version')
@@ -516,3 +536,4 @@ export const queryCurrentTemplateVersion = async ({
   }
   return { data: undefined, error };
 };
+
