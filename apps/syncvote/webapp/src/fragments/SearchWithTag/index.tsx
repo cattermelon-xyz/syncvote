@@ -26,9 +26,16 @@ const SearchWithTag = ({
     configInfo: config.queryTag,
   }).data;
 
-  const dataTemplates = useGetDataHook({
-    configInfo: config.queryTemplate,
-  }).data;
+  let data: any;
+  switch (tagTo) {
+    case TagObject.TEMPLATE:
+      data = useGetDataHook({
+        configInfo: config.queryTemplate,
+      }).data;
+      break;
+    default:
+      break;
+  }
 
   const dispatch = useDispatch();
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
@@ -50,37 +57,52 @@ const SearchWithTag = ({
 
   useEffect(() => {
     if (!inputSearchText && selectedTagIds.length === 0) {
-      onResult(dataTemplates);
+      onResult(data);
     }
-  }, [inputSearchText, selectedTagIds, onResult, dataTemplates]);
+  }, [inputSearchText, selectedTagIds, onResult, data]);
 
   const search = async ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
     // TODO: change to search api
     if (text) {
-      await useSetData({
-        params: {
-          inputSearch: text,
-        },
-        configInfo: config.searchTemplate,
-        dispatch,
-        onSuccess: (data) => {
-          onResult(data);
-          setLoading(false);
-        },
-        onError: () => {
-          Modal.error({
-            title: 'Error',
-            content: 'Search failed',
+      switch (tagTo) {
+        case TagObject.TEMPLATE:
+          await useSetData({
+            params: {
+              inputSearch: text,
+            },
+            configInfo: config.searchTemplate,
+            dispatch,
+            onSuccess: (data) => {
+              onResult(data);
+              setLoading(false);
+            },
+            onError: () => {
+              Modal.error({
+                title: 'Error',
+                content: 'Search failed',
+              });
+            },
           });
-        },
-      });
+          break;
+        default:
+          break;
+      }
     } else {
-      const result = dataTemplates.filter(
-        (item: ITemplate) =>
-          item.status === true &&
-          tags.every((tag) => item.tags?.map((tag) => tag.value).includes(tag))
-      );
+      let result;
+      switch (tagTo) {
+        case TagObject.TEMPLATE:
+          result = data.filter(
+            (item: ITemplate) =>
+              item.status === true &&
+              tags.every((tag) =>
+                item.tags?.map((tag) => tag.value).includes(tag)
+              )
+          );
+          break;
+        default:
+          break;
+      }
       onResult(result);
     }
     setLoading(false);

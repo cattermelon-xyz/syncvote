@@ -45,22 +45,30 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
     setSortTemplateOptions(options);
   };
   useEffect(() => {
+    let foundPublishableWorkflow = false;
     for (var i = 0; i < orgs.length; i++) {
       if (orgs[i].role === 'ADMIN') {
-        for (var j = 0; j < orgs[j].workflows.length; j++) {
-          for (var k = 0; k < orgs[j].workflows[k].versions.length; k++) {
+        for (var j = 0; j < orgs[i].workflows.length; j++) {
+          for (var k = 0; k < orgs[i].workflows[j].versions.length; k++) {
             if (
               ['PUBLIC_COMMUNITY', 'PUBLISHED'].indexOf(
-                orgs[j].workflows[j].versions[k]?.status
+                orgs[i].workflows[j].versions[k]?.status
               ) !== -1
             ) {
-              setCanPublishTemplate(true);
+              foundPublishableWorkflow = true;
               break;
             }
           }
+          if (foundPublishableWorkflow) {
+            break;
+          }
         }
       }
+      if (foundPublishableWorkflow) {
+        break;
+      }
     }
+    setCanPublishTemplate(foundPublishableWorkflow);
   }, [orgs]);
   return (
     <>

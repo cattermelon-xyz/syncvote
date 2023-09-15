@@ -272,7 +272,9 @@ const ModalEditTemplate = ({
                 setValue={(str: string) => setDesc(str)}
               />
             </Space>
-            {templateId !== -1 && <AddAndRemoveTag templateId={templateId} />}
+            {/* {templateId !== -1 &&  */}
+            <AddAndRemoveTag templateId={templateId} />
+            {/* } */}
           </Space>
         </Space>
       </Space>
