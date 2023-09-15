@@ -485,7 +485,7 @@ export const queryATemplate = async ({
   dispatch(startLoading({}));
   const { data, error } = await supabase
     .from('template')
-    .select('*')
+    .select('*, tag_template ( tag (*))')
     .eq('id', templateId);
   if (!error) {
     dispatch(addTemplate(data[0]));

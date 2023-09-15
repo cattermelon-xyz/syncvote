@@ -10,4 +10,5 @@ export interface ITemplate {
   banner_url: string;
   created_at: string;
   tags?: ITag[];
+  status: boolean;
 }

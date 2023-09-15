@@ -3,9 +3,10 @@ import { config } from '@dal/config';
 import { TagObject } from '@dal/data/tag';
 import { ITag } from '@types';
 import { Input, Modal, Space, Tag } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGetDataHook, useSetData } from 'utils';
 import { useDispatch } from 'react-redux';
+import { ITemplate } from '@dal/redux/reducers/template.reducer/interface';
 
 type SearchWithTagProps = {
   className?: string;
@@ -23,6 +24,10 @@ const SearchWithTag = ({
   const tags: ITag[] = useGetDataHook({
     params: { tagTo: tagTo },
     configInfo: config.queryTag,
+  }).data;
+
+  const dataTemplates = useGetDataHook({
+    configInfo: config.queryTemplate,
   }).data;
 
   const dispatch = useDispatch();
@@ -43,26 +48,41 @@ const SearchWithTag = ({
     }
   };
 
+  useEffect(() => {
+    if (!inputSearchText && selectedTagIds.length === 0) {
+      onResult(dataTemplates);
+    }
+  }, [inputSearchText, selectedTagIds, onResult, dataTemplates]);
+
   const search = async ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
     // TODO: change to search api
-    await useSetData({
-      params: {
-        inputSearch: text,
-      },
-      configInfo: config.searchTemplate,
-      dispatch,
-      onSuccess: (data) => {
-        onResult(data);
-        setLoading(false);
-      },
-      onError: () => {
-        Modal.error({
-          title: 'Error',
-          content: 'Search failed',
-        });
-      },
-    });
+    if (text) {
+      await useSetData({
+        params: {
+          inputSearch: text,
+        },
+        configInfo: config.searchTemplate,
+        dispatch,
+        onSuccess: (data) => {
+          onResult(data);
+          setLoading(false);
+        },
+        onError: () => {
+          Modal.error({
+            title: 'Error',
+            content: 'Search failed',
+          });
+        },
+      });
+    } else {
+      const result = dataTemplates.filter(
+        (item: ITemplate) =>
+          item.status === true &&
+          tags.every((tag) => item.tags?.map((tag) => tag.value).includes(tag))
+      );
+      onResult(result);
+    }
     setLoading(false);
   };
 
