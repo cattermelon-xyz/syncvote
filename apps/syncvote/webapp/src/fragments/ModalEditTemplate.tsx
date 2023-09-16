@@ -9,6 +9,7 @@ import { TextEditor } from 'rich-text-editor';
 import { useGetDataHook, useSetData } from 'utils';
 import { newTag } from '@dal/data/tag';
 import AddAndRemoveTag from './AddAndRemoveTag';
+import { queryATemplate } from '@dal/data/template';
 
 type OrgSelectOption = {
   value: number;
@@ -50,6 +51,9 @@ const ModalEditTemplate = ({
   const [workflowId, setWorkflowId] = useState<number | undefined>(
     workflow?.id || undefined
   );
+  const [optionTags, setOptionTags] = useState<ITag[]>();
+  const [tagsForNewTemplate, setTagsForNewTemplate] =
+    useState<(string | number)[]>();
   const [workflowVersionId, setWorkflowVersionId] = useState(-1);
   const dispatch = useDispatch();
 
@@ -165,6 +169,11 @@ const ModalEditTemplate = ({
   useEffect(() => {
     setupOptions();
   }, [orgs]);
+
+  const onTagsChange = (tags: any) => {
+    setTagsForNewTemplate(tags);
+  };
+
   return (
     <Modal
       title={modalTitle}
@@ -193,8 +202,51 @@ const ModalEditTemplate = ({
           params: toSaveData,
           configInfo: config.upsertTemplate,
           dispatch: dispatch,
-          onSuccess: (data: any) => {
+          onSuccess: async (data: any) => {
             setData(data);
+            const templateIdAfterCreated = data[0].id;
+            if (templateId === -1 && tagsForNewTemplate && optionTags) {
+              const allTagsToInsert = [];
+              for (const tagId of tagsForNewTemplate) {
+                if (typeof tagId === 'number') {
+                  const label = optionTags.find(
+                    (tag: any) => tag.value === tagId
+                  )?.label;
+                  if (label) {
+                    allTagsToInsert.push({
+                      value: tagId,
+                      label,
+                    });
+                  }
+                }
+                if (typeof tagId === 'string') {
+                  const { data: newTagData } = await newTag({
+                    dispatch,
+                    tag: tagId,
+                  });
+                  if (newTagData) {
+                    allTagsToInsert.push(newTagData);
+                  }
+                }
+              }
+              const { data: dataATemplate, error } = await queryATemplate({
+                dispatch,
+                templateId: templateIdAfterCreated,
+              });
+
+              await useSetData({
+                params: {
+                  template: { ...dataATemplate, status: true },
+                  newTags: allTagsToInsert,
+                },
+                configInfo: config.updateATemplateTag,
+                dispatch: dispatch,
+                onSuccess: () => {
+                  setTagsForNewTemplate([]);
+                  setOptionTags([]);
+                },
+              });
+            }
           },
           onError: (error: any) => {
             setError(error);
@@ -301,7 +353,11 @@ const ModalEditTemplate = ({
                 setValue={(str: string) => setDesc(str)}
               />
             </Space>
-            {templateId !== -1 && <AddAndRemoveTag templateId={templateId} />}
+            <AddAndRemoveTag
+              templateId={templateId}
+              onTagsChange={onTagsChange}
+              setOptionTags={setOptionTags}
+            />
           </Space>
         </Space>
       </Space>

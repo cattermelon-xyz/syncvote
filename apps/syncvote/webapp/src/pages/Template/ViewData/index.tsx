@@ -86,7 +86,6 @@ export const TemplateViewData = () => {
     }
     setLoading(false);
   };
-  console.log('1111');
   useEffect(() => {
     fetchTemplateData();
   }, []);
@@ -293,9 +292,9 @@ export const TemplateViewData = () => {
                     <Empty />
                   )}
                   <div className='font-bold text-md p-2'>Tags :</div>
-                  <div className='m-4 mt-2 p-2 bg-white rounded-lg public-desc-wrapper'>
-                    {template.tags &&
-                      template.tags.map((tagWrapper: any) => {
+                  {template.tags && template.tags.length !== 0 ? (
+                    <div className='m-4 mt-2 p-2 bg-white rounded-lg public-desc-wrapper'>
+                      {template.tags.map((tagWrapper: any) => {
                         const tag = tagWrapper.tag;
                         return (
                           <Tag
@@ -306,7 +305,12 @@ export const TemplateViewData = () => {
                           </Tag>
                         );
                       })}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className='m-4 mt-2 p-2 bg-white rounded-lg public-desc-wrapper'>
+                      <p>Template has no tag.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : null}
