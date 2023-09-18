@@ -47,7 +47,8 @@ const Footer = () => {
         </div>
       </div>
       <div className='text-zinc-400 w-full text-center py-12 border-t border-gray-400'>
-        Copyright @ 2023. All rights reserved.
+        <p>Copyright @ 2023. All rights reserved.</p>
+        <p className='text-sm text-gray-200'>version 20230918</p>
       </div>
     </div>
   );
