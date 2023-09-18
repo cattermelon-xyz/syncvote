@@ -1,15 +1,16 @@
 import {
-  ClockCircleOutlined,
   SettingOutlined,
   TwitterOutlined,
   CaretRightOutlined,
 } from '@ant-design/icons';
-import { memo } from 'react';
+import { memo, useContext } from 'react';
 import { Handle, Position } from 'reactflow';
 
 import parse from 'html-react-parser';
 import moment from 'moment';
 import { displayDelayDuration } from '../utils';
+import { GraphContext } from '../context';
+
 // TODO: how to register getIcon in 1 place?
 const getIcon = (provider: string, id: number | undefined) => {
   let rs = <></>;
@@ -42,6 +43,9 @@ const Node = memo(
       ? 'border-2 border-violet-500 border-dashed'
       : 'border border-slate-700 border-solid';
     const style = data.style;
+
+    const { onNewProposal } = useContext(GraphContext);
+
     return (
       <>
         <Handle
@@ -72,7 +76,6 @@ const Node = memo(
           style={{ background: '#aca' }}
           isConnectable={isConnectable}
         />
-
         <Handle
           id={`s-${Position.Top}`}
           type='source'
@@ -112,7 +115,15 @@ const Node = memo(
             </div>
           ) : null}
           {id === 'root' ? (
-            <div className='absolute -left-9 bg-violet-100 py-1 px-2 rounded-md text-blue-500'>
+            <div
+              className='absolute -left-9 bg-violet-100 py-1 px-2 rounded-md text-blue-500'
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onNewProposal) {
+                  onNewProposal();
+                }
+              }}
+            >
               <CaretRightOutlined />
             </div>
           ) : null}
