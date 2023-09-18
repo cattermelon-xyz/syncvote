@@ -16,10 +16,9 @@ const PreviewWorkflowModal: React.FC<PreviewWorkflowModalProps> = ({
   onClose,
   workflow,
 }) => {
-  const orgs =
-    useGetDataHook({
-      configInfo: config.queryOrgs,
-    }).data;
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
 
   const handleCancel = () => {
     onClose();
@@ -57,7 +56,7 @@ const PreviewWorkflowModal: React.FC<PreviewWorkflowModalProps> = ({
             preview={false}
             width={600}
             height={343}
-            src={`${workflow?.workflow_version[0].preview_image_url}`}
+            src={`${workflow?.workflow_version[0]?.preview_image_url}`}
             // fallback=''
           />
         </div>
