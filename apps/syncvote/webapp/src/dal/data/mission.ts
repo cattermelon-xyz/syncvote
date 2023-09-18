@@ -165,3 +165,25 @@ export const deleteMission = async ({
     onError(error);
   }
 };
+
+export const insertMission = async ({
+  params,
+  dispatch,
+  onSuccess = () => {},
+  onError = () => {},
+}: {
+  params: any;
+  dispatch: any;
+  onSuccess?: (data: any) => void;
+  onError?: (error: any) => void;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase.from('mission').insert(params);
+  dispatch(finishLoading({}));
+  if (!error) {
+    onSuccess(data);
+  } else {
+    onError(error);
+    console.log(error);
+  }
+};
