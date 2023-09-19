@@ -223,7 +223,18 @@ const BluePrint = () => {
                           }
                         />
                       ) : (
-                        <Empty />
+                        <Space className='w-full' direction='vertical'>
+                          <div className='w-full flex flex-col items-end'>
+                            <Button
+                              type='primary'
+                              icon={<PlusOutlined />}
+                              onClick={() => handleNewWorkflow()}
+                            >
+                              New Workflow
+                            </Button>
+                          </div>
+                          <Empty />
+                        </Space>
                       ),
                   },
                   {

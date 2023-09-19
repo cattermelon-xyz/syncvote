@@ -3,9 +3,12 @@ import { Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import { L } from '@utils/locales/L';
 import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { createIdString, useGetDataHook } from 'utils';
+import { createIdString, useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
 import { Icon } from 'icon';
+import { emptyStage } from 'directed-graph';
+import { randomIcon } from '@utils/helpers';
+import { useDispatch } from 'react-redux';
 
 interface CreateWorkflowModalProps {
   open: boolean;
@@ -20,6 +23,7 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
 }) => {
   const navigate = useNavigate();
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
@@ -30,10 +34,34 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
     start: open,
   }).data;
 
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+
   const handleOk = async () => {
     const org = orgs.find((org: any) => org.id === value);
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
-    navigate(`${orgIdString}/new-workflow/`);
+    const props = {
+      title: 'Untitled Workflow',
+      desc: '',
+      owner_org_id: org.id,
+      emptyStage: emptyStage,
+      iconUrl: 'preset:' + randomIcon(),
+      authority: user.id,
+    };
+
+    await useSetData({
+      onSuccess: (data: any) => {
+        const { versions, insertedId } = data;
+        navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
+      },
+      onError: (error: any) => {
+        Modal.error({ content: error.message });
+      },
+      params: props,
+      configInfo: config.insertWorkflowAndVersion,
+      dispatch,
+    });
   };
 
   const handleCancel = () => {
