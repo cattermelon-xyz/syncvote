@@ -10,6 +10,7 @@ import parse from 'html-react-parser';
 import moment from 'moment';
 import { displayDelayDuration } from '../utils';
 import { GraphContext } from '../context';
+import DocInputSomeThing from './DocInputSomeThing';
 
 // TODO: how to register getIcon in 1 place?
 const getIcon = (provider: string, id: number | undefined) => {
@@ -44,7 +45,7 @@ const Node = memo(
       : 'border border-slate-700 border-solid';
     const style = data.style;
 
-    const { onNewProposal } = useContext(GraphContext);
+    const { onNewProposal, data: dataVersion } = useContext(GraphContext);
     const env = import.meta.env.VITE_ENV;
 
     return (
@@ -123,7 +124,7 @@ const Node = memo(
                   onClick={(e) => {
                     e.stopPropagation();
                     if (onNewProposal) {
-                      onNewProposal();
+                      onNewProposal(<DocInputSomeThing data={dataVersion} />);
                     }
                   }}
                 >

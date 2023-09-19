@@ -13,39 +13,24 @@ export const CreateProposalModal = ({
   onCancel,
   workflow,
   workflowVersion,
+  docInputSomething,
 }: {
   open: boolean;
   workflow: any;
   onCancel: () => void;
   workflowVersion: any;
+  docInputSomething: JSX.Element;
 }) => {
   const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [desc, setDesc] = useState(workflow?.desc);
   const [width, setWidth] = useState(628);
   const [zoom, setZoom] = useState(false);
-  const [optionDocs, setOptionDocs] = useState<any>([]);
-  const [value, setValue] = useState();
-  const { orgIdString, workflowIdString, versionIdString } = useParams();
 
   const data = workflowVersion?.data || emptyStage;
   const docs: IDoc[] = data.docs || [];
 
   const [isWarning, setIsWarning] = useState(false);
-
-  useEffect(() => {
-    if (docs) {
-      setOptionDocs(
-        docs.map((doc) => ({
-          key: doc.id,
-          label: <div className='flex items-center'>{doc.title}</div>,
-          value: doc.id,
-        }))
-      );
-
-      setValue(optionDocs[0]?.key);
-    }
-  }, [docs]);
 
   const handleClick = async () => {
     if (!name) {
@@ -129,7 +114,8 @@ export const CreateProposalModal = ({
                     disabled
                   ></Select>
                 </div>
-                <div className='text-sm text-[#575655]'>Select docs</div>
+                {docInputSomething}
+                {/* <div className='text-sm text-[#575655]'>Select docs</div>
                 <div className='relative'>
                   <Select
                     className='w-3/4'
@@ -158,7 +144,7 @@ export const CreateProposalModal = ({
                     value={desc}
                     setValue={(val: any) => setDesc(val)}
                   />
-                </div>
+                </div> */}
               </Space>
               <Button
                 onClick={() => {

@@ -117,7 +117,6 @@ export const EditVersion = () => {
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
-  const [showDocs, setShownDocs] = useState(false);
   const extractWorkflowFromList = (wfList: any) => {
     let extractedVersion = extractVersion({
       workflows: wfList,
@@ -132,6 +131,9 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
+  const [docInputSomething, setDocInputSomething] = useState<JSX.Element>(
+    <></>
+  );
   // const autoSaveWorker: Worker = useMemo(
   //   () => new Worker(new URL('/workers/AutoSave.ts', import.meta.url)),
   //   []
@@ -572,12 +574,14 @@ export const EditVersion = () => {
                     }}
                     workflow={workflow}
                     workflowVersion={version}
+                    docInputSomething={docInputSomething}
                   />
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
-                    onNewProposal={() => {
+                    onNewProposal={(data: JSX.Element) => {
                       setOpenCreateProposalModal(true);
+                      setDocInputSomething(data);
                     }}
                     navPanel={
                       <Space direction='vertical'>
