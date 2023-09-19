@@ -131,9 +131,7 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
-  const [docInputSomething, setDocInputSomething] = useState<JSX.Element>(
-    <></>
-  );
+
   // const autoSaveWorker: Worker = useMemo(
   //   () => new Worker(new URL('/workers/AutoSave.ts', import.meta.url)),
   //   []
@@ -574,17 +572,12 @@ export const EditVersion = () => {
                     }}
                     workflow={workflow}
                     workflowVersion={version}
-                    docInputSomething={docInputSomething}
                   />
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
-                    openCreateProposalModal={(data: JSX.Element) => {
+                    openCreateProposalModal={() => {
                       setOpenCreateProposalModal(true);
-                      setDocInputSomething(data);
-                    }}
-                    onCreateNewProposal={() => {
-                      
                     }}
                     navPanel={
                       <Space direction='vertical'>

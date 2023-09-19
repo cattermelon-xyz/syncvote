@@ -31,7 +31,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
   setValue,
   value,
   onBlur,
-  id,
 }) => {
   return (
     <ReactQuill
@@ -41,7 +40,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
       onChange={setValue}
       modules={modules}
       className='height-editor'
-      id={id}
     />
   );
 };

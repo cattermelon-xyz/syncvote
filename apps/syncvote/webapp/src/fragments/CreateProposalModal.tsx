@@ -14,13 +14,11 @@ export const CreateProposalModal = ({
   onCancel,
   workflow,
   workflowVersion,
-}: // docInputSomething,
-{
+}: {
   open: boolean;
   workflow: any;
   onCancel: () => void;
   workflowVersion: any;
-  docInputSomething: JSX.Element;
 }) => {
   const dispatch = useDispatch();
   const [name, setName] = useState('');
@@ -105,7 +103,7 @@ export const CreateProposalModal = ({
 
   const reset = () => {
     setName('');
-    
+
     const doc = filtered_docs.find((doc: any) => doc.id === value);
     setDesc(doc?.template);
   };

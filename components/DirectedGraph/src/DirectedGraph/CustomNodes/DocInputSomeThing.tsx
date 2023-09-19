@@ -60,11 +60,7 @@ export const DocInputSomeThing = ({ data }: { data: any }) => {
       </div>
       <div className='text-sm text-[#575655] mb-2'>Proposal content</div>
       <div>
-        <TextEditor
-          value={desc}
-          setValue={(val: any) => setDesc(val)}
-          id='text-editor'
-        />
+        <TextEditor value={desc} setValue={(val: any) => setDesc(val)} />
       </div>
     </>
   );
