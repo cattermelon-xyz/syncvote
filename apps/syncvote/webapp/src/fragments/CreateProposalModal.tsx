@@ -105,7 +105,9 @@ export const CreateProposalModal = ({
 
   const reset = () => {
     setName('');
-    setDesc('');
+    
+    const doc = filtered_docs.find((doc: any) => doc.id === value);
+    setDesc(doc?.template);
   };
 
   const [optionWorkflows, setOptionWorkflows] = useState<any>([
