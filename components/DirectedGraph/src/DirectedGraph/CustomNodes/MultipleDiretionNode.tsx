@@ -44,7 +44,9 @@ const Node = memo(
       : 'border border-slate-700 border-solid';
     const style = data.style;
 
-    const { onNewProposal } = useContext(GraphContext);
+    const { openCreateProposalModal } =
+      useContext(GraphContext);
+      
     const env = import.meta.env.VITE_ENV;
 
     return (
@@ -122,8 +124,8 @@ const Node = memo(
                   className='absolute -left-9 bg-violet-100 py-1 px-2 rounded-md text-blue-500'
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (onNewProposal) {
-                      onNewProposal();
+                    if (openCreateProposalModal) {
+                      openCreateProposalModal();
                     }
                   }}
                 >

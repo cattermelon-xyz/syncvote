@@ -2,11 +2,12 @@ import { Button, Input, Modal, Select, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { IDoc, emptyStage } from 'directed-graph';
 
-import parse from 'html-react-parser';
-import { TextEditor } from 'rich-text-editor';
-import { useParams } from 'react-router-dom';
 import { insertMission } from '@dal/data';
 import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { TextEditor } from 'rich-text-editor';
+import { useGetDataHook } from 'utils';
+import { config } from '@dal/config';
 
 export const CreateProposalModal = ({
   open,
@@ -21,31 +22,39 @@ export const CreateProposalModal = ({
 }) => {
   const dispatch = useDispatch();
   const [name, setName] = useState('');
-  const [desc, setDesc] = useState(workflow?.desc);
-  const [width, setWidth] = useState(628);
-  const [zoom, setZoom] = useState(false);
-  const [optionDocs, setOptionDocs] = useState<any>([]);
-  const [value, setValue] = useState();
-  const { orgIdString, workflowIdString, versionIdString } = useParams();
+
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
 
   const data = workflowVersion?.data || emptyStage;
-  const docs: IDoc[] = data.docs || [];
 
   const [isWarning, setIsWarning] = useState(false);
 
+  const [desc, setDesc] = useState<any>('');
+
+  const root_docs = data.checkpoints[0].data.docs || [];
+  let docs: IDoc[] = data.docs || [];
+
+  const root_doc_ids = root_docs.map((doc: any) => doc.id);
+  const filtered_docs = docs.filter((doc) => root_doc_ids.includes(doc.id));
+
+  const { orgIdString, workflowIdString, versionIdString } = useParams();
+  const [value, setValue] = useState<string>();
+  const [optionDocs, setOptionDocs] = useState<any>([]);
+
   useEffect(() => {
     if (docs) {
-      setOptionDocs(
-        docs.map((doc) => ({
-          key: doc.id,
-          label: <div className='flex items-center'>{doc.title}</div>,
-          value: doc.id,
-        }))
-      );
+      const optionDocs = filtered_docs.map((doc) => ({
+        key: doc.id,
+        label: <div className='flex items-center'>{doc.title}</div>,
+        value: doc.id,
+        desc: doc.template,
+      }));
 
-      setValue(optionDocs[0]?.key);
+      setOptionDocs(optionDocs);
     }
-  }, [docs]);
+  }, []);
 
   const handleClick = async () => {
     if (!name) {
@@ -54,6 +63,15 @@ export const CreateProposalModal = ({
         setIsWarning(false);
       }, 2000);
     } else {
+      // const textEditorElement = document.getElementById('text-editor');
+      // if (textEditorElement) {
+      //   const qlEditorElement = textEditorElement.querySelector('.ql-editor');
+      //   if (qlEditorElement) {
+      //     const qlEditorHTML = qlEditorElement.innerHTML;
+
+      //   }
+      // }
+
       await insertMission({
         dispatch: dispatch,
         params: {
@@ -62,6 +80,7 @@ export const CreateProposalModal = ({
           data: data,
           status: 'DRAFT',
           workflow_version_id: workflowVersion.id,
+          creator_id: user.id,
         },
         onSuccess: () => {
           Modal.success({
@@ -77,8 +96,16 @@ export const CreateProposalModal = ({
         },
       });
 
+      reset();
       onCancel();
     }
+  };
+
+  const reset = () => {
+    setName('');
+
+    const doc = filtered_docs.find((doc: any) => doc.id === value);
+    setDesc(doc?.template);
   };
 
   const [optionWorkflows, setOptionWorkflows] = useState<any>([
@@ -96,11 +123,10 @@ export const CreateProposalModal = ({
           open={open}
           onCancel={onCancel}
           onOk={() => {
-            // onCancel();
             handleClick();
           }}
           title={'Create a proposal'}
-          width={width}
+          width={628}
         >
           <div className='flex'>
             <div style={{ width: 580 }}>
@@ -129,18 +155,22 @@ export const CreateProposalModal = ({
                     disabled
                   ></Select>
                 </div>
-                <div className='text-sm text-[#575655]'>Select docs</div>
-                <div className='relative'>
+                <div className='text-sm text-[#575655] mb-2'>Select docs</div>
+                <div className='relative mb-2'>
                   <Select
                     className='w-3/4'
                     options={optionDocs}
-                    defaultValue={optionDocs[0]}
-                    onChange={(docId) => {
-                      setValue(docId);
+                    onChange={(value) => {
+                      setValue(value);
+                      const doc = filtered_docs.find(
+                        (doc: any) => doc.id === value
+                      );
+                      setDesc(doc?.template);
                     }}
                   />
                   <Button
-                    className='absolute inset-y-0 right-0'
+                    className='absolute inset-y-0 right-0 mb-2'
+                    disabled={value ? false : true}
                     onClick={() => {
                       window.open(
                         `/doc/${orgIdString}/${workflowIdString}/${versionIdString}/${value}`,
@@ -152,43 +182,18 @@ export const CreateProposalModal = ({
                     View doc details
                   </Button>
                 </div>
-                <div className='text-sm text-[#575655]'>Proposal content</div>
+                <div className='text-sm text-[#575655] mb-2'>
+                  Proposal content
+                </div>
                 <div>
                   <TextEditor
                     value={desc}
                     setValue={(val: any) => setDesc(val)}
+                    id='text-editor'
                   />
                 </div>
               </Space>
-              <Button
-                onClick={() => {
-                  if (width === 628) {
-                    setWidth(width * 2);
-                    setZoom(true);
-                  } else {
-                    setWidth(width / 2);
-                    setZoom(false);
-                  }
-                }}
-              >
-                Phong to
-              </Button>
             </div>
-
-            {zoom && (
-              <div
-                className='ml-6'
-                style={{
-                  borderLeft: '1px solid #E3E3E2',
-                  width: 580,
-                  height: 660,
-                }}
-              >
-                <div className='ml-6 overflow-scroll h-full'>
-                  <div>{parse(desc || '')}</div>
-                </div>
-              </div>
-            )}
           </div>
         </Modal>
       </div>

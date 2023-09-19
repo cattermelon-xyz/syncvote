@@ -24,9 +24,14 @@ interface TextEditorProps {
   setValue?: any;
   value?: any;
   onBlur?: () => Promise<void>;
+  id?: string;
 }
 
-const TextEditor: React.FC<TextEditorProps> = ({ setValue, value, onBlur }) => {
+const TextEditor: React.FC<TextEditorProps> = ({
+  setValue,
+  value,
+  onBlur,
+}) => {
   return (
     <ReactQuill
       onBlur={onBlur}
