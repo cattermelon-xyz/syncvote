@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Button, Select } from 'antd';
 import { useState } from 'react';
 import { TextEditor } from 'rich-text-editor';
@@ -6,25 +6,30 @@ import { IDoc } from '../../..';
 import { useParams } from 'react-router-dom';
 
 export const DocInputSomeThing = ({ data }: { data: any }) => {
-  const [desc, setDesc] = useState('');
-  const docs: IDoc[] = data.docs || [];
+  const [desc, setDesc] = useState<any>('');
+
+  const root_docs = data.checkpoints[0].data.docs || [];
+  let docs: IDoc[] = data.docs || [];
+
+  const root_doc_ids = root_docs.map((doc: any) => doc.id);
+  const filtered_docs = docs.filter((doc) => root_doc_ids.includes(doc.id));
+
   const { orgIdString, workflowIdString, versionIdString } = useParams();
-  const [value, setValue] = useState();
+  const [value, setValue] = useState<string>();
   const [optionDocs, setOptionDocs] = useState<any>([]);
 
   useEffect(() => {
     if (docs) {
-      setOptionDocs(
-        docs.map((doc) => ({
-          key: doc.id,
-          label: <div className='flex items-center'>{doc.title}</div>,
-          value: doc.id,
-        }))
-      );
+      const optionDocs = filtered_docs.map((doc) => ({
+        key: doc.id,
+        label: <div className='flex items-center'>{doc.title}</div>,
+        value: doc.id,
+        desc: doc.template,
+      }));
 
-      setValue(optionDocs[0]?.key);
+      setOptionDocs(optionDocs);
     }
-  }, [docs]);
+  }, []);
 
   return (
     <>
@@ -33,12 +38,15 @@ export const DocInputSomeThing = ({ data }: { data: any }) => {
         <Select
           className='w-3/4'
           options={optionDocs}
-          defaultValue={optionDocs[0] || ''}
-          disabled={optionDocs ? false : true}
+          onChange={(value) => {
+            setValue(value);
+            const doc = filtered_docs.find((doc: any) => doc.id === value);
+            setDesc(doc?.template);
+          }}
         />
         <Button
           className='absolute inset-y-0 right-0 mb-2'
-          disabled={optionDocs ? false : true}
+          disabled={value ? false : true}
           onClick={() => {
             window.open(
               `/doc/${orgIdString}/${workflowIdString}/${versionIdString}/${value}`,
@@ -52,7 +60,11 @@ export const DocInputSomeThing = ({ data }: { data: any }) => {
       </div>
       <div className='text-sm text-[#575655] mb-2'>Proposal content</div>
       <div>
-        <TextEditor value={desc} setValue={(val: any) => setDesc(val)} />
+        <TextEditor
+          value={desc}
+          setValue={(val: any) => setDesc(val)}
+          id='text-editor'
+        />
       </div>
     </>
   );

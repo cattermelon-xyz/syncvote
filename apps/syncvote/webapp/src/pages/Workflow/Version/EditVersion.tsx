@@ -579,9 +579,12 @@ export const EditVersion = () => {
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
-                    onNewProposal={(data: JSX.Element) => {
+                    openCreateProposalModal={(data: JSX.Element) => {
                       setOpenCreateProposalModal(true);
                       setDocInputSomething(data);
+                    }}
+                    onCreateNewProposal={() => {
+                      
                     }}
                     navPanel={
                       <Space direction='vertical'>

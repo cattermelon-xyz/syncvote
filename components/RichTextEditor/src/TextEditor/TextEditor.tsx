@@ -24,9 +24,15 @@ interface TextEditorProps {
   setValue?: any;
   value?: any;
   onBlur?: () => Promise<void>;
+  id?: string;
 }
 
-const TextEditor: React.FC<TextEditorProps> = ({ setValue, value, onBlur }) => {
+const TextEditor: React.FC<TextEditorProps> = ({
+  setValue,
+  value,
+  onBlur,
+  id,
+}) => {
   return (
     <ReactQuill
       onBlur={onBlur}
@@ -35,6 +41,7 @@ const TextEditor: React.FC<TextEditorProps> = ({ setValue, value, onBlur }) => {
       onChange={setValue}
       modules={modules}
       className='height-editor'
+      id={id}
     />
   );
 };
