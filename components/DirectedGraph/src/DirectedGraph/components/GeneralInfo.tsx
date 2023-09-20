@@ -73,15 +73,19 @@ const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
     <>
       <div className='text-zinc-400'>General info</div>
       <ul className='list-disc ml-4'>
-        {participation ? (
+        {participation || participationDescription ? (
           <li>
             Who can participate:{' '}
             <span>
               {/* {participation.type === 'token'
                 ? `Token holder`
                 : `Custom`} */}
-              <span>{renderParticipation(participation)}</span>
-              <SideNote value={participationDescription} />
+              {participation && (
+                <span>{renderParticipation(participation)}</span>
+              )}
+              {participationDescription ? (
+                <SideNote value={participationDescription} />
+              ) : null}
             </span>
           </li>
         ) : null}
@@ -91,13 +95,16 @@ const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
             <SideNote value={votingLocation} />
           </li>
         ) : null}
-        {checkpoint?.duration ? (
+        {checkpoint?.duration || checkpoint?.durationDescription ? (
           <li>
             Duration:{' '}
             <span className='text-violet-500'>
               {displayDuration(
                 moment.duration((checkpoint?.duration || 0) * 1000)
               )}
+              {checkpoint?.durationDescription ? (
+                <SideNote value={checkpoint?.durationDescription} />
+              ) : null}
             </span>
           </li>
         ) : null}
