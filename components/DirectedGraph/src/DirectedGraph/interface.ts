@@ -13,7 +13,6 @@ export interface ICheckPoint {
   triggers?: any[];
   participation?: IParticipant;
   participationDescription?: string;
-  proposerDescription?: string;
   note?: string;
   quorum?: number;
   includedAbstain?: boolean;
@@ -192,6 +191,7 @@ export interface IGraph {
   onConfigPanelClose?: () => void;
   onConfigEdgePanelClose?: () => void;
   onChangeLayout?: (data: IWorkflowVersionLayout) => void;
+  openCreateProposalModal?: () => void;
 }
 
 export interface IConfigPanel {

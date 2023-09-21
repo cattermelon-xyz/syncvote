@@ -1,13 +1,15 @@
 import { config } from '@dal/config';
-import { upsertTemplate } from '@dal/data/template';
-import { IOrgInfo } from '@types';
-import { Modal, Space, Select, Input } from 'antd';
+import { IOrgInfo, ITag } from '@types';
+import { Modal, Space, Select, Input, SelectProps } from 'antd';
 import { Banner } from 'banner';
 import Icon from 'icon/src/Icon';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { TextEditor } from 'rich-text-editor';
-import { useGetDataHook } from 'utils';
+import { useGetDataHook, useSetData } from 'utils';
+import { newTag } from '@dal/data/tag';
+import AddAndRemoveTag from './AddAndRemoveTag';
+import { queryATemplate } from '@dal/data/template';
 
 type OrgSelectOption = {
   value: number;
@@ -28,6 +30,7 @@ type ModalEditTemplateProps = {
   templateId?: number;
   template?: any;
   selectedOrgId?: number;
+  workflow?: any;
 };
 
 // templateId === -1 => create new template
@@ -38,43 +41,52 @@ const ModalEditTemplate = ({
   templateId = -1,
   template = {},
   selectedOrgId,
+  workflow,
 }: ModalEditTemplateProps) => {
   const [title, setTitle] = useState(template.title || '');
   const [desc, setDesc] = useState(template.desc || '');
   const [iconUrl, setIconUrl] = useState(template.icon_url || '');
   const [bannerUrl, setBannerUrl] = useState(template.banner_url || '');
   const [orgId, setOrgId] = useState<number | undefined>(selectedOrgId);
-  const [workflowId, setWorkflowId] = useState<number | undefined>(undefined);
+  const [workflowId, setWorkflowId] = useState<number | undefined>(
+    workflow?.id || undefined
+  );
+  const [optionTags, setOptionTags] = useState<ITag[]>();
+  const [tagsForNewTemplate, setTagsForNewTemplate] =
+    useState<(string | number)[]>();
   const [workflowVersionId, setWorkflowVersionId] = useState(-1);
-
-  const presetIcons =
-    useGetDataHook({
-      configInfo: config.queryPresetIcons,
-    }).data;
-
-  const presetBanners =
-    useGetDataHook({
-      configInfo: config.queryPresetBanners,
-    }).data;
-
-  const orgs =
-    useGetDataHook({
-      configInfo: config.queryOrgs,
-    }).data;
-
   const dispatch = useDispatch();
+
+  const [data, setData] = useState(null);
+  const [error, setError] = useState('');
+
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+
+  const presetBanners = useGetDataHook({
+    configInfo: config.queryPresetBanners,
+  }).data;
+
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
+
   const modalTitle =
     templateId === -1
       ? 'Publish a workflow template'
       : `Edit "${template.title}" template`;
+
   const reset = () => {
     if (templateId === -1) {
-      setIconUrl('');
-      setBannerUrl('');
-      setTitle('');
+      if (!workflow) {
+        setIconUrl('');
+        setBannerUrl('');
+        setTitle('');
+        setOrgId(selectedOrgId);
+        setWorkflowId(undefined);
+      }
       setDesc('');
-      setOrgId(selectedOrgId);
-      setWorkflowId(undefined);
     }
   };
   const [options, setOptions] = useState<{
@@ -84,8 +96,28 @@ const ModalEditTemplate = ({
     workflows: [],
     orgs: [],
   });
+
   const setupOptions = async () => {
     if (orgs) {
+      if (workflow) {
+        const w = { ...workflow };
+        const versions = w.workflow_version || [];
+
+        for (var i = 0; i < versions.length; i++) {
+          if (
+            versions[i].status === 'PUBLISHED' ||
+            versions[i].status === 'PUBLIC_COMMUNITY'
+          ) {
+            w.published_version_id = versions[i].id;
+            break;
+          }
+        }
+
+        setWorkflowVersionId(w?.published_version_id || -1);
+        setIconUrl(w?.icon_url ? w.icon_url : '');
+        setBannerUrl(w?.banner_url ? w.banner_url : '');
+        setTitle('Template of ' + w?.title);
+      }
       let adminOrgsData = [];
       adminOrgsData = orgs.filter((org: any) => org.role === 'ADMIN');
       const workflows = adminOrgsData.flatMap((adminOrg: any) =>
@@ -94,6 +126,7 @@ const ModalEditTemplate = ({
           org_title: adminOrg.title,
         }))
       );
+
       workflows.map((workflow: any) => {
         const versions = workflow.versions || [];
         for (var i = 0; i < versions.length; i++) {
@@ -106,6 +139,7 @@ const ModalEditTemplate = ({
           }
         }
       });
+
       // Querry from org
       setOptions({
         workflows: workflows
@@ -124,15 +158,22 @@ const ModalEditTemplate = ({
       // TODO: query orgs here!
     }
   };
+
   useEffect(() => {
     setTitle(template.title || '');
     setIconUrl(template.icon_url || '');
     setBannerUrl(template.banner_url || '');
     setDesc(template.desc || '');
   }, [template]);
+
   useEffect(() => {
     setupOptions();
   }, [orgs]);
+
+  const onTagsChange = (tags: any) => {
+    setTagsForNewTemplate(tags);
+  };
+
   return (
     <Modal
       title={modalTitle}
@@ -152,11 +193,66 @@ const ModalEditTemplate = ({
           bannerUrl,
           workflowVersionId,
         };
+
+        console.log(workflowVersionId);
+
         onCancel();
-        const { data, error } = await upsertTemplate({
-          dispatch,
-          ...toSaveData,
+
+        await useSetData({
+          params: toSaveData,
+          configInfo: config.upsertTemplate,
+          dispatch: dispatch,
+          onSuccess: async (data: any) => {
+            setData(data);
+            const templateIdAfterCreated = data[0].id;
+            if (templateId === -1 && tagsForNewTemplate && optionTags) {
+              const allTagsToInsert = [];
+              for (const tagId of tagsForNewTemplate) {
+                if (typeof tagId === 'number') {
+                  const label = optionTags.find(
+                    (tag: any) => tag.value === tagId
+                  )?.label;
+                  if (label) {
+                    allTagsToInsert.push({
+                      value: tagId,
+                      label,
+                    });
+                  }
+                }
+                if (typeof tagId === 'string') {
+                  const { data: newTagData } = await newTag({
+                    dispatch,
+                    tag: tagId,
+                  });
+                  if (newTagData) {
+                    allTagsToInsert.push(newTagData);
+                  }
+                }
+              }
+              const { data: dataATemplate, error } = await queryATemplate({
+                dispatch,
+                templateId: templateIdAfterCreated,
+              });
+
+              await useSetData({
+                params: {
+                  template: { ...dataATemplate, status: true },
+                  newTags: allTagsToInsert,
+                },
+                configInfo: config.updateATemplateTag,
+                dispatch: dispatch,
+                onSuccess: () => {
+                  setTagsForNewTemplate([]);
+                  setOptionTags([]);
+                },
+              });
+            }
+          },
+          onError: (error: any) => {
+            setError(error);
+          },
         });
+
         if (error) {
           Modal.error({
             title: 'Error',
@@ -214,6 +310,7 @@ const ModalEditTemplate = ({
                 setTitle('Template of ' + w?.label);
               }}
               value={workflowId}
+              disabled={workflowId !== undefined}
             />
           </Space>
         ) : null}
@@ -256,6 +353,11 @@ const ModalEditTemplate = ({
                 setValue={(str: string) => setDesc(str)}
               />
             </Space>
+            <AddAndRemoveTag
+              templateId={templateId}
+              onTagsChange={onTagsChange}
+              setOptionTags={setOptionTags}
+            />
           </Space>
         </Space>
       </Space>

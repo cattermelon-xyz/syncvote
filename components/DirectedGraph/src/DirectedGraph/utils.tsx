@@ -21,7 +21,7 @@ export const displayDelayDuration = (duration: moment.Duration) => {
     duration.minutes() === 0 ? '' : `${duration.minutes()} minutes `;
   const delay = years + months + days + hours + minutes;
   return delay ? (
-    <div>
+    <div className='whitespace-nowrap'>
       <ClockCircleOutlined className='mr-1' />
       {delay}
     </div>

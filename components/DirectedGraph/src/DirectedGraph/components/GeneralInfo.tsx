@@ -10,7 +10,7 @@ const renderParticipation = (participation: IParticipant | undefined) => {
   let rs = null;
   if (!participation || (participation.type && !participation.data)) {
     // rs = <div className='text-red-500'>Missing participation setup</div>;
-    rs = 'Other identity';
+    rs = 'Custom';
   } else {
     const { type, data: pdata } = participation;
     const identities = (pdata as string[]) || [];
@@ -38,7 +38,7 @@ const renderParticipation = (participation: IParticipant | undefined) => {
             <span className='text-violet-500 mx-1'>
               {((pdata as string[]) || []).length}
             </span>
-            can participate in the voting process.
+            can participate in the voting/proposal process.
           </span>
         </Popover>
       );
@@ -48,6 +48,7 @@ const renderParticipation = (participation: IParticipant | undefined) => {
           <span className='text-violet-500 mx-1'>
             <TokenInput address={(pdata as IToken)?.address || ''} />
           </span>
+          holders
           {(pdata as IToken)?.min ? (
             <>
               {' '}
@@ -66,33 +67,25 @@ const renderParticipation = (participation: IParticipant | undefined) => {
 };
 
 const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
-  const {
-    proposerDescription,
-    participation,
-    participationDescription,
-    votingLocation,
-  } = checkpoint;
+  const { participation, participationDescription, votingLocation } =
+    checkpoint;
   return (
     <>
       <div className='text-zinc-400'>General info</div>
       <ul className='list-disc ml-4'>
-        {proposerDescription ? (
+        {participation || participationDescription ? (
           <li>
-            Who can propose:{' '}
-            <span className='text-violet-500'>{proposerDescription}</span>
-          </li>
-        ) : null}
-        {participation ? (
-          <li>
-            Who can vote:{' '}
+            Who can participate:{' '}
             <span>
               {/* {participation.type === 'token'
                 ? `Token holder`
-                : `Other identity`} */}
-              <span className='text-violet-500'>
-                {renderParticipation(participation)}
-              </span>
-              <SideNote value={participationDescription} />
+                : `Custom`} */}
+              {participation && (
+                <span>{renderParticipation(participation)}</span>
+              )}
+              {participationDescription ? (
+                <SideNote value={participationDescription} />
+              ) : null}
             </span>
           </li>
         ) : null}
@@ -102,13 +95,16 @@ const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
             <SideNote value={votingLocation} />
           </li>
         ) : null}
-        {checkpoint?.duration ? (
+        {checkpoint?.duration || checkpoint?.durationDescription ? (
           <li>
             Duration:{' '}
             <span className='text-violet-500'>
               {displayDuration(
                 moment.duration((checkpoint?.duration || 0) * 1000)
               )}
+              {checkpoint?.durationDescription ? (
+                <SideNote value={checkpoint?.durationDescription} />
+              ) : null}
             </span>
           </li>
         ) : null}

@@ -45,7 +45,7 @@ export const changeVersion = ({
   if (changedCheckPointData.triggers) {
     newData.checkpoints[index].triggers = changedCheckPointData.triggers;
   }
-  if (changedCheckPointData.duration) {
+  if (changedCheckPointData.hasOwnProperty('duration')) {
     newData.checkpoints[index].duration = changedCheckPointData.duration;
   }
   newData.checkpoints[index].isEnd = changedCheckPointData.isEnd === true;
@@ -66,10 +66,6 @@ export const changeVersion = ({
   if (changedCheckPointData.hasOwnProperty('participationDescription')) {
     newData.checkpoints[index].participationDescription =
       changedCheckPointData.participationDescription;
-  }
-  if (changedCheckPointData.hasOwnProperty('proposerDescription')) {
-    newData.checkpoints[index].proposerDescription =
-      changedCheckPointData.proposerDescription;
   }
   if (changedCheckPointData.hasOwnProperty('quorum')) {
     newData.checkpoints[index].quorum = changedCheckPointData.quorum;

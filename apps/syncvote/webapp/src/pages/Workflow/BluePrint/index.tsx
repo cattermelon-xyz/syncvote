@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { LeftOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import WorkflowCard from '../fragments/WorkflowCard';
 import { L } from '@utils/locales/L';
@@ -11,8 +11,13 @@ import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
 import { insertWorkflowAndVersion } from '@dal/data';
 import { randomIcon } from '@utils/helpers';
-import { createIdString, extractIdFromIdString, useGetDataHook } from 'utils';
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  createIdString,
+  extractIdFromIdString,
+  useGetDataHook,
+  useSetData,
+} from 'utils';
+import { useDispatch } from 'react-redux';
 import EditOrg from '@pages/Organization/home/EditOrg';
 import { emptyStage } from 'directed-graph';
 import NotFound404 from '@pages/NotFound404';
@@ -26,35 +31,27 @@ interface SortProps {
   type: 'asc' | 'des';
 }
 
-interface DataItem {
-  title: string;
-  [key: string]: any;
-}
-
 const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [templates, setTemplates] = useState<any[]>([]);
 
-  const user =
-    useGetDataHook({
-      configInfo: config.queryUserById,
-    }).data;
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
 
   const navigate = useNavigate();
 
-  const presetIcons =
-    useGetDataHook({
-      configInfo: config.queryPresetIcons,
-    }).data;
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
 
   const { orgIdString } = useParams();
 
   const [loading, setLoading] = useState(true);
 
-  const orgs =
-    useGetDataHook({
-      configInfo: config.queryOrgs,
-    }).data;
+  const orgs = useGetDataHook({
+    configInfo: config.queryOrgs,
+  }).data;
 
   const org = orgs.find(
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
@@ -103,25 +100,26 @@ const BluePrint = () => {
       iconUrl: 'preset:' + randomIcon(),
       authority: user.id,
     };
-    insertWorkflowAndVersion({
-      dispatch: dispatch,
-      props: props,
-      onError: (error) => {
-        Modal.error({ content: error.message });
-      },
-      onSuccess: (versions, insertedId) => {
+
+    await useSetData({
+      onSuccess: (data: any) => {
+        const { versions, insertedId } = data;
         navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
       },
+      onError: (error: any) => {
+        Modal.error({ content: error.message });
+      },
+      params: props,
+      configInfo: config.insertWorkflowAndVersion,
+      dispatch,
     });
   };
   return (
     <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
       <EditOrg
-        orgId={data?.id}
+        dataOrg={data}
         isOpen={showEditOrg}
         onClose={() => setShowEditOrg(false)}
-        title={data?.title}
-        desc={data?.desc}
         onSaved={() => {
           setShowEditOrg(false);
         }}
@@ -223,7 +221,18 @@ const BluePrint = () => {
                           }
                         />
                       ) : (
-                        <Empty />
+                        <Space className='w-full' direction='vertical'>
+                          <div className='w-full flex flex-col items-end'>
+                            <Button
+                              type='primary'
+                              icon={<PlusOutlined />}
+                              onClick={() => handleNewWorkflow()}
+                            >
+                              New Workflow
+                            </Button>
+                          </div>
+                          <Empty />
+                        </Space>
                       ),
                   },
                   {

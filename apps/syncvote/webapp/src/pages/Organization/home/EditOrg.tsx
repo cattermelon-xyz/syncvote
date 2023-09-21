@@ -1,7 +1,6 @@
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Button,
-  Divider,
   Drawer,
   Input,
   Modal,
@@ -13,37 +12,71 @@ import {
 import { IProfile } from '@types';
 import { useEffect, useState } from 'react';
 import InviteMember from './InviteMember';
-import { deleteOrg, upsertAnOrg } from '@dal/data';
 import { useDispatch } from 'react-redux';
+import { useSetData, useGetDataHook } from 'utils';
+import { config } from '@dal/config';
+import { Icon } from 'icon';
 // TODO: consider move this to src/fragments
 
 const EditOrg = ({
   isOpen = false,
   onClose,
-  orgId,
-  title,
-  desc,
+  dataOrg,
   profile,
   onSaved,
   onDeleted,
 }: {
   isOpen?: boolean;
   onClose: () => void;
-  orgId: number;
-  title: string;
-  desc: string;
+  dataOrg: any;
   profile: IProfile[];
   onSaved: () => void;
   onDeleted: () => void;
 }) => {
-  const [orgTitle, setOrgTitle] = useState(title);
-  const [orgDesc, setOrgDesc] = useState(desc);
+  const presetIcons = useGetDataHook({
+    configInfo: config.queryPresetIcons,
+  }).data;
+  const [orgTitle, setOrgTitle] = useState(dataOrg?.title);
+  const [orgDesc, setOrgDesc] = useState(dataOrg?.desc);
+  const [iconUrl, setIconUrl] = useState(dataOrg?.icon_url);
   const [shouldShowInviteMember, setShouldShowInviteMember] = useState(false);
-  useEffect(() => {
-    setOrgTitle(title);
-    setOrgDesc(desc);
-  }, [title, desc]);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setIconUrl(dataOrg?.icon_url);
+    setOrgTitle(dataOrg?.title);
+    setOrgDesc(dataOrg?.desc);
+  }, [dataOrg]);
+
+  const handleChangeAvatar = async (obj: any) => {
+    const newIconUrl = obj.isPreset ? `preset:${obj.filePath}` : obj.filePath;
+
+    setIconUrl(newIconUrl);
+
+    await useSetData({
+      params: {
+        org: {
+          ...dataOrg,
+          icon_url: newIconUrl,
+        },
+      },
+      configInfo: config.upsertAnOrg,
+      dispatch: dispatch,
+      onSuccess: () => {
+        Modal.success({
+          title: 'Success',
+          content: 'Change avatar successfully',
+        });
+      },
+      onError: () => {
+        Modal.error({
+          title: 'Error',
+          content: 'Cannot change avatar',
+        });
+      },
+    });
+  };
+
   return (
     <Drawer
       open={isOpen}
@@ -53,6 +86,14 @@ const EditOrg = ({
     >
       <Space direction='vertical' size='large' className='w-full'>
         <Space direction='vertical' size='small' className='w-full'>
+          <Space>
+            <Icon
+              presetIcon={presetIcons}
+              editable={true}
+              iconUrl={iconUrl}
+              onUpload={handleChangeAvatar}
+            />
+          </Space>
           <span>Title</span>
           <Input
             value={orgTitle}
@@ -109,14 +150,16 @@ const EditOrg = ({
           <Button
             type='default'
             onClick={() => {
-              upsertAnOrg({
-                org: {
-                  id: orgId,
-                  title: title,
-                  desc: desc,
+              useSetData({
+                params: {
+                  org: {
+                    ...dataOrg,
+                    title: orgTitle,
+                    desc: orgDesc,
+                  },
                 },
-                dispatch,
-                onLoad: () => {
+                configInfo: config.upsertAnOrg,
+                onSuccess: () => {
                   Modal.success({
                     title: 'Saved!',
                     content: 'Your changes have been saved.',
@@ -130,6 +173,7 @@ const EditOrg = ({
                   });
                   onSaved();
                 },
+                dispatch: dispatch,
               });
             }}
           >
@@ -139,8 +183,11 @@ const EditOrg = ({
             title='Delete workspace'
             description='Are you sure to delete this workspace and all of its content?'
             onConfirm={() => {
-              deleteOrg({
-                orgId,
+              useSetData({
+                params: {
+                  orgId: dataOrg?.id,
+                },
+                configInfo: config.deleteOrg,
                 dispatch,
                 onSuccess: () => {
                   Modal.info({

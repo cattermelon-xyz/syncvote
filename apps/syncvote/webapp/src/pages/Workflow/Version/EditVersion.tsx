@@ -38,6 +38,7 @@ import { AuthContext } from '@layout/context/AuthContext';
 import Header from './fragment/Header';
 import NotFound404 from '@pages/NotFound404';
 import Debug from '@components/Debug/Debug';
+import { CreateProposalModal } from '@fragments/CreateProposalModal';
 
 const extractVersion = ({
   workflows,
@@ -99,6 +100,7 @@ export const EditVersion = () => {
     workflowId,
     versionId,
   });
+  const [openCreateProposalModal, setOpenCreateProposalModal] = useState(false);
   const { web2Integrations } = useSelector((state: any) => state.integration);
   const [version, setVersion] = useState<any>(extractedVersion);
   const [web2IntegrationsState, setWeb2IntegrationsState] =
@@ -115,7 +117,6 @@ export const EditVersion = () => {
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
-  const [showDocs, setShownDocs] = useState(false);
   const extractWorkflowFromList = (wfList: any) => {
     let extractedVersion = extractVersion({
       workflows: wfList,
@@ -130,6 +131,7 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
+
   // const autoSaveWorker: Worker = useMemo(
   //   () => new Worker(new URL('/workers/AutoSave.ts', import.meta.url)),
   //   []
@@ -563,9 +565,20 @@ export const EditVersion = () => {
                 />
               ) : (
                 <div className='w-full h-full'>
+                  <CreateProposalModal
+                    open={openCreateProposalModal}
+                    onCancel={() => {
+                      setOpenCreateProposalModal(false);
+                    }}
+                    workflow={workflow}
+                    workflowVersion={version}
+                  />
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
+                    openCreateProposalModal={() => {
+                      setOpenCreateProposalModal(true);
+                    }}
                     navPanel={
                       <Space direction='vertical'>
                         <div

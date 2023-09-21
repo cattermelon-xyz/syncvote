@@ -13,16 +13,15 @@ import {
   LogoutOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
-import { createIdString, getImageUrl, useGetDataHook } from 'utils';
+import { createIdString, getImageUrl, useGetDataHook, useSetData } from 'utils';
 import { Banner } from 'banner';
 import ChangeNameWorkflowModal from './ChangeNameWorkflowModal';
 import DeleteWorkflowModal from './DeleteWorkflowModal';
 import DuplicateWorkflowModal from './DuplicateWorkflowModal';
 import MoveWorkflowModal from './MoveWorkflowModal';
 import MoveToWorkflowModal from './MoveToWorkflowModal';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import ShareModal from '../Version/fragment/ShareModal';
-import { upsertWorkflowVersion } from '@dal/data';
 import PreviewWorkflowModal from './PreviewWorkflowModal';
 import { config } from '@dal/config';
 
@@ -226,10 +225,15 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       workflowId,
       status,
     };
-    await upsertWorkflowVersion({
-      dispatch,
-      mode: 'info',
-      workflowVersion,
+
+    await useSetData({
+      params: {
+        versionId,
+        workflowId,
+        status,
+        mode: 'info',
+      },
+      configInfo: config.upsertWorkflowVersion,
       onSuccess: (data) => {
         onSuccess(data);
       },
@@ -240,6 +244,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         });
         onError(error);
       },
+      dispatch: dispatch,
     });
   };
 

@@ -7,24 +7,14 @@ import { Button, Empty, Space, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import ModalEditTemplate from '@fragments/ModalEditTemplate';
 import { useDispatch } from 'react-redux';
-import { deleteTemplate, upsertTemplate } from '@dal/data/template';
-import { useGetDataHook } from 'utils';
+import { useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
 
-// interface ITemplate {
-//   id?: number;
-//   title?: string;
-//   desc?: string;
-//   icon_url?: string;
-//   banner_url?: string;
-//   owner_org_id?: number;
-//   current_version_id?: number;
-//   // status: string;
-// }
 type TemplateListProps = {
   templates: any[];
   orgId?: number;
 };
+
 interface SortProps {
   by: string;
   type: 'asc' | 'des';
@@ -55,22 +45,30 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
     setSortTemplateOptions(options);
   };
   useEffect(() => {
+    let foundPublishableWorkflow = false;
     for (var i = 0; i < orgs.length; i++) {
       if (orgs[i].role === 'ADMIN') {
-        for (var j = 0; j < orgs[j].workflows.length; j++) {
-          for (var k = 0; k < orgs[j].workflows[k].versions.length; k++) {
+        for (var j = 0; j < orgs[i].workflows.length; j++) {
+          for (var k = 0; k < orgs[i].workflows[j].versions.length; k++) {
             if (
               ['PUBLIC_COMMUNITY', 'PUBLISHED'].indexOf(
-                orgs[j].workflows[j].versions[k]?.status
+                orgs[i].workflows[j].versions[k]?.status
               ) !== -1
             ) {
-              setCanPublishTemplate(true);
+              foundPublishableWorkflow = true;
               break;
             }
           }
+          if (foundPublishableWorkflow) {
+            break;
+          }
         }
       }
+      if (foundPublishableWorkflow) {
+        break;
+      }
     }
+    setCanPublishTemplate(foundPublishableWorkflow);
   }, [orgs]);
   return (
     <>
@@ -103,10 +101,19 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
                     content: `Are you sure you want to delete this template? This action cannot be undone and all associated data will be permanently removed from the system.`,
                     okText: 'Delete',
                     onOk: () => {
-                      deleteTemplate({
-                        dispatch,
-                        templateId: template.id,
-                        orgId: template.owner_org_id,
+                      // deleteTemplate({
+                      //   dispatch,
+                      //   templateId: template.id,
+                      //   orgId: template.owner_org_id,
+                      // });
+
+                      useSetData({
+                        params: {
+                          templateId: template.id,
+                          orgId: template.owner_org_id,
+                        },
+                        configInfo: config.deleteTemplate,
+                        dispatch: dispatch,
                       });
                     },
                     icon: <></>,
@@ -121,22 +128,42 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
                     icon: <></>,
                     okButtonProps: { className: 'bg-violet-700' },
                     onOk: () => {
-                      upsertTemplate({
-                        dispatch,
-                        templateId: template.id,
-                        orgId: template.owner_org_id,
-                        status: false,
+                      useSetData({
+                        params: {
+                          templateId: template.id,
+                          orgId: template.owner_org_id,
+                          status: false,
+                        },
+                        configInfo: config.upsertTemplate,
+                        dispatch: dispatch,
                       });
+
+                      // upsertTemplate({
+                      //   dispatch,
+                      //   templateId: template.id,
+                      //   orgId: template.owner_org_id,
+                      //   status: false,
+                      // });
                     },
                   });
                 }}
                 publishClickHandler={() => {
-                  upsertTemplate({
-                    dispatch,
-                    templateId: template.id,
-                    orgId: template.owner_org_id,
-                    status: true,
+                  useSetData({
+                    params: {
+                      templateId: template.id,
+                      orgId: template.owner_org_id,
+                      status: true,
+                    },
+                    configInfo: config.upsertTemplate,
+                    dispatch: dispatch,
                   });
+
+                  // upsertTemplate({
+                  //   dispatch,
+                  //   templateId: template.id,
+                  //   orgId: template.owner_org_id,
+                  //   status: true,
+                  // });
                 }}
               />
             ))

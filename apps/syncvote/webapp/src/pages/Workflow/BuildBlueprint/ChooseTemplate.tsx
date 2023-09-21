@@ -4,9 +4,8 @@ import Button from '@components/Button/Button';
 import { PlusOutlined } from '@ant-design/icons';
 import { Input, Modal, Space } from 'antd';
 import { Icon } from 'icon';
-import { supabase, useGetDataHook } from 'utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+import { useGetDataHook, useSetData } from 'utils';
+import { useDispatch } from 'react-redux';
 import { extractIdFromIdString } from 'utils';
 import { emptyStage } from 'directed-graph';
 import { insertWorkflowAndVersion } from '@dal/data';
@@ -21,7 +20,7 @@ const ChooseTemplate = () => {
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
@@ -46,15 +45,18 @@ const ChooseTemplate = () => {
       iconUrl,
       authority: user.id,
     };
-    insertWorkflowAndVersion({
-      dispatch: dispatch,
-      props: props,
-      onError: (error) => {
-        Modal.error({ content: error.message });
-      },
-      onSuccess: (versions, insertedId) => {
+
+    await useSetData({
+      onSuccess: (data: any) => {
+        const { versions, insertedId } = data;
         navigate(`/${orgIdString}/${insertedId}/${versions[0].id}`);
       },
+      onError: (error: any) => {
+        Modal.error({ content: error.message });
+      },
+      params: props,
+      configInfo: config.insertWorkflowAndVersion,
+      dispatch,
     });
   };
   return (

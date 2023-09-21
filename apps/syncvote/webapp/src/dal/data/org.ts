@@ -8,8 +8,8 @@ import {
   removeUserOfOrg,
   deleteOrgInfo,
 } from '@dal/redux/reducers/orginfo.reducer';
-import { off } from 'process';
 import { deepEqual } from '@utils/helpers';
+import { ITag } from '@types';
 
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -103,12 +103,14 @@ export class OrgFunctionClass {
             banner_url,
             status,
             created_at,
-            current_version_id
+            current_version_id,
+            tag_template ( tag (*))
           )
         )
       `
         )
         .eq('user_id', userId);
+
       if (!error) {
         const tmp: any[] = [];
         data.forEach((d: any) => {
@@ -171,6 +173,22 @@ export class OrgFunctionClass {
                 : workflowPresetBanner,
             };
           });
+
+          const templates = org?.templates.map((template: any) => {
+            const tags: ITag[] = [];
+            template.tag_template.map((itm: any) => {
+              tags.push({
+                value: itm.tag.id,
+                label: itm.tag.label,
+              });
+            });
+            delete template.tag_template;
+            template.tags = [...tags];
+            return {
+              ...template,
+            };
+          });
+
           tmp.push({
             id: org?.id,
             role: d.role,
@@ -183,12 +201,17 @@ export class OrgFunctionClass {
             profile: profiles,
             last_updated: org.last_updated,
             workflows: workflows || [],
-            templates: org.templates || [],
+            templates: templates || [],
           });
         });
-        dispatch(setOrgsInfo(tmp));
-        dispatch(setLastFetch({}));
-        onSuccess(tmp);
+
+        if (deepEqual(orgs, tmp)) {
+          onSuccess(orgs);
+        } else {
+          dispatch(setOrgsInfo(tmp));
+          dispatch(setLastFetch({}));
+          onSuccess(tmp);
+        }
       } else {
         onError(error);
       }
@@ -314,6 +337,66 @@ export class OrgFunctionClass {
     } else if (error) {
       onError(error);
     }
+  }
+
+  async newOrg({
+    params,
+    onSuccess = () => {},
+    onError = () => {},
+    dispatch,
+  }: {
+    params: {
+      orgInfo: {
+        title: string;
+        desc?: string;
+        icon_url: string;
+        org_size?: string;
+        org_type?: string;
+        preset_banner_url?: string;
+      };
+      uid: string;
+    };
+    onSuccess?: (data: any) => void;
+    onError?: (data: any) => void;
+    dispatch: any;
+  }) {
+    const { orgInfo, uid } = params;
+    dispatch(startLoading({}));
+
+    try {
+      const url =
+        'https://uafmqopjujmosmilsefw.supabase.co/functions/v1/new-org';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${supabaseAnonKey}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          orgInfo,
+          uid,
+        }),
+      });
+      const result = await response.json();
+      if (result) {
+        const data = result[0];
+        const info = structuredClone(orgInfo);
+        dispatch(
+          changeOrgInfo({
+            id: data.id,
+            role: 'ADMIN',
+            ...info,
+          })
+        );
+        dispatch(setLastFetch({}));
+        onSuccess(data);
+      } else {
+        onError(new Error("Can't create organization"));
+      }
+    } catch (error) {
+      onError(error);
+    }
+    dispatch(finishLoading({}));
   }
 }
 

@@ -7,7 +7,7 @@ import { GrDocumentText } from 'react-icons/gr';
 import parse from 'html-react-parser';
 import { DirectedGraph, emptyStage } from 'directed-graph';
 import { extractIdFromIdString, useGetDataHook } from 'utils';
-import { Button, Layout, Space, Empty, Modal, Skeleton } from 'antd';
+import { Button, Layout, Space, Empty, Modal, Skeleton, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -72,6 +72,7 @@ export const TemplateViewData = () => {
           icon_url: data.icon_url,
           owner_org_id: data.owner_org_id,
           created_at: data.created_at,
+          tags: data.tag_template,
         });
       } else {
         Modal.error({
@@ -85,7 +86,6 @@ export const TemplateViewData = () => {
     }
     setLoading(false);
   };
-  console.log('1111');
   useEffect(() => {
     fetchTemplateData();
   }, []);
@@ -290,6 +290,26 @@ export const TemplateViewData = () => {
                     </div>
                   ) : (
                     <Empty />
+                  )}
+                  <div className='font-bold text-md p-2'>Tags :</div>
+                  {template.tags && template.tags.length !== 0 ? (
+                    <div className='m-4 mt-2 p-2 bg-white rounded-lg public-desc-wrapper'>
+                      {template.tags.map((tagWrapper: any) => {
+                        const tag = tagWrapper.tag;
+                        return (
+                          <Tag
+                            className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full`}
+                            key={tag.id}
+                          >
+                            {tag.label}
+                          </Tag>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className='m-4 mt-2 p-2 bg-white rounded-lg public-desc-wrapper'>
+                      <p>Template has no tag.</p>
+                    </div>
                   )}
                 </div>
               </div>

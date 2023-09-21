@@ -88,8 +88,6 @@ export class UserFunctionClass {
     onSuccess?: () => void;
     onError?: (error: any) => void;
   }) {
-    console.log('params', params);
-
     const { userProfile } = params;
 
     const newUserProfile = { ...userProfile };
@@ -114,17 +112,28 @@ export class UserFunctionClass {
       );
       newUserProfile.icon_url = '';
     }
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('profile')
       .update(newUserProfile)
-      .eq('id', newUserProfile.id);
-
-    console.log('debug');
+      .eq('id', newUserProfile.id)
+      .select('id, email, full_name, icon_url,preset_icon_url, about_me');
 
     if (!error) {
-      console.log('debug1');
       onSuccess();
-      dispatch(setUser(newUserProfile));
+      const profileInfo = data[0];
+      const presetIcon = profileInfo?.preset_icon_url
+        ? `preset:${profileInfo.preset_icon_url}`
+        : profileInfo.preset_icon_url;
+
+      const userDataAfterHandle = {
+        id: profileInfo.id,
+        email: profileInfo.email,
+        full_name: profileInfo.full_name,
+        avatar_url: profileInfo.icon_url ? profileInfo.icon_url : presetIcon,
+        about_me: profileInfo.about_me,
+      };
+
+      dispatch(setUser(userDataAfterHandle));
     } else {
       onError(error);
     }
@@ -217,7 +226,7 @@ export class UserFunctionClass {
     }
     // dispatch(finishLoading({}));
   }
-  
+
   async inviteUserByEmail({
     params,
     dispatch,
@@ -525,7 +534,7 @@ export const changePassword = async ({
   onSuccess?: (() => void) | undefined;
   onError?: (error: any) => void;
 }) => {
-  const { data, error } = await supabase.auth.updateUser({
+  const { error } = await supabase.auth.updateUser({
     password: password,
   });
   if (error) {

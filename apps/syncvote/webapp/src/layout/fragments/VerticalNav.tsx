@@ -45,7 +45,7 @@ const VerticalNav = () => {
       label: (
         <>
           <FileOutlined className='text-base mr-2' />
-          <span className='text-sm'>Worflow</span>
+          <span className='text-sm'>Workflow</span>
         </>
       ),
       key: 'workflow',
@@ -152,7 +152,10 @@ const VerticalNav = () => {
       <CreateWorkflowModal
         open={openModalCreateWorkflow}
         onClose={() => setOpenModalCreateWorkflow(false)}
-        setOpenCreateWorkspaceModal={() => setOpenModalCreateWorkflow}
+        setOpenCreateWorkspaceModal={() => {
+          setOpenModalCreateWorkflow(false);
+          setOpenModalCreateWorkspace(true);
+        }}
       />
       <Space
         direction='vertical'

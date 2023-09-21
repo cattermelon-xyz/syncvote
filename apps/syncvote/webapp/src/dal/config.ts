@@ -45,6 +45,10 @@ export const config: ConfigObject = {
     reduxObjectPath: 'template',
   },
 
+  searchTemplate: {
+    dalFunction: templateFunction.searchTemplate,
+  },
+
   queryPresetIcons: {
     dalFunction: presetFunction.queryPresetIcons, // done
     reduxObjectPath: 'preset',
@@ -82,10 +86,6 @@ export const config: ConfigObject = {
     dalFunction: orgFunction.deleteOrg,
   },
 
-  queryUserByEmail: {
-    dalFunction: userFunction.queryUserByEmail,
-  },
-
   inviteExistingMember: {
     dalFunction: userFunction.inviteExistingMember,
   },
@@ -113,5 +113,39 @@ export const config: ConfigObject = {
   queryWorkflow: {
     dalFunction: workflowFunction.queryWorkflow,
     reduxObjectPath: 'workflow',
+  },
+
+  newOrg: {
+    dalFunction: orgFunction.newOrg,
+  },
+
+  upsertTemplate: {
+    dalFunction: templateFunction.upsertTemplate,
+  },
+
+  deleteTemplate: {
+    dalFunction: templateFunction.deleteTemplate,
+  },
+
+  updateAWorkflowTag: {
+    dalFunction: workflowFunction.updateAWorkflowTag,
+  },
+
+
+  queryATemplate: {
+    dalFunction: templateFunction.queryATemplate,
+    reduxObjectPath: 'template',
+  },
+
+  updateATemplateTag: {
+    dalFunction: templateFunction.updateATemplateTag,
+  },
+
+  updateAWorkflowInfo: {
+    dalFunction: workflowFunction.updateAWorkflowInfo,
+  },
+
+  upsertWorkflowVersion: {
+    dalFunction: workflowFunction.upsertWorkflowVersion,
   },
 };

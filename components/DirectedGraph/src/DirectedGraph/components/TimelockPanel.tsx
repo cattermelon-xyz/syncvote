@@ -83,12 +83,9 @@ const TimelockPanel = ({
             <TextEditor
               value={tmpDelayNote}
               setValue={(val: any) => {
+                // separate the value from the editor might boost the performance
                 setTmpDelayNote(val);
-              }}
-              onBlur={async () => {
-                if (tmpDelayNote !== delayNote) {
-                  setValue({ delayNote: tmpDelayNote });
-                }
+                setValue({ delayNote: val });
               }}
             />
           </div>

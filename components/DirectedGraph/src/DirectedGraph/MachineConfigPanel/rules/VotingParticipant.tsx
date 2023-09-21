@@ -25,7 +25,6 @@ const VotingPartipation = () => {
   const tokenData = type === 'token' && data ? (data as IToken) : {};
   return (
     <Space direction='vertical' size='small' className='w-full'>
-      <div className='text-sm'>Voter</div>
       <Select
         disabled={!(viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION)}
         value={type}
@@ -43,7 +42,7 @@ const VotingPartipation = () => {
             label: (
               <div className='flex items-center'>
                 <FiUserCheck className='mr-2' />
-                Other identity
+                Custom
               </div>
             ),
             value: 'identity',
@@ -63,20 +62,19 @@ const VotingPartipation = () => {
       />
       {type ? <div className='py-1'>{/* <hr /> */}</div> : null}
       {type === 'identity' ? (
-        <></>
-      ) : // <AllowedByIdentity
-      //   editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
-      //   identity={identity}
-      //   setIdentity={(newIdentity: string[]) => {
-      //     onChange({
-      //       participation: {
-      //         type: 'identity',
-      //         data: newIdentity,
-      //       },
-      //     });
-      //   }}
-      // />
-      null}
+        <AllowedByIdentity
+          editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
+          identity={identity}
+          setIdentity={(newIdentity: string[]) => {
+            onChange({
+              participation: {
+                type: 'identity',
+                data: newIdentity,
+              },
+            });
+          }}
+        />
+      ) : null}
       {type === 'token' ? (
         <AllowedByToken
           editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
