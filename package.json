@@ -3,6 +3,7 @@
   "workspaces": [
     "apps/*",
     "apps/syncvote/webapp",
+    "apps/admin/webapp",
     "components/*",
     "votemachines/*",
     "votemachines/polling/weblib",
