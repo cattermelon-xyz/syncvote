@@ -1,0 +1,1 @@
+This is Syncvote Admin tool which allows admin to keep track of Syncvote app performance.

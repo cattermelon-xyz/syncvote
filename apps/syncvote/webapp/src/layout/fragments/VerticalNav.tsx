@@ -152,7 +152,10 @@ const VerticalNav = () => {
       <CreateWorkflowModal
         open={openModalCreateWorkflow}
         onClose={() => setOpenModalCreateWorkflow(false)}
-        setOpenCreateWorkspaceModal={() => setOpenModalCreateWorkflow}
+        setOpenCreateWorkspaceModal={() => {
+          setOpenModalCreateWorkflow(false);
+          setOpenModalCreateWorkspace(true);
+        }}
       />
       <Space
         direction='vertical'

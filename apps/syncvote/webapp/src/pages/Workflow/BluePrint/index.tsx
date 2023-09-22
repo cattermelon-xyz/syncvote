@@ -117,11 +117,9 @@ const BluePrint = () => {
   return (
     <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
       <EditOrg
-        orgId={data?.id}
+        dataOrg={data}
         isOpen={showEditOrg}
         onClose={() => setShowEditOrg(false)}
-        title={data?.title}
-        desc={data?.desc}
         onSaved={() => {
           setShowEditOrg(false);
         }}
