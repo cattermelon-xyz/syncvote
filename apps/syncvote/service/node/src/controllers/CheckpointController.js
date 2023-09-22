@@ -5,12 +5,8 @@ const createCheckpoint = async (req, res) => {
     const {
       id,
       vote_machine_type,
-      childrens,
       mission_id,
-      duration,
       participation,
-      delays,
-      delayUnits,
       quorum,
       options,
     } = req.body;
@@ -49,6 +45,6 @@ const getAllCheckpoint = async (req, res) => {
 };
 
 module.exports = {
-  createMission,
+  createCheckpoint,
   getAllCheckpoint,
 };

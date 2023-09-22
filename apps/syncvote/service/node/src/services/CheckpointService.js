@@ -32,7 +32,7 @@ async function getAllCheckpoint() {
       } else {
         resolve({
           status: 'ERR',
-          massage: 'Cannot get all mission',
+          massage: 'Cannot get all checkpoints',
         });
       }
     } catch (e) {

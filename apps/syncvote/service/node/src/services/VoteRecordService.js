@@ -1,27 +1,33 @@
 const { supabase } = require('../configs/supabaseClient');
-const { Mission } = require('../models/Mission');
+const { VoteRecord } = require('../models/VoteRecord');
 
-async function getAllMission() {
+async function getAllVoteRecord() {
   return new Promise(async (resolve, reject) => {
     try {
       const { data, error } = await supabase.from('mission').select('*');
 
       if (!error) {
-        let missions = [];
-        data.map((m) => {
-          missions.push(
-            new Mission(m.id, m.owner_id, m.status, m.current_vote_data_id)
+        let voteRecords = [];
+        data.map((vr) => {
+          voteRecords.push(
+            new VoteRecord(
+              vr.id,
+              vr.who,
+              vr.option,
+              vr.voting_power,
+              vr.current_vote_data_id
+            )
           );
         });
         resolve({
           status: 'OK',
           message: 'SUCCESS',
-          data: missions,
+          data: voteRecords,
         });
       } else {
         resolve({
           status: 'ERR',
-          massage: 'Cannot get all mission',
+          massage: 'Cannot get all vote records',
         });
       }
     } catch (e) {
@@ -30,11 +36,11 @@ async function getAllMission() {
   });
 }
 
-async function insertMisson(params) {
+async function insertVoteRecord(params) {
   return new Promise(async (resolve, reject) => {
     try {
-      const { data: newMission, error } = await supabase
-        .from('mission')
+      const { data: newVoteRecord, error } = await supabase
+        .from('vote_record')
         .insert(params)
         .select('*');
 
@@ -42,7 +48,7 @@ async function insertMisson(params) {
         resolve({
           status: 'OK',
           message: 'SUCCESS',
-          data: newMission,
+          data: newVoteRecord,
         });
       } else {
         resolve({
@@ -57,6 +63,6 @@ async function insertMisson(params) {
 }
 
 module.exports = {
-  getAllMission,
-  insertMisson,
+  getAllVoteRecord,
+  insertVoteRecord,
 };
