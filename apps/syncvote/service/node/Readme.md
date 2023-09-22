@@ -2,9 +2,17 @@
 
 ## Database design
 
-![Alt text](<Screenshot 2023-09-22 at 13.16.12.png>)
+![Alt text](public/database.png)
 
+## Flow (Updating...)
 
-## Flow
+![Alt text](public/flow.png)
 
-![Alt text](image.png)
+## Code structure
+
+![Alt text](public/structure.png)
+
+1. Client send a request to server
+2. Route will direct the request
+3. The controller receives the request and gives it to the service to process
+4. Controller will return response
