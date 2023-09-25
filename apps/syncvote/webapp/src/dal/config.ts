@@ -3,6 +3,7 @@ import {
   UserFunctionClass,
   WorkflowFunctionClass,
   PresetFunctionClass,
+  MissionFunctionClass,
 } from '@dal/data';
 
 import { ConfigInfo } from 'utils';
@@ -29,6 +30,7 @@ const orgFunction = new OrgFunctionClass();
 const workflowFunction = new WorkflowFunctionClass();
 const templateFunction = new TemplateFunctionClass();
 const tagFunction = new TagFunctionClass();
+const missionFunction = new MissionFunctionClass();
 
 interface ConfigObject {
   [key: string]: ConfigInfo;
@@ -131,7 +133,6 @@ export const config: ConfigObject = {
     dalFunction: workflowFunction.updateAWorkflowTag,
   },
 
-
   queryATemplate: {
     dalFunction: templateFunction.queryATemplate,
     reduxObjectPath: 'template',
@@ -147,5 +148,10 @@ export const config: ConfigObject = {
 
   upsertWorkflowVersion: {
     dalFunction: workflowFunction.upsertWorkflowVersion,
+  },
+
+  queryMission: {
+    dalFunction: missionFunction.queryMission,
+    reduxObjectPath: 'mission',
   },
 };

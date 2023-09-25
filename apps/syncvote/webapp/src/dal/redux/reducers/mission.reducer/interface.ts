@@ -4,6 +4,7 @@ export interface IMission {
   title?: string,
   desc?: string,
   icon_url?: string,
+  org_icon_url?: string,
   data?: string,
   status?: string,
   banner_url?: string,
