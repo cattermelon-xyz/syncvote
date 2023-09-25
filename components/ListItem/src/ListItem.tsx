@@ -86,7 +86,7 @@ const ListItem: React.FC<Props> = ({
           <Popover content={content} trigger='click' placement='rightTop'>
             <Button
               style={{ border: 'None', padding: '5px' }}
-              className='w-[44px] bg-[#F6F6F6]'
+              className='w-[44px] bg-[#F4F0FA]'
             >
               {typeSort === 'asc' ? (
                 <SortAscendingOutlined
