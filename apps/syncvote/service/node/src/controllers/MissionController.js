@@ -2,9 +2,8 @@ const MissionService = require('../services/MissionService');
 
 const createMission = async (req, res) => {
   try {
-    const { owner_id, status } = req.body;
-    console.log(req.body);
-    if (!status || !owner_id) {
+    const { creator_id, status } = req.body;
+    if (!status || !creator_id) {
       return res.status(200).json({
         status: 'ERR',
         message: 'The input is required',

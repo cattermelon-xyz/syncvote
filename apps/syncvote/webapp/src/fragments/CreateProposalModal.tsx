@@ -16,11 +16,13 @@ export const CreateProposalModal = ({
   onCancel,
   workflow,
   workflowVersion,
+  missionId,
 }: {
   open: boolean;
   workflow: any;
   onCancel: () => void;
   workflowVersion: any;
+  missionId?: number;
 }) => {
   const dispatch = useDispatch();
   const [name, setName] = useState('');
@@ -67,22 +69,17 @@ export const CreateProposalModal = ({
     } else {
       // create mission
       const missionData = {
-        owner_id: user.id,
+        creator_id: user.id,
         status: 'DRAFT',
+        title: name,
+        desc: desc,
+        data: data,
+        workflow_version_id: workflowVersion.id,
       };
 
-      createMission({ missionData, workflowVersion });
-
-      await insertMission({
-        dispatch: dispatch,
-        params: {
-          title: name,
-          desc: desc,
-          data: data,
-          status: 'DRAFT',
-          workflow_version_id: workflowVersion.id,
-          creator_id: user.id,
-        },
+      await createMission({
+        missionData,
+        workflowVersion,
         onSuccess: () => {
           Modal.success({
             title: 'Success',
@@ -96,6 +93,30 @@ export const CreateProposalModal = ({
           });
         },
       });
+
+      // await insertMission({
+      //   dispatch: dispatch,
+      //   params: {
+      //     title: name,
+      //     desc: desc,
+      //     data: data,
+      //     status: 'DRAFT',
+      //     workflow_version_id: workflowVersion.id,
+      //     creator_id: user.id,
+      //   },
+      //   onSuccess: () => {
+      //     Modal.success({
+      //       title: 'Success',
+      //       content: 'Create a new proposal successfully',
+      //     });
+      //   },
+      //   onError: () => {
+      //     Modal.error({
+      //       title: 'Error',
+      //       content: 'Error to create a proposal',
+      //     });
+      //   },
+      // });
 
       reset();
       onCancel();
