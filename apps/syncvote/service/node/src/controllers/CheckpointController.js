@@ -2,22 +2,8 @@ const CheckpointService = require('../services/CheckpointService');
 
 const createCheckpoint = async (req, res) => {
   try {
-    const {
-      id,
-      vote_machine_type,
-      mission_id,
-      participation,
-      quorum,
-      options,
-    } = req.body;
-    if (
-      !id ||
-      !vote_machine_type ||
-      !mission_id ||
-      !participation ||
-      !quorum ||
-      !options
-    ) {
+    const { id, mission_id } = req.body;
+    if (!id || !mission_id) {
       return res.status(200).json({
         status: 'ERR',
         message: 'The input is required',

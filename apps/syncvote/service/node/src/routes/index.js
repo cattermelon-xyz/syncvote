@@ -8,7 +8,6 @@ const routes = (app) => {
   app.use('/api/checkpoint', CheckpointRouter);
   app.use('/api/vote-record', VoteRecordRouter);
   app.use('/api/current-vote-data', CurrentVoteDataRouter);
-  app.use('/vote', VoteRecordRouter);
 };
 
 module.exports = routes;

@@ -2,7 +2,8 @@ const MissionService = require('../services/MissionService');
 
 const createMission = async (req, res) => {
   try {
-    const { owner_id, status, current_vote_data_id } = req.body;
+    const { owner_id, status } = req.body;
+    console.log(req.body);
     if (!status || !owner_id) {
       return res.status(200).json({
         status: 'ERR',

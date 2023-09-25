@@ -1,6 +1,7 @@
 import { Button, Input, Modal, Select, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { IDoc, emptyStage } from 'directed-graph';
+import axios from 'axios';
 
 import { insertMission } from '@dal/data';
 import { useDispatch } from 'react-redux';
@@ -8,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { TextEditor } from 'rich-text-editor';
 import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
+import { createMission } from '@axios/createMission';
 
 export const CreateProposalModal = ({
   open,
@@ -63,14 +65,13 @@ export const CreateProposalModal = ({
         setIsWarning(false);
       }, 2000);
     } else {
-      // const textEditorElement = document.getElementById('text-editor');
-      // if (textEditorElement) {
-      //   const qlEditorElement = textEditorElement.querySelector('.ql-editor');
-      //   if (qlEditorElement) {
-      //     const qlEditorHTML = qlEditorElement.innerHTML;
+      // create mission
+      const missionData = {
+        owner_id: user.id,
+        status: 'DRAFT',
+      };
 
-      //   }
-      // }
+      createMission({ missionData, workflowVersion });
 
       await insertMission({
         dispatch: dispatch,
