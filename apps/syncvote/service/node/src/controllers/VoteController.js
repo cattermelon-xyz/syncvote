@@ -1,6 +1,6 @@
 const VoteRecordService = require('../services/VoteRecordService');
 
-const createVoteRecord = async (req, res) => {
+const voting = async (req, res) => {
   try {
     const { who, option, voting_power, current_vote_data_id } = req.body;
     if (!who || !option || !voting_power || !current_vote_data_id) {
@@ -19,18 +19,6 @@ const createVoteRecord = async (req, res) => {
   }
 };
 
-const getAllVoteRecord = async (req, res) => {
-  try {
-    const respone = await VoteRecordService.getAllVoteRecord();
-    return res.status(200).json(respone);
-  } catch (e) {
-    return res.status(404).json({
-      message: e,
-    });
-  }
-};
-
 module.exports = {
-  createVoteRecord,
-  getAllVoteRecord,
+  voting,
 };
