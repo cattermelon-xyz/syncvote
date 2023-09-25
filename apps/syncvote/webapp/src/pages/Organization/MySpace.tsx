@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Dropdown, MenuProps, Space, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Dropdown, MenuProps, Space, Tabs, Empty } from 'antd';
 import { L } from '@utils/locales/L';
 import SpaceCard from '@pages/Organization/fragments/SpaceCard';
 import { ListItem } from 'list-item';
@@ -13,6 +13,8 @@ import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
+import ListProposals from '@pages/Mission/fragments/ListProposals';
+
 const env = import.meta.env.VITE_ENV;
 
 interface SortProps {
@@ -30,13 +32,48 @@ const MySpace: React.FC = () => {
     configInfo: config.queryOrgs,
   }).data;
 
+  const [runGetMission, setRunGetMission] = useState(false);
+
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
 
-  const presetIcons = useGetDataHook({
-    configInfo: config.queryPresetIcons,
+  const [orgIds, setOrgIds] = useState<any>([]);
+
+  const missionData = useGetDataHook({
+    params: {
+      orgIds,
+    },
+    start: runGetMission,
+    configInfo: config.queryMission,
   }).data;
+
+  useEffect(() => {
+    if (orgIds && orgIds.length > 0) {
+      setRunGetMission(true);
+    }
+  }, [JSON.stringify(orgIds), setRunGetMission]);
+
+  const [myProposals, setMyProposals] = useState<any[]>([]);
+  const [allProposals, setAllProposals] = useState<any[]>([]);
+  useEffect(() => {
+    if (orgs) {
+      const fetchedOrgIds = orgs.map((org: any) => org.id);
+      setOrgIds(fetchedOrgIds);
+    }
+  }, [orgs, myProposals]);
+
+  useEffect(() => {
+    if (missionData && user) {
+      const missionDataArray = Object.values(missionData);
+
+      const getMyProposals = missionDataArray.filter(
+        (mission: any) => mission.creator_id === user.id
+      );
+      setMyProposals(getMyProposals);
+      setAllProposals(missionDataArray);
+    }
+  }, [missionData, user]);
 
   const [adminOrgs, setAdminOrgs] = useState<DataItem[]>([]);
   const [workflows, setWorkflows] = useState<DataItem[]>([]);
@@ -89,31 +126,7 @@ const MySpace: React.FC = () => {
           org_title: adminOrg.title,
         }))
       );
-      // Querry from org
       setWorkflows(allWorkflows);
-
-      // await getWorkflowFromEditor({
-      //   userId: user.id,
-      //   dispatch,
-      //   onSuccess: (data: any) => {
-      //     console.log('Editor', data);
-      //   },
-      //   onError: (error: any) => {
-      //     console.log(error);
-      //   },
-      // });
-      // await getWorkflowFromEditor({
-      //   userId: user.id,
-      //   dispatch,
-      //   onSuccess: (data: any) => {
-      //     console.log('Editor', data);
-      //   },
-      //   onError: (error: any) => {
-      //     console.log(error);
-      //   },
-      // });
-
-      // Querry workflow from workflow_version_editor
     }
     setLoading(false);
     const url = PublicPageRedirect.getRedirectUrl();
@@ -121,13 +134,14 @@ const MySpace: React.FC = () => {
       navigate(url);
     }
   };
-  // const dispatch = useDispatch();
   const navigate = useNavigate();
+
   useEffect(() => {
     if (user) {
       fetchData();
     }
   }, [user, orgs]);
+
   const items: MenuProps['items'] = [
     {
       label: (
@@ -160,6 +174,76 @@ const MySpace: React.FC = () => {
     onClick: handleMenuClick,
   };
 
+  const tabsItems = [
+    {
+      key: '1',
+      label: L('spaces'),
+      children:
+        filterSpaceByOptions && filterSpaceByOptions.length > 0 ? (
+          <ListItem
+            handleSort={handleSortSpaceDetail}
+            items={
+              filterSpaceByOptions &&
+              filterSpaceByOptions.map((adminOrg, index) => (
+                <SpaceCard
+                  key={index}
+                  dataSpace={adminOrg}
+                  isOwner={adminOrg.role === 'ADMIN'}
+                />
+              ))
+            }
+            columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
+          />
+        ) : (
+          <Space className='w-full' direction='vertical'>
+            <Empty />
+          </Space>
+        ),
+    },
+    {
+      key: '2',
+      label: L('workflows'),
+      children:
+        filterWorkflowByOptions && filterWorkflowByOptions.length > 0 ? (
+          <ListItem
+            handleSort={handleSortWorkflowDetail}
+            items={
+              filterWorkflowByOptions &&
+              filterWorkflowByOptions.map((workflow, index) => (
+                <WorkflowCard key={index} dataWorkflow={workflow} />
+              ))
+            }
+            columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
+          />
+        ) : (
+          <Space className='w-full' direction='vertical'>
+            <Empty />
+          </Space>
+        ),
+    },
+  ];
+
+  if (env !== 'production') {
+    tabsItems.push({
+      key: '3',
+      label: 'Proposal',
+      children: myProposals && allProposals && (
+        <div className='flex flex-col gap-6'>
+          <ListProposals
+            listProposals={myProposals}
+            title={'My proposals'}
+            type='owner'
+          />
+          <ListProposals
+            listProposals={allProposals}
+            title={'All proposals'}
+            type='all'
+          />
+        </div>
+      ),
+    });
+  }
+
   return (
     <>
       <CreateSpaceModal
@@ -182,44 +266,9 @@ const MySpace: React.FC = () => {
             </Dropdown>
           ) : null}
         </Space>
-        <section className='w-full mb-8'>
-          {loading ? (
-            <Skeleton />
-          ) : (
-            <ListItem
-              handleSort={handleSortSpaceDetail}
-              items={
-                filterSpaceByOptions &&
-                filterSpaceByOptions.map((adminOrg, index) => (
-                  <SpaceCard
-                    key={index}
-                    dataSpace={adminOrg}
-                    isOwner={adminOrg.role === 'ADMIN'}
-                  />
-                ))
-              }
-              columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
-              title={L('spaces')}
-            />
-          )}
-        </section>
-        <section className='w-full mb-8'>
-          {loading ? (
-            <Skeleton />
-          ) : (
-            <ListItem
-              handleSort={handleSortWorkflowDetail}
-              items={
-                filterWorkflowByOptions &&
-                filterWorkflowByOptions.map((workflow, index) => (
-                  <WorkflowCard key={index} dataWorkflow={workflow} />
-                ))
-              }
-              columns={{ xs: 2, md: 3, xl: 3, '2xl': 3 }}
-              title={L('workflows')}
-            />
-          )}
-        </section>
+      </div>
+      <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
+        {loading ? <Skeleton /> : <Tabs items={tabsItems} />}
       </div>
     </>
   );
