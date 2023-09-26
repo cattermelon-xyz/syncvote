@@ -50,24 +50,33 @@ const explain = ({
             })}
           </ul>
         </li>
-        {quorum !== undefined ? (
+        {(quorum !== 0 && quorum !== undefined) ||
+        (data.max !== 0 && data.max !== undefined) ? (
+          <>
+            {quorum !== 0 && quorum !== undefined ? (
+              <li>
+                Voting quorum:{' '}
+                <span className='text-violet-500'>
+                  <NumberWithPercentageInput value={quorum} />{' '}
+                  <TokenInput address={data.token || ''} />
+                </span>
+              </li>
+            ) : null}
+            {data.max !== 0 && data.max !== undefined ? (
+              <li>
+                Wining threshold:{' '}
+                <span className='text-violet-500'>
+                  <NumberWithPercentageInput value={data.max} />{' '}
+                  <TokenInput address={data.token || ''} />
+                </span>
+              </li>
+            ) : null}
+          </>
+        ) : (
           <li>
-            Voting quorum:{' '}
-            <span className='text-violet-500'>
-              <NumberWithPercentageInput value={quorum} />{' '}
-              <TokenInput address={data.token || ''} />
-            </span>
+            Result calculation:{' '}
           </li>
-        ) : null}
-        {data.max !== undefined ? (
-          <li>
-            Wining threshold:{' '}
-            <span className='text-violet-500'>
-              <NumberWithPercentageInput value={data.max} />{' '}
-              <TokenInput address={data.token || ''} />
-            </span>
-          </li>
-        ) : null}
+        )}
       </ul>
     </div>
   );
