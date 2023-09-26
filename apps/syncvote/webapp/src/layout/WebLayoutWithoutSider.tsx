@@ -26,7 +26,7 @@ const WebLayoutWithoutSider = ({ children }: Props) => {
                 {children}
               </Layout>
             </Layout>
-            <Footer />
+            {/* <Footer /> */}
           </Layout>
         )}
       </AuthContext.Consumer>
