@@ -98,10 +98,12 @@ const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
         {checkpoint?.duration || checkpoint?.durationDescription ? (
           <li>
             Duration:{' '}
+            <span>
             <span className='text-violet-500'>
               {displayDuration(
                 moment.duration((checkpoint?.duration || 0) * 1000)
               )}
+              </span>
               {checkpoint?.durationDescription ? (
                 <SideNote value={checkpoint?.durationDescription} />
               ) : null}
