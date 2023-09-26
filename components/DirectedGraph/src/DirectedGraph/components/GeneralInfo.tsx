@@ -88,26 +88,26 @@ const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
               ) : null}
             </span>
           </li>
-        ) : null}
+        ) : <li>Who can pariticapte:</li>}
         {isRTE(votingLocation) ? (
           <li>
             Location:
             <SideNote value={votingLocation} />
           </li>
-        ) : null}
-        {checkpoint?.duration || checkpoint?.durationDescription ? (
+        ) : <li>Location:</li>}
           <li>
             Duration:{' '}
+            <span>
             <span className='text-violet-500'>
-              {displayDuration(
+              {checkpoint?.duration ? displayDuration(
                 moment.duration((checkpoint?.duration || 0) * 1000)
-              )}
+              ):''}
+              </span>
               {checkpoint?.durationDescription ? (
                 <SideNote value={checkpoint?.durationDescription} />
               ) : null}
             </span>
           </li>
-        ) : null}
       </ul>
     </>
   );
