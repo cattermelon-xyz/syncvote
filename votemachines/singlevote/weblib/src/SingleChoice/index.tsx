@@ -115,53 +115,66 @@ const explain = ({
         <li>
           Voting method: <span className='text-violet-500'>Single Choice</span>
         </li>
-        {noOfOptions ? (
-          <li>
-            Voting options:{' '}
-            <ul className='flex flex-col gap-1'>
-              {data.options.map((option: string, index: number) => {
-                return <li key={index}>{renderOption({ data, index })}</li>;
-              })}
-              {checkpoint.includedAbstain ? (
-                <li className='text-violet-500'>Abstain</li>
-              ) : null}
-            </ul>
-          </li>
-        ) : null}
+
+        <li>
+          Voting options:{' '}
+          <ul className='flex flex-col gap-1'>
+            {noOfOptions ? (
+              <>
+                {data.options.map((option: string, index: number) => {
+                  return <li key={index}>{renderOption({ data, index })}</li>;
+                })}
+                {checkpoint.includedAbstain ? (
+                  <li className='text-violet-500'>Abstain</li>
+                ) : null}
+              </>
+            ) : null}
+          </ul>
+        </li>
+
         <SideNote value={optionsDescription} />
-        {quorum ? (
+        {(quorum !== 0 || data.max !== 0) ? (
+          <>
+            {quorum !== 0 ? (
+              <li>
+                Voting quorum:{' '}
+                <span className='text-violet-500'>
+                  <NumberWithPercentageInput value={quorum} />{' '}
+                  {!data.token ? (
+                    'votes'
+                  ) : (
+                    <>
+                      {' '}
+                      token(s) <TokenInput address={data.token} />
+                    </>
+                  )}
+                </span>
+              </li>
+            ) : null}
+            {data.max !== 0 ? (
+              <li>
+                Wining threshold:{' '}
+                <span className='text-violet-500'>
+                  <NumberWithPercentageInput value={data.max} />{' '}
+                  {!data.token ? (
+                    'votes'
+                  ) : (
+                    <>
+                      {' '}
+                      token(s) <TokenInput address={data.token} />
+                    </>
+                  )}
+                </span>
+                <SideNote value={resultDescription} />
+              </li>
+            ) : null}
+          </>
+        ) : (
           <li>
-            Voting quorum:{' '}
-            <span className='text-violet-500'>
-              <NumberWithPercentageInput value={quorum} />{' '}
-              {!data.token ? (
-                'votes'
-              ) : (
-                <>
-                  {' '}
-                  token(s) <TokenInput address={data.token} />
-                </>
-              )}
-            </span>
+            Result calculation:{' '}
+            {resultDescription ? <SideNote value={resultDescription} /> : null}
           </li>
-        ) : null}
-        {data.max !== undefined ? (
-          <li>
-            Wining threshold:{' '}
-            <span className='text-violet-500'>
-              <NumberWithPercentageInput value={data.max} />{' '}
-              {!data.token ? (
-                'votes'
-              ) : (
-                <>
-                  {' '}
-                  token(s) <TokenInput address={data.token} />
-                </>
-              )}
-            </span>
-            <SideNote value={resultDescription} />
-          </li>
-        ) : null}
+        )}
       </ul>
     </>
   );
