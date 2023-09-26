@@ -28,7 +28,6 @@ export class MissionFunctionClass {
     reduxDataReturn: any;
   }) {
     const { orgIds } = params;
-    console.log('orgIds to query', orgIds);
     const { missions } = reduxDataReturn;
     if (shouldCache) {
       onSuccess(missions);
@@ -41,7 +40,6 @@ export class MissionFunctionClass {
 
       // TODO: check if data is correct
       if (data) {
-        console.log('data from supabase', data);
         const newMissions: IMission[] = [];
         const mList = Array.isArray(data) ? data : [data];
         mList.forEach((d: any) => {
