@@ -13,6 +13,7 @@ type SearchWithTagProps = {
   placeholder?: string;
   tagTo: TagObject;
   onResult: (result: any) => void;
+  showSearchTag?: boolean;
 };
 
 const SearchWithTag = ({
@@ -20,6 +21,7 @@ const SearchWithTag = ({
   placeholder = 'Search ...',
   tagTo = TagObject.TEMPLATE,
   onResult,
+  showSearchTag = true,
 }: SearchWithTagProps) => {
   const tags: ITag[] = useGetDataHook({
     params: { tagTo: tagTo },
@@ -127,34 +129,36 @@ const SearchWithTag = ({
           }
         }}
       />
-      <div className='w-full'>
-        {!inputSearchText &&
-          tags.map((tag: any) => {
-            return (
-              <Tag
-                className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full ${
-                  selectedTagIds.indexOf(tag.value) !== -1
-                    ? 'bg-violet-500 text-white'
-                    : ''
-                }`}
-                onClick={() => {
-                  const newselectedTagIds = structuredClone(selectedTagIds);
-                  const idx = selectedTagIds.indexOf(tag.value);
-                  if (idx !== -1) {
-                    newselectedTagIds.splice(idx, 1);
-                  } else {
-                    newselectedTagIds.push(tag.value);
-                  }
-                  setSelectedTagIds(newselectedTagIds);
-                  search({ tags: newselectedTagIds, text: toSearch });
-                }}
-                key={tag.value}
-              >
-                {tag.label} ({extractCount(tag)})
-              </Tag>
-            );
-          })}
-      </div>
+      {showSearchTag && (
+        <div className='w-full'>
+          {!inputSearchText &&
+            tags.map((tag: any) => {
+              return (
+                <Tag
+                  className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full ${
+                    selectedTagIds.indexOf(tag.value) !== -1
+                      ? 'bg-violet-500 text-white'
+                      : ''
+                  }`}
+                  onClick={() => {
+                    const newselectedTagIds = structuredClone(selectedTagIds);
+                    const idx = selectedTagIds.indexOf(tag.value);
+                    if (idx !== -1) {
+                      newselectedTagIds.splice(idx, 1);
+                    } else {
+                      newselectedTagIds.push(tag.value);
+                    }
+                    setSelectedTagIds(newselectedTagIds);
+                    search({ tags: newselectedTagIds, text: toSearch });
+                  }}
+                  key={tag.value}
+                >
+                  {tag.label} ({extractCount(tag)})
+                </Tag>
+              );
+            })}
+        </div>
+      )}
     </Space>
   );
 };

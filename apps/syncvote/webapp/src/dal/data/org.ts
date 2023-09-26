@@ -400,6 +400,57 @@ export class OrgFunctionClass {
   }
 }
 
+export const queryOrgByRange = async ({
+  from,
+  to,
+  onSuccess,
+  onError = (error) => {
+    console.error(error); // eslint-disable-line
+  },
+  dispatch,
+}: {
+  from: number;
+  to: number;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  dispatch(startLoading({}));
+
+  const { data, error } = await supabase
+    .from('org')
+    .select('*')
+    .range(from, to);
+
+  if (!error) {
+    const orgsAfterHandle: any[] = [];
+
+    data.forEach((org: any) => {
+      const presetIcon = org?.preset_icon_url
+        ? `preset:${org.preset_icon_url}`
+        : org.preset_icon_url;
+      const presetBanner = org?.preset_banner_url
+        ? `preset:${org.preset_banner_url}`
+        : org.preset_banner_url;
+
+      orgsAfterHandle.push({
+        id: org.id,
+        created_at: org.created_at,
+        title: org.title,
+        icon_url: org.icon_url ? org.icon_url : presetIcon,
+        banner_url: org.banner_url ? org.banner_url : presetBanner,
+        desc: org.desc,
+        last_updated: org.last_updated,
+      });
+    });
+
+    onSuccess(orgsAfterHandle);
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
+};
+
 export const newOrg = async ({
   orgInfo,
   uid,

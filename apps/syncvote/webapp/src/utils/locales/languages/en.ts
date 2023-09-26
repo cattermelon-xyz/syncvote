@@ -322,4 +322,5 @@ export const LANG: any = {
   changeSpaceInfo: 'Change workspace info',
   password: 'Password',
   youSignUpWith: `You're signing up as`,
+  exploreOrg: 'Explore public organizations',
 };

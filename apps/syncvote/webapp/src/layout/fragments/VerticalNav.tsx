@@ -6,6 +6,7 @@ import {
   LogoutOutlined,
   PlusOutlined,
   ShareAltOutlined,
+  DiffOutlined,
 } from '@ant-design/icons';
 import CreateSpaceModal from '@/fragments/CreateNewDialog/CreateSpaceModal';
 import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal';
@@ -106,6 +107,15 @@ const VerticalNav = () => {
             ),
             destinationUrl: '/explore',
           },
+          {
+            label: (
+              <>
+                <DiffOutlined />
+                Templates
+              </>
+            ),
+            destinationUrl: '/templates',
+          },
         ]
       : [
           {
@@ -117,14 +127,23 @@ const VerticalNav = () => {
             ),
             destinationUrl: '/',
           },
+          // {
+          //   label: (
+          //     <>
+          //       <GlobalOutlined />
+          //       Explore
+          //     </>
+          //   ),
+          //   destinationUrl: '/explore',
+          // },
           {
             label: (
               <>
-                <GlobalOutlined />
-                Explore
+                <DiffOutlined />
+                Templates
               </>
             ),
-            destinationUrl: '/explore',
+            destinationUrl: '/templates',
           },
         ];
 
