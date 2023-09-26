@@ -1,6 +1,7 @@
 import { Button, Input, Modal, Select, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { IDoc, emptyStage } from 'directed-graph';
+import axios from 'axios';
 
 import { insertMission } from '@dal/data';
 import { useDispatch } from 'react-redux';
@@ -8,17 +9,20 @@ import { useParams } from 'react-router-dom';
 import { TextEditor } from 'rich-text-editor';
 import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
+import { createMission } from '@axios/createMission';
 
 export const CreateProposalModal = ({
   open,
   onCancel,
   workflow,
   workflowVersion,
+  missionId,
 }: {
   open: boolean;
   workflow: any;
   onCancel: () => void;
   workflowVersion: any;
+  missionId?: number;
 }) => {
   const dispatch = useDispatch();
   const [name, setName] = useState('');
@@ -63,25 +67,19 @@ export const CreateProposalModal = ({
         setIsWarning(false);
       }, 2000);
     } else {
-      // const textEditorElement = document.getElementById('text-editor');
-      // if (textEditorElement) {
-      //   const qlEditorElement = textEditorElement.querySelector('.ql-editor');
-      //   if (qlEditorElement) {
-      //     const qlEditorHTML = qlEditorElement.innerHTML;
+      // create mission
+      const missionData = {
+        creator_id: user.id,
+        status: 'DRAFT',
+        title: name,
+        desc: desc,
+        data: data,
+        workflow_version_id: workflowVersion.id,
+      };
 
-      //   }
-      // }
-
-      await insertMission({
-        dispatch: dispatch,
-        params: {
-          title: name,
-          desc: desc,
-          data: data,
-          status: 'DRAFT',
-          workflow_version_id: workflowVersion.id,
-          creator_id: user.id,
-        },
+      await createMission({
+        missionData,
+        workflowVersion,
         onSuccess: () => {
           Modal.success({
             title: 'Success',
@@ -95,6 +93,30 @@ export const CreateProposalModal = ({
           });
         },
       });
+
+      // await insertMission({
+      //   dispatch: dispatch,
+      //   params: {
+      //     title: name,
+      //     desc: desc,
+      //     data: data,
+      //     status: 'DRAFT',
+      //     workflow_version_id: workflowVersion.id,
+      //     creator_id: user.id,
+      //   },
+      //   onSuccess: () => {
+      //     Modal.success({
+      //       title: 'Success',
+      //       content: 'Create a new proposal successfully',
+      //     });
+      //   },
+      //   onError: () => {
+      //     Modal.error({
+      //       title: 'Error',
+      //       content: 'Error to create a proposal',
+      //     });
+      //   },
+      // });
 
       reset();
       onCancel();
