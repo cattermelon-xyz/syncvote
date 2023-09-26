@@ -18,7 +18,7 @@ export function useGetDataHook<T>({
   params,
   configInfo,
   cacheOption = true,
-  start,
+  start = true,
 }: useGetDataHookProps<T>) {
   const reduxDataReturn = useSelector(
     (state: any) => state[configInfo.reduxObjectPath!]

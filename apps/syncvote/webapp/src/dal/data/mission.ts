@@ -7,6 +7,74 @@ import {
 } from '@dal/redux/reducers/mission.reducer';
 import { supabase } from 'utils';
 import { IMission } from '@types';
+import { deepEqual } from '@utils/helpers';
+
+export class MissionFunctionClass {
+  async queryMission({
+    params,
+    onSuccess,
+    onError = (error) => {
+      console.error(error); // eslint-disable-line
+    },
+    dispatch,
+    shouldCache,
+    reduxDataReturn,
+  }: {
+    params: { orgIds: number[] };
+    onSuccess: (data: any) => void;
+    onError?: (data: any) => void;
+    dispatch: any;
+    shouldCache: boolean;
+    reduxDataReturn: any;
+  }) {
+    const { orgIds } = params;
+    console.log('orgIds to query', orgIds);
+    const { missions } = reduxDataReturn;
+    if (shouldCache) {
+      onSuccess(missions);
+    } else {
+      dispatch(startLoading({}));
+      const { data, error } = await supabase
+        .from('mission_view')
+        .select('*')
+        .in('org_id', orgIds);
+
+      // TODO: check if data is correct
+      if (data) {
+        console.log('data from supabase', data);
+        const newMissions: IMission[] = [];
+        const mList = Array.isArray(data) ? data : [data];
+        mList.forEach((d: any) => {
+          const newd = { ...d };
+          newd.mission_icon_url = d.mission_icon_url
+            ? d.mission_icon_url
+            : `preset:${d.mission_preset_icon_url}`;
+
+          const orgPresetIcon = d?.org_preset_icon_url
+            ? `preset:${d?.org_preset_icon_url}`
+            : d?.preset_icon_url;
+
+          newd.org_icon_url = d?.org_icon_url ? d?.org_icon_url : orgPresetIcon;
+
+          delete newd.org_preset_icon_url;
+          delete newd.mission_preset_icon_url;
+          delete newd.preset_banner_url;
+          newMissions.push(newd);
+        });
+        if (deepEqual(newMissions, missions)) {
+          onSuccess(missions);
+        } else {
+          dispatch(setLastFetch({}));
+          dispatch(setReducerMissions(newMissions));
+          onSuccess(newMissions);
+        }
+      } else if (error) {
+        onError(error);
+      }
+      dispatch(finishLoading({}));
+    }
+  }
+}
 
 export const queryMission = async ({
   orgId,
