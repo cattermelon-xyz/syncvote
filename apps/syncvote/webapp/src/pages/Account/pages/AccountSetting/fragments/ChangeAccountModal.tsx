@@ -91,7 +91,7 @@ const ChangeModal: React.FC<ChangeModalProps> = ({
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={handleCancel}
-      okText={L('createNew')}
+      okText={L('Save')}
       cancelButtonProps={{ style: { display: 'none' } }}
       className='w-1/4'
     >

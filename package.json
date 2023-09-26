@@ -4,6 +4,7 @@
     "apps/*",
     "apps/syncvote/webapp",
     "apps/admin/webapp",
+    "apps/syncvote/service/node",
     "components/*",
     "votemachines/*",
     "votemachines/polling/weblib",

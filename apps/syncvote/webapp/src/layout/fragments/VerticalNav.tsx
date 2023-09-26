@@ -210,13 +210,6 @@ const VerticalNav = () => {
             })}
           </Space>
         </Space>
-        <Button
-          className='w-full border-0 text-left shadow-none ml-8 mb-14'
-          type='default'
-        >
-          <LogoutOutlined />
-          Log out
-        </Button>
       </Space>
     </>
   );
