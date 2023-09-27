@@ -67,11 +67,13 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
 
   return (
     <Space className='flex items-center justify-end gap-3'>
+      {/*}
       {isAuth ? (
         <div className='flex rounded-full h-[36px] w-[36px] bg-gray-100 justify-center cursor-pointer'>
           <BellOutlined style={{ fontSize: '20px' }} />
         </div>
       ) : null}
+      */}
       {isAuth ? (
         <Popover
           placement='bottomRight'

@@ -14,7 +14,12 @@ import { supabase, useGetDataHook } from 'utils';
 import { Session } from '@supabase/supabase-js';
 import LoadingPage from '@pages/LoadingPage';
 import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
-import { MySpace, OrganizationExplore, SharedSpace } from '@pages/Organization';
+import {
+  MySpace,
+  OrganizationExplore,
+  SharedSpace,
+  HomeTemplate,
+} from '@pages/Organization';
 import WebLayout from '@layout/WebLayout';
 import TemplateDetail from '@pages/Template/Detail';
 import { TemplateViewData } from '@pages/Template/ViewData';
@@ -95,6 +100,7 @@ const AppRoutes = () => {
             <Route path='/' element={<App layout={WebLayout} />}>
               <Route index element={<MySpace />} />
               <Route path='/explore' element={<OrganizationExplore />} />
+              <Route path='/templates' element={<HomeTemplate />} />
             </Route>
           ) : null}
           {env === 'dev' && session !== null ? (
@@ -102,6 +108,7 @@ const AppRoutes = () => {
               <Route index element={<MySpace />} />
               <Route path='/explore' element={<OrganizationExplore />} />
               <Route path='/shared' element={<SharedSpace />} />
+              <Route path='/templates' element={<HomeTemplate />} />
             </Route>
           ) : null}
           {session === null ? (

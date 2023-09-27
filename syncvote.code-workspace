@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "project-root",
+      "path": "./"
+    },
+    {
+      "name": "front end",
+      "path": "./webapp"
+    },
+    {
+      "name": "supabase-functions",
+      "path": "supabase/functions"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "supabase/functions/": true,
+      "webapp/": true,
+      "node_modules": true
+    }
+  }
+}

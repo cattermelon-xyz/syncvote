@@ -34,9 +34,11 @@ const WebLayout = ({ children }: Props) => {
                 {children}
               </Layout>
             </Layout>
+            {/*
             <div className='w-full'>
               <Footer />
             </div>
+             */}
           </Layout>
         )}
       </AuthContext.Consumer>
