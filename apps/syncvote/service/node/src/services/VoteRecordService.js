@@ -36,12 +36,12 @@ async function getAllVoteRecord() {
   });
 }
 
-async function insertVoteRecord(params) {
+async function insertVoteRecord(props) {
   return new Promise(async (resolve, reject) => {
     try {
       const { data: newVoteRecord, error } = await supabase
         .from('vote_record')
-        .insert(params)
+        .insert(props)
         .select('*');
 
       if (!error) {

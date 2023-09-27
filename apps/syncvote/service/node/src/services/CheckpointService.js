@@ -41,12 +41,12 @@ async function getAllCheckpoint() {
   });
 }
 
-async function insertCheckpoint(params) {
+async function insertCheckpoint(props) {
   return new Promise(async (resolve, reject) => {
     try {
       const { data: newCheckpoint, error } = await supabase
         .from('checkpoint')
-        .insert(params)
+        .insert(props)
         .select('*');
 
       if (!error) {

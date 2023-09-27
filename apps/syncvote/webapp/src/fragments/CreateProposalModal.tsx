@@ -94,30 +94,6 @@ export const CreateProposalModal = ({
         },
       });
 
-      // await insertMission({
-      //   dispatch: dispatch,
-      //   params: {
-      //     title: name,
-      //     desc: desc,
-      //     data: data,
-      //     status: 'DRAFT',
-      //     workflow_version_id: workflowVersion.id,
-      //     creator_id: user.id,
-      //   },
-      //   onSuccess: () => {
-      //     Modal.success({
-      //       title: 'Success',
-      //       content: 'Create a new proposal successfully',
-      //     });
-      //   },
-      //   onError: () => {
-      //     Modal.error({
-      //       title: 'Error',
-      //       content: 'Error to create a proposal',
-      //     });
-      //   },
-      // });
-
       reset();
       onCancel();
     }

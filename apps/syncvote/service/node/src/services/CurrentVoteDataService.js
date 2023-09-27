@@ -1,9 +1,9 @@
 const { supabase } = require('../configs/supabaseClient');
 
-async function insertCurrentVoteData(params) {
+async function insertCurrentVoteData(props) {
   return new Promise(async (resolve, reject) => {
     try {
-      const { checkpoint_id } = params;
+      const { checkpoint_id } = props;
       const { data: newCurrentVoteData, error } = await supabase
         .from('current_vote_data')
         .insert({

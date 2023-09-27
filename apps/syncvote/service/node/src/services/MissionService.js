@@ -30,12 +30,12 @@ async function getAllMission() {
   });
 }
 
-async function insertMisson(params) {
+async function insertMisson(props) {
   return new Promise(async (resolve, reject) => {
     try {
       const { data: newMission, error } = await supabase
         .from('mission')
-        .insert(params)
+        .insert(props)
         .select('*');
 
       if (!error) {
@@ -56,7 +56,37 @@ async function insertMisson(params) {
   });
 }
 
+async function updateMission(props) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { params, mission_id } = props;
+
+      const { data: updateMission, error } = await supabase
+        .from('mission')
+        .update(params)
+        .eq('id', mission_id)
+        .select('*');
+
+      if (!error) {
+        resolve({
+          status: 'OK',
+          message: 'SUCCESS',
+          data: updateMission,
+        });
+      } else {
+        resolve({
+          status: 'ERR',
+          message: error,
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
 module.exports = {
   getAllMission,
   insertMisson,
+  updateMission,
 };
