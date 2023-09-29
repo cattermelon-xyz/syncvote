@@ -90,18 +90,6 @@ const BluePrint = () => {
 
   const [isExplorePage, setIsExplorePage] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log('isExplorePage:', isExplorePage);
-  }, [isExplorePage]);
-
-  useEffect(() => {
-    // console.log('missionData', missionData);
-    // console.log('myProposals', myProposals);
-    // console.log('allProposals', allProposals);
-    // console.log('orgs', orgs);
-    // console.log('org', org);
-  }, [missionData, myProposals, allProposals, org, orgs]);
-
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
     by: 'Last modified',
     type: 'des',
@@ -121,21 +109,22 @@ const BluePrint = () => {
         (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
       );
 
-      console.log('org after handle', org);
-
       if (org === undefined) {
         setIsExplorePage(true);
         queryOrgByIdForExplore({
           orgId: orgId[0],
           onSuccess: (data: any) => {
             const org = data[0];
-            console.log('data[0]', data[0]);
             setData(org);
             const workflowsData = org?.workflows?.map((workflow: any) => ({
               ...workflow,
               org_title: org.title,
             }));
-            setWorkflows(workflowsData);
+            const publicCommunityworkflows = workflowsData.filter(
+              (workflow: any) =>
+                workflow.versions[0].status === 'PUBLIC_COMMUNITY'
+            );
+            setWorkflows(publicCommunityworkflows);
             setTemplates(org?.templates || []);
             setLoading(false);
           },
@@ -153,7 +142,6 @@ const BluePrint = () => {
           ...workflow,
           org_title: org.title,
         }));
-        console.log('workflowsData', workflowsData);
         setWorkflows(workflowsData);
         setTemplates(org?.templates || []);
         setLoading(false);
@@ -225,6 +213,7 @@ const BluePrint = () => {
                 <WorkflowCard
                   key={workflow?.id + index}
                   dataWorkflow={workflow}
+                  isListHome={isExplorePage ? true : false}
                 />
               ))
             }
