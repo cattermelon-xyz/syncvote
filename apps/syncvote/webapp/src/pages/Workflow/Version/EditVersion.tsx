@@ -572,7 +572,6 @@ export const EditVersion = () => {
                     }}
                     workflow={workflow}
                     workflowVersion={version}
-                    missionId={36}
                   />
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
