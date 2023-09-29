@@ -32,8 +32,8 @@ const getAllMission = async (req, res) => {
 
 const updateMission = async (req, res) => {
   try {
-    const { params, mission_id } = req.body;
-    if (!params || !mission_id) {
+    const { params, missionId } = req.body;
+    if (!params || !missionId) {
       return res.status(200).json({
         status: 'ERR',
         message: 'The input is required',

@@ -59,12 +59,12 @@ async function insertMisson(props) {
 async function updateMission(props) {
   return new Promise(async (resolve, reject) => {
     try {
-      const { params, mission_id } = props;
+      const { params, missionId } = props;
 
       const { data: updateMission, error } = await supabase
         .from('mission')
         .update(params)
-        .eq('id', mission_id)
+        .eq('id', missionId)
         .select('*');
 
       if (!error) {

@@ -1,31 +1,34 @@
 import { Button, Input, Modal, Select, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { IDoc, emptyStage } from 'directed-graph';
-import axios from 'axios';
 
-import { insertMission } from '@dal/data';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { TextEditor } from 'rich-text-editor';
 import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
-import { createMission } from '@axios/createMission';
+import { createMission, updateMission } from '@axios/createMission';
+import { queryAMission } from '@dal/data';
+
+interface CreateProposalModalProps {
+  open: boolean;
+  workflow: any;
+  onCancel: () => void;
+  workflowVersion: any;
+  missionId?: number;
+}
 
 export const CreateProposalModal = ({
   open,
   onCancel,
   workflow,
   workflowVersion,
-  missionId,
-}: {
-  open: boolean;
-  workflow: any;
-  onCancel: () => void;
-  workflowVersion: any;
-  missionId?: number;
-}) => {
+  missionId = -1,
+}: CreateProposalModalProps) => {
   const dispatch = useDispatch();
+  const [mission, setMission] = useState<any>({});
   const [name, setName] = useState('');
+  const [status, setStatus] = useState('DRAFT');
 
   const user = useGetDataHook({
     configInfo: config.queryUserById,
@@ -58,9 +61,21 @@ export const CreateProposalModal = ({
 
       setOptionDocs(optionDocs);
     }
+    if (missionId) {
+      queryAMission({
+        missionId: missionId,
+        onLoad: (data: any) => {
+          const mission = data[0];
+          setMission(mission);
+          setName(mission.title);
+          setDesc(mission.desc);
+        },
+        dispatch,
+      });
+    }
   }, []);
 
-  const handleClick = async () => {
+  const handleClick = async (kind: string) => {
     if (!name) {
       setIsWarning(true);
       setTimeout(() => {
@@ -68,31 +83,58 @@ export const CreateProposalModal = ({
       }, 2000);
     } else {
       // create mission
-      const missionData = {
-        creator_id: user.id,
-        status: 'DRAFT',
-        title: name,
-        desc: desc,
-        data: data,
-        workflow_version_id: workflowVersion.id,
-      };
+      if (kind === 'Edit') {
+        let missionData = {
+          status: status,
+          title: name,
+          desc: desc,
+        };
 
-      await createMission({
-        missionData,
-        workflowVersion,
-        onSuccess: () => {
-          Modal.success({
-            title: 'Success',
-            content: 'Create a new proposal successfully',
-          });
-        },
-        onError: () => {
-          Modal.error({
-            title: 'Error',
-            content: 'Error to create a proposal',
-          });
-        },
-      });
+        await updateMission({
+          missionId: missionId,
+          missionData: missionData,
+          workflowVersion: workflowVersion,
+          onSuccess: () => {
+            Modal.success({
+              title: 'Success',
+              content: 'Edit proposal successfully',
+            });
+          },
+          onError: () => {
+            Modal.error({
+              title: 'Error',
+              content: 'Error to edit a proposal',
+            });
+          },
+        });
+      } else if (kind === 'New') {
+        const missionData = {
+          creator_id: user.id,
+          status: status,
+          title: name,
+          desc: desc,
+          data: data,
+          icon_url: workflow.icon_url,
+          workflow_version_id: workflowVersion.id,
+        };
+
+        await createMission({
+          missionData,
+          workflowVersion,
+          onSuccess: () => {
+            Modal.success({
+              title: 'Success',
+              content: 'Create a new proposal successfully',
+            });
+          },
+          onError: () => {
+            Modal.error({
+              title: 'Error',
+              content: 'Error to create a proposal',
+            });
+          },
+        });
+      }
 
       reset();
       onCancel();
@@ -120,11 +162,40 @@ export const CreateProposalModal = ({
         <Modal
           open={open}
           onCancel={onCancel}
-          onOk={() => {
-            handleClick();
-          }}
-          title={'Create a proposal'}
+          title={!missionId ? 'Create a proposal' : 'Edit a proposal'}
           width={628}
+          footer={[
+            <Button key='back' onClick={onCancel}>
+              Cancel
+            </Button>,
+            <Button
+              key='save-draft'
+              type='primary'
+              onClick={() => {
+                if (missionId) {
+                  handleClick('Edit');
+                } else {
+                  handleClick('New');
+                }
+              }}
+            >
+              Save Draft
+            </Button>,
+            <Button
+              key='publish'
+              type='primary'
+              onClick={() => {
+                setStatus('PUBLIC');
+                if (missionId) {
+                  handleClick('Edit');
+                } else {
+                  handleClick('New');
+                }
+              }}
+            >
+              Publish
+            </Button>,
+          ]}
         >
           <div className='flex'>
             <div style={{ width: 580 }}>
