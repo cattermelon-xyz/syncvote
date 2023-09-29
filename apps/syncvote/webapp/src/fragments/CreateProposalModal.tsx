@@ -28,7 +28,6 @@ export const CreateProposalModal = ({
   const dispatch = useDispatch();
   const [mission, setMission] = useState<any>({});
   const [name, setName] = useState('');
-  const [status, setStatus] = useState('DRAFT');
 
   const user = useGetDataHook({
     configInfo: config.queryUserById,
@@ -61,7 +60,7 @@ export const CreateProposalModal = ({
 
       setOptionDocs(optionDocs);
     }
-    if (missionId) {
+    if (missionId !== -1) {
       queryAMission({
         missionId: missionId,
         onLoad: (data: any) => {
@@ -75,7 +74,7 @@ export const CreateProposalModal = ({
     }
   }, []);
 
-  const handleClick = async (kind: string) => {
+  const handleClick = async (kind: string, status: string) => {
     if (!name) {
       setIsWarning(true);
       setTimeout(() => {
@@ -162,7 +161,7 @@ export const CreateProposalModal = ({
         <Modal
           open={open}
           onCancel={onCancel}
-          title={!missionId ? 'Create a proposal' : 'Edit a proposal'}
+          title={missionId === -1 ? 'Create a proposal' : 'Edit a proposal'}
           width={628}
           footer={[
             <Button key='back' onClick={onCancel}>
@@ -172,10 +171,10 @@ export const CreateProposalModal = ({
               key='save-draft'
               type='primary'
               onClick={() => {
-                if (missionId) {
-                  handleClick('Edit');
+                if (missionId !== -1) {
+                  handleClick('Edit', 'DRAFT');
                 } else {
-                  handleClick('New');
+                  handleClick('New', 'DRAFT');
                 }
               }}
             >
@@ -185,11 +184,10 @@ export const CreateProposalModal = ({
               key='publish'
               type='primary'
               onClick={() => {
-                setStatus('PUBLIC');
-                if (missionId) {
-                  handleClick('Edit');
+                if (missionId !== -1) {
+                  handleClick('Edit', 'PUBLIC');
                 } else {
-                  handleClick('New');
+                  handleClick('New', 'PUBLIC');
                 }
               }}
             >

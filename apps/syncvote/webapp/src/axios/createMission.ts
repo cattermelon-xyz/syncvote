@@ -47,14 +47,14 @@ export const updateMission = async ({
   missionId,
   missionData,
   workflowVersion,
-  onSuccess,
-  onError,
+  onSuccess = () => {},
+  onError = () => {},
 }: {
   missionId: number;
   missionData: any;
-  workflowVersion: any;
-  onSuccess: () => void;
-  onError: () => void;
+  workflowVersion?: any;
+  onSuccess?: () => void;
+  onError?: () => void;
 }) => {
   axios
     .post(`${import.meta.env.VITE_SERVER_URL}/mission/update`, {
@@ -102,26 +102,42 @@ const createCheckpointBE = async ({
       checkpointDataBe
     )
     .then(async (response) => {
-      console.log('Success create checkpoint', response.data);
+      const checkpoint = response.data.data[0];
+
+      if (checkpoint.id === `${checkpoint.mission_id}-root`) {
+        createCurrentVoteDataBE({
+          checkpointId: checkpoint.id,
+          missionId: checkpoint.mission_id,
+        });
+      }
     })
     .catch((error) => {
       console.log('Error', error);
     });
 };
 
-// const createCurrentVoteDataBE = async ({
-//   checkpointId,
-// }: {
-//   checkpointId: string;
-// }) => {
-//   axios
-//     .post(`${import.meta.env.VITE_SERVER_URL}/current-vote-data/create`, {
-//       checkpoint_id: checkpointId,
-//     })
-//     .then((response) => {
-//       console.log('Success', response.data);
-//     })
-//     .catch((error) => {
-//       console.log('Error', error);
-//     });
-// };
+const createCurrentVoteDataBE = async ({
+  checkpointId,
+  missionId,
+}: {
+  checkpointId: string;
+  missionId: number;
+}) => {
+  axios
+    .post(`${import.meta.env.VITE_SERVER_URL}/current-vote-data/create`, {
+      checkpoint_id: checkpointId,
+    })
+    .then(async (response) => {
+      console.log('Success', response.data);
+
+      await updateMission({
+        missionId: missionId,
+        missionData: {
+          current_vote_data_id: response.data.data[0].id,
+        },
+      });
+    })
+    .catch((error) => {
+      console.log('Error', error);
+    });
+};
