@@ -313,6 +313,7 @@ export const LANG: any = {
   searchAWorkflow: 'Search a workflow',
   backToSharedSpaces: 'Back to shared spaces',
   backToMySpaces: 'Back to my spaces',
+  backToExplore: 'Back to Explore',
   accountSettings: 'Account settings',
   changeName: 'Change name',
   email: 'Email',

@@ -9,7 +9,7 @@ import { Icon } from 'icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
-import { insertWorkflowAndVersion } from '@dal/data';
+import { queryOrgByIdForExplore } from '@dal/data';
 import { randomIcon } from '@utils/helpers';
 import {
   createIdString,
@@ -23,6 +23,7 @@ import { emptyStage } from 'directed-graph';
 import NotFound404 from '@pages/NotFound404';
 import TemplateList from '@fragments/TemplateList';
 import { config } from '@dal/config';
+import ListProposals from '@pages/Mission/fragments/ListProposals';
 
 // TODO: this file is placed in wrong folder!
 
@@ -34,32 +35,72 @@ interface SortProps {
 const BluePrint = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [templates, setTemplates] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const { orgIdString } = useParams();
+  const dispatch = useDispatch();
+  const orgId = [extractIdFromIdString(orgIdString)];
+  const [loading, setLoading] = useState(true);
+  const [runGetMission, setRunGetMission] = useState(false);
+  const [myProposals, setMyProposals] = useState<any[]>([]);
+  const [allProposals, setAllProposals] = useState<any[]>([]);
 
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
 
-  const navigate = useNavigate();
-
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
-
-  const { orgIdString } = useParams();
-
-  const [loading, setLoading] = useState(true);
 
   const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
   }).data;
 
+  const missionData = useGetDataHook({
+    params: {
+      orgIds: orgId,
+    },
+    start: runGetMission,
+    configInfo: config.queryMission,
+    cacheOption: false,
+  }).data;
+
+  useEffect(() => {
+    if (orgId && orgId.length > 0) {
+      setRunGetMission(true);
+    }
+  }, [JSON.stringify(orgId), setRunGetMission]);
+
+  useEffect(() => {
+    if (missionData && user) {
+      const missionDataArray = Object.values(missionData);
+
+      const getMyProposals = missionDataArray.filter(
+        (mission: any) => mission.creator_id === user.id
+      );
+      setMyProposals(getMyProposals);
+      setAllProposals(missionDataArray);
+    }
+  }, [missionData, user]);
+
   const org = orgs.find(
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
   );
+  const [data, setData] = useState<any>(org);
 
-  // const data = location.state?.dataSpace || org;
-  const data = org;
-  const dispatch = useDispatch();
+  const [isExplorePage, setIsExplorePage] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log('isExplorePage:', isExplorePage);
+  }, [isExplorePage]);
+
+  useEffect(() => {
+    // console.log('missionData', missionData);
+    // console.log('myProposals', myProposals);
+    // console.log('allProposals', allProposals);
+    // console.log('orgs', orgs);
+    // console.log('org', org);
+  }, [missionData, myProposals, allProposals, org, orgs]);
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
     by: 'Last modified',
@@ -75,19 +116,51 @@ const BluePrint = () => {
   };
 
   useEffect(() => {
-    if (data) {
+    if (orgs && orgs.length > 0) {
       const org = orgs.find(
         (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
       );
-      const workflowsData = org?.workflows?.map((workflow: any) => ({
-        ...workflow,
-        org_title: org.title,
-      }));
-      setWorkflows(workflowsData);
-      setTemplates(org?.templates || []);
-      setLoading(false);
+
+      console.log('org after handle', org);
+
+      if (org === undefined) {
+        setIsExplorePage(true);
+        queryOrgByIdForExplore({
+          orgId: orgId[0],
+          onSuccess: (data: any) => {
+            const org = data[0];
+            console.log('data[0]', data[0]);
+            setData(org);
+            const workflowsData = org?.workflows?.map((workflow: any) => ({
+              ...workflow,
+              org_title: org.title,
+            }));
+            setWorkflows(workflowsData);
+            setTemplates(org?.templates || []);
+            setLoading(false);
+          },
+          onError: (error) => {
+            Modal.error({
+              title: 'Error',
+              content: error,
+            });
+          },
+          dispatch,
+        });
+      } else {
+        setData(org);
+        const workflowsData = org?.workflows?.map((workflow: any) => ({
+          ...workflow,
+          org_title: org.title,
+        }));
+        console.log('workflowsData', workflowsData);
+        setWorkflows(workflowsData);
+        setTemplates(org?.templates || []);
+        setLoading(false);
+      }
     }
-  }, [orgs]);
+  }, [JSON.stringify(orgs)]);
+
   const [showEditOrg, setShowEditOrg] = useState(false);
   const handleNewWorkflow = async () => {
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
@@ -114,6 +187,88 @@ const BluePrint = () => {
       dispatch,
     });
   };
+
+  const tabItems = [
+    {
+      key: '1',
+      label: 'Proposal',
+      children: myProposals && allProposals && (
+        <div className='flex flex-col gap-6'>
+          {isExplorePage ? (
+            ''
+          ) : (
+            <ListProposals
+              listProposals={myProposals}
+              title={'My proposals'}
+              type='owner'
+            />
+          )}
+
+          <ListProposals
+            listProposals={allProposals}
+            title={isExplorePage ? '' : 'All proposals'}
+            type='all'
+          />
+        </div>
+      ),
+    },
+    {
+      key: '2',
+      label: 'Workflows',
+      children:
+        filterWorkflowByOptions && filterWorkflowByOptions.length > 0 ? (
+          <ListItem
+            handleSort={handleSortWorkflowDetail}
+            items={
+              filterWorkflowByOptions &&
+              filterWorkflowByOptions?.map((workflow, index) => (
+                <WorkflowCard
+                  key={workflow?.id + index}
+                  dataWorkflow={workflow}
+                />
+              ))
+            }
+            columns={{ sm: 2, md: 3, xl: 3, '2xl': 3 }}
+            extra={
+              <Button
+                type='primary'
+                icon={<PlusOutlined />}
+                onClick={() => handleNewWorkflow()}
+              >
+                New Workflow
+              </Button>
+            }
+          />
+        ) : (
+          <Space className='w-full' direction='vertical'>
+            <div className='w-full flex flex-col items-end'>
+              <Button
+                type='primary'
+                icon={<PlusOutlined />}
+                onClick={() => handleNewWorkflow()}
+              >
+                New Workflow
+              </Button>
+            </div>
+            <Empty />
+          </Space>
+        ),
+    },
+  ];
+
+  if (!isExplorePage) {
+    tabItems.push({
+      key: '3',
+      label: 'Templates',
+      children: (
+        <TemplateList
+          templates={templates}
+          orgId={extractIdFromIdString(orgIdString)}
+        />
+      ),
+    });
+  }
+
   return (
     <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
       <EditOrg
@@ -128,7 +283,7 @@ const BluePrint = () => {
         }}
         profile={data?.profile || []}
       />
-      {org === undefined ? (
+      {org === undefined && isExplorePage === false ? (
         loading ? (
           <Skeleton className='mt-4' />
         ) : (
@@ -138,11 +293,17 @@ const BluePrint = () => {
         <>
           <div
             className='flex my-4 gap-1 cursor-pointer'
-            onClick={() => navigate('/')}
+            onClick={() => {
+              if (isExplorePage) {
+                navigate('/explore');
+              } else {
+                navigate('/');
+              }
+            }}
           >
             <LeftOutlined style={{ color: '#6200ee' }} />
             <p className='font-medium text-[#6200ee] self-center'>
-              {L('backToMySpaces')}
+              {isExplorePage ? L('backToExplore') : L('backToMySpaces')}
             </p>
           </div>
           <Space
@@ -186,69 +347,7 @@ const BluePrint = () => {
             </div>
           </Space>
 
-          <div>
-            {loading ? (
-              <Skeleton />
-            ) : (
-              <Tabs
-                items={[
-                  {
-                    key: '1',
-                    label: 'Workflows',
-                    children:
-                      filterWorkflowByOptions &&
-                      filterWorkflowByOptions.length > 0 ? (
-                        <ListItem
-                          handleSort={handleSortWorkflowDetail}
-                          items={
-                            filterWorkflowByOptions &&
-                            filterWorkflowByOptions?.map((workflow, index) => (
-                              <WorkflowCard
-                                key={workflow?.id + index}
-                                dataWorkflow={workflow}
-                              />
-                            ))
-                          }
-                          columns={{ sm: 2, md: 3, xl: 3, '2xl': 3 }}
-                          extra={
-                            <Button
-                              type='primary'
-                              icon={<PlusOutlined />}
-                              onClick={() => handleNewWorkflow()}
-                            >
-                              New Workflow
-                            </Button>
-                          }
-                        />
-                      ) : (
-                        <Space className='w-full' direction='vertical'>
-                          <div className='w-full flex flex-col items-end'>
-                            <Button
-                              type='primary'
-                              icon={<PlusOutlined />}
-                              onClick={() => handleNewWorkflow()}
-                            >
-                              New Workflow
-                            </Button>
-                          </div>
-                          <Empty />
-                        </Space>
-                      ),
-                  },
-                  {
-                    key: '2',
-                    label: 'Templates',
-                    children: (
-                      <TemplateList
-                        templates={templates}
-                        orgId={extractIdFromIdString(orgIdString)}
-                      />
-                    ),
-                  },
-                ]}
-              />
-            )}
-          </div>
+          <div>{loading ? <Skeleton /> : <Tabs items={tabItems} />}</div>
         </>
       )}
     </div>
