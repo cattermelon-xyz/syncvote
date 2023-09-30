@@ -330,7 +330,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           if (isListHome) {
             navigate(
               `/public/${createIdString(
-                dataWorkflow?.infoOrg.title,
+                dataWorkflow?.org_title,
                 dataWorkflow?.owner_org_id.toString()
               )}/${createIdString(
                 dataWorkflow?.title,

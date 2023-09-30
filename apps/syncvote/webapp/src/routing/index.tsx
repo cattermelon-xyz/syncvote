@@ -113,7 +113,7 @@ const AppRoutes = () => {
           ) : null}
           {session === null ? (
             <Route path='*' element={<App layout={WebLayoutWithoutSider} />}>
-              <Route index element={<OrganizationExplore />} />
+              <Route index element={<HomeTemplate />} />
             </Route>
           ) : null}
           <Route path='*' element={<App layout={PublicAppLayout} />}>

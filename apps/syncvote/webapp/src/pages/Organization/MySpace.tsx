@@ -46,6 +46,7 @@ const MySpace: React.FC = () => {
     },
     start: runGetMission,
     configInfo: config.queryMission,
+    cacheOption: false,
   }).data;
 
   useEffect(() => {

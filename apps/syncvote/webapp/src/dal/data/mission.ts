@@ -28,6 +28,7 @@ export class MissionFunctionClass {
     reduxDataReturn: any;
   }) {
     const { orgIds } = params;
+
     const { missions } = reduxDataReturn;
     if (shouldCache) {
       onSuccess(missions);

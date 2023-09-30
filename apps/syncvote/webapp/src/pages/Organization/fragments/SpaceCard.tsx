@@ -87,10 +87,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ dataSpace, isOwner }) => {
         className='w-[189px] bg-white rounded-xl border border-neutral-200 flex-col justify-start items-start gap-2'
         onClick={() => {
           navigate(
-            `/${createIdString(dataSpace.title, dataSpace.id.toString())}`,
-            {
-              state: { dataSpace },
-            }
+            `/${createIdString(dataSpace.title, dataSpace.id.toString())}`
           );
         }}
         hoverable={true}
