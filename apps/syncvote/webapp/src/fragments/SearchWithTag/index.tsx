@@ -121,6 +121,11 @@ const SearchWithTag = ({
         onChange={(e) => {
           setInputSearchText(e.target.value);
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            search({ tags: selectedTagIds, text: inputSearchText });
+          }
+        }}
         onBlur={() => {
           if (inputSearchText && inputSearchText !== toSearch) {
             setSelectedTagIds([]);
@@ -129,10 +134,8 @@ const SearchWithTag = ({
           }
         }}
       />
-      {showSearchTag && (
         <div className='w-full'>
-          {!inputSearchText &&
-            tags.map((tag: any) => {
+          {tags.map((tag: any) => {
               return (
                 <Tag
                   className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full ${
@@ -149,7 +152,8 @@ const SearchWithTag = ({
                       newselectedTagIds.push(tag.value);
                     }
                     setSelectedTagIds(newselectedTagIds);
-                    search({ tags: newselectedTagIds, text: toSearch });
+                    setInputSearchText("");
+                    search({ tags: newselectedTagIds, text: "" });
                   }}
                   key={tag.value}
                 >
@@ -158,7 +162,6 @@ const SearchWithTag = ({
               );
             })}
         </div>
-      )}
     </Space>
   );
 };
