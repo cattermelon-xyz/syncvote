@@ -1,0 +1,76 @@
+const { supabase } = require('../configs/supabaseClient');
+const { VoteRecord } = require('../models/VoteRecord');
+
+async function getAllVoteRecord() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { data, error } = await supabase.from('mission').select('*');
+
+      if (!error) {
+        let voteRecords = [];
+        data.map((vr) => {
+          voteRecords.push(
+            new VoteRecord(
+              vr.id,
+              vr.who,
+              vr.option,
+              vr.voting_power,
+              vr.current_vote_data_id
+            )
+          );
+        });
+        resolve({
+          status: 'OK',
+          message: 'SUCCESS',
+          data: voteRecords,
+        });
+      } else {
+        resolve({
+          status: 'ERR',
+          massage: 'Cannot get all vote records',
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+<<<<<<< HEAD
+async function insertVoteRecord(props) {
+=======
+async function insertVoteRecord(params) {
+>>>>>>> main
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { data: newVoteRecord, error } = await supabase
+        .from('vote_record')
+<<<<<<< HEAD
+        .insert(props)
+=======
+        .insert(params)
+>>>>>>> main
+        .select('*');
+
+      if (!error) {
+        resolve({
+          status: 'OK',
+          message: 'SUCCESS',
+          data: newVoteRecord,
+        });
+      } else {
+        resolve({
+          status: 'ERR',
+          message: error,
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+module.exports = {
+  getAllVoteRecord,
+  insertVoteRecord,
+};
