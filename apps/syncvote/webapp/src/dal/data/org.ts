@@ -398,6 +398,37 @@ export class OrgFunctionClass {
     }
     dispatch(finishLoading({}));
   }
+
+  async searchOrg({
+    params,
+    dispatch,
+    onSuccess,
+    onError = (error) => {
+      console.log(error);
+    },
+  }: {
+    params: { inputSearch: string };
+    dispatch: any;
+    onSuccess: (data: any) => void;
+    onError: (error: any) => void;
+  }) {
+    dispatch(startLoading({}));
+    const { inputSearch } = params;
+    const { data, error } = await supabase
+      .from('org')
+      .select(`*`)
+      .textSearch('title', `'${inputSearch}'`);
+
+    if (error) {
+      onError(error);
+    } else {
+      if (data) {
+        onSuccess(data);
+      }
+    }
+
+    dispatch(finishLoading({}));
+  }
 }
 
 export const queryOrgByIdForExplore = async ({
@@ -1256,3 +1287,78 @@ export const deleteOrg = async ({
     onSuccess();
   }
 };
+export async function  queryAllOrgs({
+  dispatch,
+  onSuccess,
+  onError = (error) => {
+    console.log(error);
+  },
+}: {
+  dispatch: any;
+  onSuccess: (data: any) => void;
+  onError?: (error: any) => void;
+}) {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('org')
+    .select(`id,
+    title,
+    desc,
+    icon_url,
+    banner_url,
+    preset_icon_url,
+    preset_banner_url,
+    org_size,
+    org_type,
+    last_updated,
+    user_org(
+      role,
+      profile (
+        id,
+        email,
+        full_name,
+        icon_url,
+        preset_icon_url,
+        confirm_email_at
+      )
+    ),
+    workflows:workflow (
+      id,
+      title,
+      owner_org_id,
+      icon_url,
+      banner_url,
+      preset_icon_url,
+      preset_banner_url,
+      versions: workflow_version(
+        id, 
+        data,
+        preview_image_url,
+        status,
+        created_at,
+        last_updated
+      )
+    ),
+    templates:template (
+      id,
+      title,
+      desc,
+      owner_org_id,
+      icon_url,
+      banner_url,
+      status,
+      created_at,
+      current_version_id,
+      tag_template ( tag (*))
+    )`)
+
+  if (error) {
+    onError(error);
+  } else {
+    if (data) {
+      onSuccess(data);
+    }
+  }
+
+  dispatch(finishLoading({}));
+}

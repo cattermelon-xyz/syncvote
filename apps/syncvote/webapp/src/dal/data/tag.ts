@@ -13,6 +13,7 @@ export enum TagObject {
   TEMPLATE = 'template',
   WORKFLOW = 'workflow',
   MISSION = 'mission',
+  ORGANIZATION = 'organization',
 }
 export class TagFunctionClass {
   queryTag = async ({

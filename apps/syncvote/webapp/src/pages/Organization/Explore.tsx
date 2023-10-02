@@ -55,15 +55,17 @@ const Home: React.FC = () => {
           {L('exploreOrg')}
         </Title>
         <SearchWithTag
-          tagTo={TagObject.TEMPLATE}
-          onResult={(result: any) => {}}
+          tagTo={TagObject.ORGANIZATION}
+          onResult={(result: any) => {
+            setOrgsData(result);
+          }}
           showSearchTag={false}
         />
         <ListItem
           // handleSort={handleSortSpaceDetail}
           items={
-            OrgsData &&
-            OrgsData.map((OrgData, index) => (
+            (OrgsData) &&
+            (OrgsData).map((OrgData, index) => (
               <OrgCard key={index} orgData={OrgData} />
             ))
           }

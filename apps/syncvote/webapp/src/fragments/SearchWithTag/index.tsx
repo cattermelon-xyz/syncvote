@@ -16,6 +16,8 @@ type SearchWithTagProps = {
   showSearchTag?: boolean;
 };
 
+
+
 const SearchWithTag = ({
   className = '',
   placeholder = 'Search ...',
@@ -28,18 +30,31 @@ const SearchWithTag = ({
     configInfo: config.queryTag,
   }).data;
 
-  let data: any;
-  switch (tagTo) {
-    case TagObject.TEMPLATE:
-      data = useGetDataHook({
-        configInfo: config.queryTemplate,
-      }).data;
-      break;
-    default:
-      break;
-  }
-
   const dispatch = useDispatch();
+
+  let data: any;
+    switch (tagTo) {
+      case TagObject.TEMPLATE:
+        data = useGetDataHook({
+          configInfo: config.queryTemplate,
+        }).data;
+        break;
+      case TagObject.ORGANIZATION:
+        data = useGetDataHook({
+          configInfo: config.queryOrgs,
+        }).data;
+        // queryAllOrgs({
+        //   dispatch,
+        //   onSuccess: (orgs: any) => {
+        //     data = orgs;
+        //     console.log('hello', orgs);
+        //   },
+        // });
+        break;
+      default:
+        break;
+    }
+
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [inputSearchText, setInputSearchText] = useState('');
   const [toSearch, setToSearch] = useState('');
@@ -66,14 +81,34 @@ const SearchWithTag = ({
   const search = async ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
     // TODO: change to search api
-    if (text) {
-      switch (tagTo) {
-        case TagObject.TEMPLATE:
+    switch (tagTo) {
+      case TagObject.TEMPLATE:
+        await useSetData({
+          params: {
+            inputSearch: text,
+          },
+          configInfo: config.searchTemplate,
+          dispatch,
+          onSuccess: (data) => {
+            onResult(data);
+            setLoading(false);
+          },
+          onError: () => {
+            Modal.error({
+              title: 'Error',
+              content: 'Search failed',
+            });
+          },
+        });
+        break;
+
+      case TagObject.ORGANIZATION: // New case for organization
+        if (text) {
           await useSetData({
             params: {
               inputSearch: text,
             },
-            configInfo: config.searchTemplate,
+            configInfo: config.searchOrg,
             dispatch,
             onSuccess: (data) => {
               onResult(data);
@@ -87,10 +122,15 @@ const SearchWithTag = ({
             },
           });
           break;
-        default:
-          break;
-      }
-    } else {
+        }
+        setLoading(false);
+        break;
+
+      default:
+        break;
+    }
+
+    if (!text) {
       let result;
       switch (tagTo) {
         case TagObject.TEMPLATE:
@@ -122,7 +162,7 @@ const SearchWithTag = ({
           setInputSearchText(e.target.value);
         }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === 'Enter') {
             search({ tags: selectedTagIds, text: inputSearchText });
           }
         }}
@@ -134,34 +174,34 @@ const SearchWithTag = ({
           }
         }}
       />
-        <div className='w-full'>
-          {tags.map((tag: any) => {
-              return (
-                <Tag
-                  className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full ${
-                    selectedTagIds.indexOf(tag.value) !== -1
-                      ? 'bg-violet-500 text-white'
-                      : ''
-                  }`}
-                  onClick={() => {
-                    const newselectedTagIds = structuredClone(selectedTagIds);
-                    const idx = selectedTagIds.indexOf(tag.value);
-                    if (idx !== -1) {
-                      newselectedTagIds.splice(idx, 1);
-                    } else {
-                      newselectedTagIds.push(tag.value);
-                    }
-                    setSelectedTagIds(newselectedTagIds);
-                    setInputSearchText("");
-                    search({ tags: newselectedTagIds, text: "" });
-                  }}
-                  key={tag.value}
-                >
-                  {tag.label} ({extractCount(tag)})
-                </Tag>
-              );
-            })}
-        </div>
+      <div className='w-full'>
+        {tags.map((tag: any) => {
+          return (
+            <Tag
+              className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full ${
+                selectedTagIds.indexOf(tag.value) !== -1
+                  ? 'bg-violet-500 text-white'
+                  : ''
+              }`}
+              onClick={() => {
+                const newselectedTagIds = structuredClone(selectedTagIds);
+                const idx = selectedTagIds.indexOf(tag.value);
+                if (idx !== -1) {
+                  newselectedTagIds.splice(idx, 1);
+                } else {
+                  newselectedTagIds.push(tag.value);
+                }
+                setSelectedTagIds(newselectedTagIds);
+                setInputSearchText('');
+                search({ tags: newselectedTagIds, text: '' });
+              }}
+              key={tag.value}
+            >
+              {tag.label} ({extractCount(tag)})
+            </Tag>
+          );
+        })}
+      </div>
     </Space>
   );
 };
