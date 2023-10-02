@@ -39,18 +39,6 @@ const SearchWithTag = ({
           configInfo: config.queryTemplate,
         }).data;
         break;
-      case TagObject.ORGANIZATION:
-        data = useGetDataHook({
-          configInfo: config.queryOrgs,
-        }).data;
-        // queryAllOrgs({
-        //   dispatch,
-        //   onSuccess: (orgs: any) => {
-        //     data = orgs;
-        //     console.log('hello', orgs);
-        //   },
-        // });
-        break;
       default:
         break;
     }
@@ -80,35 +68,18 @@ const SearchWithTag = ({
 
   const search = async ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
-    // TODO: change to search api
-    switch (tagTo) {
-      case TagObject.TEMPLATE:
-        await useSetData({
-          params: {
-            inputSearch: text,
-          },
-          configInfo: config.searchTemplate,
-          dispatch,
-          onSuccess: (data) => {
-            onResult(data);
-            setLoading(false);
-          },
-          onError: () => {
-            Modal.error({
-              title: 'Error',
-              content: 'Search failed',
-            });
-          },
-        });
-        break;
 
-      case TagObject.ORGANIZATION: // New case for organization
-        if (text) {
+    if (text){
+      console.log("text in searchWithTag", text)
+
+      // TODO: change to search api
+      switch (tagTo) {
+        case TagObject.TEMPLATE:
           await useSetData({
             params: {
               inputSearch: text,
             },
-            configInfo: config.searchOrg,
+            configInfo: config.searchTemplate,
             dispatch,
             onSuccess: (data) => {
               onResult(data);
@@ -122,15 +93,30 @@ const SearchWithTag = ({
             },
           });
           break;
-        }
-        setLoading(false);
-        break;
-
-      default:
-        break;
-    }
-
-    if (!text) {
+  
+        case TagObject.ORGANIZATION: // New case for organization
+            await useSetData({
+              params: {
+                inputSearch: text,
+              },
+              configInfo: config.querySearchOrgForExplore,
+              dispatch,
+              onSuccess: (data) => {
+                onResult(data);
+                setLoading(false);
+              },
+              onError: () => {
+                Modal.error({
+                  title: 'Error',
+                  content: 'Search failed',
+                });
+              },
+            });
+            break;
+        default:
+          break;
+      }
+    } else {
       let result;
       switch (tagTo) {
         case TagObject.TEMPLATE:
@@ -174,6 +160,8 @@ const SearchWithTag = ({
           }
         }}
       />
+      {showSearchTag && (
+
       <div className='w-full'>
         {tags.map((tag: any) => {
           return (
@@ -202,6 +190,7 @@ const SearchWithTag = ({
           );
         })}
       </div>
+      )}
     </Space>
   );
 };

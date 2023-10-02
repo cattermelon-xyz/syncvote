@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Space } from 'antd';
 import { Icon } from 'icon';
 import { createIdString, useGetDataHook } from 'utils';
@@ -13,6 +13,8 @@ const OrgCard: React.FC<Props> = ({ orgData }) => {
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
+
+  useEffect(() => {console.log("An orgData", orgData)}, [orgData])
 
   const navigate = useNavigate();
 

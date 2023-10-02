@@ -48,6 +48,12 @@ const Home: React.FC = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    console.log("OrgsData", OrgsData)
+  }, [
+    OrgsData
+  ])
+
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
       <section className='w-full'>
@@ -57,7 +63,7 @@ const Home: React.FC = () => {
         <SearchWithTag
           tagTo={TagObject.ORGANIZATION}
           onResult={(result: any) => {
-            setOrgsData(result);
+            // setOrgsData(result);
           }}
           showSearchTag={false}
         />
