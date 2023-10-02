@@ -1,0 +1,25 @@
+.slideTitle {
+  &.swiper {
+    width: 100%;
+    height: 250px;
+  }
+  .swiper-slide {
+    text-align: center;
+    font-size: 18px;
+
+    /* Center slide text vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .slideTitle .mySwiper .swiper-slide .swiper-pagination {
+    height: 130px;
+    background-color: #5d23bb;
+  }
+  .swiper-pagination {
+    .swiper-pagination-bullet {
+      background-color: #5d23bb;
+      margin-left: 1rem;
+    }
+  }
+}
