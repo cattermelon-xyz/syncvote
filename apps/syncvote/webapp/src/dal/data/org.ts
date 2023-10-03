@@ -473,7 +473,6 @@ export class OrgFunctionClass {
       .textSearch('title', `'${inputSearch}'`);
   
     if (!error) {
-      console.log('data return org when search', data);
       const tmp: any[] = [];
       data.forEach((d: any) => {
         const org: any = d || {
@@ -645,7 +644,6 @@ export const queryOrgByIdForExplore = async ({
     )
     .eq('id', orgId);
   if (!error) {
-    console.log('data return org', data);
     const tmp: any[] = [];
     data.forEach((d: any) => {
       const org: any = d || {

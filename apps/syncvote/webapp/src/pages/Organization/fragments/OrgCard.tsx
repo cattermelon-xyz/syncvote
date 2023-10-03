@@ -14,8 +14,6 @@ const OrgCard: React.FC<Props> = ({ orgData }) => {
     configInfo: config.queryPresetIcons,
   }).data;
 
-  useEffect(() => {console.log("An orgData", orgData)}, [orgData])
-
   const navigate = useNavigate();
 
   return (
