@@ -14,7 +14,6 @@ export const createMission = async ({
   axios
     .post(`${import.meta.env.VITE_SERVER_URL}/mission/create`, missionData)
     .then((response) => {
-<<<<<<< HEAD
       if (missionData.status === 'PUBLIC') {
         const mission = response.data.data[0];
 
@@ -84,26 +83,6 @@ export const updateMission = async ({
         });
       }
 
-=======
-      // const mission = response.data.data[0];
-
-      // workflowVersion.data.checkpoints.map(async (checkpoint: any) => {
-      //   const checkpointDataBe = {
-      //     id: `${mission.id}-${checkpoint.id}`,
-      //     vote_machine_type: checkpoint.vote_machine_type,
-      //     mission_id: mission.id,
-      //     participation: checkpoint?.participation,
-      //     quorum: 60,
-      //     options: checkpoint.data?.options,
-      //     delays: checkpoint?.delays,
-      //     delayUnits: checkpoint?.delayUnits,
-      //     duration: checkpoint?.duration,
-      //     children: checkpoint?.children,
-      //   };
-
-      //   await createCheckpointBE({ checkpointDataBe });
-      // });
->>>>>>> main
       onSuccess();
     })
     .catch((error) => {
@@ -123,7 +102,6 @@ const createCheckpointBE = async ({
       checkpointDataBe
     )
     .then(async (response) => {
-<<<<<<< HEAD
       const checkpoint = response.data.data[0];
 
       if (checkpoint.id === `${checkpoint.mission_id}-root`) {
@@ -132,16 +110,12 @@ const createCheckpointBE = async ({
           missionId: checkpoint.mission_id,
         });
       }
-=======
-      console.log('Success create checkpoint', response.data);
->>>>>>> main
     })
     .catch((error) => {
       console.log('Error', error);
     });
 };
 
-<<<<<<< HEAD
 const createCurrentVoteDataBE = async ({
   checkpointId,
   missionId,
@@ -167,21 +141,3 @@ const createCurrentVoteDataBE = async ({
       console.log('Error', error);
     });
 };
-=======
-// const createCurrentVoteDataBE = async ({
-//   checkpointId,
-// }: {
-//   checkpointId: string;
-// }) => {
-//   axios
-//     .post(`${import.meta.env.VITE_SERVER_URL}/current-vote-data/create`, {
-//       checkpoint_id: checkpointId,
-//     })
-//     .then((response) => {
-//       console.log('Success', response.data);
-//     })
-//     .catch((error) => {
-//       console.log('Error', error);
-//     });
-// };
->>>>>>> main

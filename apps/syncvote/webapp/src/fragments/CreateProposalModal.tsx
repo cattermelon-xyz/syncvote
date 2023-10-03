@@ -8,7 +8,6 @@ import { useParams } from 'react-router-dom';
 import { TextEditor } from 'rich-text-editor';
 import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
-<<<<<<< HEAD
 import { createMission, updateMission } from '@axios/createMission';
 import { queryAMission } from '@dal/data';
 
@@ -19,28 +18,14 @@ interface CreateProposalModalProps {
   workflowVersion: any;
   missionId?: number;
 }
-=======
-import { createMission } from '@axios/createMission';
->>>>>>> main
 
 export const CreateProposalModal = ({
   open,
   onCancel,
   workflow,
   workflowVersion,
-<<<<<<< HEAD
   missionId = -1,
 }: CreateProposalModalProps) => {
-=======
-  missionId,
-}: {
-  open: boolean;
-  workflow: any;
-  onCancel: () => void;
-  workflowVersion: any;
-  missionId?: number;
-}) => {
->>>>>>> main
   const dispatch = useDispatch();
   const [mission, setMission] = useState<any>({});
   const [name, setName] = useState('');
@@ -98,7 +83,6 @@ export const CreateProposalModal = ({
       }, 2000);
     } else {
       // create mission
-<<<<<<< HEAD
       if (kind === 'Edit') {
         let missionData = {
           status: status,
@@ -151,33 +135,6 @@ export const CreateProposalModal = ({
           },
         });
       }
-=======
-      const missionData = {
-        creator_id: user.id,
-        status: 'DRAFT',
-        title: name,
-        desc: desc,
-        data: data,
-        workflow_version_id: workflowVersion.id,
-      };
-
-      await createMission({
-        missionData,
-        workflowVersion,
-        onSuccess: () => {
-          Modal.success({
-            title: 'Success',
-            content: 'Create a new proposal successfully',
-          });
-        },
-        onError: () => {
-          Modal.error({
-            title: 'Error',
-            content: 'Error to create a proposal',
-          });
-        },
-      });
->>>>>>> main
 
       // await insertMission({
       //   dispatch: dispatch,

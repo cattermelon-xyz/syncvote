@@ -19,9 +19,7 @@ class VoteMachineController {
         checkpointData
       );
     } else {
-      throw new Error(
-        `Invalid voting machine type: ${checkpointData.vote_machine_type}`
-      );
+      throw new Error(`Invalid data`);
     }
   }
 

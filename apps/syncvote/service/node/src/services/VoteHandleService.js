@@ -1,5 +1,6 @@
 const { supabase } = require('../configs/supabaseClient');
 const moment = require('moment');
+const { insertVoteRecord } = require('./VoteRecordService');
 const {
   VoteMachineController,
 } = require('../models/votemachines/VotingController');
@@ -10,7 +11,7 @@ async function handleVoting(props) {
       const { who, option, voting_power, mission_id } = props;
 
       const { data: mision_vote_details, error: mvd_error } = await supabase
-        .from('misson_vote_details')
+        .from('mission_vote_details')
         .select(`*`)
         .eq('mission_id', mission_id);
 
@@ -23,22 +24,42 @@ async function handleVoting(props) {
         try {
           const voteMachineController = new VoteMachineController({});
 
-          const fallback = voteMachineController.fallBack(
-            mision_vote_details[0]
-          );
+          // const { fallback, error: f_error } = voteMachineController.fallBack(
+          //   mision_vote_details[0]
+          // );
 
-          if (fallback) {
+          // if (fallback) {
+          //   console.log('Move this mission to fallback checkpoint');
+          //   resolve({
+          //     status: 'FALLBACK',
+          //     message: f_error,
+          //   });
+          // }
+
+          const { notRecorded, error: r_error } =
+            voteMachineController.recordVote(mision_vote_details[0], {
+              who,
+              option,
+              voting_power,
+            });
+
+          if (notRecorded) {
+            console.log('Reject this vote');
             resolve({
-              status: 'FALLBACK',
-              message: fallback,
+              status: 'Err',
+              message: r_error,
             });
           }
 
-          voteMachineController.recordVote(mision_vote_details[0], {
-            who,
-            option,
-            voting_power,
+          // write this record to vote data record
+          const respone = await insertVoteRecord({
+            idenity: who,
+            option: option,
+            voting_power: voting_power,
+            current_vote_data_id: mision_vote_details[0].cvd_id,
           });
+
+          resolve(respone);
         } catch (error) {
           console.log(error);
         }
