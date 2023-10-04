@@ -139,11 +139,7 @@ export const queryAMission = async ({
       newData[index].icon_url = d.icon_url
         ? d.icon_url
         : `preset:${d.preset_icon_url}`;
-      newData[index].banner_url = d.banner_url
-        ? d.banner_url
-        : `preset:${d.preset_banner_url}`;
       delete newData[index].preset_icon_url;
-      delete newData[index].preset_banner_url;
     });
     dispatch(setLastFetch({}));
     dispatch(setReducerMissions(data));
