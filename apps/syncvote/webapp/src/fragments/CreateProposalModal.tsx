@@ -1,7 +1,6 @@
 import { Button, Input, Modal, Select, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { IDoc, emptyStage } from 'directed-graph';
-import axios from 'axios';
 
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
