@@ -13,6 +13,7 @@ import { ReloadOutlined } from '@ant-design/icons';
 const Home: React.FC = () => {
   const dispatch = useDispatch();
   const [OrgsData, setOrgsData] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [page, setPage] = useState(0);
 
   const getFromAndTo = () => {
@@ -55,8 +56,13 @@ const Home: React.FC = () => {
           {L('exploreOrg')}
         </Title>
         <SearchWithTag
-          tagTo={TagObject.TEMPLATE}
-          onResult={(result: any) => {}}
+          tagTo={TagObject.ORGANIZATION}
+          onResult={(result: any) => {
+            if (result) {
+              setOrgsData(result);
+              setIsSearching(true);
+            }
+          }}
           showSearchTag={false}
         />
         <ListItem
@@ -69,15 +75,19 @@ const Home: React.FC = () => {
           }
           columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
         />
-        <div className='w-full flex justify-center items-center'>
-          <Button
-            onClick={fetchData}
-            className='mt-4'
-            icon={<ReloadOutlined />}
-          >
-            View More
-          </Button>
-        </div>
+        {isSearching ? (
+          <div></div>
+        ) : (
+          <div className='w-full flex justify-center items-center'>
+            <Button
+              onClick={fetchData}
+              className='mt-4'
+              icon={<ReloadOutlined />}
+            >
+              View More
+            </Button>
+          </div>
+        )}
       </section>
     </div>
   );

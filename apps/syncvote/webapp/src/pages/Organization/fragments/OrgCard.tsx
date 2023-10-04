@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Space } from 'antd';
 import { Icon } from 'icon';
 import { createIdString, useGetDataHook } from 'utils';
