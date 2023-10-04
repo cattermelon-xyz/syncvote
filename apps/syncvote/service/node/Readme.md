@@ -4,7 +4,6 @@
 
 ![Alt text](public/database.png)
 
-<<<<<<< HEAD
 ## Create proposal flow
 
 ![Alt text](public/create_proposal.png)
@@ -12,11 +11,6 @@
 ## Vote flow
 
 ![Alt text](public/voting.png)
-=======
-## Flow (Updating...)
-
-![Alt text](public/flow.png)
->>>>>>> main
 
 ## Code structure
 
