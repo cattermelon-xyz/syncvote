@@ -6,18 +6,33 @@ class SingleVote extends VotingMachine {
   }
 
   initDataForCVD(data) {
-    console.log('Haha', data);
+    const options = data.options;
+    if (options.length === 0) {
+      return {
+        initData: false,
+        error: 'Cannot init data because options is empty',
+      };
+    }
+    let result = {};
+    for (const option of options) {
+      result[option] = 0;
+    }
+
+    return {
+      initData: true,
+      result: result,
+    };
   }
 
-  fallBack(data) {
+  fallBack() {
     // check fallback of VotingMachine class
-    const { fallBack, error } = super.fallBack(data);
-    if (fallBack) {
-      return { fallBack, error };
+    const { fallback, error } = super.fallBack();
+    if (fallback) {
+      return { fallback, error };
     }
 
     // Are there enough conditions for tally?
-    const shouldTally = this.shouldTally(data);
+    const shouldTally = this.shouldTally();
     if (shouldTally) {
       return { fallback: true, error: 'This checkpoint should tally' };
     }
@@ -25,11 +40,11 @@ class SingleVote extends VotingMachine {
     return {};
   }
 
-  recordVote(data, voteData) {
+  recordVote(voteData) {
     // check recordVote of VotingMachine class
-    const { notRecorded } = super.recordVote(data, voteData);
+    const { notRecorded, error } = super.recordVote(voteData);
     if (notRecorded) {
-      return super.recordVote(data, voteData);
+      return { notRecorded, error };
     }
 
     // check if options is single vote
@@ -38,18 +53,22 @@ class SingleVote extends VotingMachine {
     }
 
     // check if user is alreadyvote
-    if (data.who !== null && data.who.includes(voteData.identify)) {
+    if (this.who !== null && this.who.includes(voteData.identify)) {
       return { notRecorded: true, error: 'User is already voted' };
     }
+
+    // check if user was allow to vote, check participant
+
+    // check if abstain, dont increase the result, abstain send option [255]
+    this.who = this.who.concat(voteData.identify);
+    this.result[voteData.option[0]] += 1;
 
     return {};
   }
 
-  shouldTally(data) {
+  shouldTally() {
     super.shouldTally();
     const shouldTally = false;
-
-    console.log(data);
 
     return shouldTally;
   }

@@ -2,6 +2,7 @@ const { supabase } = require('../configs/supabaseClient');
 const {
   VoteMachineController,
 } = require('../models/votemachines/VotingController');
+const moment = require('moment');
 
 async function handleVoting(props) {
   return new Promise(async (resolve, reject) => {
@@ -24,6 +25,7 @@ async function handleVoting(props) {
 
           // 1️⃣ check if it is the first time of vote
           if (mission_vote_details.length === 0) {
+            
             // check if this mission was not created
             const { data: mission } = await supabase
               .from('mission')
@@ -73,13 +75,18 @@ async function handleVoting(props) {
               return;
             }
 
-            // 3. Create new current_vote_data for root checkpoint
+            // 3. Create new current_vote_data for root checkpoint and start it
             const { data: newCurrentVoteData } = await supabase
               .from('current_vote_data')
               .insert({
                 checkpoint_id: rootCheckpoint[0].id,
                 result: result,
                 who: [],
+                startToVote: moment().format(),
+                endToVote: moment()
+                  .add(rootCheckpoint[0].duration, 'seconds')
+                  .format(),
+                tallyResult: [],
               })
               .select('*');
 
@@ -182,6 +189,65 @@ async function handleVoting(props) {
   });
 }
 
+async function hangleSubmitDoc(props) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { identify, doc_id, content, mission_id } = props;
+
+      let { data: mission_vote_details, error: mvd_error } = await supabase
+        .from('mission_vote_details')
+        .select(`*`)
+        .eq('mission_id', mission_id);
+
+      if (mvd_error) {
+        resolve({
+          status: 'ERR',
+          message: mvd_error,
+        });
+      } else {
+        let voteMachineController = new VoteMachineController({});
+
+        // check if this mission is first time of vote
+        if (mission_vote_details.length === 0) {
+          const { data: mission } = await supabase
+            .from('mission')
+            .select('*')
+            .eq('id', mission_id);
+
+          // check if this mission was not created
+          if (mission.length === 0) {
+            resolve({
+              status: 'ERR',
+              message: 'This mission was not created',
+            });
+            return;
+          }
+
+          // check if this mission was not going to publish
+          if (mission[0].status === 'DRAFT') {
+            resolve({
+              status: 'ERR',
+              message: 'This mission was not publish',
+            });
+            return;
+          }
+
+          // get the data of rootCheckpoint
+          const { data: rootCheckpoint } = await supabase
+            .from('checkpoint')
+            .select('*')
+            .eq('id', `${mission_id}-root`);
+
+          voteMachineController = VoteMachineController({});
+        }
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
 module.exports = {
   handleVoting,
+  hangleSubmitDoc,
 };

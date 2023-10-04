@@ -4,7 +4,6 @@ class DocInput extends VotingMachine {
   constructor(props) {
     super(props);
   }
-
   initDataForCVD(data) {
     const options = data.options;
     if (options.length === 0) {
@@ -31,12 +30,6 @@ class DocInput extends VotingMachine {
       return { fallback, error };
     }
 
-    // Are there enough conditions for tally?
-    const shouldTally = this.shouldTally();
-    if (shouldTally) {
-      return { fallback: true, error: 'This checkpoint should tally' };
-    }
-
     return {};
   }
 
@@ -59,9 +52,7 @@ class DocInput extends VotingMachine {
 
     // check if user was allow to vote, check participant
 
-
     // check if abstain, dont increase the result, abstain send option [255]
-
     this.who = this.who.concat(voteData.identify);
     this.result[voteData.option[0]] += 1;
 

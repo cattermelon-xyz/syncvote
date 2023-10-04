@@ -13,6 +13,8 @@ class VotingMachine {
       delayUnits,
       quorums,
       result,
+      startToVote,
+      endToVote,
     } = props;
     this.name = name;
     this.options = options;
@@ -23,11 +25,27 @@ class VotingMachine {
     this.delayUnits = delayUnits;
     this.quorums = quorums;
     this.result = result;
+    this.startToVote = startToVote;
+    this.endToVote = endToVote;
   }
 
+  isStarted() {
+    if (this.startToVote) {
+      return true;
+    }
+    return false;
+  }
+
+  start() {}
+
   fallBack() {
+    // check if this checkpoint was not ready to vote
+    // if (!this.isStarted()) {
+    //   return { fallback: true, error: 'This checkpoint was not ready to vote' };
+    // }
+
     // check if this checkpoint is outdate
-    const createdAtMoment = moment(this.cvd_created_at);
+    const createdAtMoment = moment(this.startToVote);
     const now = moment();
 
     const differenceInSeconds = now.diff(createdAtMoment, 'seconds');
