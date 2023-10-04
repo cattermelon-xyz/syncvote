@@ -16,7 +16,7 @@ import {
 } from '@ant-design/icons';
 import { Icon } from 'icon';
 
-const Voting = () => {
+const MissionVotingDetail = () => {
   return (
     <div className='w-[1033px] flex gap-4'>
       <div className='w-2/3'>
@@ -196,4 +196,4 @@ const Voting = () => {
   );
 };
 
-export default Voting;
+export default MissionVotingDetail;
