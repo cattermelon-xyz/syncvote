@@ -10,7 +10,7 @@ const createMission = async (req, res) => {
       });
     }
 
-    const respone = await MissionService.insertMisson(req.body);
+    const respone = await MissionService.insertMission(req.body);
     return res.status(200).json(respone);
   } catch (e) {
     return res.status(404).json({

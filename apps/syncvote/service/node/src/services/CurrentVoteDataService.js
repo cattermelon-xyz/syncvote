@@ -3,12 +3,18 @@ const { supabase } = require('../configs/supabaseClient');
 async function insertCurrentVoteData(props) {
   return new Promise(async (resolve, reject) => {
     try {
-      const { checkpoint_id } = props;
+      const { checkpoint_id, options } = props;
+      
+      const optionCounts = {};
+      for (const option of options) {
+        optionCounts[option] = 0;
+      }
+
       const { data: newCurrentVoteData, error } = await supabase
         .from('current_vote_data')
         .insert({
           checkpoint_id: checkpoint_id,
-          result: [],
+          // result: { ...optionCounts },
         })
         .select('*');
 

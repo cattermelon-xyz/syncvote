@@ -2,6 +2,7 @@ const { Pooling } = require('./Pooling');
 const { Veto } = require('./Veto');
 const { Upvote } = require('./Upvote');
 const { SingleVote } = require('./SingleVote');
+const { DocInput } = require('./DocInput');
 
 class VoteMachineController {
   constructor(props) {
@@ -10,25 +11,53 @@ class VoteMachineController {
       veto: new Veto(props),
       upvote: new Upvote(props),
       SingleChoiceRaceToMax: new SingleVote(props),
+      DocInput: new DocInput(props),
     };
+    this.vote_machine_type = props.vote_machine_type;
   }
 
-  fallBack(checkpointData) {
-    if (this.votingTypes[checkpointData.vote_machine_type]) {
-      return this.votingTypes[checkpointData.vote_machine_type].fallBack(
-        checkpointData
-      );
+  initDataForCVD(data) {
+    if (this.votingTypes[data.vote_machine_type]) {
+      return this.votingTypes[data.vote_machine_type].initDataForCVD(data);
     } else {
       throw new Error(`Invalid data`);
     }
   }
 
-  recordVote(checkpointData, voteData) {
-    if (this.votingTypes[checkpointData.vote_machine_type]) {
-      return this.votingTypes[checkpointData.vote_machine_type].recordVote(
-        checkpointData,
-        voteData
+  fallBack() {
+    if (this.votingTypes[this.vote_machine_type]) {
+      return this.votingTypes[this.vote_machine_type].fallBack();
+    } else {
+      throw new Error(`Invalid data`);
+    }
+  }
+
+  recordVote(voteData) {
+    if (this.votingTypes[this.vote_machine_type]) {
+      return this.votingTypes[this.vote_machine_type].recordVote(voteData);
+    } else {
+      throw new Error(
+        `Invalid voting machine type: ${checkpointData.vote_machine_type}`
       );
+    }
+  }
+
+  getResult() {
+    if (this.votingTypes[this.vote_machine_type]) {
+      return {
+        who: this.votingTypes[this.vote_machine_type].who,
+        result: this.votingTypes[this.vote_machine_type].result,
+      };
+    } else {
+      throw new Error(
+        `Invalid voting machine type: ${checkpointData.vote_machine_type}`
+      );
+    }
+  }
+
+  shouldTally() {
+    if (this.votingTypes[this.vote_machine_type]) {
+      return this.votingTypes[this.vote_machine_type].shouldTally();
     } else {
       throw new Error(
         `Invalid voting machine type: ${checkpointData.vote_machine_type}`

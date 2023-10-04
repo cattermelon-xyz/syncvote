@@ -5,17 +5,28 @@ class SingleVote extends VotingMachine {
     super(props);
   }
 
+  initDataForCVD(data) {
+    console.log('Haha', data);
+  }
+
   fallBack(data) {
-    if (super.fallBack(data)) {
-      return super.fallBack(data);
-    } else if (this.shouldTally()) {
-      return this.shouldTally();
+    // check fallback of VotingMachine class
+    const { fallBack, error } = super.fallBack(data);
+    if (fallBack) {
+      return { fallBack, error };
+    }
+
+    // Are there enough conditions for tally?
+    const shouldTally = this.shouldTally(data);
+    if (shouldTally) {
+      return { fallback: true, error: 'This checkpoint should tally' };
     }
 
     return {};
   }
 
   recordVote(data, voteData) {
+    // check recordVote of VotingMachine class
     const { notRecorded } = super.recordVote(data, voteData);
     if (notRecorded) {
       return super.recordVote(data, voteData);
@@ -26,18 +37,21 @@ class SingleVote extends VotingMachine {
       return { notRecorded: true, error: 'You need to pick one' };
     }
 
-    //check if user is alreadyvote
+    // check if user is alreadyvote
+    if (data.who !== null && data.who.includes(voteData.identify)) {
+      return { notRecorded: true, error: 'User is already voted' };
+    }
 
     return {};
   }
 
-  shouldTally() {
+  shouldTally(data) {
     super.shouldTally();
     const shouldTally = false;
-    if (shouldTally) {
-      return { fallback: true, error: 'This checkpoint should tally' };
-    }
-    return null;
+
+    console.log(data);
+
+    return shouldTally;
   }
 }
 

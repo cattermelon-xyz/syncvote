@@ -2,8 +2,8 @@ const VoteHandleService = require('../services/VoteHandleService');
 
 const voting = async (req, res) => {
   try {
-    const { who, option, voting_power, mission_id } = req.body;
-    if (!who || !option || !voting_power || !mission_id) {
+    const { identify, option, voting_power, mission_id } = req.body;
+    if (!identify || !option || !voting_power || !mission_id) {
       return res.status(200).json({
         status: 'ERR',
         message: 'The input is required',

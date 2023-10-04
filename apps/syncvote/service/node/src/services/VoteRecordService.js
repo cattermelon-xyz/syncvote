@@ -36,28 +36,6 @@ async function getAllVoteRecord() {
   });
 }
 
-async function insertVoteRecord(props) {
-  const { data: newVoteRecord, error } = await supabase
-    .from('vote_record')
-    .insert(props)
-    .select('*');
-
-    console.log(props);
-  if (!error) {
-    return {
-      status: 'OK',
-      message: 'SUCCESS',
-      data: newVoteRecord,
-    };
-  } else {
-    return {
-      status: 'ERR',
-      message: error,
-    };
-  }
-}
-
 module.exports = {
   getAllVoteRecord,
-  insertVoteRecord,
 };
