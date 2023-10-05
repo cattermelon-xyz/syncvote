@@ -26,7 +26,6 @@ export const CreateProposalModal = ({
   missionId = -1,
 }: CreateProposalModalProps) => {
   const dispatch = useDispatch();
-  const [mission, setMission] = useState<any>({});
   const [name, setName] = useState('');
 
   const user = useGetDataHook({
@@ -65,7 +64,6 @@ export const CreateProposalModal = ({
         missionId: missionId,
         onLoad: (data: any) => {
           const mission = data[0];
-          setMission(mission);
           setName(mission.title);
           setDesc(mission.desc);
         },
