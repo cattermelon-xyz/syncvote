@@ -7,8 +7,8 @@ class SingleVote extends VotingMachine {
     this.thresholds = thresholds;
   }
 
-  initDataForCVD(data) {
-    const options = data.options;
+  initDataForCVD() {
+    const options = this.options;
     if (options.length === 0) {
       return {
         initData: false,

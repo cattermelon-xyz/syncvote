@@ -31,150 +31,135 @@ async function handleVoting(props) {
             return;
           }
 
-          let voteMachineController = new VoteMachineController({});
-
-          // create a new current vote data
-          // 1. Get the root checkpoint data
-          const { data: rootCheckpoint } = await supabase
-            .from('checkpoint')
-            .select('*')
-            .eq('id', `${mission_id}-root`);
-
-          // 2. Get the data was created by voteMachine
-          const {
-            initData,
-            error: init_error,
-            result,
-          } = voteMachineController.initDataForCVD({
-            vote_machine_type: rootCheckpoint[0].vote_machine_type,
-            options: rootCheckpoint[0].options,
-          });
-
-          // check if cannot init the data for current_vote_data
-          if (!initData) {
+          // 2️⃣ check mission is stopped
+          if (mission_vote_details[0].status === 'STOPPED') {
             resolve({
               status: 'ERR',
-              message: init_error,
+              message: 'This mission is stopped!',
             });
             return;
           }
 
-          // 3. Create new current_vote_data for root checkpoint and start it
-          const { data: newCurrentVoteData } = await supabase
-            .from('current_vote_data')
+          let voteMachineController = new VoteMachineController(
+            mission_vote_details[0]
+          );
+
+          // 3️⃣ check if the fisrt time of voting
+          if (!mission_vote_details[0].result) {
+            // update data of current vote data
+
+            // 1. Get the data was created by voteMachine
+            const {
+              initData,
+              error: init_error,
+              result,
+            } = voteMachineController.initDataForCVD();
+
+            // check if cannot init the data for current_vote_data
+            if (!initData) {
+              resolve({
+                status: 'ERR',
+                message: init_error,
+              });
+              return;
+            }
+
+            // 2. Update result current_vote_data for checkpoint
+            await supabase
+              .from('current_vote_data')
+              .update({
+                result: result,
+              })
+              .eq('id', mission_vote_details[0].cvd_id);
+
+            // 3. Update the result of mission_vote_details
+            mission_vote_details[0].result = result;
+
+            // 4. Update voteController
+            voteMachineController = new VoteMachineController(
+              mission_vote_details[0]
+            );
+          }
+
+          // 4️⃣ check if fallback
+          const { fallback, error: f_error } = voteMachineController.fallBack();
+
+          if (fallback) {
+            console.log('Move this mission to fallback checkpoint');
+            resolve({
+              status: 'FALLBACK',
+              message: f_error,
+            });
+            return;
+          }
+
+          // 5️⃣ check if recorded
+          const { notRecorded, error: r_error } =
+            voteMachineController.recordVote({
+              identify,
+              option,
+              voting_power,
+            });
+
+          if (notRecorded) {
+            resolve({
+              status: 'ERR',
+              message: r_error,
+            });
+            return;
+          }
+
+          // 6️⃣ write this record to vote data record and change the result
+          const { error: nv_error } = await supabase
+            .from('vote_record')
             .insert({
-              checkpoint_id: rootCheckpoint[0].id,
-              result: result,
-              who: [],
-              startToVote: moment().format(),
-              endToVote: moment()
-                .add(rootCheckpoint[0].duration, 'seconds')
-                .format(),
-              tallyResult: [],
+              identify,
+              option,
+              voting_power,
+              current_vote_data_id: mission_vote_details[0].cvd_id,
             })
             .select('*');
 
-          // 4. Update the current_vote_data_id for mission
-          await supabase
-            .from('mission')
-            .update({ current_vote_data_id: newCurrentVoteData[0].id })
-            .eq('id', mission_id)
-            .select('*');
+          if (nv_error) {
+            resolve({
+              status: 'ERR',
+              message: nv_error,
+            });
+            return;
+          }
 
-          // 5. Get new mission_vote_details
-          mission_vote_details = (
-            await supabase
-              .from('mission_vote_details')
-              .select(`*`)
-              .eq('mission_id', mission_id)
-          ).data;
+          // 7️⃣ change the result
+          const { who, result } = voteMachineController.getResult();
+          const { error: cvd_err } = await supabase
+            .from('current_vote_data')
+            .update({ who: who, result: result })
+            .eq('id', mission_vote_details[0].cvd_id);
 
-          // }
+          if (cvd_err) {
+            resolve({
+              status: 'ERR',
+              message: cvd_err,
+            });
+            return;
+          }
 
-          // // Update voteMachineController
-          // voteMachineController = new VoteMachineController(
-          //   mission_vote_details[0]
-          // );
+          // 8️⃣ Check if tally
+          const { shouldTally, error: t_error } =
+            voteMachineController.shouldTally();
 
-          // // 2️⃣ check if fallback
-          // const { fallback, error: f_error } = voteMachineController.fallBack();
+          // check if tally have error
+          if (t_error) {
+            console.log('Move this mission to fallback checkpoint');
+            resolve({
+              status: 'ERR',
+              message: t_error,
+            });
+            return;
+          }
 
-          // if (fallback) {
-          //   console.log('Move this mission to fallback checkpoint');
-          //   resolve({
-          //     status: 'FALLBACK',
-          //     message: f_error,
-          //   });
-          //   return;
-          // }
-
-          // // 3️⃣ check if recorded
-          // const { notRecorded, error: r_error } =
-          //   voteMachineController.recordVote({
-          //     identify,
-          //     option,
-          //     voting_power,
-          //   });
-
-          // if (notRecorded) {
-          //   resolve({
-          //     status: 'ERR',
-          //     message: r_error,
-          //   });
-          //   return;
-          // }
-
-          // // 4️⃣ write this record to vote data record and change the result
-          // const { error: nv_error } = await supabase
-          //   .from('vote_record')
-          //   .insert({
-          //     identify,
-          //     option,
-          //     voting_power,
-          //     current_vote_data_id: mission_vote_details[0].cvd_id,
-          //   })
-          //   .select('*');
-
-          // if (nv_error) {
-          //   resolve({
-          //     status: 'ERR',
-          //     message: nv_error,
-          //   });
-          //   return;
-          // }
-
-          // // 5️⃣ change the result
-          // const { who, result } = voteMachineController.getResult();
-          // const { error: cvd_err } = await supabase
-          //   .from('current_vote_data')
-          //   .update({ who: who, result: result })
-          //   .eq('id', mission_vote_details[0].cvd_id);
-
-          // if (cvd_err) {
-          //   resolve({
-          //     status: 'ERR',
-          //     message: cvd_err,
-          //   });
-          //   return;
-          // }
-
-          // // 6️⃣ Check if tally
-          // const { shouldTally, error: t_error } =
-          //   voteMachineController.shouldTally();
-
-          // // check if tally have error
-          // if (t_error) {
-          //   console.log('Move this mission to fallback checkpoint');
-          //   resolve({
-          //     status: 'ERR',
-          //     message: t_error,
-          //   });
-          //   return;
-          // }
-
-          // if (shouldTally) {
-          //   console.log('Move this checkpoint');
-          // }
+          if (shouldTally) {
+            console.log('Move this checkpoint');
+          }
         } catch (error) {
           console.log(error);
         }
@@ -287,11 +272,16 @@ async function handleSubbmission(props) {
             .eq('id', mission_vote_details[0].cvd_id);
 
           // 7️⃣ create a new current_vote_data
+
           const current_vote_data = await insertCurrentVoteData({
             checkpoint_id: `${mission_vote_details[0].m_id}-${mission_vote_details[0].id}`,
-            startToVote: moment().add(checkpoint.duration, 'seconds').format(),
+            startToVote: moment()
+              .add(mission_vote_details[0].delays[index], 'days')
+              .format(),
             endToVote: moment().add(checkpoint.duration, 'seconds').format(),
           });
+
+          // 8️⃣ change the current vote data
 
           if (cvd_err) {
             resolve({
