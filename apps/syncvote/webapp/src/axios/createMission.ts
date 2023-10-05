@@ -2,12 +2,10 @@ import axios from 'axios';
 
 export const createMission = async ({
   missionData,
-  workflowVersion,
   onSuccess,
   onError,
 }: {
   missionData: any;
-  workflowVersion: any;
   onSuccess: () => void;
   onError: () => void;
 }) => {

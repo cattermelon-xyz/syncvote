@@ -5,7 +5,7 @@ import { IDoc, emptyStage } from 'directed-graph';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { TextEditor } from 'rich-text-editor';
-import { useGetDataHook } from 'utils';
+import { useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
 import { createMission, updateMission } from '@axios/createMission';
 import { queryAMission } from '@dal/data';
@@ -36,10 +36,11 @@ export const CreateProposalModal = ({
 
   const [isWarning, setIsWarning] = useState(false);
 
-  const [desc, setDesc] = useState<any>('');
+  const [templateOfDoc, setTemplateOfDoc] = useState<any>('');
 
   const root_docs = data.checkpoints[0].data.docs || [];
   let docs: IDoc[] = data.docs || [];
+  const [docsOfMission, setDocsOfMission] = useState(data.docs || []);
 
   const root_doc_ids = root_docs.map((doc: any) => doc.id);
   const filtered_docs = docs.filter((doc) => root_doc_ids.includes(doc.id));
@@ -54,7 +55,7 @@ export const CreateProposalModal = ({
         key: doc.id,
         label: <div className='flex items-center'>{doc.title}</div>,
         value: doc.id,
-        desc: doc.template,
+        template: doc.template,
       }));
 
       setOptionDocs(optionDocs);
@@ -65,7 +66,8 @@ export const CreateProposalModal = ({
         onLoad: (data: any) => {
           const mission = data[0];
           setName(mission.title);
-          setDesc(mission.desc);
+          setTemplateOfDoc(mission.docs[0]?.template);
+          setDocsOfMission(mission.docs);
         },
         dispatch,
       });
@@ -84,7 +86,7 @@ export const CreateProposalModal = ({
         let missionData = {
           status: status,
           title: name,
-          desc: desc,
+          docs: docsOfMission,
         };
 
         await updateMission({
@@ -108,15 +110,15 @@ export const CreateProposalModal = ({
           creator_id: user.id,
           status: status,
           title: name,
-          desc: desc,
           data: data,
           icon_url: workflow.icon_url,
+          start: data.start,
           workflow_version_id: workflowVersion.id,
+          docs: docsOfMission,
         };
 
         await createMission({
           missionData,
-          workflowVersion,
           onSuccess: () => {
             Modal.success({
               title: 'Success',
@@ -132,41 +134,18 @@ export const CreateProposalModal = ({
         });
       }
 
-      // await insertMission({
-      //   dispatch: dispatch,
-      //   params: {
-      //     title: name,
-      //     desc: desc,
-      //     data: data,
-      //     status: 'DRAFT',
-      //     workflow_version_id: workflowVersion.id,
-      //     creator_id: user.id,
-      //   },
-      //   onSuccess: () => {
-      //     Modal.success({
-      //       title: 'Success',
-      //       content: 'Create a new proposal successfully',
-      //     });
-      //   },
-      //   onError: () => {
-      //     Modal.error({
-      //       title: 'Error',
-      //       content: 'Error to create a proposal',
-      //     });
-      //   },
-      // });
-
-      reset();
+      // reset();
       onCancel();
     }
   };
 
-  const reset = () => {
-    setName('');
+  // const reset = () => {
+  //   setName('');
 
-    const doc = filtered_docs.find((doc: any) => doc.id === value);
-    setDesc(doc?.template);
-  };
+  //   const doc = filtered_docs.find((doc: any) => doc.id === value);
+  //   setTemplateOfDoc(doc?.template);
+  //   setDocsOfMission(data?.docs);
+  // };
 
   const [optionWorkflows, setOptionWorkflows] = useState<any>([
     {
@@ -248,12 +227,14 @@ export const CreateProposalModal = ({
                   <Select
                     className='w-3/4'
                     options={optionDocs}
-                    onChange={(value) => {
-                      setValue(value);
-                      const doc = filtered_docs.find(
-                        (doc: any) => doc.id === value
+                    onChange={(val) => {
+                      setValue(val);
+                      console.log(val, docsOfMission);
+
+                      const doc = docsOfMission.find(
+                        (doc: any) => doc.id === val
                       );
-                      setDesc(doc?.template);
+                      setTemplateOfDoc(doc?.template);
                     }}
                   />
                   <Button
@@ -275,8 +256,26 @@ export const CreateProposalModal = ({
                 </div>
                 <div>
                   <TextEditor
-                    value={desc}
-                    setValue={(val: any) => setDesc(val)}
+                    value={templateOfDoc}
+                    setValue={(val: any) => {
+                      setTemplateOfDoc(val);
+                      console.log(value);
+
+                      if (value) {
+                        const updatedDocs = [...docsOfMission];
+                        const docIndex = updatedDocs.findIndex(
+                          (doc) => doc.id === value
+                        );
+                        if (docIndex !== -1) {
+                          updatedDocs[docIndex].template = val;
+                          setDocsOfMission(updatedDocs);
+                        } else {
+                          console.log(
+                            'Không tìm thấy tài liệu với id được chỉ định.'
+                          );
+                        }
+                      }
+                    }}
                     id='text-editor'
                   />
                 </div>
