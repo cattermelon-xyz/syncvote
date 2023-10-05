@@ -14,7 +14,7 @@ interface CreateProposalModalProps {
   open: boolean;
   workflow: any;
   onCancel: () => void;
-  workflowVersion: any;
+  workflowVersion?: any;
   missionId?: number;
 }
 
@@ -92,7 +92,6 @@ export const CreateProposalModal = ({
         await updateMission({
           missionId: missionId,
           missionData: missionData,
-          workflowVersion: workflowVersion,
           onSuccess: () => {
             Modal.success({
               title: 'Success',

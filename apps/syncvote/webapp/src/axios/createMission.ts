@@ -31,7 +31,6 @@ export const updateMission = async ({
 }: {
   missionId: number;
   missionData: any;
-  workflowVersion?: any;
   onSuccess?: () => void;
   onError?: () => void;
 }) => {
