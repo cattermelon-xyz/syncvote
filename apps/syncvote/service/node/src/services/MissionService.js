@@ -1,6 +1,9 @@
 const { supabase } = require('../configs/supabaseClient');
 const { Mission } = require('../models/Mission');
 const { insertCheckpoint } = require('./CheckpointService');
+const { insertCurrentVoteData } = require('./CurrentVoteDataService');
+const moment = require('moment');
+
 async function getAllMission() {
   return new Promise(async (resolve, reject) => {
     try {
@@ -48,12 +51,14 @@ async function insertMission(props) {
               title: checkpoint.title,
               docs: checkpoint.docs,
               participation: checkpoint?.participation,
-              quorum: 60,
+              quorum: checkpoint?.quorum,
               options: checkpoint.data?.options,
+              thresholes: checkpoint.data?.max,
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
               duration: checkpoint?.duration,
               children: checkpoint?.children,
+              isEnd: checkpoint?.isEnd,
             };
 
             const error = await insertCheckpoint(checkpointData);
@@ -62,6 +67,36 @@ async function insertMission(props) {
                 status: 'ERR',
                 message: error,
               });
+              return;
+            }
+
+            if (checkpoint.id === newMission[0].start) {
+              // create current_vote_data
+              const current_vote_data = await insertCurrentVoteData({
+                checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
+                startToVote: moment().format(),
+                endToVote: moment()
+                  .add(checkpoint.duration, 'seconds')
+                  .format(),
+              });
+
+              console.log(current_vote_data);
+
+              const { u_error } = await supabase
+                .from('mission')
+                .update({
+                  current_vote_data_id: current_vote_data.id,
+                })
+                .eq('id', newMission[0].id)
+                .select('*');
+
+              if (error) {
+                resolve({
+                  status: 'ERR',
+                  message: u_error,
+                });
+                return;
+              }
             }
           });
         }
@@ -103,12 +138,14 @@ async function updateMission(props) {
               title: checkpoint.title,
               docs: checkpoint.docs,
               participation: checkpoint?.participation,
-              quorum: 60,
+              quorum: checkpoint?.quorum,
               options: checkpoint.data?.options,
+              thresholes: checkpoint.data?.max,
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
               duration: checkpoint?.duration,
               children: checkpoint?.children,
+              isEnd: checkpoint?.isEnd,
             };
 
             const error = await insertCheckpoint(checkpointData);

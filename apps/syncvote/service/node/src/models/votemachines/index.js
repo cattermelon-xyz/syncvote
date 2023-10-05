@@ -4,31 +4,29 @@ const { isArraySubset } = require('../../functions/index');
 class VotingMachine {
   constructor(props) {
     const {
-      name,
       options,
       duration,
       cvd_created_at,
       who,
       delays,
       delayUnits,
-      quorums,
       result,
       startToVote,
       endToVote,
       tallyResult,
+      participation,
     } = props;
-    this.name = name;
     this.options = options;
     this.duration = duration;
     this.cvd_created_at = cvd_created_at;
     this.who = who;
     this.delays = delays;
     this.delayUnits = delayUnits;
-    this.quorums = quorums;
     this.result = result;
     this.startToVote = startToVote;
     this.endToVote = endToVote;
     this.tallyResult = tallyResult;
+    this.participation = participation;
   }
 
   isStarted() {

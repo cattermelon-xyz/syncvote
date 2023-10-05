@@ -71,8 +71,6 @@ class SingleVote extends VotingMachine {
   shouldTally() {
     super.shouldTally();
 
-    const shouldTally = false;
-
     // check if thesholes is percentage
     if (this.thresholds > 1) {
       for (const option of this.options) {
@@ -108,8 +106,6 @@ class SingleVote extends VotingMachine {
         }
       }
     }
-
-    return shouldTally;
   }
 }
 
