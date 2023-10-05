@@ -196,6 +196,7 @@ const BluePrint = () => {
             listProposals={allProposals}
             title={isExplorePage ? '' : 'All proposals'}
             type='all'
+            isExcludeDraftMission={isExplorePage ? true : false}
           />
         </div>
       ),
