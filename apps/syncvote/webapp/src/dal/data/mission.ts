@@ -75,6 +75,32 @@ export class MissionFunctionClass {
   }
 }
 
+export const queryAMissionDetail = async ({
+  missionId,
+  onSuccess,
+  onError = (error) => {
+    console.error(error); // eslint-disable-line
+  },
+  dispatch,
+}: {
+  missionId: number;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('mission_vote_details')
+    .select('*')
+    .eq('mission_id', missionId);
+  if (!error) {
+    onSuccess(data[0]);
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
+};
+
 export const queryMission = async ({
   orgId,
   onLoad,
