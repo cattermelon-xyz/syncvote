@@ -4,9 +4,13 @@
 
 ![Alt text](public/database.png)
 
-## Flow (Updating...)
+## Create proposal flow
 
-![Alt text](public/flow.png)
+![Alt text](public/create_proposal.png)
+
+## Vote flow
+
+![Alt text](public/voting.png)
 
 ## Code structure
 

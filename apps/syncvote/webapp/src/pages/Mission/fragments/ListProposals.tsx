@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Icon } from 'icon';
-import { useGetDataHook } from 'utils';
+import { useGetDataHook, createIdString } from 'utils';
 import { config } from '@dal/config';
 import { Space, Button } from 'antd';
 import { SortAscendingOutlined } from '@ant-design/icons';
 import { Empty } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   title?: string;
@@ -16,6 +17,17 @@ const ListProposals: React.FC<Props> = ({ listProposals, title, type }) => {
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
+
+  const navigate = useNavigate();
+
+  const handleNavigate = (proposal: any) => {
+    const pathOrg = createIdString(
+      proposal.org_title,
+      proposal.org_id.toString()
+    );
+    const pathMission = createIdString(proposal.title, proposal.id.toString());
+    navigate(`/${pathOrg}/${pathMission}`);
+  };
 
   return (
     <div>
@@ -67,7 +79,13 @@ const ListProposals: React.FC<Props> = ({ listProposals, title, type }) => {
             </div>
           ) : (
             listProposals.map((proposal, index) => (
-              <div key={index}>
+              <div
+                key={index}
+                onClick={() => {
+                  handleNavigate(proposal);
+                }}
+                className='cursor-pointer'
+              >
                 <div className='flex items-center'>
                   <div className='w-[50%] flex'>
                     <Icon

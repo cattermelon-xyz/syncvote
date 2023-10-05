@@ -71,6 +71,10 @@ export const config: ConfigObject = {
     reduxObjectPath: 'orginfo',
   },
 
+  querySearchOrgForExplore: {
+    dalFunction: orgFunction.querySearchOrgForExplore,
+  },
+
   getWorkflowByStatus: {
     dalFunction: workflowFunction.getWorkflowByStatus,
     reduxObjectPath: 'workflow',

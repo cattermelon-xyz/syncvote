@@ -6,7 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-
+local.code-workspace
+.vscode/local.code-workspace
 # OS 
 .DS_Store
 
@@ -134,3 +135,4 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+.vscode/local.code-workspace

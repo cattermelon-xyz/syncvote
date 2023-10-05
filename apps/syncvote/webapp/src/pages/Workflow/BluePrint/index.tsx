@@ -120,9 +120,9 @@ const BluePrint = () => {
               ...workflow,
               org_title: org.title,
             }));
+
             const publicCommunityworkflows = workflowsData.filter(
-              (workflow: any) =>
-                workflow.versions[0].status === 'PUBLIC_COMMUNITY'
+              (workflow: any) => workflow?.versions[0]?.status === 'PUBLISHED'
             );
             setWorkflows(publicCommunityworkflows);
             setTemplates(org?.templates || []);

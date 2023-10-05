@@ -8,6 +8,7 @@ import AuthRoutes from './AuthRoutes';
 import OrgRoutes from './OrgRoutes';
 import AccountRoutes from './AccountRoutes';
 import EditorRoutes from './EditorRoutes';
+import VotingRoutes from './VotingRoutes';
 import { AuthContext } from '@layout/context/AuthContext';
 import { useEffect, useState } from 'react';
 import { supabase, useGetDataHook } from 'utils';
@@ -78,6 +79,7 @@ const AppRoutes = () => {
           {EditorRoutes}
           {OrgRoutes}
           {AccountRoutes}
+          {VotingRoutes}
           <Route path='/' element={<App layout={WebLayoutWithoutSider} />}>
             <Route
               path='template/:templateIdString'
