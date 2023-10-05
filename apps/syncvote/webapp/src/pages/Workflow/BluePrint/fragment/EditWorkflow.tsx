@@ -3,11 +3,12 @@ import { TextEditor } from 'rich-text-editor';
 import { Icon } from 'icon';
 import { newTag } from '@dal/data/tag';
 import { ITag, IWorkflow } from '@types';
-import { Drawer, Input, Select, SelectProps, Space, Switch } from 'antd';
+import { Button, Drawer, Input, Select, SelectProps, Space, Switch } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
+import SaveOutlined from '@ant-design/icons/lib/icons/SaveOutlined';
 
 const EditWorkflow = ({
   open,
@@ -205,7 +206,7 @@ const EditWorkflow = ({
           size='small'
           className='p-4 rounded-lg bg-white w-full'
         >
-          <Space
+          {/* <Space
             direction='horizontal'
             className='px-2 py-2 bg-zinc-100 flex justify-between rounded-lg'
           >
@@ -237,16 +238,16 @@ const EditWorkflow = ({
               onChange={onChangeTagValue}
               value={existedTags}
             />
-          </Space>
+          </Space> */}
         </Space>
-        {/* <Button
-          type="default"
-          className="w-full"
+        <Button
+          type='default'
+          className='w-full'
           icon={<SaveOutlined />}
-          onClick={() => onSave(title, desc, iconUrl)}
+          onClick={() => onSave({ title, desc, iconUrl })}
         >
           Save
-        </Button> */}
+        </Button>
       </Space>
     </Drawer>
   );
