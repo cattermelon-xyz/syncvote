@@ -15,6 +15,7 @@ class VotingMachine {
       result,
       startToVote,
       endToVote,
+      tallyResult,
     } = props;
     this.name = name;
     this.options = options;
@@ -27,6 +28,7 @@ class VotingMachine {
     this.result = result;
     this.startToVote = startToVote;
     this.endToVote = endToVote;
+    this.tallyResult = tallyResult;
   }
 
   isStarted() {
@@ -40,9 +42,9 @@ class VotingMachine {
 
   fallBack() {
     // check if this checkpoint was not ready to vote
-    // if (!this.isStarted()) {
-    //   return { fallback: true, error: 'This checkpoint was not ready to vote' };
-    // }
+    if (!this.isStarted()) {
+      return { fallback: true, error: 'This checkpoint was not ready to vote' };
+    }
 
     // check if this checkpoint is outdate
     const createdAtMoment = moment(this.startToVote);

@@ -3,6 +3,8 @@ const { VotingMachine } = require('.');
 class SingleVote extends VotingMachine {
   constructor(props) {
     super(props);
+    const { thresholds } = props;
+    this.thresholds = thresholds;
   }
 
   initDataForCVD(data) {
@@ -68,7 +70,44 @@ class SingleVote extends VotingMachine {
 
   shouldTally() {
     super.shouldTally();
+
     const shouldTally = false;
+
+    // check if thesholes is percentage
+    if (this.thresholds > 1) {
+      for (const option of this.options) {
+        if (this.result[option] === this.thresholds) {
+          this.tallyResult = { option: this.result[option] };
+          return { shouldTally: true };
+        } else if (this.result[option] === this.thresholds) {
+          return { shouldTally: false, error: 'fallback' };
+        } else {
+          return { shouldTally: false };
+        }
+      }
+    } else {
+      if (this.who && this.who.length !== 0) {
+        let count_number_of_vote = this.who.length;
+        // check if the number of voter is bigger than quorums
+        let thresholdsNumber = 0;
+        if (this.thresholds * this.quorums <= count_number_of_vote) {
+          thresholdsNumber = this.thresholds * count_number_of_vote;
+        } else {
+          thresholdsNumber = this.thresholds * this.quorums;
+        }
+
+        for (const option of this.options) {
+          if (this.result[option] === thresholdsNumber) {
+            this.tallyResult = { option: this.result[option] };
+            return { shouldTally: true };
+          } else if (this.result[option] === this.thresholds) {
+            return { shouldTally: false, error: 'fallback' };
+          } else {
+            return { shouldTally: false };
+          }
+        }
+      }
+    }
 
     return shouldTally;
   }

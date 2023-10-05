@@ -4,6 +4,7 @@ class DocInput extends VotingMachine {
   constructor(props) {
     super(props);
   }
+  
   initDataForCVD(data) {
     const options = data.options;
     if (options.length === 0) {

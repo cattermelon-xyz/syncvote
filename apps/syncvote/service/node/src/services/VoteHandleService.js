@@ -25,7 +25,6 @@ async function handleVoting(props) {
 
           // 1️⃣ check if it is the first time of vote
           if (mission_vote_details.length === 0) {
-            
             // check if this mission was not created
             const { data: mission } = await supabase
               .from('mission')
@@ -155,6 +154,7 @@ async function handleVoting(props) {
               status: 'ERR',
               message: nv_error,
             });
+            return;
           }
 
           // 5️⃣ change the result
@@ -169,10 +169,26 @@ async function handleVoting(props) {
               status: 'ERR',
               message: cvd_err,
             });
+            return;
           }
 
           // 6️⃣ Check if tally
-          const shouldTally = voteMachineController.getResult();
+          const { shouldTally, error: t_error } =
+            voteMachineController.shouldTally();
+
+          // check if tally have error
+          if (t_error) {
+            console.log('Move this mission to fallback checkpoint');
+            resolve({
+              status: 'ERR',
+              message: t_error,
+            });
+            return;
+          }
+
+          if (shouldTally) {
+            console.log('Move this checkpoint');
+          }
         } catch (error) {
           console.log(error);
         }
