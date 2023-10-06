@@ -57,7 +57,7 @@ class VoteMachineController {
 
   shouldTally() {
     if (this.votingTypes[this.vote_machine_type]) {
-      return this.votingTypes[this.vote_machine_type].shoulPdTally();
+      return this.votingTypes[this.vote_machine_type].shouldTally();
     } else {
       throw new Error(
         `Invalid voting machine type: ${checkpointData.vote_machine_type}`

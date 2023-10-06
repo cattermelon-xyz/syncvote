@@ -24,14 +24,6 @@ class DocInput extends VotingMachine {
       return { notRecorded: true, error: 'Your doc required is not enough' };
     }
 
-    // check type of participation
-    if (this.participation.type === 'identify') {
-      // check if user was allow to vote, check participation
-      if (!this.participation.data.includes(voteData.identify)) {
-        return { notRecorded: true, error: `You don't have right to vote` };
-      }
-    }
-
     this.who = [voteData.identify];
     this.result = voteData.submission;
     this.tallyResult = [voteData.option];

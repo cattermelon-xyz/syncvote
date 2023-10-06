@@ -53,12 +53,13 @@ async function insertMission(props) {
               participation: checkpoint?.participation,
               quorum: checkpoint?.quorum,
               options: checkpoint.data?.options,
-              thresholes: checkpoint.data?.max,
+              thresholds: checkpoint.data?.max,
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
               duration: checkpoint?.duration,
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
+              includedAbstain: checkpoint?.includedAbstain,
             };
 
             const error = await insertCheckpoint(checkpointData);
@@ -69,8 +70,9 @@ async function insertMission(props) {
               });
               return;
             }
-
+            console.log(1);
             if (checkpoint.id === newMission[0].start) {
+              console.log(2);
               // create current_vote_data
               const current_vote_data = await insertCurrentVoteData({
                 checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
@@ -140,12 +142,13 @@ async function updateMission(props) {
               participation: checkpoint?.participation,
               quorum: checkpoint?.quorum,
               options: checkpoint.data?.options,
-              thresholes: checkpoint.data?.max,
+              thresholds: checkpoint.data?.max,
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
               duration: checkpoint?.duration,
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
+              includedAbstain: checkpoint?.includedAbstain,
             };
 
             const error = await insertCheckpoint(checkpointData);

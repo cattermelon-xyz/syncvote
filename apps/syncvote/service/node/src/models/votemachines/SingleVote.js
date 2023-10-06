@@ -3,8 +3,10 @@ const { VotingMachine } = require('.');
 class SingleVote extends VotingMachine {
   constructor(props) {
     super(props);
-    const { thresholds } = props;
+    const { thresholds, includedAbstain, quorum } = props;
     this.thresholds = thresholds;
+    this.includedAbstain = includedAbstain;
+    this.quorum = quorum;
   }
 
   initDataForCVD() {
@@ -16,8 +18,18 @@ class SingleVote extends VotingMachine {
       };
     }
     let result = {};
-    for (const option of options) {
-      result[option] = 0;
+    options.map((_, index) => {
+      result[index] = {
+        count: 0,
+        voting_power: 0,
+      };
+    });
+
+    if (this.includedAbstain) {
+      result['-1'] = {
+        count: 0,
+        voting_power: 0,
+      };
     }
 
     return {
@@ -34,7 +46,7 @@ class SingleVote extends VotingMachine {
     }
 
     // Are there enough conditions for tally?
-    const shouldTally = this.shouldTally();
+    const { shouldTally } = this.shouldTally();
     if (shouldTally) {
       return { fallback: true, error: 'This checkpoint should tally' };
     }
@@ -45,6 +57,7 @@ class SingleVote extends VotingMachine {
   recordVote(voteData) {
     // check recordVote of VotingMachine class
     const { notRecorded, error } = super.recordVote(voteData);
+
     if (notRecorded) {
       return { notRecorded, error };
     }
@@ -54,59 +67,80 @@ class SingleVote extends VotingMachine {
       return { notRecorded: true, error: 'You need to pick one' };
     }
 
-    // check if user is alreadyvote
+    // check if user is already vote
     if (this.who !== null && this.who.includes(voteData.identify)) {
       return { notRecorded: true, error: 'User is already voted' };
     }
 
-    // check if user was allow to vote, check participant
+    // check if abstain, dont increase the result, abstain send option [-1]'
+    if (!this.includedAbstain && voteData.option[0] === -1) {
+      return { notRecorded: true, error: 'Cannot vote abstain option' };
+    }
 
-    // check if abstain, dont increase the result, abstain send option [255]
-    this.who = this.who.concat(voteData.identify);
-    this.result[voteData.option[0]] += 1;
-
+    if (voteData.option[0] === -1) {
+      if (!this.who || this.who.length === 0) {
+        this.who = [voteData.identify];
+      } else {
+        this.who = this.who.concat(voteData.identify);
+      }
+      this.result['-1'].count += 1;
+    } else {
+      if (!this.who || this.who.length === 0) {
+        this.who = [voteData.identify];
+      } else {
+        this.who = this.who.concat(voteData.identify);
+      }
+      if (this.participation.type === 'identity') {
+        this.result[voteData.option[0]].count += 1;
+        this.result[voteData.option[0]].voting_power += 1;
+      } else {
+        // Dont have vote by token
+      }
+    }
     return {};
   }
 
   shouldTally() {
     super.shouldTally();
 
-    // check if thesholes is percentage
-    if (this.thresholds > 1) {
-      for (const option of this.options) {
-        if (this.result[option] === this.thresholds) {
-          this.tallyResult = { option: this.result[option] };
-          return { shouldTally: true };
-        } else if (this.result[option] === this.thresholds) {
-          return { shouldTally: false, error: 'fallback' };
+    if (this.who && this.who.length !== 0) {
+      // check if the number of voter is bigger than quorum
+      let thresholdsNumber = 0;
+
+      // check if thesholes is percentage
+      if (this.thresholds > 1) {
+        thresholdsNumber = this.thresholds;
+      } else {
+        if (this.thresholds * this.quorum <= this.who.length) {
+          thresholdsNumber = this.thresholds * this.who.length;
         } else {
-          return { shouldTally: false };
+          thresholdsNumber = this.thresholds * this.quorum;
         }
       }
-    } else {
-      if (this.who && this.who.length !== 0) {
-        let count_number_of_vote = this.who.length;
-        // check if the number of voter is bigger than quorums
-        let thresholdsNumber = 0;
-        if (this.thresholds * this.quorums <= count_number_of_vote) {
-          thresholdsNumber = this.thresholds * count_number_of_vote;
-        } else {
-          thresholdsNumber = this.thresholds * this.quorums;
+
+      for (let index in this.options) {
+        if (this.includedAbstain) {
+          if (this.result['-1'].count >= thresholdsNumber) {
+            if (this.who.length >= this.quorum) {
+              this.tallyResult = { option: this.result['-1'] };
+              return { shouldTally: true };
+            }
+          }
         }
 
-        for (const option of this.options) {
-          if (this.result[option] === thresholdsNumber) {
-            this.tallyResult = { option: this.result[option] };
+        if (this.result[index].count >= thresholdsNumber) {
+          if (this.who.length >= this.quorum) {
+            this.tallyResult = { option: this.result[index] };
             return { shouldTally: true };
-          } else if (this.result[option] === this.thresholds) {
-            return { shouldTally: false, error: 'fallback' };
-          } else {
-            return { shouldTally: false };
           }
         }
       }
     }
+
+    return { shouldTally: false };
   }
+
+  
 }
 
 module.exports = {

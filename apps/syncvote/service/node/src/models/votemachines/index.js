@@ -26,7 +26,7 @@ class VotingMachine {
     this.startToVote = startToVote;
     this.endToVote = endToVote;
     this.tallyResult = tallyResult;
-    this.participation = participation;
+    this.participation = JSON.parse(participation);
   }
 
   isStarted() {
@@ -58,9 +58,18 @@ class VotingMachine {
 
   recordVote(voteData) {
     // check if user's choice is wrong
-    const isSubset = isArraySubset(voteData.option, this.options);
-    if (!isSubset) {
-      return { notRecorded: true, error: 'Invalid choice' };
+    for (const option of voteData.option) {
+      if (option > this.options.length - 1) {
+        return { notRecorded: true, error: `Invalid choice` };
+      }
+    }
+
+    // check if user was allow to vote, check participation
+    if (this.participation.type === 'identity') {
+      // check if user was allow to vote, check participation
+      if (!this.participation.data.includes(voteData.identify)) {
+        return { notRecorded: true, error: `You don't have right to vote` };
+      }
     }
 
     return {};
