@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input } from 'antd';
+import { vote } from '@axios/vote';
 
 interface Props {
   open: boolean;
@@ -24,11 +25,27 @@ const ModalVoterInfo: React.FC<Props> = ({
         const voteData = {
           identify: values.info,
           option: option,
-          voting_power: 1,
+          voting_power: values.votepower,
           mission_id: missionId,
         };
 
-        console.log('voteData', voteData);
+        vote({
+          data: voteData,
+          onSuccess: (res: any) => {
+            console.log('res', res);
+            Modal.success({
+              title: 'Success',
+              content: 'Voting successfully',
+            });
+          },
+          onError: () => {
+            Modal.error({
+              title: 'Error',
+              content: 'Voting error',
+            });
+          },
+        });
+
         onClose();
       })
       .catch((info) => {
@@ -54,6 +71,18 @@ const ModalVoterInfo: React.FC<Props> = ({
               {
                 required: true,
                 message: 'Please input your email or wallet address',
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label='Voting power'
+            name='votepower'
+            rules={[
+              {
+                required: true,
+                message: 'Please input your vote power',
               },
             ]}
           >

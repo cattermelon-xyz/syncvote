@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Card, Button, Progress, Space, Tag, Timeline, Radio } from 'antd';
+import {
+  Card,
+  Button,
+  Progress,
+  Space,
+  Tag,
+  Timeline,
+  Radio,
+  Empty,
+} from 'antd';
 import {
   UploadOutlined,
   ReloadOutlined,
@@ -11,7 +20,6 @@ import { queryAMissionDetail } from '@dal/data';
 import { extractIdFromIdString } from 'utils';
 import { Modal } from 'antd';
 import { useDispatch } from 'react-redux';
-import parse from 'html-react-parser';
 import {
   formatDate,
   getTimeElapsedSinceStart,
@@ -29,7 +37,7 @@ const MissionVotingDetail = () => {
     useState<boolean>(false);
   const [openModalVoterInfo, setOpenModalVoterInfo] = useState<boolean>(false);
   const [listParticipants, setListParticipants] = useState<any[]>([]);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<number>(-1);
   const dispatch = useDispatch();
 
   const fetchData = () => {
@@ -54,12 +62,14 @@ const MissionVotingDetail = () => {
 
   useEffect(() => {
     if (missionData) {
-      const totalVotes = Object.values(missionData.result).reduce(
-        (acc: number, vote: any) => acc + vote,
-        0
-      );
-      if (totalVotes < missionData.quorum) {
-        setIsReachedQuorum(false);
+      if (missionData.result) {
+        const totalVotes = Object.values(missionData.result).reduce(
+          (acc: number, vote: any) => acc + vote,
+          0
+        );
+        if (totalVotes < missionData.quorum) {
+          setIsReachedQuorum(false);
+        }
       }
 
       const participationObj = JSON.parse(missionData.participation);
@@ -93,7 +103,7 @@ const MissionVotingDetail = () => {
                 </div>
               </div>
             </div>
-            <Space direction='vertical' size={16}>
+            <Space direction='vertical' size={16} className='w-full'>
               <Card className='w-[271px]'>
                 <Space direction='horizontal' size={'small'}>
                   <p>Author</p>
@@ -102,9 +112,15 @@ const MissionVotingDetail = () => {
                 </Space>
               </Card>
               <Card className='p-4'>
-                <Space direction='vertical' size={24}>
+                <div className='flex flex-col gap-6'>
                   <p className='text-xl font-medium'>Proposal content</p>
-                  <p>{parse(missionData.desc)}</p>
+                  {missionData?.desc ? (
+                    <p>{missionData?.desc}</p>
+                  ) : (
+                    <div className='flex justify-center items-center w-full'>
+                      <Empty />
+                    </div>
+                  )}
                   <Button
                     style={{
                       border: 'None',
@@ -115,16 +131,17 @@ const MissionVotingDetail = () => {
                   >
                     {/* <p className='text-[#6200EE]'>View more</p> */}
                   </Button>
-                </Space>
+                </div>
               </Card>
               <Card className='p-4'>
                 <div className='flex flex-col gap-6'>
                   <p className='text-xl font-medium'>Vote</p>
                   {missionData.options.map((option: any, index: any) => (
                     <Card className='w-full' key={index}>
+                      {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
                       <Radio
-                        checked={selectedOption === option}
-                        onChange={() => setSelectedOption(option)}
+                        checked={selectedOption === index + 1}
+                        onChange={() => setSelectedOption(index + 1)}
                       >
                         {`${index + 1}. ${option}`}
                       </Radio>
@@ -202,44 +219,49 @@ const MissionVotingDetail = () => {
                 </Button>
               </div>
             </Card>
-            <Card className=''>
-              <p className='mb-6 text-base font-semibold'>Voting results</p>
-              {missionData.options.map((option: any, index: any) => {
-                const totalVotes = Object.values(missionData.result).reduce(
-                  (acc: number, vote: any) => acc + vote,
-                  0
-                );
+            {missionData.result ? (
+              <Card className=''>
+                <p className='mb-6 text-base font-semibold'>Voting results</p>
+                {missionData.options.map((option: any, index: any) => {
+                  const totalVotes = Object.values(missionData.result).reduce(
+                    (acc: number, vote: any) => acc + vote,
+                    0
+                  );
 
-                let percentage;
-                if (missionData.quorum > totalVotes) {
-                  percentage =
-                    (missionData.result[option] / missionData.quorum) * 100;
-                } else {
-                  percentage = (missionData.result[option] / totalVotes) * 100;
-                }
-                percentage = parseFloat(percentage.toFixed(2));
-                return (
-                  <div key={index} className='flex flex-col gap-2'>
-                    <p className='text-base font-semibold'>{option}</p>
-                    <p className='text-base'>
-                      {missionData.result[option]} votes
-                    </p>
-                    <Progress percent={percentage} size='small' />
+                  let percentage;
+                  if (missionData.quorum > totalVotes) {
+                    percentage =
+                      (missionData.result[option] / missionData.quorum) * 100;
+                  } else {
+                    percentage =
+                      (missionData.result[option] / totalVotes) * 100;
+                  }
+                  percentage = parseFloat(percentage.toFixed(2));
+                  return (
+                    <div key={index} className='flex flex-col gap-2'>
+                      <p className='text-base font-semibold'>{option}</p>
+                      <p className='text-base'>
+                        {missionData.result[option]} votes
+                      </p>
+                      <Progress percent={percentage} size='small' />
+                    </div>
+                  );
+                })}
+                {isReachedQuorum ? (
+                  <div className='w-full flex justify-center items-center mt-2'>
+                    <Button className='w-full bg-[#EAF6EE] text-[#29A259]'>
+                      Reached required quorum
+                    </Button>
                   </div>
-                );
-              })}
-              {isReachedQuorum ? (
-                <div className='w-full flex justify-center items-center mt-2'>
-                  <Button className='w-full bg-[#EAF6EE] text-[#29A259]'>
-                    Reached required quorum
-                  </Button>
-                </div>
-              ) : (
-                <div className='w-full flex justify-center items-center mt-2'>
-                  <Button className='w-full'>Not reached quorum</Button>
-                </div>
-              )}
-            </Card>
+                ) : (
+                  <div className='w-full flex justify-center items-center mt-2'>
+                    <Button className='w-full'>Not reached quorum</Button>
+                  </div>
+                )}
+              </Card>
+            ) : (
+              <></>
+            )}
             <Card className=''>
               <p className='mb-4 text-base font-semibold'>Rules & conditions</p>
               <div className='flex flex-col gap-2'>
@@ -299,7 +321,7 @@ const MissionVotingDetail = () => {
         listParticipants={listParticipants}
       />
       <ModalVoterInfo
-        option={[selectedOption]}
+        option={[selectedOption - 1]}
         open={openModalVoterInfo}
         onClose={() => setOpenModalVoterInfo(false)}
         missionId={missionId}
