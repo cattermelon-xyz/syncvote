@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Icon } from 'icon';
 import { useGetDataHook, createIdString } from 'utils';
 import { config } from '@dal/config';
@@ -11,9 +11,15 @@ interface Props {
   title?: string;
   listProposals: any[];
   type?: string;
+  isExcludeDraftMission?: boolean;
 }
 
-const ListProposals: React.FC<Props> = ({ listProposals, title, type }) => {
+const ListProposals: React.FC<Props> = ({
+  listProposals,
+  title,
+  type,
+  isExcludeDraftMission,
+}) => {
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
@@ -28,6 +34,10 @@ const ListProposals: React.FC<Props> = ({ listProposals, title, type }) => {
     const pathMission = createIdString(proposal.title, proposal.id.toString());
     navigate(`/${pathOrg}/${pathMission}`);
   };
+
+  const filteredProposals = isExcludeDraftMission
+    ? listProposals.filter((proposal) => proposal.status !== 'DRAFT')
+    : listProposals;
 
   return (
     <div>
@@ -73,12 +83,12 @@ const ListProposals: React.FC<Props> = ({ listProposals, title, type }) => {
           <p className='w-[25%]'>{type === 'all' ? 'Voting ends on' : ''}</p>
         </div>
         <div className='flex flex-col gap-2'>
-          {listProposals.length === 0 ? (
+          {filteredProposals.length === 0 ? (
             <div>
               <Empty />
             </div>
           ) : (
-            listProposals.map((proposal, index) => (
+            filteredProposals.map((proposal, index) => (
               <div
                 key={index}
                 onClick={() => {
