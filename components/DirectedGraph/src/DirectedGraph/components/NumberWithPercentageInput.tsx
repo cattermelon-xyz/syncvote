@@ -7,20 +7,23 @@ const NumberWithPercentageInput = ({
   value,
   setValue = undefined,
   className = '',
+  allowPercentage = true,
 }: {
   prefix?: ReactNode;
   suffix?: ReactNode;
   value: number | undefined;
   setValue?: (value: number) => void;
   className?: string;
+  allowPercentage?: boolean;
 }) => {
   const convertToStr = (val: number) => {
     let tmp = '0';
     if (val !== undefined || val !== 0) {
-      tmp =
-        val < 1
-          ? `${(val * 100).toFixed(2)}%`
-          : `${val.toLocaleString('en-US')}`;
+      if (allowPercentage) {
+        tmp = val < 1 ? `${(val * 100).toFixed(2)}%` : `${val.toLocaleString('en-US')}`;
+      } else {
+        tmp = val.toFixed(2);
+      }
     }
     return tmp;
   };
@@ -38,12 +41,11 @@ const NumberWithPercentageInput = ({
         const str = e.target.value;
         let val = 0;
         if (str !== '') {
-          val =
-            str.indexOf('%') > 0
-              ? parseFloat(str) / 100 > 1
-                ? 1
-                : parseFloat(str) / 100
-              : parseFloat(str);
+          if (allowPercentage && str.indexOf('%') > 0) {
+            val = parseFloat(str) / 100 > 1 ? 1 : parseFloat(str) / 100;
+          } else {
+            val = parseFloat(str);
+          }
         }
         setStr(convertToStr(val));
         setValue(val);
