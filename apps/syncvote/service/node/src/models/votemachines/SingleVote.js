@@ -117,21 +117,11 @@ class SingleVote extends VotingMachine {
           thresholdsNumber = this.thresholds * this.quorum;
         }
       }
-
       for (let index in this.options) {
-        if (this.includedAbstain) {
-          if (this.result['-1'].count >= thresholdsNumber) {
-            if (this.who.length >= this.quorum) {
-              this.tallyResult = { option: this.result['-1'] };
-              return { shouldTally: true };
-            }
-          }
-        }
-
         if (this.result[index].count >= thresholdsNumber) {
           if (this.who.length >= this.quorum) {
-            this.tallyResult = { option: this.result[index] };
-            return { shouldTally: true };
+            this.tallyResult = { index: index, ...this.result[index] };
+            return { shouldTally: true, tallyResult: this.tallyResult };
           }
         }
       }
@@ -139,8 +129,6 @@ class SingleVote extends VotingMachine {
 
     return { shouldTally: false };
   }
-
-  
 }
 
 module.exports = {

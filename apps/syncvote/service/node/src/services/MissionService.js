@@ -70,16 +70,16 @@ async function insertMission(props) {
               });
               return;
             }
-            console.log(1);
+
             if (checkpoint.id === newMission[0].start) {
               console.log(2);
               // create current_vote_data
               const current_vote_data = await insertCurrentVoteData({
                 checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
                 startToVote: moment().format(),
-                endToVote: moment()
-                  .add(checkpoint.duration, 'seconds')
-                  .format(),
+                // endToVote: moment()
+                //   .add(checkpoint.duration, 'seconds')
+                //   .format(),
               });
 
               console.log(current_vote_data);
@@ -92,13 +92,18 @@ async function insertMission(props) {
                 .eq('id', newMission[0].id)
                 .select('*');
 
-              if (error) {
+              if (u_error) {
                 resolve({
                   status: 'ERR',
                   message: u_error,
                 });
                 return;
               }
+
+              // update the progress for mission
+              await supabase.from('mission').update({
+                progress: [`${updateMission[0].id}-${checkpoint.id}`],
+              });
             }
           });
         }
@@ -156,6 +161,39 @@ async function updateMission(props) {
               resolve({
                 status: 'ERR',
                 message: error,
+              });
+              return;
+            }
+
+            if (checkpoint.id === updateMission[0].start) {
+              // create current_vote_data
+              const current_vote_data = await insertCurrentVoteData({
+                checkpoint_id: `${updateMission[0].id}-${checkpoint.id}`,
+                startToVote: moment().format(),
+                // endToVote: moment()
+                //   .add(checkpoint.duration, 'seconds')
+                //   .format(),
+              });
+
+              const { u_error } = await supabase
+                .from('mission')
+                .update({
+                  current_vote_data_id: current_vote_data.id,
+                })
+                .eq('id', updateMission[0].id)
+                .select('*');
+
+              if (u_error) {
+                resolve({
+                  status: 'ERR',
+                  message: u_error,
+                });
+                return;
+              }
+
+              // update the progress for mission
+              await supabase.from('mission').update({
+                progress: [`${updateMission[0].id}-${checkpoint.id}`],
               });
             }
           });

@@ -12,7 +12,7 @@ class VotingMachine {
       delayUnits,
       result,
       startToVote,
-      endToVote,
+      endedAt,
       tallyResult,
       participation,
     } = props;
@@ -24,7 +24,7 @@ class VotingMachine {
     this.delayUnits = delayUnits;
     this.result = result;
     this.startToVote = startToVote;
-    this.endToVote = endToVote;
+    this.endedAt = endedAt;
     this.tallyResult = tallyResult;
     this.participation = JSON.parse(participation);
   }

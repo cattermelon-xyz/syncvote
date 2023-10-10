@@ -38,7 +38,8 @@ export const CreateProposalModal = ({
 
   const [templateOfDoc, setTemplateOfDoc] = useState<any>('');
 
-  const root_docs = data.checkpoints[0].data.docs || [];
+  // To do: check if mission dont have doc
+  const root_docs = data.checkpoints[0]?.data?.docs || [];
   let docs: IDoc[] = data.docs || [];
   const [docsOfMission, setDocsOfMission] = useState(data.docs || []);
 
