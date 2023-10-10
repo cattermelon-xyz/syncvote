@@ -1,0 +1,24 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+.lottie-hero > svg {
+    transform: unset !important;
+  }
+
+  .bg-blue-gradient {
+    background: linear-gradient(
+      157.81deg,
+      #def9fa -43.27%,
+      #bef3f5 -21.24%,
+      #9dedf0 12.19%,
+      #7de7eb 29.82%,
+      #5ce1e6 51.94%,
+      #33bbcf 90.29%
+    );
+  }
+
+  .blue__gradient {
+    background: linear-gradient(180deg, rgba(207, 191, 255, 0) 0%, #251c7a 100%);
+    filter: blur(123px);
+  }

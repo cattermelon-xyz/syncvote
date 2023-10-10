@@ -1,0 +1,84 @@
+.directed-graph-config-panel {
+  .ant-tabs-nav-wrap {
+    /* px-4 */
+    padding-left: 1rem; /* 16px */
+    padding-right: 1rem; /* 16px */
+    background-color: white;
+  }
+  .ant-tabs-tabpane {
+    padding-left: 1rem; /* 16px */
+    padding-right: 1rem; /* 16px */
+  }
+  .ant-btn-dangerous {
+    color: #aaa;
+  }
+  color: '#575655';
+}
+.edge-config-panel {
+  .ant-drawer-body {
+    background-color: #f6f6f6;
+  }
+}
+
+.directed-graph {
+  .react-flow__panel.top.left {
+    padding: 16px;
+    margin-left: 48px;
+    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    background-color: white;
+    border-radius: 16px;
+  }
+  .react-flow__panel.bottom.right {
+    padding: 16px;
+    margin-bottom: 48px;
+    margin-right: 48px;
+    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    background-color: white;
+    border-radius: 16px;
+  }
+  .react-flow__panel.bottom.center {
+    background-color: white;
+    padding: 16px;
+    border-radius: 16px 16px 0px 0px;
+    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    margin-bottom: 0px;
+  }
+  .react-flow__panel.react-flow__controls.bottom.left {
+    margin-bottom: 48px;
+    margin-left: 48px;
+    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    background-color: white;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .react-flow__edge:hover {
+    opacity: 0.3;
+  }
+  .react-flow__handle {
+    opacity: 0;
+  }
+}
+
+.machine-config-panel-tabs {
+  ul,
+  ol {
+    padding-left: 1rem;
+  }
+}
+.directed-graph-config-panel {
+  ul,
+  ol {
+    padding-left: 1rem;
+  }
+}
+// how to do watermark?
+// .directed-graph {
+//   background-image: url('/public/assets/images/watermark.png');
+//   background-repeat: no-repeat;
+//   background-position: 100% 100%;
+// }
+// .react-flow__edges.react-flow__container {
+//   background-image: url('/public/assets/images/watermark.png');
+//   background-repeat: no-repeat;
+//   background-position: 0% 100%;
+// }

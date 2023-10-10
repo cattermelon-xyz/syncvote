@@ -1,0 +1,9 @@
+.reaction.selected {
+  /* background-color: black; */
+  color: blueviolet;
+  border: 1px solid blueviolet;
+}
+
+.reaction {
+  background-color: #f6f6f6;
+}
