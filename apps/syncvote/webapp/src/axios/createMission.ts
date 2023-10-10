@@ -2,12 +2,10 @@ import axios from 'axios';
 
 export const createMission = async ({
   missionData,
-  workflowVersion,
   onSuccess,
   onError,
 }: {
   missionData: any;
-  workflowVersion: any;
   onSuccess: () => void;
   onError: () => void;
 }) => {
@@ -31,7 +29,10 @@ export const updateMission = async ({
 }: {
   missionId: number;
   missionData: any;
+<<<<<<< HEAD
+=======
   workflowVersion?: any;
+>>>>>>> main
   onSuccess?: () => void;
   onError?: () => void;
 }) => {

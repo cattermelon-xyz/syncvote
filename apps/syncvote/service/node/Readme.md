@@ -20,3 +20,8 @@
 2. Route will direct the request
 3. The controller receives the request and gives it to the service to process
 4. Controller will return response
+
+
+// Split web2 and web3 part
+
+// Change the way construct code, endpoint is vote machine

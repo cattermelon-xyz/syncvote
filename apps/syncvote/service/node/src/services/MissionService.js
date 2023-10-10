@@ -1,6 +1,9 @@
 const { supabase } = require('../configs/supabaseClient');
 const { Mission } = require('../models/Mission');
 const { insertCheckpoint } = require('./CheckpointService');
+const { insertCurrentVoteData } = require('./CurrentVoteDataService');
+const moment = require('moment');
+
 async function getAllMission() {
   return new Promise(async (resolve, reject) => {
     try {
@@ -45,13 +48,18 @@ async function insertMission(props) {
               id: `${newMission[0].id}-${checkpoint.id}`,
               vote_machine_type: checkpoint.vote_machine_type,
               mission_id: newMission[0].id,
+              title: checkpoint.title,
+              docs: checkpoint.docs,
               participation: checkpoint?.participation,
-              quorum: 60,
+              quorum: checkpoint?.quorum,
               options: checkpoint.data?.options,
+              thresholds: checkpoint.data?.max,
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
               duration: checkpoint?.duration,
               children: checkpoint?.children,
+              isEnd: checkpoint?.isEnd,
+              includedAbstain: checkpoint?.includedAbstain,
             };
 
             const error = await insertCheckpoint(checkpointData);
@@ -59,6 +67,42 @@ async function insertMission(props) {
               resolve({
                 status: 'ERR',
                 message: error,
+              });
+              return;
+            }
+
+            if (checkpoint.id === newMission[0].start) {
+              console.log(2);
+              // create current_vote_data
+              const current_vote_data = await insertCurrentVoteData({
+                checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
+                startToVote: moment().format(),
+                // endToVote: moment()
+                //   .add(checkpoint.duration, 'seconds')
+                //   .format(),
+              });
+
+              console.log(current_vote_data);
+
+              const { u_error } = await supabase
+                .from('mission')
+                .update({
+                  current_vote_data_id: current_vote_data.id,
+                })
+                .eq('id', newMission[0].id)
+                .select('*');
+
+              if (u_error) {
+                resolve({
+                  status: 'ERR',
+                  message: u_error,
+                });
+                return;
+              }
+
+              // update the progress for mission
+              await supabase.from('mission').update({
+                progress: [`${updateMission[0].id}-${checkpoint.id}`],
               });
             }
           });
@@ -98,13 +142,18 @@ async function updateMission(props) {
               id: `${updateMission[0].id}-${checkpoint.id}`,
               vote_machine_type: checkpoint.vote_machine_type,
               mission_id: updateMission[0].id,
+              title: checkpoint.title,
+              docs: checkpoint.docs,
               participation: checkpoint?.participation,
-              quorum: 60,
+              quorum: checkpoint?.quorum,
               options: checkpoint.data?.options,
+              thresholds: checkpoint.data?.max,
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
               duration: checkpoint?.duration,
               children: checkpoint?.children,
+              isEnd: checkpoint?.isEnd,
+              includedAbstain: checkpoint?.includedAbstain,
             };
 
             const error = await insertCheckpoint(checkpointData);
@@ -112,6 +161,39 @@ async function updateMission(props) {
               resolve({
                 status: 'ERR',
                 message: error,
+              });
+              return;
+            }
+
+            if (checkpoint.id === updateMission[0].start) {
+              // create current_vote_data
+              const current_vote_data = await insertCurrentVoteData({
+                checkpoint_id: `${updateMission[0].id}-${checkpoint.id}`,
+                startToVote: moment().format(),
+                // endToVote: moment()
+                //   .add(checkpoint.duration, 'seconds')
+                //   .format(),
+              });
+
+              const { u_error } = await supabase
+                .from('mission')
+                .update({
+                  current_vote_data_id: current_vote_data.id,
+                })
+                .eq('id', updateMission[0].id)
+                .select('*');
+
+              if (u_error) {
+                resolve({
+                  status: 'ERR',
+                  message: u_error,
+                });
+                return;
+              }
+
+              // update the progress for mission
+              await supabase.from('mission').update({
+                progress: [`${updateMission[0].id}-${checkpoint.id}`],
               });
             }
           });
@@ -134,59 +216,61 @@ async function updateMission(props) {
   });
 }
 
-async function getAMision(props) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const { missionId } = props;
-      const { data: newMission, error } = await supabase
-        .from('mission')
-        .select('*')
-        .eq('id', missionId);
+// async function getAMision(props) {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       const { missionId } = props;
+//       const { data: newMission, error } = await supabase
+//         .from('mission')
+//         .select('*')
+//         .eq('id', missionId);
 
-      if (!error) {
-        if (newMission[0].status === 'PUBLIC') {
-          newMission[0].data.checkpoints.map(async (checkpoint) => {
-            const checkpointData = {
-              id: `${newMission[0].id}-${checkpoint.id}`,
-              vote_machine_type: checkpoint.vote_machine_type,
-              mission_id: newMission[0].id,
-              participation: checkpoint?.participation,
-              quorum: 60,
-              options: checkpoint.data?.options,
-              delays: checkpoint?.delays,
-              delayUnits: checkpoint?.delayUnits,
-              duration: checkpoint?.duration,
-              children: checkpoint?.children,
-            };
+//       if (!error) {
+//         if (newMission[0].status === 'PUBLIC') {
+//           newMission[0].data.checkpoints.map(async (checkpoint) => {
+//             const checkpointData = {
+//               id: `${newMission[0].id}-${checkpoint.id}`,
+//               vote_machine_type: checkpoint.vote_machine_type,
+//               title: checkpoint.title,
+//               docs: checkpoint.docs,
+//               mission_id: newMission[0].id,
+//               participation: checkpoint?.participation,
+//               quorum: 60,
+//               options: checkpoint.data?.options,
+//               delays: checkpoint?.delays,
+//               delayUnits: checkpoint?.delayUnits,
+//               duration: checkpoint?.duration,
+//               children: checkpoint?.children,
+//             };
 
-            const error = await insertCheckpoint(checkpointData);
-            if (error) {
-              resolve({
-                status: 'ERR',
-                message: error,
-              });
-            }
-          });
-        }
-        resolve({
-          status: 'OK',
-          message: 'SUCCESS',
-          data: newMission,
-        });
-      } else {
-        resolve({
-          status: 'ERR',
-          message: error,
-        });
-      }
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
+//             const error = await insertCheckpoint(checkpointData);
+//             if (error) {
+//               resolve({
+//                 status: 'ERR',
+//                 message: error,
+//               });
+//             }
+//           });
+//         }
+//         resolve({
+//           status: 'OK',
+//           message: 'SUCCESS',
+//           data: newMission,
+//         });
+//       } else {
+//         resolve({
+//           status: 'ERR',
+//           message: error,
+//         });
+//       }
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// }
 
 module.exports = {
-  getAllMission,
+  // getAllMission,
   insertMission,
   updateMission,
 };
