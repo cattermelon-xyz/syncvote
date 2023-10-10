@@ -24,6 +24,7 @@ import NotFound404 from '@pages/NotFound404';
 import TemplateList from '@fragments/TemplateList';
 import { config } from '@dal/config';
 import ListProposals from '@pages/Mission/fragments/ListProposals';
+const env = import.meta.env.VITE_ENV;
 
 // TODO: this file is placed in wrong folder!
 
@@ -178,30 +179,6 @@ const BluePrint = () => {
 
   const tabItems = [
     {
-      key: '1',
-      label: 'Proposal',
-      children: myProposals && allProposals && (
-        <div className='flex flex-col gap-6'>
-          {isExplorePage ? (
-            ''
-          ) : (
-            <ListProposals
-              listProposals={myProposals}
-              title={'My proposals'}
-              type='owner'
-            />
-          )}
-
-          <ListProposals
-            listProposals={allProposals}
-            title={isExplorePage ? '' : 'All proposals'}
-            type='all'
-            isExcludeDraftMission={isExplorePage ? true : false}
-          />
-        </div>
-      ),
-    },
-    {
       key: '2',
       label: 'Workflows',
       children:
@@ -245,6 +222,33 @@ const BluePrint = () => {
         ),
     },
   ];
+
+  if (env !== 'production') {
+    tabItems.unshift({
+      key: '1',
+      label: 'Proposal',
+      children: myProposals && allProposals && (
+        <div className='flex flex-col gap-6'>
+          {isExplorePage ? (
+            ''
+          ) : (
+            <ListProposals
+              listProposals={myProposals}
+              title={'My proposals'}
+              type='owner'
+            />
+          )}
+
+          <ListProposals
+            listProposals={allProposals}
+            title={isExplorePage ? '' : 'All proposals'}
+            type='all'
+            isExcludeDraftMission={isExplorePage ? true : false}
+          />
+        </div>
+      ),
+    });
+  }
 
   if (!isExplorePage) {
     tabItems.push({
