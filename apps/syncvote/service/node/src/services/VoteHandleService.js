@@ -2,11 +2,8 @@ const { supabase } = require('../configs/supabaseClient');
 const {
   VoteMachineController,
 } = require('../models/votemachines/VotingController');
-<<<<<<< HEAD
 const moment = require('moment');
 const { insertCurrentVoteData } = require('./CurrentVoteDataService');
-=======
->>>>>>> main
 
 async function handleVoting(props) {
   return new Promise(async (resolve, reject) => {
@@ -25,7 +22,6 @@ async function handleVoting(props) {
         });
       } else {
         try {
-<<<<<<< HEAD
           // 1️⃣ check mission is not created or publish
           if (mission_vote_details.length === 0) {
             resolve({
@@ -53,55 +49,11 @@ async function handleVoting(props) {
             // update data of current vote data
 
             // 1. Get the data was created by voteMachine
-=======
-          let voteMachineController = new VoteMachineController({});
-
-          // 1️⃣ check if it is the first time of vote
-          if (mission_vote_details.length === 0) {
-            // check if this mission was not created
-            const { data: mission } = await supabase
-              .from('mission')
-              .select('*')
-              .eq('id', mission_id);
-
-            if (mission.length === 0) {
-              resolve({
-                status: 'ERR',
-                message: 'This mission was not created',
-              });
-              return;
-            }
-
-            // check if this mission was not going to publish
-            if (mission[0].status === 'DRAFT') {
-              resolve({
-                status: 'ERR',
-                message: 'This mission was not publish',
-              });
-              return;
-            }
-
-            // create a new current vote data
-            // 1. Get the root checkpoint data
-            const { data: rootCheckpoint } = await supabase
-              .from('checkpoint')
-              .select('*')
-              .eq('id', `${mission_id}-root`);
-
-            // 2. Get the data was created by voteMachine
->>>>>>> main
             const {
               initData,
               error: init_error,
               result,
-<<<<<<< HEAD
             } = voteMachineController.initDataForCVD();
-=======
-            } = voteMachineController.initDataForCVD({
-              vote_machine_type: rootCheckpoint[0].vote_machine_type,
-              options: rootCheckpoint[0].options,
-            });
->>>>>>> main
 
             // check if cannot init the data for current_vote_data
             if (!initData) {
@@ -112,7 +64,6 @@ async function handleVoting(props) {
               return;
             }
 
-<<<<<<< HEAD
             // 2. Update result current_vote_data for checkpoint
             await supabase
               .from('current_vote_data')
@@ -132,42 +83,6 @@ async function handleVoting(props) {
 
           // 4️⃣ check if fallback
           const { fallback, error: f_error } = voteMachineController.fallBack();
-=======
-            // 3. Create new current_vote_data for root checkpoint
-            const { data: newCurrentVoteData } = await supabase
-              .from('current_vote_data')
-              .insert({
-                checkpoint_id: rootCheckpoint[0].id,
-                result: result,
-                who: [],
-              })
-              .select('*');
-
-            // 4. Update the current_vote_data_id for mission
-            await supabase
-              .from('mission')
-              .update({ current_vote_data_id: newCurrentVoteData[0].id })
-              .eq('id', mission_id)
-              .select('*');
-
-            // 5. Get new mission_vote_details
-            mission_vote_details = (
-              await supabase
-                .from('mission_vote_details')
-                .select(`*`)
-                .eq('mission_id', mission_id)
-            ).data;
-          }
-
-          // Update voteMachineController
-          voteMachineController = new VoteMachineController(
-            mission_vote_details[0]
-          );
-
-          // 2️⃣ check if fallback
-          const { fallback, error: f_error } = voteMachineController.fallBack();
-
->>>>>>> main
           if (fallback) {
             console.log('Move this mission to fallback checkpoint');
             resolve({
@@ -177,11 +92,7 @@ async function handleVoting(props) {
             return;
           }
 
-<<<<<<< HEAD
           // 5️⃣ check if recorded
-=======
-          // 3️⃣ check if recorded
->>>>>>> main
           const { notRecorded, error: r_error } =
             voteMachineController.recordVote({
               identify,
@@ -197,11 +108,7 @@ async function handleVoting(props) {
             return;
           }
 
-<<<<<<< HEAD
           // 6️⃣ write this record to vote data record and change the result
-=======
-          // 4️⃣ write this record to vote data record and change the result
->>>>>>> main
           const { error: nv_error } = await supabase
             .from('vote_record')
             .insert({
@@ -217,16 +124,10 @@ async function handleVoting(props) {
               status: 'ERR',
               message: nv_error,
             });
-<<<<<<< HEAD
             return;
           }
 
           // 7️⃣ change the result
-=======
-          }
-
-          // 5️⃣ change the result
->>>>>>> main
           const { who, result } = voteMachineController.getResult();
           const { error: cvd_err } = await supabase
             .from('current_vote_data')
@@ -238,7 +139,6 @@ async function handleVoting(props) {
               status: 'ERR',
               message: cvd_err,
             });
-<<<<<<< HEAD
             return;
           }
 
@@ -333,12 +233,6 @@ async function handleVoting(props) {
             status: 'OK',
             message: 'Vote successfully',
           });
-=======
-          }
-
-          // 6️⃣ Check if tally
-          const shouldTally = voteMachineController.getResult();
->>>>>>> main
         } catch (error) {
           console.log(error);
         }
@@ -355,7 +249,6 @@ async function handleVoting(props) {
   });
 }
 
-<<<<<<< HEAD
 async function handleSubbmission(props) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -487,8 +380,4 @@ async function handleSubbmission(props) {
 module.exports = {
   handleVoting,
   handleSubbmission,
-=======
-module.exports = {
-  handleVoting,
->>>>>>> main
 };

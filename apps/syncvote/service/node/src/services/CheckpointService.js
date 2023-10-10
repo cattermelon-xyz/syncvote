@@ -6,10 +6,6 @@ async function insertCheckpoint(props) {
       .from('checkpoint')
       .insert(props)
       .select('*');
-<<<<<<< HEAD
-=======
-
->>>>>>> main
     if (error) {
       return error;
     }

@@ -3,7 +3,6 @@ const { VotingMachine } = require('.');
 class SingleVote extends VotingMachine {
   constructor(props) {
     super(props);
-<<<<<<< HEAD
     const { thresholds, includedAbstain, quorum } = props;
     this.thresholds = thresholds;
     this.includedAbstain = includedAbstain;
@@ -48,23 +47,6 @@ class SingleVote extends VotingMachine {
 
     // Are there enough conditions for tally?
     const { shouldTally } = this.shouldTally();
-=======
-  }
-
-  initDataForCVD(data) {
-    console.log('Haha', data);
-  }
-
-  fallBack(data) {
-    // check fallback of VotingMachine class
-    const { fallBack, error } = super.fallBack(data);
-    if (fallBack) {
-      return { fallBack, error };
-    }
-
-    // Are there enough conditions for tally?
-    const shouldTally = this.shouldTally(data);
->>>>>>> main
     if (shouldTally) {
       return { fallback: true, error: 'This checkpoint should tally' };
     }
@@ -72,20 +54,12 @@ class SingleVote extends VotingMachine {
     return {};
   }
 
-<<<<<<< HEAD
   recordVote(voteData) {
     // check recordVote of VotingMachine class
     const { notRecorded, error } = super.recordVote(voteData);
 
     if (notRecorded) {
       return { notRecorded, error };
-=======
-  recordVote(data, voteData) {
-    // check recordVote of VotingMachine class
-    const { notRecorded } = super.recordVote(data, voteData);
-    if (notRecorded) {
-      return super.recordVote(data, voteData);
->>>>>>> main
     }
 
     // check if options is single vote
@@ -93,7 +67,6 @@ class SingleVote extends VotingMachine {
       return { notRecorded: true, error: 'You need to pick one' };
     }
 
-<<<<<<< HEAD
     // check if user is already vote
     if (this.who !== null && this.who.includes(voteData.identify)) {
       return { notRecorded: true, error: 'User is already voted' };
@@ -155,23 +128,6 @@ class SingleVote extends VotingMachine {
     }
 
     return { shouldTally: false };
-=======
-    // check if user is alreadyvote
-    if (data.who !== null && data.who.includes(voteData.identify)) {
-      return { notRecorded: true, error: 'User is already voted' };
-    }
-
-    return {};
-  }
-
-  shouldTally(data) {
-    super.shouldTally();
-    const shouldTally = false;
-
-    console.log(data);
-
-    return shouldTally;
->>>>>>> main
   }
 }
 

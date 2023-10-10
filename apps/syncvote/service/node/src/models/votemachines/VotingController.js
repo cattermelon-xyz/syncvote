@@ -16,15 +16,9 @@ class VoteMachineController {
     this.vote_machine_type = props.vote_machine_type;
   }
 
-<<<<<<< HEAD
   initDataForCVD() {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].initDataForCVD();
-=======
-  initDataForCVD(data) {
-    if (this.votingTypes[data.vote_machine_type]) {
-      return this.votingTypes[data.vote_machine_type].initDataForCVD(data);
->>>>>>> main
     } else {
       throw new Error(`Invalid data`);
     }
