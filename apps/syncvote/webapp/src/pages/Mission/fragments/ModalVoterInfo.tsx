@@ -22,12 +22,19 @@ const ModalVoterInfo: React.FC<Props> = ({
       .validateFields()
       .then((values) => {
         form.resetFields();
-        const voteData = {
+        let voteData: any = {
           identify: values.info,
           option: option,
-          voting_power: values.votepower,
           mission_id: missionId,
         };
+
+        if (option[0] === -1) {
+          voteData.voting_power = 0;
+        } else {
+          voteData.voting_power = values.votepower;
+        }
+
+        console.log('voteData', voteData);
 
         vote({
           data: voteData,

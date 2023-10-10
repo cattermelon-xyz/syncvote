@@ -203,6 +203,15 @@ export const getTimeRemainingToEnd = (endToVote: string) => {
     : `${hours} hours`;
 };
 
+export const extractCurrentCheckpointId = (inputStr: string) => {
+  const parts = inputStr.split('-');
+  if (parts.length <= 1) {
+    return null;
+  }
+  parts.shift();
+  return parts.join('-');
+};
+
 /**
  * 13 - 4 = 9; 13: minuend, 4: substrahend, 9: difference
  * @param minuend: number[]

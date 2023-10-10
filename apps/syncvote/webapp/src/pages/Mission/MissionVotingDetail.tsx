@@ -27,6 +27,8 @@ import {
 } from '@utils/helpers';
 import ModalListParticipants from './fragments/ModalListParticipants';
 import ModalVoterInfo from './fragments/ModalVoterInfo';
+import { extractCurrentCheckpointId } from '@utils/helpers';
+import parse from 'html-react-parser';
 
 const MissionVotingDetail = () => {
   const { missionIdString } = useParams();
@@ -38,6 +40,8 @@ const MissionVotingDetail = () => {
   const [openModalVoterInfo, setOpenModalVoterInfo] = useState<boolean>(false);
   const [listParticipants, setListParticipants] = useState<any[]>([]);
   const [selectedOption, setSelectedOption] = useState<number>(-1);
+  const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
+
   const dispatch = useDispatch();
 
   const fetchData = () => {
@@ -45,6 +49,17 @@ const MissionVotingDetail = () => {
       missionId,
       onSuccess: (data: any) => {
         setMissionData(data);
+        console.log('data', data);
+        const currentCheckpointId = extractCurrentCheckpointId(data.id);
+        const checkpointData = data.data.checkpoints.filter(
+          (checkpoint: any) => checkpoint.id === currentCheckpointId
+        );
+        console.log('checkpointData', checkpointData[0]);
+        let checkpointDataAfterHandle = checkpointData[0];
+        if (checkpointData[0].includedAbstain === true) {
+          checkpointDataAfterHandle.data.options.push('Abstain');
+        }
+        setCurrentCheckpointData(checkpointDataAfterHandle);
       },
       onError: (error) => {
         Modal.error({
@@ -61,25 +76,28 @@ const MissionVotingDetail = () => {
   }, []);
 
   useEffect(() => {
-    if (missionData) {
+    console.log('missionData', missionData);
+  }, [missionData]);
+
+  useEffect(() => {
+    if (missionData && currentCheckpointData) {
       if (missionData.result) {
-        const totalVotes = Object.values(missionData.result).reduce(
-          (acc: number, vote: any) => acc + vote,
+        const totalVotingPower = Object.values(missionData.result).reduce(
+          (acc: number, voteData: any) => acc + voteData.voting_power,
           0
         );
-        if (totalVotes < missionData.quorum) {
-          setIsReachedQuorum(false);
+        if (totalVotingPower >= currentCheckpointData.quorum) {
+          setIsReachedQuorum(true);
         }
       }
 
-      const participationObj = JSON.parse(missionData.participation);
-      setListParticipants(participationObj.data);
+      setListParticipants(currentCheckpointData.participation.data);
     }
   }, [missionData, selectedOption]);
 
   return (
     <>
-      {missionData && (
+      {missionData && currentCheckpointData && (
         <div className='w-[1033px] flex gap-4'>
           <div className='w-2/3'>
             <div className='flex flex-col mb-10 gap-6'>
@@ -113,9 +131,11 @@ const MissionVotingDetail = () => {
               </Card>
               <Card className='p-4'>
                 <div className='flex flex-col gap-6'>
-                  <p className='text-xl font-medium'>Proposal content</p>
-                  {missionData?.desc ? (
-                    <p>{missionData?.desc}</p>
+                  <p className='text-xl font-medium'>Checkpoint description</p>
+                  {currentCheckpointData?.description ? (
+                    <p className='ml-4'>
+                      {parse(currentCheckpointData?.description)}
+                    </p>
                   ) : (
                     <div className='flex justify-center items-center w-full'>
                       <Empty />
@@ -136,17 +156,26 @@ const MissionVotingDetail = () => {
               <Card className='p-4'>
                 <div className='flex flex-col gap-6'>
                   <p className='text-xl font-medium'>Vote</p>
-                  {missionData.options.map((option: any, index: any) => (
-                    <Card className='w-full' key={index}>
-                      {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                      <Radio
-                        checked={selectedOption === index + 1}
-                        onChange={() => setSelectedOption(index + 1)}
-                      >
-                        {`${index + 1}. ${option}`}
-                      </Radio>
-                    </Card>
-                  ))}
+                  {currentCheckpointData.data.options.map(
+                    (option: any, index: any) => (
+                      <Card className='w-full' key={index}>
+                        {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
+                        <Radio
+                          checked={
+                            selectedOption ===
+                            (option === 'Abstain' ? -1 : index + 1)
+                          }
+                          onChange={() =>
+                            setSelectedOption(
+                              option === 'Abstain' ? -1 : index + 1
+                            )
+                          }
+                        >
+                          {`${index + 1}. ${option}`}
+                        </Radio>
+                      </Card>
+                    )
+                  )}
                   <Button
                     type='primary'
                     className='w-full'
@@ -222,31 +251,43 @@ const MissionVotingDetail = () => {
             {missionData.result ? (
               <Card className=''>
                 <p className='mb-6 text-base font-semibold'>Voting results</p>
-                {missionData.options.map((option: any, index: any) => {
-                  const totalVotes = Object.values(missionData.result).reduce(
-                    (acc: number, vote: any) => acc + vote,
-                    0
-                  );
+                {currentCheckpointData.data.options.map(
+                  (option: any, index: any) => {
+                    if (option === 'Abstain') {
+                      index = -1;
+                    }
+                    const totalVotingPower = Object.values(
+                      missionData.result
+                    ).reduce(
+                      (acc: number, voteData: any) =>
+                        acc + voteData.voting_power,
+                      0
+                    );
 
-                  let percentage;
-                  if (missionData.quorum > totalVotes) {
-                    percentage =
-                      (missionData.result[option] / missionData.quorum) * 100;
-                  } else {
-                    percentage =
-                      (missionData.result[option] / totalVotes) * 100;
+                    let percentage;
+                    if (currentCheckpointData.quorum >= totalVotingPower) {
+                      percentage =
+                        (missionData.result[index].voting_power /
+                          currentCheckpointData.quorum) *
+                        100;
+                    } else {
+                      percentage =
+                        (missionData.result[index].voting_power /
+                          totalVotingPower) *
+                        100;
+                    }
+                    percentage = parseFloat(percentage.toFixed(2));
+                    return (
+                      <div key={index} className='flex flex-col gap-2'>
+                        <p className='text-base font-semibold'>{option}</p>
+                        <p className='text-base'>
+                          {missionData.result[option]} votes
+                        </p>
+                        <Progress percent={percentage} size='small' />
+                      </div>
+                    );
                   }
-                  percentage = parseFloat(percentage.toFixed(2));
-                  return (
-                    <div key={index} className='flex flex-col gap-2'>
-                      <p className='text-base font-semibold'>{option}</p>
-                      <p className='text-base'>
-                        {missionData.result[option]} votes
-                      </p>
-                      <Progress percent={percentage} size='small' />
-                    </div>
-                  );
-                })}
+                )}
                 {isReachedQuorum ? (
                   <div className='w-full flex justify-center items-center mt-2'>
                     <Button className='w-full bg-[#EAF6EE] text-[#29A259]'>
@@ -279,12 +320,10 @@ const MissionVotingDetail = () => {
                 <div className='flex justify-between'>
                   <p className='text-base '>Remaining duration</p>
                   <p className='text-base font-semibold'>
-                    {getTimeRemainingToEnd(missionData.endToVote)}
+                    {getTimeRemainingToEnd(missionData.endedAt)}
                   </p>
                 </div>
-                <p className='text-right'>
-                  {formatDate(missionData.endToVote)}
-                </p>
+                <p className='text-right'>{formatDate(missionData.endedAt)}</p>
               </div>
               <hr className='w-full my-4' />
               <div className='flex justify-between'>
@@ -297,18 +336,26 @@ const MissionVotingDetail = () => {
                 </p>
               </div>
               <hr className='w-full my-4' />
-              <div className='flex justify-between'>
-                <p className='text-base '>Threshold counted by</p>
-                <p className='text-base font-semibold'>Total votes made</p>
-              </div>
-              <div className='flex justify-between'>
-                <p className='text-base '>Threshold</p>
-                <p className='text-base font-semibold'>51 votes</p>
-              </div>
+              {currentCheckpointData?.data?.threshold ? (
+                <div>
+                  <div className='flex justify-between'>
+                    <p className='text-base '>Threshold counted by</p>
+                    <p className='text-base font-semibold'>Total votes made</p>
+                  </div>
+                  <div className='flex justify-between'>
+                    <p className='text-base '>Threshold</p>
+                    <p className='text-base font-semibold'>
+                      {currentCheckpointData?.data?.threshold}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )}
               <div className='flex justify-between'>
                 <p className='text-base '>Quorum</p>
                 <p className='text-base font-semibold'>
-                  {missionData.quorum} votes
+                  {currentCheckpointData.quorum} votes
                 </p>
               </div>
             </Card>
@@ -321,7 +368,7 @@ const MissionVotingDetail = () => {
         listParticipants={listParticipants}
       />
       <ModalVoterInfo
-        option={[selectedOption - 1]}
+        option={selectedOption === -1 ? [-1] : [selectedOption - 1]}
         open={openModalVoterInfo}
         onClose={() => setOpenModalVoterInfo(false)}
         missionId={missionId}
