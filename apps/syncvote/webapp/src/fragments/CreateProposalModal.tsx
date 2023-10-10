@@ -14,11 +14,7 @@ interface CreateProposalModalProps {
   open: boolean;
   workflow: any;
   onCancel: () => void;
-<<<<<<< HEAD
   workflowVersion?: any;
-=======
-  workflowVersion: any;
->>>>>>> main
   missionId?: number;
 }
 
@@ -71,15 +67,9 @@ export const CreateProposalModal = ({
         missionId: missionId,
         onLoad: (data: any) => {
           const mission = data[0];
-<<<<<<< HEAD
           setName(mission.title);
           setTemplateOfDoc(mission.docs[0]?.template);
           setDocsOfMission(mission.docs);
-=======
-          setMission(mission);
-          setName(mission.title);
-          setDesc(mission.desc);
->>>>>>> main
         },
         dispatch,
       });
@@ -98,20 +88,12 @@ export const CreateProposalModal = ({
         let missionData = {
           status: status,
           title: name,
-<<<<<<< HEAD
           docs: docsOfMission,
-=======
-          desc: desc,
->>>>>>> main
         };
 
         await updateMission({
           missionId: missionId,
           missionData: missionData,
-<<<<<<< HEAD
-=======
-          workflowVersion: workflowVersion,
->>>>>>> main
           onSuccess: () => {
             Modal.success({
               title: 'Success',
@@ -130,38 +112,12 @@ export const CreateProposalModal = ({
           creator_id: user.id,
           status: status,
           title: name,
-<<<<<<< HEAD
           data: data,
           icon_url: workflow.icon_url,
           start: data.start,
           workflow_version_id: workflowVersion.id,
           docs: docsOfMission,
         };
-=======
-          desc: desc,
-          data: data,
-          icon_url: workflow.icon_url,
-          workflow_version_id: workflowVersion.id,
-        };
-
-        await createMission({
-          missionData,
-          workflowVersion,
-          onSuccess: () => {
-            Modal.success({
-              title: 'Success',
-              content: 'Create a new proposal successfully',
-            });
-          },
-          onError: () => {
-            Modal.error({
-              title: 'Error',
-              content: 'Error to create a proposal',
-            });
-          },
-        });
-      }
->>>>>>> main
 
         await createMission({
           missionData,
