@@ -179,15 +179,33 @@ async function handleVoting(props) {
               );
             }
 
+            // check if next checkpoint is end checkpoint
+            const next_checkpoint_id = `${mission_id}-${
+              mission_vote_details[0].children[tallyResult.index]
+            }`;
+
+            // get data of next checkpoint
+            const { data: next_checkpoint } = await supabase
+              .from('checkpoint')
+              .select('isEnd')
+              .eq('id', next_checkpoint_id);
+
+            let endedAt = null;
+            let mission_status = 'PUBLIC';
+
+            if (next_checkpoint[0].isEnd) {
+              endedAt = startToVote;
+              mission_status = 'STOPPED';
+            }
+
             // create current vote data for next checkpoint
             const { data: new_current_vote_data } = await supabase
               .from('current_vote_data')
               .insert({
-                checkpoint_id: `${mission_id}-${
-                  mission_vote_details[0].children[tallyResult.index]
-                }`,
+                checkpoint_id: next_checkpoint_id,
                 initData: tallyResult,
                 startToVote: startToVote,
+                endedAt: endedAt,
               })
               .select('*');
 
@@ -195,11 +213,13 @@ async function handleVoting(props) {
             const progress = mission_vote_details[0].progress.concat(
               new_current_vote_data[0].checkpoint_id
             );
-            const { error: m_err } = await supabase
+
+            await supabase
               .from('mission')
               .update({
                 current_vote_data_id: new_current_vote_data[0].id,
                 progress: progress,
+                status: mission_status,
               })
               .eq('id', mission_id);
 
