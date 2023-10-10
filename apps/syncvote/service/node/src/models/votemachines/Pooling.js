@@ -8,6 +8,10 @@ class Pooling extends VotingMachine {
   recordVote() {
     console.log('SingleVote');
   }
+
+  tally() {
+    // should calculate voting power of pool vote
+  }
 }
 module.exports = {
   Pooling,

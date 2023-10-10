@@ -95,6 +95,7 @@ const ResultCalculator = (props: ResultCalculatorProps) => {
             setValue={(val: number) => {
               setValue({ quorum: val });
             }}
+            allowPercentage={false}
           />
         </Space>
       )}
