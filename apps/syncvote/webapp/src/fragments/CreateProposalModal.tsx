@@ -143,6 +143,8 @@ export const CreateProposalModal = ({
 
   // const reset = () => {
   //   setName('');
+  // const reset = () => {
+  //   setName('');
 
   //   const doc = filtered_docs.find((doc: any) => doc.id === value);
   //   setTemplateOfDoc(doc?.template);
