@@ -44,6 +44,11 @@ class VotingMachine {
       return { fallback: true, error: 'This checkpoint was not ready to vote' };
     }
 
+    // check if this checkpoint is ended
+    if (this.endedAt) {
+      return { fallback: true, error: 'This checkpoint is ended' };
+    }
+
     // check if this checkpoint is outdate
     const createdAtMoment = moment(this.startToVote);
     const now = moment();
