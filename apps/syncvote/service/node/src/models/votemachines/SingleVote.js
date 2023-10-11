@@ -3,21 +3,50 @@ const { VotingMachine } = require('.');
 class SingleVote extends VotingMachine {
   constructor(props) {
     super(props);
+    const { thresholds, includedAbstain, quorum } = props;
+    this.thresholds = thresholds;
+    this.includedAbstain = includedAbstain;
+    this.quorum = quorum;
   }
 
-  initDataForCVD(data) {
-    console.log('Haha', data);
+  initDataForCVD() {
+    const options = this.options;
+    if (options.length === 0) {
+      return {
+        initData: false,
+        error: 'Cannot init data because options is empty',
+      };
+    }
+    let result = {};
+    options.map((_, index) => {
+      result[index] = {
+        count: 0,
+        voting_power: 0,
+      };
+    });
+
+    if (this.includedAbstain) {
+      result['-1'] = {
+        count: 0,
+        voting_power: 0,
+      };
+    }
+
+    return {
+      initData: true,
+      result: result,
+    };
   }
 
-  fallBack(data) {
+  fallBack() {
     // check fallback of VotingMachine class
-    const { fallBack, error } = super.fallBack(data);
-    if (fallBack) {
-      return { fallBack, error };
+    const { fallback, error } = super.fallBack();
+    if (fallback) {
+      return { fallback, error };
     }
 
     // Are there enough conditions for tally?
-    const shouldTally = this.shouldTally(data);
+    const { shouldTally } = this.shouldTally();
     if (shouldTally) {
       return { fallback: true, error: 'This checkpoint should tally' };
     }
@@ -25,11 +54,12 @@ class SingleVote extends VotingMachine {
     return {};
   }
 
-  recordVote(data, voteData) {
+  recordVote(voteData) {
     // check recordVote of VotingMachine class
-    const { notRecorded } = super.recordVote(data, voteData);
+    const { notRecorded, error } = super.recordVote(voteData);
+
     if (notRecorded) {
-      return super.recordVote(data, voteData);
+      return { notRecorded, error };
     }
 
     // check if options is single vote
@@ -37,21 +67,67 @@ class SingleVote extends VotingMachine {
       return { notRecorded: true, error: 'You need to pick one' };
     }
 
-    // check if user is alreadyvote
-    if (data.who !== null && data.who.includes(voteData.identify)) {
+    // check if user is already vote
+    if (this.who !== null && this.who.includes(voteData.identify)) {
       return { notRecorded: true, error: 'User is already voted' };
     }
 
+    // check if abstain, dont increase the result, abstain send option [-1]'
+    if (!this.includedAbstain && voteData.option[0] === -1) {
+      return { notRecorded: true, error: 'Cannot vote abstain option' };
+    }
+
+    if (voteData.option[0] === -1) {
+      if (!this.who || this.who.length === 0) {
+        this.who = [voteData.identify];
+      } else {
+        this.who = this.who.concat(voteData.identify);
+      }
+      this.result['-1'].count += 1;
+    } else {
+      if (!this.who || this.who.length === 0) {
+        this.who = [voteData.identify];
+      } else {
+        this.who = this.who.concat(voteData.identify);
+      }
+      if (this.participation.type === 'identity') {
+        this.result[voteData.option[0]].count += 1;
+        this.result[voteData.option[0]].voting_power += 1;
+      } else {
+        // Dont have vote by token
+      }
+    }
     return {};
   }
 
-  shouldTally(data) {
+  shouldTally() {
     super.shouldTally();
-    const shouldTally = false;
 
-    console.log(data);
+    if (this.who && this.who.length !== 0) {
+      // check if the number of voter is bigger than quorum
+      let thresholdsNumber = 0;
 
-    return shouldTally;
+      // check if thesholes is percentage
+      if (this.thresholds > 1) {
+        thresholdsNumber = this.thresholds;
+      } else {
+        if (this.thresholds * this.quorum <= this.who.length) {
+          thresholdsNumber = this.thresholds * this.who.length;
+        } else {
+          thresholdsNumber = this.thresholds * this.quorum;
+        }
+      }
+      for (let index in this.options) {
+        if (this.result[index].count >= thresholdsNumber) {
+          if (this.who.length >= this.quorum) {
+            this.tallyResult = { index: index, ...this.result[index] };
+            return { shouldTally: true, tallyResult: this.tallyResult };
+          }
+        }
+      }
+    }
+
+    return { shouldTally: false };
   }
 }
 
