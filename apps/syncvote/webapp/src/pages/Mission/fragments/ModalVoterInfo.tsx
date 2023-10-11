@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Form, Input } from 'antd';
 import { vote } from '@axios/vote';
+import { useDispatch } from 'react-redux';
 
 interface Props {
   open: boolean;
@@ -16,7 +17,7 @@ const ModalVoterInfo: React.FC<Props> = ({
   missionId,
 }) => {
   const [form] = Form.useForm();
-
+  const dispatch = useDispatch();
   const handleOk = async () => {
     form
       .validateFields()
@@ -25,14 +26,9 @@ const ModalVoterInfo: React.FC<Props> = ({
         let voteData: any = {
           identify: values.info,
           option: option,
+          voting_power: values.votepower,
           mission_id: missionId,
         };
-
-        if (option[0] === -1) {
-          voteData.voting_power = 0;
-        } else {
-          voteData.voting_power = values.votepower;
-        }
 
         console.log('voteData', voteData);
 
@@ -40,10 +36,17 @@ const ModalVoterInfo: React.FC<Props> = ({
           data: voteData,
           onSuccess: (res: any) => {
             console.log('res', res);
-            Modal.success({
-              title: 'Success',
-              content: 'Voting successfully',
-            });
+            if (res.data.status === 'FALLBACK') {
+              Modal.error({
+                title: 'Error',
+                content: res.data.message,
+              });
+            } else {
+              Modal.success({
+                title: 'Success',
+                content: 'Voting successfully',
+              });
+            }
           },
           onError: () => {
             Modal.error({
@@ -51,6 +54,7 @@ const ModalVoterInfo: React.FC<Props> = ({
               content: 'Voting error',
             });
           },
+          dispatch,
         });
 
         onClose();

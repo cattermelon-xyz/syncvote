@@ -193,33 +193,44 @@ const MissionVotingDetail = () => {
                     <p className='w-8/12'>Identity</p>
                     <p className='w-4/12 text-right'>Vote</p>
                   </div>
-                  <div className='flex mb-4'>
-                    <div className='w-8/12 flex items-center gap-2'>
-                      <Icon iconUrl='' presetIcon='' size='medium' />
-                      <p>limon@gmail.com</p>
-                    </div>
-                    <p className='w-4/12 text-right'>Yes</p>
-                  </div>
-                  <div className='flex mb-4'>
-                    <div className='w-8/12 flex items-center gap-2'>
-                      <Icon iconUrl='' presetIcon='' size='medium' />
-                      <p>k2@hectagon.finance</p>
-                    </div>
-                    <p className='w-4/12 text-right'>Yes</p>
-                  </div>
-                  <div className='flex mb-4'>
-                    <div className='w-8/12 flex items-center gap-2'>
-                      <Icon iconUrl='' presetIcon='' size='medium' />
-                      <p>tony@refine.net</p>
-                    </div>
-                    <p className='w-4/12 text-right'>Yes</p>
-                  </div>
+                  {missionData.vote_record &&
+                    missionData.vote_record.map(
+                      (record: any, recordIndex: number) => {
+                        return (
+                          <div className='flex mb-4' key={recordIndex}>
+                            <div className='w-8/12 flex items-center gap-2'>
+                              <Icon iconUrl='' presetIcon='' size='medium' />
+                              <p>{record.identify}</p>
+                            </div>
+                            {record.option.map(
+                              (option: any, optionIndex: number) => {
+                                const voteOption =
+                                  option === '-1'
+                                    ? 'Abstain'
+                                    : currentCheckpointData.data.options[
+                                        parseInt(option)
+                                      ];
+                                console.log('voteOption', voteOption);
+                                return (
+                                  <p
+                                    key={optionIndex}
+                                    className='w-4/12 text-right'
+                                  >
+                                    {voteOption}
+                                  </p>
+                                );
+                              }
+                            )}
+                          </div>
+                        );
+                      }
+                    )}
                 </div>
-                <div className='w-full flex justify-center items-center'>
+                {/* <div className='w-full flex justify-center items-center'>
                   <Button className='mt-4' icon={<ReloadOutlined />}>
                     View More
                   </Button>
-                </div>
+                </div> */}
               </Card>
             </Space>
           </div>
@@ -253,8 +264,9 @@ const MissionVotingDetail = () => {
                 <p className='mb-6 text-base font-semibold'>Voting results</p>
                 {currentCheckpointData.data.options.map(
                   (option: any, index: any) => {
+                    // still calculate voting_power of Abstain but not show in result
                     if (option === 'Abstain') {
-                      index = -1;
+                      return <div key={-1}></div>;
                     }
                     const totalVotingPower = Object.values(
                       missionData.result

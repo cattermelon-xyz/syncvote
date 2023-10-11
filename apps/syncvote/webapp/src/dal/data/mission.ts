@@ -94,7 +94,24 @@ export const queryAMissionDetail = async ({
     .select('*')
     .eq('mission_id', missionId);
   if (!error) {
-    onSuccess(data[0]);
+    const { data: dataVoteRecords, error: errorVoteRecord } = await supabase
+      .from('vote_record')
+      .select('*')
+      .eq('current_vote_data_id', data[0].cvd_id);
+
+    if (!errorVoteRecord) {
+      const voteRecords = dataVoteRecords.map((voteRecord) => {
+        return {
+          identify: voteRecord.identify,
+          option: voteRecord.option,
+        };
+      });
+      const dataMissionAfterHandle = data[0];
+      dataMissionAfterHandle.vote_record = voteRecords;
+      onSuccess(dataMissionAfterHandle);
+    } else {
+      onError(errorVoteRecord);
+    }
   } else {
     onError(error);
   }
