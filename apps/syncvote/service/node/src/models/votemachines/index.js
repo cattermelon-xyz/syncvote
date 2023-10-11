@@ -1,10 +1,8 @@
 const moment = require('moment');
-const { isArraySubset } = require('../../functions/index');
 
 class VotingMachine {
   constructor(props) {
     const {
-      options,
       duration,
       cvd_created_at,
       who,

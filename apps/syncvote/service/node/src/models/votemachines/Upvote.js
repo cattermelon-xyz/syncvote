@@ -9,17 +9,9 @@ class UpVote extends VotingMachine {
   }
 
   initDataForCVD() {
-    const options = this.options;
-    if (options.length === 0) {
-      return {
-        initData: false,
-        error: 'Cannot init data because options is empty',
-      };
-    }
-
     let result = {
       '-1': {
-        cont: 0,
+        count: 0,
         voting_power: 0,
       },
       0: {
@@ -59,7 +51,7 @@ class UpVote extends VotingMachine {
     }
 
     // check if user's choice is wrong
-    if (voteData.option[0] !== 0 || voteData.option[0] !== 1) {
+    if (voteData.option[0] !== 0 && voteData.option[0] !== -1) {
       return { notRecorded: true, error: `Invalid choice` };
     }
 
@@ -105,7 +97,8 @@ class UpVote extends VotingMachine {
           thresholdsNumber = this.thresholds * this.quorum;
         }
       }
-      for (let index in this.options) {
+      const options = [0, -1];
+      for (let index of options) {
         if (this.result[index].count >= thresholdsNumber) {
           if (this.who.length >= this.quorum) {
             this.tallyResult = { index: index, ...this.result[index] };

@@ -116,7 +116,7 @@ export const CreateProposalModal = ({
           icon_url: workflow.icon_url,
           start: data.start,
           workflow_version_id: workflowVersion.id,
-          docs: docsOfMission,
+          // docs: docsOfMission,
         };
 
         await createMission({

@@ -3,7 +3,7 @@ const { VotingMachine } = require('.');
 class SingleVote extends VotingMachine {
   constructor(props) {
     super(props);
-    const { thresholds, includedAbstain, quorum } = props;
+    const { thresholds, includedAbstain, quorum, options } = props;
     this.thresholds = thresholds;
     this.includedAbstain = includedAbstain;
     this.quorum = quorum;

@@ -170,24 +170,26 @@ async function handleVoting(props) {
             const index = tallyResult.index;
 
             // check if delays
-            if (mission_vote_details[0].delays[index]) {
-              let delayUnits = `${mission_vote_details[0].delayUnits[index]}s`;
+            if (mission_vote_details[0].delays) {
+              if (mission_vote_details[0].delays[index]) {
+                let delayUnits = `${mission_vote_details[0].delayUnits[index]}s`;
 
-              startToVote = moment().add(
-                mission_vote_details[0].delays[index],
-                delayUnits
-              );
+                startToVote = moment().add(
+                  mission_vote_details[0].delays[index],
+                  delayUnits
+                );
+              }
             }
 
             // check if next checkpoint is end checkpoint
             const next_checkpoint_id = `${mission_id}-${
               mission_vote_details[0].children[tallyResult.index]
             }`;
-
+            console.log(next_checkpoint_id);
             // get data of next checkpoint
             const { data: next_checkpoint } = await supabase
               .from('checkpoint')
-              .select('isEnd')
+              .select('*')
               .eq('id', next_checkpoint_id);
 
             let endedAt = null;

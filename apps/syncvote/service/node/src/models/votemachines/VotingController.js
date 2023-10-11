@@ -1,6 +1,6 @@
 const { Pooling } = require('./Pooling');
 const { Veto } = require('./Veto');
-const { Upvote } = require('./Upvote');
+const { UpVote } = require('./Upvote');
 const { SingleVote } = require('./SingleVote');
 const { DocInput } = require('./DocInput');
 
@@ -8,8 +8,8 @@ class VoteMachineController {
   constructor(props) {
     this.votingTypes = {
       pooling: new Pooling(props),
-      veto: new Veto(props),
-      upvote: new Upvote(props),
+      Veto: new Veto(props),
+      UpVote: new UpVote(props),
       SingleChoiceRaceToMax: new SingleVote(props),
       DocInput: new DocInput(props),
     };
