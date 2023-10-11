@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
-import {
-  Card,
-  Button,
-  Radio,
-} from 'antd';
+import { Card, Button, Radio } from 'antd';
 
 interface Props {
   currentCheckpointData: any;
   onSelectedOption: any;
   setOpenModalVoterInfo: any;
+  missionData: any;
   setSubmission: any;
   submission: any;
 }
@@ -17,6 +14,7 @@ const VoteSection: React.FC<Props> = ({
   currentCheckpointData,
   onSelectedOption,
   setOpenModalVoterInfo,
+  missionData,
   setSubmission,
   submission,
 }) => {

@@ -30,6 +30,7 @@ import ModalVoterInfo from './fragments/ModalVoterInfo';
 import { extractCurrentCheckpointId } from '@utils/helpers';
 import parse from 'html-react-parser';
 import VoteSection from './fragments/VoteSection';
+import ShowDescription from './fragments/ShowDescription';
 
 const MissionVotingDetail = () => {
   const { missionIdString } = useParams();
@@ -42,7 +43,7 @@ const MissionVotingDetail = () => {
   const [listParticipants, setListParticipants] = useState<any[]>([]);
   const [selectedOption, onSelectedOption] = useState<number>(-1);
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
-  const [submission, setSubmission] = useState<any>()
+  const [submission, setSubmission] = useState<any>();
 
   const dispatch = useDispatch();
 
@@ -152,34 +153,19 @@ const MissionVotingDetail = () => {
                   <p className='w-[168px] truncate ...'>{missionData.author}</p>
                 </Space>
               </Card>
-              <Card className='p-4'>
-                <div className='flex flex-col gap-6'>
-                  <p className='text-xl font-medium'>Checkpoint description</p>
-                  {currentCheckpointData?.description ? (
-                    <p className='ml-4'>
-                      {parse(currentCheckpointData?.description)}
-                    </p>
-                  ) : (
-                    <div className='flex justify-center items-center w-full'>
-                      <Empty />
-                    </div>
-                  )}
-                  <Button
-                    style={{
-                      border: 'None',
-                      padding: '0px',
-                      boxShadow: 'None',
-                    }}
-                    className=''
-                  >
-                    {/* <p className='text-[#6200EE]'>View more</p> */}
-                  </Button>
-                </div>
-              </Card>
+              <ShowDescription
+                titleDescription={'Proposal content'}
+                description={missionData?.m_desc}
+              />
+              <ShowDescription
+                titleDescription={'Checkpoint description'}
+                description={currentCheckpointData?.description}
+              />
               <VoteSection
                 currentCheckpointData={currentCheckpointData}
                 setOpenModalVoterInfo={setOpenModalVoterInfo}
                 onSelectedOption={onSelectedOption}
+                missionData={missionData}
                 setSubmission={setSubmission}
                 submission={submission}
               />

@@ -26,7 +26,6 @@ export const CreateProposalModal = ({
   missionId = -1,
 }: CreateProposalModalProps) => {
   const dispatch = useDispatch();
-  const [mission, setMission] = useState<any>({});
   const [name, setName] = useState('');
 
   const user = useGetDataHook({
@@ -37,39 +36,16 @@ export const CreateProposalModal = ({
 
   const [isWarning, setIsWarning] = useState(false);
 
-  const [templateOfDoc, setTemplateOfDoc] = useState<any>('');
-
-  // To do: check if mission dont have doc
-  const root_docs = data.checkpoints[0]?.data?.docs || [];
-  let docs: IDoc[] = data.docs || [];
-  const [docsOfMission, setDocsOfMission] = useState(data.docs || []);
-
-  const root_doc_ids = root_docs.map((doc: any) => doc.id);
-  const filtered_docs = docs.filter((doc) => root_doc_ids.includes(doc.id));
-
-  const { orgIdString, workflowIdString, versionIdString } = useParams();
-  const [value, setValue] = useState<string>();
-  const [optionDocs, setOptionDocs] = useState<any>([]);
+  const [missionDesc, setMissionDesc] = useState<any>('');
 
   useEffect(() => {
-    if (docs) {
-      const optionDocs = filtered_docs.map((doc) => ({
-        key: doc.id,
-        label: <div className='flex items-center'>{doc.title}</div>,
-        value: doc.id,
-        template: doc.template,
-      }));
-
-      setOptionDocs(optionDocs);
-    }
     if (missionId !== -1) {
       queryAMission({
         missionId: missionId,
         onLoad: (data: any) => {
           const mission = data[0];
           setName(mission.title);
-          setTemplateOfDoc(mission.docs[0]?.template);
-          setDocsOfMission(mission.docs);
+          setMissionDesc(mission?.desc);
         },
         dispatch,
       });
@@ -88,7 +64,7 @@ export const CreateProposalModal = ({
         let missionData = {
           status: status,
           title: name,
-          docs: docsOfMission,
+          desc: missionDesc,
         };
 
         await updateMission({
@@ -116,7 +92,7 @@ export const CreateProposalModal = ({
           icon_url: workflow.icon_url,
           start: data.start,
           workflow_version_id: workflowVersion.id,
-          docs: docsOfMission,
+          desc: missionDesc,
         };
 
         await createMission({
@@ -226,59 +202,14 @@ export const CreateProposalModal = ({
                     disabled
                   ></Select>
                 </div>
-                <div className='text-sm text-[#575655] mb-2'>Select docs</div>
-                <div className='relative mb-2'>
-                  <Select
-                    className='w-3/4'
-                    options={optionDocs}
-                    onChange={(val) => {
-                      setValue(val);
-                      console.log(val, docsOfMission);
-
-                      const doc = docsOfMission.find(
-                        (doc: any) => doc.id === val
-                      );
-                      setTemplateOfDoc(doc?.template);
-                    }}
-                  />
-                  <Button
-                    className='absolute inset-y-0 right-0 mb-2'
-                    disabled={value ? false : true}
-                    onClick={() => {
-                      window.open(
-                        `/doc/${orgIdString}/${workflowIdString}/${versionIdString}/${value}`,
-                        '_blank',
-                        'noopener,noreferrer'
-                      );
-                    }}
-                  >
-                    View doc details
-                  </Button>
-                </div>
                 <div className='text-sm text-[#575655] mb-2'>
-                  Proposal content
+                  Proposal description
                 </div>
                 <div>
                   <TextEditor
-                    value={templateOfDoc}
+                    value={missionDesc}
                     setValue={(val: any) => {
-                      setTemplateOfDoc(val);
-                      console.log(value);
-
-                      if (value) {
-                        const updatedDocs = [...docsOfMission];
-                        const docIndex = updatedDocs.findIndex(
-                          (doc) => doc.id === value
-                        );
-                        if (docIndex !== -1) {
-                          updatedDocs[docIndex].template = val;
-                          setDocsOfMission(updatedDocs);
-                        } else {
-                          console.log(
-                            'Không tìm thấy tài liệu với id được chỉ định.'
-                          );
-                        }
-                      }
+                      setMissionDesc(val);
                     }}
                     id='text-editor'
                   />
