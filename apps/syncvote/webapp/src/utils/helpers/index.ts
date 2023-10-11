@@ -1,5 +1,6 @@
 import copy from 'copy-to-clipboard';
 import { AlertMessage } from 'types/common';
+import moment from 'moment';
 
 const cacheTime = import.meta.env.VITE_CACHED_TIME;
 export const isSelected = (item: any, listSelected: Array<any>) =>
@@ -164,43 +165,19 @@ const getTimeDifference = (startDate: Date, endDate: Date) => {
 };
 
 export const getTimeElapsedSinceStart = (startToVote: string) => {
-  const now = new Date(
-    Date.UTC(
-      new Date().getUTCFullYear(),
-      new Date().getUTCMonth(),
-      new Date().getUTCDate(),
-      new Date().getUTCHours(),
-      new Date().getUTCMinutes(),
-      new Date().getUTCSeconds()
-    )
-  );
-  const start = new Date(startToVote);
+  const now = moment.utc();
+  const start = moment.utc(startToVote);
+  const duration = moment.duration(start.diff(now));
 
-  const { days, hours } = getTimeDifference(start, now);
-
-  return days > 0 ? `${days} days ${hours} hours ago` : `${hours} hours ago`;
+  return duration.humanize(true);
 };
 
 export const getTimeRemainingToEnd = (endToVote: string) => {
-  const now = new Date(
-    Date.UTC(
-      new Date().getUTCFullYear(),
-      new Date().getUTCMonth(),
-      new Date().getUTCDate(),
-      new Date().getUTCHours(),
-      new Date().getUTCMinutes(),
-      new Date().getUTCSeconds()
-    )
-  );
-  const end = new Date(endToVote);
+  const now = moment.utc();
+  const end = moment.utc(endToVote);
+  const duration = moment.duration(end.diff(now));
 
-  const { days, hours } = getTimeDifference(now, end);
-
-  return days > 0
-    ? hours > 0
-      ? `${days} days ${hours} hours`
-      : `${days} days`
-    : `${hours} hours`;
+  return duration.humanize(true);
 };
 
 export const extractCurrentCheckpointId = (inputStr: string) => {

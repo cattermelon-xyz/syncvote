@@ -1,19 +1,6 @@
 import { useEffect, useState } from 'react';
-import {
-  Card,
-  Button,
-  Progress,
-  Space,
-  Tag,
-  Timeline,
-  Radio,
-  Empty,
-} from 'antd';
-import {
-  UploadOutlined,
-  ReloadOutlined,
-  BranchesOutlined,
-} from '@ant-design/icons';
+import { Card, Button, Progress, Space, Tag } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { Icon } from 'icon';
 import { useParams } from 'react-router-dom';
 import { queryAMissionDetail } from '@dal/data';
@@ -28,7 +15,7 @@ import {
 import ModalListParticipants from './fragments/ModalListParticipants';
 import ModalVoterInfo from './fragments/ModalVoterInfo';
 import { extractCurrentCheckpointId } from '@utils/helpers';
-import parse from 'html-react-parser';
+import MissionProgress from './fragments/MissionProgress';
 import VoteSection from './fragments/VoteSection';
 import ShowDescription from './fragments/ShowDescription';
 
@@ -59,6 +46,15 @@ const MissionVotingDetail = () => {
         );
         console.log('checkpointData', checkpointData[0]);
         let checkpointDataAfterHandle = checkpointData[0];
+
+        const startToVote = new Date(data.startToVote);
+        // convert second to millisecond of duration
+        const duration = checkpointData[0].duration * 1000;
+        const endTovote = new Date(
+          startToVote.getTime() + duration
+        ).toISOString();
+
+        checkpointDataAfterHandle.endToVote = endTovote;
 
         switch (checkpointData[0]?.vote_machine_type) {
           case 'SingleChoiceRaceToMax':
@@ -193,7 +189,6 @@ const MissionVotingDetail = () => {
                                     : currentCheckpointData.data.options[
                                         parseInt(option)
                                       ];
-                                console.log('voteOption', voteOption);
                                 return (
                                   <p
                                     key={optionIndex}
@@ -218,30 +213,9 @@ const MissionVotingDetail = () => {
             </Space>
           </div>
           <div className='flex-1 flex flex-col gap-4'>
-            <Card className=''>
-              <p className='mb-6 text-base font-semibold'>Progress</p>
-              <Timeline
-                items={[
-                  {
-                    color: '#D9D9D9',
-                    children: 'Temperature Check',
-                  },
-                  {
-                    color: '#D9D9D9',
-                    children: 'Proposal revision',
-                  },
-                  {
-                    color: 'green',
-                    children: 'Consensus Check',
-                  },
-                ]}
-              />
-              <div className='w-full flex justify-center items-center'>
-                <Button className='w-full' icon={<BranchesOutlined />}>
-                  View live workflow
-                </Button>
-              </div>
-            </Card>
+            {missionData?.progress && (
+              <MissionProgress progress={missionData?.progress} />
+            )}
             {missionData.result ? (
               <Card className=''>
                 <p className='mb-6 text-base font-semibold'>Voting results</p>
@@ -315,10 +289,12 @@ const MissionVotingDetail = () => {
                 <div className='flex justify-between'>
                   <p className='text-base '>Remaining duration</p>
                   <p className='text-base font-semibold'>
-                    {getTimeRemainingToEnd(missionData.endedAt)}
+                    {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
                   </p>
                 </div>
-                <p className='text-right'>{formatDate(missionData.endedAt)}</p>
+                <p className='text-right'>
+                  {formatDate(currentCheckpointData.endToVote)}
+                </p>
               </div>
               <hr className='w-full my-4' />
               <div className='flex justify-between'>
