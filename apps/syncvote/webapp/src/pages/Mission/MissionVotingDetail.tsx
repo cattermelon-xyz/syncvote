@@ -29,6 +29,7 @@ import ModalListParticipants from './fragments/ModalListParticipants';
 import ModalVoterInfo from './fragments/ModalVoterInfo';
 import { extractCurrentCheckpointId } from '@utils/helpers';
 import parse from 'html-react-parser';
+import VoteSection from './fragments/VoteSection';
 
 const MissionVotingDetail = () => {
   const { missionIdString } = useParams();
@@ -39,8 +40,9 @@ const MissionVotingDetail = () => {
     useState<boolean>(false);
   const [openModalVoterInfo, setOpenModalVoterInfo] = useState<boolean>(false);
   const [listParticipants, setListParticipants] = useState<any[]>([]);
-  const [selectedOption, setSelectedOption] = useState<number>(-1);
+  const [selectedOption, onSelectedOption] = useState<number>(-1);
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
+  const [submission, setSubmission] = useState<any>()
 
   const dispatch = useDispatch();
 
@@ -51,13 +53,34 @@ const MissionVotingDetail = () => {
         setMissionData(data);
         console.log('data', data);
         const currentCheckpointId = extractCurrentCheckpointId(data.id);
-        const checkpointData = data.data.checkpoints.filter(
+        const checkpointData = data?.data?.checkpoints.filter(
           (checkpoint: any) => checkpoint.id === currentCheckpointId
         );
         console.log('checkpointData', checkpointData[0]);
         let checkpointDataAfterHandle = checkpointData[0];
-        if (checkpointData[0].includedAbstain === true) {
-          checkpointDataAfterHandle.data.options.push('Abstain');
+
+        switch (checkpointData[0]?.vote_machine_type) {
+          case 'SingleChoiceRaceToMax':
+            if (checkpointData[0]?.includedAbstain === true) {
+              checkpointDataAfterHandle.data.options.push('Abstain');
+            }
+            break;
+          case 'UpVote':
+            checkpointDataAfterHandle.data.options = [];
+            checkpointDataAfterHandle.data.options.push('Upvote');
+            if (checkpointData[0]?.includedAbstain === true) {
+              checkpointDataAfterHandle.data.options.push('Abstain');
+            }
+            break;
+          case 'Veto':
+            checkpointDataAfterHandle.data.options = [];
+            checkpointDataAfterHandle.data.options.push('Upvote');
+            if (checkpointData[0]?.includedAbstain === true) {
+              checkpointDataAfterHandle.data.options.push('Abstain');
+            }
+            break;
+          default:
+            break;
         }
         setCurrentCheckpointData(checkpointDataAfterHandle);
       },
@@ -153,39 +176,13 @@ const MissionVotingDetail = () => {
                   </Button>
                 </div>
               </Card>
-              <Card className='p-4'>
-                <div className='flex flex-col gap-6'>
-                  <p className='text-xl font-medium'>Vote</p>
-                  {currentCheckpointData.data.options.map(
-                    (option: any, index: any) => (
-                      <Card className='w-full' key={index}>
-                        {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                        <Radio
-                          checked={
-                            selectedOption ===
-                            (option === 'Abstain' ? -1 : index + 1)
-                          }
-                          onChange={() =>
-                            setSelectedOption(
-                              option === 'Abstain' ? -1 : index + 1
-                            )
-                          }
-                        >
-                          {`${index + 1}. ${option}`}
-                        </Radio>
-                      </Card>
-                    )
-                  )}
-                  <Button
-                    type='primary'
-                    className='w-full'
-                    onClick={() => setOpenModalVoterInfo(true)}
-                    disabled={selectedOption ? false : true}
-                  >
-                    Vote
-                  </Button>
-                </div>
-              </Card>
+              <VoteSection
+                currentCheckpointData={currentCheckpointData}
+                setOpenModalVoterInfo={setOpenModalVoterInfo}
+                onSelectedOption={onSelectedOption}
+                setSubmission={setSubmission}
+                submission={submission}
+              />
               <Card className='p-4'>
                 <div className='flex flex-col gap-4'>
                   <p className='text-xl font-medium'>Votes</p>
@@ -255,7 +252,7 @@ const MissionVotingDetail = () => {
               />
               <div className='w-full flex justify-center items-center'>
                 <Button className='w-full' icon={<BranchesOutlined />}>
-                  View More
+                  View live workflow
                 </Button>
               </div>
             </Card>
