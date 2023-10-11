@@ -26,6 +26,13 @@ class DocInput extends VotingMachine {
 
     this.who = [voteData.identify];
     this.result = voteData.submission;
+    // [
+    //   {
+    //     arweaveId: 'arweaveId',
+    //     action: 'Edit || New || Appendix',
+    //     docId: '',
+    //   },
+    // ];
     this.tallyResult = [voteData.option];
     return {};
   }

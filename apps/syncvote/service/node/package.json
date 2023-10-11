@@ -18,6 +18,7 @@
     "http": "^0.0.1-security",
     "nodemon": "^3.0.1",
     "postgres": "^3.3.5",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "@supabase/supabase-js": "^2.21.0",
   }
 }

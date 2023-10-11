@@ -72,7 +72,6 @@ async function insertMission(props) {
             }
 
             if (checkpoint.id === newMission[0].start) {
-              console.log(2);
               // create current_vote_data
               const current_vote_data = await insertCurrentVoteData({
                 checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
@@ -81,8 +80,6 @@ async function insertMission(props) {
                 //   .add(checkpoint.duration, 'seconds')
                 //   .format(),
               });
-
-              console.log(current_vote_data);
 
               const { u_error } = await supabase
                 .from('mission')
@@ -101,9 +98,12 @@ async function insertMission(props) {
               }
 
               // update the progress for mission
-              await supabase.from('mission').update({
-                progress: [`${updateMission[0].id}-${checkpoint.id}`],
-              });
+              await supabase
+                .from('mission')
+                .update({
+                  progress: [`${newMission[0].id}-${checkpoint.id}`],
+                })
+                .eq('id', newMission[0].id);
             }
           });
         }
@@ -192,9 +192,12 @@ async function updateMission(props) {
               }
 
               // update the progress for mission
-              await supabase.from('mission').update({
-                progress: [`${updateMission[0].id}-${checkpoint.id}`],
-              });
+              await supabase
+                .from('mission')
+                .update({
+                  progress: [`${updateMission[0].id}-${checkpoint.id}`],
+                })
+                .eq('id', updateMission[0].id);
             }
           });
         }

@@ -16,7 +16,6 @@ class VotingMachine {
       tallyResult,
       participation,
     } = props;
-    this.options = options;
     this.duration = duration;
     this.cvd_created_at = cvd_created_at;
     this.who = who;
@@ -50,25 +49,17 @@ class VotingMachine {
     }
 
     // check if this checkpoint is outdate
-    const createdAtMoment = moment(this.startToVote);
-    const now = moment();
+    const createdAtMoment = moment(this.startToVote).unix();
+    const now = moment().unix();
 
-    const differenceInSeconds = now.diff(createdAtMoment, 'seconds');
-    if (differenceInSeconds >= this.duration) {
-      return { fallback: true, error: 'This checkpoint is stopped' };
+    if (now <= createdAtMoment) {
+      return { fallback: true, error: 'This checkpoint is not start to vote' };
     }
 
     return {};
   }
 
   recordVote(voteData) {
-    // check if user's choice is wrong
-    for (const option of voteData.option) {
-      if (option > this.options.length - 1) {
-        return { notRecorded: true, error: `Invalid choice` };
-      }
-    }
-
     // check if user was allow to vote, check participation
     if (this.participation.type === 'identity') {
       // check if user was allow to vote, check participation
