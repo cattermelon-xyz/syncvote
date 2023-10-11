@@ -16,14 +16,22 @@ function App({ layout }: { layout: any }) {
   // const token = window.localStorage.getItem('isConnectWallet');
   const { loading } = useSelector((state: any) => state.ui);
   const { session } = useContext(AuthContext);
+  const env = import.meta.env.VITE_ENV;
 
   useEffect(() => {
-    registerVoteMachine(SingleChoice);
-    registerVoteMachine(Polling);
-    registerVoteMachine(Veto);
-    registerVoteMachine(UpVote);
-    registerVoteMachine(DocInput);
-  }, [session]);
+    if (env === 'production') {
+      registerVoteMachine(SingleChoice);
+      registerVoteMachine(Polling);
+      registerVoteMachine(Veto);
+      registerVoteMachine(UpVote);
+    } else {
+      registerVoteMachine(SingleChoice);
+      registerVoteMachine(Polling);
+      registerVoteMachine(Veto);
+      registerVoteMachine(UpVote);
+      registerVoteMachine(DocInput);
+    }
+  }, [session, env]);
 
   const Layout: any = layout;
   return (

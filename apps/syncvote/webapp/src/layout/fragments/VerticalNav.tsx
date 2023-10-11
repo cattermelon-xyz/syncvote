@@ -127,15 +127,15 @@ const VerticalNav = () => {
             ),
             destinationUrl: '/',
           },
-          {
-            label: (
-              <>
-                <GlobalOutlined />
-                Explore
-              </>
-            ),
-            destinationUrl: '/explore',
-          },
+          // {
+          //   label: (
+          //     <>
+          //       <GlobalOutlined />
+          //       Explore
+          //     </>
+          //   ),
+          //   destinationUrl: '/explore',
+          // },
           {
             label: (
               <>
