@@ -47,11 +47,13 @@ class VotingMachine {
     }
 
     // check if this checkpoint is outdate
-    const createdAtMoment = moment(this.startToVote).unix();
+    const startToVoteMoment = moment(this.startToVote).unix();
     const now = moment().unix();
 
-    if (now <= createdAtMoment) {
+    if (now <= startToVoteMoment) {
       return { fallback: true, error: 'This checkpoint is not start to vote' };
+    } else if (now > startToVoteMoment + this.duration) {
+      return { fallback: true, error: 'This checkpoint supose to be closed' };
     }
 
     return {};
