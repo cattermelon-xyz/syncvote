@@ -52,6 +52,11 @@ const ModalVoterInfo: React.FC<Props> = ({
                 title: 'Error',
                 content: res.data.message,
               });
+            } else if (res.data.status === 'ERR') {
+              Modal.error({
+                title: 'Error',
+                content: res.data.message,
+              });
             } else {
               Modal.success({
                 title: 'Success',
@@ -85,7 +90,7 @@ const ModalVoterInfo: React.FC<Props> = ({
           onClose();
         }}
       >
-        <Form form={form} layout='vertical'>
+        <Form form={form} layout='vertical' initialValues={{ votepower: 1 }}>
           <Form.Item
             label='Email or wallet address'
             name='info'
@@ -108,7 +113,7 @@ const ModalVoterInfo: React.FC<Props> = ({
               },
             ]}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
         </Form>
       </Modal>
