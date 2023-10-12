@@ -1,12 +1,14 @@
 import React from 'react';
 import { Modal, Form, Input } from 'antd';
 import { vote } from '@axios/vote';
+import { useDispatch } from 'react-redux';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   option: any[];
   missionId: number;
+  listParticipants: any[];
 }
 
 const ModalVoterInfo: React.FC<Props> = ({
@@ -14,29 +16,48 @@ const ModalVoterInfo: React.FC<Props> = ({
   onClose,
   option,
   missionId,
+  listParticipants,
 }) => {
   const [form] = Form.useForm();
-
+  const dispatch = useDispatch();
   const handleOk = async () => {
     form
       .validateFields()
       .then((values) => {
         form.resetFields();
-        const voteData = {
+        let voteData: any = {
           identify: values.info,
           option: option,
           voting_power: values.votepower,
           mission_id: missionId,
         };
 
+        console.log('voteData', voteData);
+
+        if (!listParticipants.includes(voteData.identify)) {
+          onClose();
+          Modal.error({
+            title: 'Error',
+            content: `You're not in list participants`,
+          });
+          return;
+        }
+
         vote({
           data: voteData,
           onSuccess: (res: any) => {
             console.log('res', res);
-            Modal.success({
-              title: 'Success',
-              content: 'Voting successfully',
-            });
+            if (res.data.status === 'FALLBACK') {
+              Modal.error({
+                title: 'Error',
+                content: res.data.message,
+              });
+            } else {
+              Modal.success({
+                title: 'Success',
+                content: 'Voting successfully',
+              });
+            }
           },
           onError: () => {
             Modal.error({
@@ -44,6 +65,7 @@ const ModalVoterInfo: React.FC<Props> = ({
               content: 'Voting error',
             });
           },
+          dispatch,
         });
 
         onClose();
