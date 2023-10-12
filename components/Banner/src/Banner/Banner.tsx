@@ -146,7 +146,7 @@ const Banner = ({
                   <div>
                     <input
                       type='file'
-                      id='single'
+                      id='banner-single'
                       accept='image/*'
                       onChange={uploadBanner}
                       className='hidden'
@@ -155,7 +155,7 @@ const Banner = ({
                       type='default'
                       className='w-full'
                       onClick={() =>
-                        document?.getElementById('single')?.click()
+                        document?.getElementById('banner-single')?.click()
                       }
                     >
                       <div className='flex items-center w-full justify-center'>
