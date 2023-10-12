@@ -97,7 +97,7 @@ const MissionVotingDetail = () => {
 
   useEffect(() => {
     console.log('missionData', missionData);
-  }, [missionData]);
+  }, [missionData, listParticipants]);
 
   useEffect(() => {
     if (missionData && currentCheckpointData) {
@@ -343,6 +343,7 @@ const MissionVotingDetail = () => {
         open={openModalVoterInfo}
         onClose={() => setOpenModalVoterInfo(false)}
         missionId={missionId}
+        listParticipants={listParticipants}
       />
     </>
   );

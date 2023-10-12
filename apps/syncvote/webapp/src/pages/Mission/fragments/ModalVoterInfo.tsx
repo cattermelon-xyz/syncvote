@@ -8,6 +8,7 @@ interface Props {
   onClose: () => void;
   option: any[];
   missionId: number;
+  listParticipants: any[];
 }
 
 const ModalVoterInfo: React.FC<Props> = ({
@@ -15,6 +16,7 @@ const ModalVoterInfo: React.FC<Props> = ({
   onClose,
   option,
   missionId,
+  listParticipants,
 }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -31,6 +33,15 @@ const ModalVoterInfo: React.FC<Props> = ({
         };
 
         console.log('voteData', voteData);
+
+        if (!listParticipants.includes(voteData.identify)) {
+          onClose();
+          Modal.error({
+            title: 'Error',
+            content: `You're not in list participants`,
+          });
+          return;
+        }
 
         vote({
           data: voteData,
