@@ -61,6 +61,9 @@ const ModalVoterInfo: React.FC<Props> = ({
               Modal.success({
                 title: 'Success',
                 content: 'Voting successfully',
+                onOk: () => {
+                  window.location.reload();
+                }
               });
             }
           },
