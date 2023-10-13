@@ -1,27 +1,33 @@
 import axios from 'axios';
+import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 
 export const createMission = async ({
   missionData,
-  onSuccess = () => {},
-  onError = () => {},
+  onSuccess,
+  onError,
+  dispatch,
 }: {
   missionData: any;
-  onSuccess?: (msg: any) => void;
-  onError?: (mgs: any) => void;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+  dispatch: any;
 }) => {
+  dispatch(startLoading({}));
   axios
     .post(`${import.meta.env.VITE_SERVER_URL}/mission/create`, missionData)
     .then((response) => {
       console.log('Respone', response.data);
       if (response.data.status === 'ERR') {
         onError(response.data.message);
+      } else {
+        onSuccess(response.data);
       }
-      onSuccess('');
     })
     .catch((error) => {
       console.log('Error', error);
-      onError('Error to create a new proposal');
+      onError(error);
     });
+  dispatch(finishLoading({}));
 };
 
 export const updateMission = async ({
