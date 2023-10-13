@@ -79,10 +79,10 @@ export const CreateProposalModal = ({
               content: 'Edit proposal successfully',
             });
           },
-          onError: () => {
+          onError: (msg) => {
             Modal.error({
               title: 'Error',
-              content: 'Error to edit a proposal',
+              content: msg,
             });
           },
         });
@@ -109,10 +109,10 @@ export const CreateProposalModal = ({
               },
             });
           },
-          onError: () => {
+          onError: (msg) => {
             Modal.error({
               title: 'Error',
-              content: 'Error to create a proposal',
+              content: msg,
             });
           },
           dispatch,

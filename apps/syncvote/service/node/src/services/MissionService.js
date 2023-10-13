@@ -44,12 +44,26 @@ async function insertMission(props) {
       if (!error) {
         if (newMission[0].status === 'PUBLIC') {
           newMission[0].data.checkpoints.map(async (checkpoint) => {
+            if (
+              !checkpoint.vote_machine_type ||
+              !checkpoint.title ||
+              !checkpoint.participation ||
+              !checkpoint.quorum ||
+              !checkpoint.thresholds ||
+              !checkpoint.duration
+            ) {
+              resolve({
+                status: 'ERR',
+                message: 'Input is required',
+              });
+              return;
+            }
+
             const checkpointData = {
               id: `${newMission[0].id}-${checkpoint.id}`,
               vote_machine_type: checkpoint.vote_machine_type,
               mission_id: newMission[0].id,
               title: checkpoint.title,
-              docs: checkpoint.docs,
               participation: checkpoint?.participation,
               quorum: checkpoint?.quorum,
               options: checkpoint.data?.options,
@@ -72,17 +86,11 @@ async function insertMission(props) {
             }
 
             if (checkpoint.id === newMission[0].start) {
-              console.log(2);
               // create current_vote_data
               const current_vote_data = await insertCurrentVoteData({
                 checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
                 startToVote: moment().format(),
-                // endToVote: moment()
-                //   .add(checkpoint.duration, 'seconds')
-                //   .format(),
               });
-
-              console.log(current_vote_data);
 
               const { u_error } = await supabase
                 .from('mission')
@@ -99,11 +107,6 @@ async function insertMission(props) {
                 });
                 return;
               }
-
-              // update the progress for mission
-              await supabase.from('mission').update({
-                progress: [`${updateMission[0].id}-${checkpoint.id}`],
-              });
             }
           });
         }
@@ -143,7 +146,6 @@ async function updateMission(props) {
               vote_machine_type: checkpoint.vote_machine_type,
               mission_id: updateMission[0].id,
               title: checkpoint.title,
-              docs: checkpoint.docs,
               participation: checkpoint?.participation,
               quorum: checkpoint?.quorum,
               options: checkpoint.data?.options,
@@ -170,9 +172,6 @@ async function updateMission(props) {
               const current_vote_data = await insertCurrentVoteData({
                 checkpoint_id: `${updateMission[0].id}-${checkpoint.id}`,
                 startToVote: moment().format(),
-                // endToVote: moment()
-                //   .add(checkpoint.duration, 'seconds')
-                //   .format(),
               });
 
               const { u_error } = await supabase
@@ -190,11 +189,6 @@ async function updateMission(props) {
                 });
                 return;
               }
-
-              // update the progress for mission
-              await supabase.from('mission').update({
-                progress: [`${updateMission[0].id}-${checkpoint.id}`],
-              });
             }
           });
         }

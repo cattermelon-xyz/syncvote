@@ -1,10 +1,8 @@
 const moment = require('moment');
-const { isArraySubset } = require('../../functions/index');
 
 class VotingMachine {
   constructor(props) {
     const {
-      options,
       duration,
       cvd_created_at,
       who,
@@ -16,7 +14,6 @@ class VotingMachine {
       tallyResult,
       participation,
     } = props;
-    this.options = options;
     this.duration = duration;
     this.cvd_created_at = cvd_created_at;
     this.who = who;
@@ -50,25 +47,19 @@ class VotingMachine {
     }
 
     // check if this checkpoint is outdate
-    const createdAtMoment = moment(this.startToVote);
-    const now = moment();
+    const startToVoteMoment = moment(this.startToVote).unix();
+    const now = moment().unix();
 
-    const differenceInSeconds = now.diff(createdAtMoment, 'seconds');
-    if (differenceInSeconds >= this.duration) {
-      return { fallback: true, error: 'This checkpoint is stopped' };
+    if (now <= startToVoteMoment) {
+      return { fallback: true, error: 'This checkpoint is not start to vote' };
+    } else if (now > startToVoteMoment + this.duration) {
+      return { fallback: true, error: 'This checkpoint supose to be closed' };
     }
 
     return {};
   }
 
   recordVote(voteData) {
-    // check if user's choice is wrong
-    for (const option of voteData.option) {
-      if (option > this.options.length - 1) {
-        return { notRecorded: true, error: `Invalid choice` };
-      }
-    }
-
     // check if user was allow to vote, check participation
     if (this.participation.type === 'identity') {
       // check if user was allow to vote, check participation
