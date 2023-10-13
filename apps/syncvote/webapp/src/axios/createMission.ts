@@ -2,22 +2,25 @@ import axios from 'axios';
 
 export const createMission = async ({
   missionData,
-  onSuccess,
-  onError,
+  onSuccess = () => {},
+  onError = () => {},
 }: {
   missionData: any;
-  onSuccess: () => void;
-  onError: () => void;
+  onSuccess?: (msg: any) => void;
+  onError?: (mgs: any) => void;
 }) => {
   axios
     .post(`${import.meta.env.VITE_SERVER_URL}/mission/create`, missionData)
     .then((response) => {
       console.log('Respone', response.data);
-      onSuccess();
+      if (response.data.status === 'ERR') {
+        onError(response.data.message);
+      }
+      onSuccess('');
     })
     .catch((error) => {
       console.log('Error', error);
-      onError();
+      onError('Error to create a new proposal');
     });
 };
 
@@ -29,8 +32,8 @@ export const updateMission = async ({
 }: {
   missionId: number;
   missionData: any;
-  onSuccess?: () => void;
-  onError?: () => void;
+  onSuccess?: (msg: any) => void;
+  onError?: (mgs: any) => void;
 }) => {
   axios
     .post(`${import.meta.env.VITE_SERVER_URL}/mission/update`, {
@@ -39,10 +42,13 @@ export const updateMission = async ({
     })
     .then((response) => {
       console.log('Respone', response.data);
-      onSuccess();
+      if (response.data.status === 'ERR') {
+        onError(response.data.message);
+      }
+      onSuccess('');
     })
     .catch((error) => {
       console.log('Error', error);
-      onError();
+      onError('Error to edit a proposal');
     });
 };
