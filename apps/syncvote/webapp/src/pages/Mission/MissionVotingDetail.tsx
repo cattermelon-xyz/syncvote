@@ -39,11 +39,11 @@ const MissionVotingDetail = () => {
       missionId,
       onSuccess: (data: any) => {
         setMissionData(data);
-        console.log('data', data);
         const currentCheckpointId = extractCurrentCheckpointId(data.id);
         const checkpointData = data?.data?.checkpoints.filter(
           (checkpoint: any) => checkpoint.id === currentCheckpointId
         );
+        console.log('missiondata', data);
         console.log('checkpointData', checkpointData[0]);
         let checkpointDataAfterHandle = checkpointData[0];
 
