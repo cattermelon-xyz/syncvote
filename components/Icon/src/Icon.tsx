@@ -23,7 +23,7 @@ const ChooseImageModal = ({
   return (
     <Modal open={isOpen} title={'Choose Icon'} onCancel={onCancel}>
       <p>Choose or upload one</p>
-      <input type='file' id='single' accept='image/*' onChange={uploadIcon} />
+      <input type='file' id='icon-single' accept='image/*' onChange={uploadIcon} />
       <div className='grid grid-cols-6 mt-4'>
         {presetIcons.map((icon: string) => (
           <div

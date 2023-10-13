@@ -3,7 +3,15 @@ import { TextEditor } from 'rich-text-editor';
 import { Icon } from 'icon';
 import { newTag } from '@dal/data/tag';
 import { ITag, IWorkflow } from '@types';
-import { Button, Drawer, Input, Select, SelectProps, Space, Switch } from 'antd';
+import {
+  Button,
+  Drawer,
+  Input,
+  Select,
+  SelectProps,
+  Space,
+  Switch,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useGetDataHook, useSetData } from 'utils';
@@ -58,6 +66,12 @@ const EditWorkflow = ({
   const [desc, setDesc] = useState(workflowDesc);
   const [iconUrl, setIconUrl] = useState(workflowIcon);
   const [status, setStatus] = useState(workflow?.workflow_version[0]?.status);
+  const [tempBannerUrl, setTempBannerUrl] = useState(
+    workflow?.banner_url || ''
+  );
+  const [tempIconUrl, setTempIconUrl] = useState(workflow?.icon_url || '');
+  const [tempTitle, setTempTitle] = useState(workflowTitle);
+  const [tempDesc, setTempDesc] = useState(workflowDesc);
 
   const presetBanners = useGetDataHook({
     configInfo: config.queryPresetBanners,
@@ -72,6 +86,19 @@ const EditWorkflow = ({
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
+
+  const handleSaveChanges = async () => {
+    setOpen(false);
+    await onSave({
+      title: tempTitle,
+      desc: tempDesc,
+      bannerUrl: tempBannerUrl,
+      iconUrl: tempIconUrl,
+    });
+    setTitle(tempTitle);
+    setDesc(tempDesc);
+    setOpen(true);
+  };
 
   useEffect(() => {
     setTitle(workflow?.title);
@@ -135,13 +162,10 @@ const EditWorkflow = ({
       <div className='relative w-full'>
         <Banner
           presetBanners={presetBanners}
-          bannerUrl={workflow?.banner_url || ''}
-          onChange={async ({ filePath, isPreset }) => {
-            setOpen(false);
-            await onSave({
-              bannerUrl: isPreset ? `preset:${filePath}` : filePath,
-            });
-            setOpen(true);
+          bannerUrl={tempBannerUrl || workflow?.banner_url || ''}
+          onChange={({ filePath, isPreset }) => {
+            const newBannerUrl = isPreset ? `preset:${filePath}` : filePath;
+            setTempBannerUrl(newBannerUrl);
           }}
           editable
         />
@@ -149,15 +173,11 @@ const EditWorkflow = ({
           <Icon
             presetIcon={presetIcons}
             size='xlarge'
-            iconUrl={iconUrl}
+            iconUrl={tempIconUrl || iconUrl}
             editable
-            onUpload={async ({ filePath, isPreset }) => {
+            onUpload={({ filePath, isPreset }) => {
               const newIconUrl = isPreset ? `preset:${filePath}` : filePath;
-              setOpen(false);
-              await onSave({
-                iconUrl: newIconUrl,
-              });
-              setOpen(true);
+              setTempIconUrl(newIconUrl);
             }}
           />
         </div>
@@ -171,33 +191,15 @@ const EditWorkflow = ({
           <Space direction='vertical' size='small' className='w-full'>
             <div>Workflow name</div>
             <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onBlur={async () => {
-                if (title !== originalTitle) {
-                  setOpen(false);
-                  await onSave({
-                    title,
-                  });
-                  setOpen(true);
-                }
-              }}
+              value={tempTitle}
+              onChange={(e) => setTempTitle(e.target.value)}
             />
           </Space>
           <Space direction='vertical' size='small' className='w-full'>
             <div>Description</div>
             <TextEditor
-              value={desc}
-              setValue={(val: any) => setDesc(val)}
-              onBlur={async () => {
-                if (desc !== originalDesc) {
-                  setOpen(false);
-                  await onSave({
-                    desc,
-                  });
-                  setOpen(true);
-                }
-              }}
+              value={tempDesc}
+              setValue={(val: any) => setTempDesc(val)}
             />
           </Space>
         </Space>
@@ -244,7 +246,12 @@ const EditWorkflow = ({
           type='default'
           className='w-full'
           icon={<SaveOutlined />}
-          onClick={() => onSave({ title, desc, iconUrl })}
+          onClick={async () => {
+            setOpen(false);
+            await onSave({ title: tempTitle, desc: tempDesc, bannerUrl: tempBannerUrl, iconUrl: tempIconUrl });
+            setTitle(tempTitle);
+            setOpen(true);
+          }}
         >
           Save
         </Button>
