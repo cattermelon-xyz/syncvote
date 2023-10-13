@@ -64,7 +64,7 @@ export const CreateProposalModal = ({
         let missionData = {
           status: status,
           title: name,
-          // desc: desc,
+          desc: missionDesc,
         };
 
         await updateMission({
