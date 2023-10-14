@@ -211,16 +211,10 @@ async function handleVoting(props) {
               })
               .select('*');
 
-            // update the current_vote_data for mission and change the progress
-            const progress = mission_vote_details[0].progress.concat(
-              new_current_vote_data[0].checkpoint_id
-            );
-
             await supabase
               .from('mission')
               .update({
                 current_vote_data_id: new_current_vote_data[0].id,
-                progress: progress,
                 status: mission_status,
               })
               .eq('id', mission_id);
