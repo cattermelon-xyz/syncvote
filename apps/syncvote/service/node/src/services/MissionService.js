@@ -52,6 +52,11 @@ async function insertMission(props) {
                 !checkpoint.quorum ||
                 !checkpoint.duration
               ) {
+                await supabase
+                  .from('mission')
+                  .delete()
+                  .eq('id', newMission[0].id);
+                  
                 resolve({
                   status: 'ERR',
                   message: 'Input is required',
