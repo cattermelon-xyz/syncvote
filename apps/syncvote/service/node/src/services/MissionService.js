@@ -44,19 +44,21 @@ async function insertMission(props) {
       if (!error) {
         if (newMission[0].status === 'PUBLIC') {
           newMission[0].data.checkpoints.map(async (checkpoint) => {
-            if (
-              !checkpoint.vote_machine_type ||
-              !checkpoint.title ||
-              !checkpoint.participation ||
-              !checkpoint.quorum ||
-              !checkpoint.thresholds ||
-              !checkpoint.duration
-            ) {
-              resolve({
-                status: 'ERR',
-                message: 'Input is required',
-              });
-              return;
+            if (!checkpoint.isEnd) {
+              if (
+                !checkpoint.vote_machine_type ||
+                !checkpoint.title ||
+                !checkpoint.participation ||
+                !checkpoint.quorum ||
+                !checkpoint.thresholds ||
+                !checkpoint.duration
+              ) {
+                resolve({
+                  status: 'ERR',
+                  message: 'Input is required',
+                });
+                return;
+              }
             }
 
             const checkpointData = {
