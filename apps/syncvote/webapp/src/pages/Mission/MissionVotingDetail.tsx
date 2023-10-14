@@ -47,14 +47,15 @@ const MissionVotingDetail = () => {
         console.log('checkpointData', checkpointData[0]);
         let checkpointDataAfterHandle = checkpointData[0];
 
-        const startToVote = new Date(data.startToVote);
-        // convert second to millisecond of duration
-        const duration = checkpointData[0].duration * 1000;
-        const endTovote = new Date(
-          startToVote.getTime() + duration
-        ).toISOString();
-
-        checkpointDataAfterHandle.endToVote = endTovote;
+        if (!data.isEnd) {
+          const startToVote = new Date(data.startToVote);
+          // convert second to millisecond of duration
+          const duration = checkpointData[0].duration * 1000;
+          const endTovote = new Date(
+            startToVote.getTime() + duration
+          ).toISOString();
+          checkpointDataAfterHandle.endToVote = endTovote;
+        }
 
         switch (checkpointData[0]?.vote_machine_type) {
           case 'SingleChoiceRaceToMax':
@@ -111,7 +112,9 @@ const MissionVotingDetail = () => {
         }
       }
 
-      setListParticipants(currentCheckpointData.participation.data);
+      if (!missionData.isEnd) {
+        setListParticipants(currentCheckpointData.participation.data);
+      }
     }
   }, [missionData, selectedOption]);
 
@@ -157,59 +160,63 @@ const MissionVotingDetail = () => {
                 titleDescription={'Checkpoint description'}
                 description={currentCheckpointData?.description}
               />
-              <VoteSection
-                currentCheckpointData={currentCheckpointData}
-                setOpenModalVoterInfo={setOpenModalVoterInfo}
-                onSelectedOption={onSelectedOption}
-                missionData={missionData}
-                setSubmission={setSubmission}
-                submission={submission}
-              />
-              <Card className='p-4'>
-                <div className='flex flex-col gap-4'>
-                  <p className='text-xl font-medium'>Votes</p>
-                  <div className='flex'>
-                    <p className='w-8/12'>Identity</p>
-                    <p className='w-4/12 text-right'>Vote</p>
-                  </div>
-                  {missionData.vote_record &&
-                    missionData.vote_record.map(
-                      (record: any, recordIndex: number) => {
-                        return (
-                          <div className='flex mb-4' key={recordIndex}>
-                            <div className='w-8/12 flex items-center gap-2'>
-                              <Icon iconUrl='' presetIcon='' size='medium' />
-                              <p>{record.identify}</p>
+              {!missionData.isEnd && (
+                <VoteSection
+                  currentCheckpointData={currentCheckpointData}
+                  setOpenModalVoterInfo={setOpenModalVoterInfo}
+                  onSelectedOption={onSelectedOption}
+                  missionData={missionData}
+                  setSubmission={setSubmission}
+                  submission={submission}
+                />
+              )}
+              {!missionData.isEnd && (
+                <Card className='p-4'>
+                  <div className='flex flex-col gap-4'>
+                    <p className='text-xl font-medium'>Votes</p>
+                    <div className='flex'>
+                      <p className='w-8/12'>Identity</p>
+                      <p className='w-4/12 text-right'>Vote</p>
+                    </div>
+                    {missionData.vote_record &&
+                      missionData.vote_record.map(
+                        (record: any, recordIndex: number) => {
+                          return (
+                            <div className='flex mb-4' key={recordIndex}>
+                              <div className='w-8/12 flex items-center gap-2'>
+                                <Icon iconUrl='' presetIcon='' size='medium' />
+                                <p>{record.identify}</p>
+                              </div>
+                              {record.option.map(
+                                (option: any, optionIndex: number) => {
+                                  const voteOption =
+                                    option === '-1'
+                                      ? 'Abstain'
+                                      : currentCheckpointData.data.options[
+                                          parseInt(option)
+                                        ];
+                                  return (
+                                    <p
+                                      key={optionIndex}
+                                      className='w-4/12 text-right'
+                                    >
+                                      {voteOption}
+                                    </p>
+                                  );
+                                }
+                              )}
                             </div>
-                            {record.option.map(
-                              (option: any, optionIndex: number) => {
-                                const voteOption =
-                                  option === '-1'
-                                    ? 'Abstain'
-                                    : currentCheckpointData.data.options[
-                                        parseInt(option)
-                                      ];
-                                return (
-                                  <p
-                                    key={optionIndex}
-                                    className='w-4/12 text-right'
-                                  >
-                                    {voteOption}
-                                  </p>
-                                );
-                              }
-                            )}
-                          </div>
-                        );
-                      }
-                    )}
-                </div>
-                {/* <div className='w-full flex justify-center items-center'>
+                          );
+                        }
+                      )}
+                  </div>
+                  {/* <div className='w-full flex justify-center items-center'>
                   <Button className='mt-4' icon={<ReloadOutlined />}>
                     View More
                   </Button>
                 </div> */}
-              </Card>
+                </Card>
+              )}
             </Space>
           </div>
           <div className='flex-1 flex flex-col gap-4'>
@@ -272,64 +279,74 @@ const MissionVotingDetail = () => {
             ) : (
               <></>
             )}
-            <Card className=''>
-              <p className='mb-4 text-base font-semibold'>Rules & conditions</p>
-              <div className='flex flex-col gap-2'>
-                <div className='flex justify-between'>
-                  <p className='text-base '>Start time</p>
-                  <p className='text-base font-semibold'>
-                    {getTimeElapsedSinceStart(missionData.startToVote)}
-                  </p>
-                </div>
-                <p className='text-right'>
-                  {formatDate(missionData.startToVote)}
+            {!missionData.isEnd && (
+              <Card className=''>
+                <p className='mb-4 text-base font-semibold'>
+                  Rules & conditions
                 </p>
-              </div>
-              <div className='flex flex-col gap-2'>
-                <div className='flex justify-between'>
-                  <p className='text-base '>Remaining duration</p>
-                  <p className='text-base font-semibold'>
-                    {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
-                  </p>
-                </div>
-                <p className='text-right'>
-                  {formatDate(currentCheckpointData.endToVote)}
-                </p>
-              </div>
-              <hr className='w-full my-4' />
-              <div className='flex justify-between'>
-                <p className='text-base '>Who can vote</p>
-                <p
-                  className='text-base font-semibold text-[#6200EE] cursor-pointer'
-                  onClick={() => setOpenModalListParticipants(true)}
-                >
-                  View details
-                </p>
-              </div>
-              <hr className='w-full my-4' />
-              {currentCheckpointData?.data?.threshold ? (
-                <div>
+                <div className='flex flex-col gap-2'>
                   <div className='flex justify-between'>
-                    <p className='text-base '>Threshold counted by</p>
-                    <p className='text-base font-semibold'>Total votes made</p>
-                  </div>
-                  <div className='flex justify-between'>
-                    <p className='text-base '>Threshold</p>
+                    <p className='text-base '>Start time</p>
                     <p className='text-base font-semibold'>
-                      {currentCheckpointData?.data?.threshold}
+                      {getTimeElapsedSinceStart(missionData.startToVote)}
                     </p>
                   </div>
+                  <p className='text-right'>
+                    {formatDate(missionData.startToVote)}
+                  </p>
                 </div>
-              ) : (
-                <></>
-              )}
-              <div className='flex justify-between'>
-                <p className='text-base '>Quorum</p>
-                <p className='text-base font-semibold'>
-                  {currentCheckpointData.quorum} votes
-                </p>
-              </div>
-            </Card>
+                <div className='flex flex-col gap-2'>
+                  <div className='flex justify-between'>
+                    <p className='text-base '>Remaining duration</p>
+                    <p className='text-base font-semibold'>
+                      {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
+                    </p>
+                  </div>
+                  {missionData.isEnd ? (
+                    <></>
+                  ) : (
+                    <p className='text-right'>
+                      {formatDate(currentCheckpointData.endToVote)}
+                    </p>
+                  )}
+                </div>
+                <hr className='w-full my-4' />
+                <div className='flex justify-between'>
+                  <p className='text-base '>Who can vote</p>
+                  <p
+                    className='text-base font-semibold text-[#6200EE] cursor-pointer'
+                    onClick={() => setOpenModalListParticipants(true)}
+                  >
+                    View details
+                  </p>
+                </div>
+                <hr className='w-full my-4' />
+                {currentCheckpointData?.data?.threshold ? (
+                  <div>
+                    <div className='flex justify-between'>
+                      <p className='text-base '>Threshold counted by</p>
+                      <p className='text-base font-semibold'>
+                        Total votes made
+                      </p>
+                    </div>
+                    <div className='flex justify-between'>
+                      <p className='text-base '>Threshold</p>
+                      <p className='text-base font-semibold'>
+                        {currentCheckpointData?.data?.threshold}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <></>
+                )}
+                <div className='flex justify-between'>
+                  <p className='text-base '>Quorum</p>
+                  <p className='text-base font-semibold'>
+                    {currentCheckpointData.quorum} votes
+                  </p>
+                </div>
+              </Card>
+            )}
           </div>
         </div>
       )}
