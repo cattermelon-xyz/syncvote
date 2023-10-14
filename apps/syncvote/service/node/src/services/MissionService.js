@@ -50,7 +50,6 @@ async function insertMission(props) {
                 !checkpoint.title ||
                 !checkpoint.participation ||
                 !checkpoint.quorum ||
-                !checkpoint.thresholds ||
                 !checkpoint.duration
               ) {
                 resolve({
