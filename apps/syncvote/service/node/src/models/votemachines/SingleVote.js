@@ -3,10 +3,11 @@ const { VotingMachine } = require('.');
 class SingleVote extends VotingMachine {
   constructor(props) {
     super(props);
-    const { thresholds, includedAbstain, quorum } = props;
+    const { thresholds, includedAbstain, quorum, options } = props;
     this.thresholds = thresholds;
     this.includedAbstain = includedAbstain;
     this.quorum = quorum;
+    this.options = options;
   }
 
   initDataForCVD() {
@@ -62,6 +63,13 @@ class SingleVote extends VotingMachine {
       return { notRecorded, error };
     }
 
+    // check if user's choice is wrong
+    for (const option of voteData.option) {
+      if (option > this.options.length - 1) {
+        return { notRecorded: true, error: `Invalid choice` };
+      }
+    }
+
     // check if options is single vote
     if (voteData.option.length !== 1) {
       return { notRecorded: true, error: 'You need to pick one' };
@@ -77,26 +85,19 @@ class SingleVote extends VotingMachine {
       return { notRecorded: true, error: 'Cannot vote abstain option' };
     }
 
-    if (voteData.option[0] === -1) {
-      if (!this.who || this.who.length === 0) {
-        this.who = [voteData.identify];
-      } else {
-        this.who = this.who.concat(voteData.identify);
-      }
-      this.result['-1'].count += 1;
+    if (!this.who || this.who.length === 0) {
+      this.who = [voteData.identify];
     } else {
-      if (!this.who || this.who.length === 0) {
-        this.who = [voteData.identify];
-      } else {
-        this.who = this.who.concat(voteData.identify);
-      }
-      if (this.participation.type === 'identity') {
-        this.result[voteData.option[0]].count += 1;
-        this.result[voteData.option[0]].voting_power += 1;
-      } else {
-        // Dont have vote by token
-      }
+      this.who = this.who.concat(voteData.identify);
     }
+
+    if (this.participation.type === 'identity') {
+      this.result[voteData.option[0]].count += 1;
+      this.result[voteData.option[0]].voting_power += 1;
+    } else {
+      // Dont have vote by token
+    }
+
     return {};
   }
 

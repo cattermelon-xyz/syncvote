@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { IDoc, emptyStage } from 'directed-graph';
 
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { TextEditor } from 'rich-text-editor';
 import { useGetDataHook, useSetData } from 'utils';
 import { config } from '@dal/config';
@@ -26,6 +26,9 @@ export const CreateProposalModal = ({
   missionId = -1,
 }: CreateProposalModalProps) => {
   const dispatch = useDispatch();
+  const { orgIdString } = useParams();
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
 
   const user = useGetDataHook({
@@ -76,10 +79,10 @@ export const CreateProposalModal = ({
               content: 'Edit proposal successfully',
             });
           },
-          onError: () => {
+          onError: (msg) => {
             Modal.error({
               title: 'Error',
-              content: 'Error to edit a proposal',
+              content: msg,
             });
           },
         });
@@ -94,21 +97,25 @@ export const CreateProposalModal = ({
           workflow_version_id: workflowVersion.id,
           desc: missionDesc,
         };
-
+        // if checkpoint is not validated => can't create mission
         await createMission({
           missionData,
           onSuccess: () => {
             Modal.success({
               title: 'Success',
               content: 'Create a new proposal successfully',
+              onOk: () => {
+                navigate(`/${orgIdString}/`);
+              },
             });
           },
-          onError: () => {
+          onError: (msg) => {
             Modal.error({
               title: 'Error',
-              content: 'Error to create a proposal',
+              content: msg,
             });
           },
+          dispatch,
         });
       }
 
