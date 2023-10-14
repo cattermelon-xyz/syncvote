@@ -27,6 +27,7 @@ const ModalUpdateDocInput: React.FC<Props> = ({
     if (missionData && currentCheckpointData) {
       const checkpointDocs = currentCheckpointData.data.docs;
       const missionDocs: IDoc[] = missionData.data.docs;
+      setDocsOfMission(missionDocs);
 
       // filteredDocs is only contain docs in missionDocs have the same id with doc in checkpointDocs
       const filteredDocs = missionDocs.filter((missionDoc) =>
@@ -58,6 +59,7 @@ const ModalUpdateDocInput: React.FC<Props> = ({
         onCancel={() => {
           onClose();
         }}
+        okText='Update'
       >
         <div className='text-sm text-[#575655] mb-2'>Select docs</div>
         <div className='relative mb-2'>
@@ -65,31 +67,33 @@ const ModalUpdateDocInput: React.FC<Props> = ({
             className='w-full'
             options={optionDocs}
             onChange={(val) => {
-              setValue(val);
-              console.log(val, docsOfMission);
+              console.log('val', val);
+              console.log('docsOfMission', docsOfMission);
 
               const doc = docsOfMission.find((doc: any) => doc.id === val);
-              setTemplateOfDoc(doc?.template);
+              console.log('doc', doc);
+              // setTemplateOfDoc(doc?.template);
+              setValue(doc?.template);
             }}
           />
         </div>
         <TextEditor
-          value={templateOfDoc}
-          setValue={(val: any) => {
-            setTemplateOfDoc(val);
-            console.log(value);
+          value={value}
+          // setValue={(val: any) => {
+          //   setTemplateOfDoc(val);
+          //   console.log(value);
 
-            if (value) {
-              const updatedDocs = [...docsOfMission];
-              const docIndex = updatedDocs.findIndex((doc) => doc.id === value);
-              if (docIndex !== -1) {
-                updatedDocs[docIndex].template = val;
-                setDocsOfMission(updatedDocs);
-              } else {
-                console.log('Không tìm thấy tài liệu với id được chỉ định.');
-              }
-            }
-          }}
+          //   if (value) {
+          //     const updatedDocs = [...docsOfMission];
+          //     const docIndex = updatedDocs.findIndex((doc) => doc.id === value);
+          //     if (docIndex !== -1) {
+          //       updatedDocs[docIndex].template = val;
+          //       // setDocsOfMission(updatedDocs);
+          //     } else {
+          //       console.log('Not found docs with this specific id.');
+          //     }
+          //   }
+          // }}
           id='text-editor'
         />
       </Modal>
