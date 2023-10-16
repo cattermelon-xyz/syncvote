@@ -47,7 +47,7 @@ const MissionVotingDetail = () => {
         console.log('checkpointData', checkpointData[0]);
         let checkpointDataAfterHandle = checkpointData[0];
 
-        if (!data.isEnd) {
+        if (!checkpointData[0].isEnd) {
           const startToVote = new Date(data.startToVote);
           // convert second to millisecond of duration
           const duration = checkpointData[0].duration * 1000;
@@ -112,7 +112,7 @@ const MissionVotingDetail = () => {
         }
       }
 
-      if (!missionData.isEnd) {
+      if (!currentCheckpointData.isEnd) {
         setListParticipants(currentCheckpointData.participation.data);
       }
     }
@@ -125,9 +125,17 @@ const MissionVotingDetail = () => {
           <div className='w-2/3'>
             <div className='flex flex-col mb-10 gap-6'>
               <div className='flex gap-4'>
-                <Tag bordered={false} color='green' className='text-base'>
-                  Active
-                </Tag>
+                {!currentCheckpointData.isEnd &&
+                getTimeRemainingToEnd(currentCheckpointData.endToVote) !=
+                  'expired' ? (
+                  <Tag bordered={false} color='green' className='text-base '>
+                    Active
+                  </Tag>
+                ) : (
+                  <Tag bordered={false} color='default' className='text-base'>
+                    Closed
+                  </Tag>
+                )}
                 <Button
                   style={{ border: 'None', padding: '0px', boxShadow: 'None' }}
                   className='text-[#6200EE]'
@@ -160,7 +168,7 @@ const MissionVotingDetail = () => {
                 titleDescription={'Checkpoint description'}
                 description={currentCheckpointData?.description}
               />
-              {!missionData.isEnd && (
+              {!currentCheckpointData.isEnd && (
                 <VoteSection
                   currentCheckpointData={currentCheckpointData}
                   setOpenModalVoterInfo={setOpenModalVoterInfo}
@@ -170,7 +178,7 @@ const MissionVotingDetail = () => {
                   submission={submission}
                 />
               )}
-              {!missionData.isEnd && (
+              {!currentCheckpointData.isEnd && (
                 <Card className='p-4'>
                   <div className='flex flex-col gap-4'>
                     <p className='text-xl font-medium'>Votes</p>
@@ -279,7 +287,7 @@ const MissionVotingDetail = () => {
             ) : (
               <></>
             )}
-            {!missionData.isEnd && (
+            {!currentCheckpointData.isEnd && (
               <Card className=''>
                 <p className='mb-4 text-base font-semibold'>
                   Rules & conditions
@@ -302,7 +310,7 @@ const MissionVotingDetail = () => {
                       {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
                     </p>
                   </div>
-                  {missionData.isEnd ? (
+                  {currentCheckpointData.isEnd ? (
                     <></>
                   ) : (
                     <p className='text-right'>

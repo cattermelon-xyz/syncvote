@@ -12,6 +12,7 @@ import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
 import { AuthContext } from '@layout/context/AuthContext';
 import { TbBolt } from 'react-icons/tb';
 import { config } from '@dal/config';
+import { DownOutlined } from '@ant-design/icons';
 
 type HeaderProps = {
   session: any;
@@ -35,7 +36,7 @@ function Header({ session }: HeaderProps) {
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
-  
+
   const navigate = useNavigate();
   const { orgIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
@@ -74,14 +75,14 @@ function Header({ session }: HeaderProps) {
           <div className='flex items-center gap-2'>
             <span className='cursor-pointer flex'>
               {orgId !== -1 && currentPage !== Pages.ORG_HOME ? (
-                <span className='text-xl flex flex-row items-center'>
-                  <HomeOutlined
+                <span className=' flex flex-row items-center bg-[#F6F6F6] px-4 py-2 rounded-lg gap-2'>
+                  {/* <HomeOutlined
                     style={{ fontSize: '24px' }}
                     onClick={() => {
                       navigate('/');
                     }}
                   />
-                  <span className='ml-2 mr-2'>/</span>
+                  <span className='ml-2 mr-2'>/</span> */}
                   <span
                     onClick={() => {
                       navigate(`/${orgIdString}`);
@@ -98,21 +99,22 @@ function Header({ session }: HeaderProps) {
                             currentOrg?.icon_url?.indexOf('preset:') === 0,
                           type: 'icon',
                         })}
-                        className='mx-2'
+                        className=''
                       />
                     ) : (
                       <Avatar>{currentOrg?.title[0]}</Avatar>
                     )}
                   </span>
                   <span
-                    className='mr-4'
+                    className=' text-base	'
                     onClick={() => {
                       navigate(`/${orgIdString}`);
                     }}
                   >
                     {currentOrg?.title}
                   </span>
-                  <Button
+                  <DownOutlined />
+                  {/* <Button
                     type='text'
                     // disabled={currentPage === Pages.ORG_HOME}
                     onClick={() => {
@@ -130,7 +132,7 @@ function Header({ session }: HeaderProps) {
                     }}
                   >
                     Settings
-                  </Button>
+                  </Button> */}
                 </span>
               ) : (
                 <span
