@@ -176,7 +176,9 @@ export const getTimeRemainingToEnd = (endToVote: string) => {
   const now = moment.utc();
   const end = moment.utc(endToVote);
   const duration = moment.duration(end.diff(now));
-
+  if (duration.asMilliseconds() <= 0) {
+    return 'expired';
+  }
   return duration.humanize(true);
 };
 
