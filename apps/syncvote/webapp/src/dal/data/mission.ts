@@ -306,8 +306,28 @@ export const insertMission = async ({
   }
 };
 
-// export const upsertDocInputArweave = async ({
-
-// }): {
-
-// }
+export const insertDocInput = async ({
+  content,
+  onSuccess = (data) => {},
+  onError = (data) => {},
+  dispatch,
+}: {
+  content: string;
+  onSuccess?: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  dispatch(startLoading({}));
+  console.log('content', content);
+  const { data, error } = await supabase
+    .from('arweave')
+    .insert([{ content: content }])
+    .select();
+  if (!error) {
+    console.log('data return create doc', data);
+    onSuccess(data[0]);
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
+};

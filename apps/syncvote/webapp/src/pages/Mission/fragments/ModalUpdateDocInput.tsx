@@ -2,12 +2,17 @@ import { Modal, Button, Select } from 'antd';
 import { TextEditor } from 'rich-text-editor';
 import { useEffect, useState } from 'react';
 import { IDoc } from 'directed-graph';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { insertDocInput } from '@dal/data';
+import { useDispatch } from 'react-redux';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   currentCheckpointData: any;
   missionData: any;
+  setSubmission: any;
+  submission: any;
 }
 
 const ModalUpdateDocInput: React.FC<Props> = ({
@@ -15,12 +20,20 @@ const ModalUpdateDocInput: React.FC<Props> = ({
   onClose,
   currentCheckpointData,
   missionData,
+  setSubmission,
+  submission,
 }) => {
+  const dispatch = useDispatch();
   const [templateOfDoc, setTemplateOfDoc] = useState<any>('');
   const [optionDocs, setOptionDocs] = useState<any>([]);
   const [value, setValue] = useState<string>();
+  const [editorValue, setEditorValue] = useState<string>('');
   const [docsOfMission, setDocsOfMission] = useState(
     missionData.data.docs || []
+  );
+  const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
+  const [editorValues, setEditorValues] = useState<{ [key: string]: string }>(
+    {}
   );
 
   useEffect(() => {
@@ -36,18 +49,30 @@ const ModalUpdateDocInput: React.FC<Props> = ({
         )
       );
 
-      const optionDocs = filteredDocs.map((doc) => ({
-        key: doc.id,
-        label: <div className='flex items-center'>{doc.title}</div>,
-        value: doc.id,
-        template: doc.template,
-      }));
-      setOptionDocs(optionDocs);
+      setOptionDocs(filteredDocs);
     }
   }, [currentCheckpointData, missionData]);
 
   const handleOk = () => {
     onClose();
+  };
+
+  const handleInsertDocInput = async (optionDocId: string) => {
+    const content = editorValues[optionDocId] || '';
+    console.log('prepare content', content);
+    insertDocInput({
+      content,
+      onSuccess: (res: any) => {
+        console.log(res);
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: error,
+        });
+      },
+      dispatch,
+    });
   };
 
   return (
@@ -59,43 +84,55 @@ const ModalUpdateDocInput: React.FC<Props> = ({
         onCancel={() => {
           onClose();
         }}
-        okText='Update'
+        okText='Ok'
+        cancelButtonProps={{ style: { display: 'none' } }}
       >
-        <div className='text-sm text-[#575655] mb-2'>Select docs</div>
-        <div className='relative mb-2'>
-          <Select
-            className='w-full'
-            options={optionDocs}
-            onChange={(val) => {
-              console.log('val', val);
-              console.log('docsOfMission', docsOfMission);
-
-              const doc = docsOfMission.find((doc: any) => doc.id === val);
-              console.log('doc', doc);
-              // setTemplateOfDoc(doc?.template);
-              setValue(doc?.template);
-            }}
-          />
+        <div className='flex flex-col gap-7 mt-5'>
+          {optionDocs &&
+            optionDocs.map((optionDoc: any, index: any) => {
+              return (
+                <div key={index}>
+                  <div
+                    className={` flex justify-between ${
+                      expandedDocId ? 'mb-7' : ''
+                    }`}
+                  >
+                    <p>{optionDoc?.title}</p>
+                    {expandedDocId === optionDoc.id ? (
+                      <DownOutlined onClick={() => setExpandedDocId(null)} />
+                    ) : (
+                      <UpOutlined
+                        onClick={() => setExpandedDocId(optionDoc.id)}
+                      />
+                    )}
+                  </div>
+                  {expandedDocId === optionDoc.id && (
+                    <div className='flex flex-col gap-2'>
+                      <TextEditor
+                        value={
+                          editorValues[optionDoc.id] || optionDoc?.template
+                        }
+                        id={`text-editor-${optionDoc.id}`}
+                        setValue={(newValue: any) => {
+                          setEditorValues((prevValues) => ({
+                            ...prevValues,
+                            [optionDoc.id]: newValue,
+                          }));
+                        }}
+                      />
+                      <Button
+                        type='primary'
+                        className='w-full'
+                        onClick={() => handleInsertDocInput(optionDoc.id)}
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
         </div>
-        <TextEditor
-          value={value}
-          // setValue={(val: any) => {
-          //   setTemplateOfDoc(val);
-          //   console.log(value);
-
-          //   if (value) {
-          //     const updatedDocs = [...docsOfMission];
-          //     const docIndex = updatedDocs.findIndex((doc) => doc.id === value);
-          //     if (docIndex !== -1) {
-          //       updatedDocs[docIndex].template = val;
-          //       // setDocsOfMission(updatedDocs);
-          //     } else {
-          //       console.log('Not found docs with this specific id.');
-          //     }
-          //   }
-          // }}
-          id='text-editor'
-        />
       </Modal>
     </>
   );

@@ -95,6 +95,8 @@ const VoteSection: React.FC<Props> = ({
           onClose={() => setOpenModalUpdateDocInput(false)}
           currentCheckpointData={currentCheckpointData}
           missionData={missionData}
+          setSubmission={setSubmission}
+          submission={submission}
         />
       )}
     </div>
