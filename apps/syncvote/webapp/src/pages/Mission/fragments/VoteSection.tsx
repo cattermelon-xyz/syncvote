@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, Button, Radio } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import ModalUpdateDocInput from './ModalUpdateDocInput';
-import { getTimeRemainingToEnd } from '@utils/helpers';
-import { getTimeRemainingToEnd } from '@utils/helpers';
+import { getTimeRemainingToEnd } from '@utils/helpers'
 
 interface Props {
   currentCheckpointData: any;
