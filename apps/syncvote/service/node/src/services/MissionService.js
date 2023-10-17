@@ -15,6 +15,7 @@ const VoteMachineValidate = {
   UpVote: new UpVote({}),
 };
 
+
 async function insertMission(props) {
   return new Promise(async (resolve, reject) => {
     try {
