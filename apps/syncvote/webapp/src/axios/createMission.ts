@@ -1,5 +1,18 @@
 import axios from 'axios';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+import { SingleChoice } from 'single-vote/src/SingleChoice/funcs';
+import { ICheckPoint } from 'directed-graph';
+import { DocInput } from 'doc-input/src/DocInput/funcs';
+import { Veto } from 'veto/src/Veto/funcs';
+import { UpVote } from 'upvote/src/UpVote/funcs';
+
+const VoteMachineValidate = {
+  SingleChoiceRaceToMax: SingleChoice.validate,
+  DocInput: DocInput.validate,
+  Veto: Veto.validate,
+  UpVote: UpVote.validate,
+};
+type VoteMachineType = 'SingleChoiceRaceToMax' | 'DocInput' | 'Veto' | 'UpVote';
 
 export const createMission = async ({
   missionData,
@@ -13,21 +26,49 @@ export const createMission = async ({
   dispatch: any;
 }) => {
   dispatch(startLoading({}));
-  axios
-    .post(`${import.meta.env.VITE_SERVER_URL}/mission/create`, missionData)
-    .then((response) => {
-      console.log('Respone', response.data);
-      if (response.data.status === 'ERR') {
-        onError(response.data.message);
-      } else {
-        onSuccess(response.data);
+  // check if all checkpoint of this mission is valid
+  const data = missionData.data;
+  let isValidate = false;
+  data.checkpoints.forEach((checkpoint: ICheckPoint, index: number) => {
+    if (!checkpoint?.isEnd) {
+      const { duration, participation, title, quorum } = checkpoint;
+      if (checkpoint.vote_machine_type) {
+        const { isValid, message } = VoteMachineValidate[
+          checkpoint.vote_machine_type as VoteMachineType
+        ]({ checkpoint: checkpoint });
+        if (duration && participation && title && isValid) {
+          if (checkpoint.vote_machine_type !== 'DocInput') {
+            if (quorum) {
+              isValidate = true;
+            }
+          } else {
+            isValidate = true;
+          }
+        }
       }
-    })
-    .catch((error) => {
-      console.log('Error', error);
-      onError(error);
-    });
-  dispatch(finishLoading({}));
+    }
+  });
+  if (isValidate) {
+    axios
+      .post(`${import.meta.env.VITE_SERVER_URL}/mission/create`, missionData)
+      .then((response) => {
+        console.log('Respone', response.data);
+        if (response.data.status === 'ERR') {
+          onError(response.data.message);
+        } else {
+          onSuccess(response.data);
+        }
+        dispatch(finishLoading({}));
+      })
+      .catch((error) => {
+        console.log('Error', error);
+        onError(error);
+        dispatch(finishLoading({}));
+      });
+  } else {
+    onError('Checkpoint of this proposal is missing attributes');
+    dispatch(finishLoading({}));
+  }
 };
 
 export const updateMission = async ({
