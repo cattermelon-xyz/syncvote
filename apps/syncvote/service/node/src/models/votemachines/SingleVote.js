@@ -115,6 +115,19 @@ class SingleVote extends VotingMachine {
       // Dont have vote by token
     }
 
+    if (!this.who || this.who.length === 0) {
+      this.who = [voteData.identify];
+    } else {
+      this.who = this.who.concat(voteData.identify);
+    }
+
+    if (this.participation.type === 'identity') {
+      this.result[voteData.option[0]].count += 1;
+      this.result[voteData.option[0]].voting_power += 1;
+    } else {
+      // Dont have vote by token
+    }
+
     return {};
   }
 
