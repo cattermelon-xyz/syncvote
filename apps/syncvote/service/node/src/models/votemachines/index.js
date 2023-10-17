@@ -23,7 +23,7 @@ class VotingMachine {
     this.startToVote = startToVote;
     this.endedAt = endedAt;
     this.tallyResult = tallyResult;
-    this.participation = JSON.parse(participation);
+    this.participation = JSON.parse(participation || `{}`);
   }
 
   isStarted() {

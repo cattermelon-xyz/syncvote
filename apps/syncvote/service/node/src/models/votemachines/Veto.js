@@ -8,6 +8,27 @@ class Veto extends VotingMachine {
     this.quorum = quorum;
   }
 
+  validate() {
+    let isValid = true;
+    const message = [];
+    if (!checkpoint?.children || checkpoint.children.length === 0) {
+      isValid = false;
+      message.push('Missing options');
+    }
+    if (!checkpoint?.quorum) {
+      isValid = false;
+      message.push('Missing quorum');
+    }
+    if (!checkpoint?.data.pass || !checkpoint?.data.fallback) {
+      isValid = false;
+      message.push('Missing pass or fallback option');
+    }
+    return {
+      isValid,
+      message,
+    };
+  }
+
   initDataForCVD() {
     let result = {
       '-1': {
