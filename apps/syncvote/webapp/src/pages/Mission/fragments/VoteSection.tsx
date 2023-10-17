@@ -3,6 +3,7 @@ import { Card, Button, Radio } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import ModalUpdateDocInput from './ModalUpdateDocInput';
 import { getTimeRemainingToEnd } from '@utils/helpers';
+import { getTimeRemainingToEnd } from '@utils/helpers';
 
 interface Props {
   currentCheckpointData: any;
@@ -83,7 +84,7 @@ const VoteSection: React.FC<Props> = ({
             type='primary'
             className='w-full'
             onClick={() => setOpenModalVoterInfo(true)}
-            disabled={selectedOption ? false : true}
+            disabled={selectedOption && getTimeRemainingToEnd(currentCheckpointData.endToVote) != "expired" ? false : true}
           >
             Vote
           </Button>
