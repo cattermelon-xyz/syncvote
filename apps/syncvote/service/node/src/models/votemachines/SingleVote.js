@@ -10,6 +10,23 @@ class SingleVote extends VotingMachine {
     this.options = options;
   }
 
+  validate(checkpoint) {
+    let isValid = true;
+    const message = [];
+    if (!checkpoint?.children || checkpoint.children.length === 0) {
+      isValid = false;
+      message.push('Missing options');
+    }
+    if (!checkpoint?.data.max) {
+      isValid = false;
+      message.push('Missing number of vote need to win');
+    }
+    return {
+      isValid,
+      message,
+    };
+  }
+
   initDataForCVD() {
     const options = this.options;
     if (options.length === 0) {
