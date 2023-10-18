@@ -23,8 +23,14 @@ async function createArweave(metadata) {
 
     console.log('https://arweave.net/' + metadataTransaction.id);
 
-    let response = await arweave.transactions.post(metadataTransaction);
-    console.log(response);
+    const response = await fetch('https://arweave.net/tx', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(metadataTransaction),
+    });
+    console.log('Test: ', response);
 
     return { arweave_id: 'https://arweave.net/' + metadataTransaction.id };
   } catch (error) {
