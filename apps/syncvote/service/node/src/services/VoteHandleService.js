@@ -4,6 +4,7 @@ const {
 } = require('../models/votemachines/VotingController');
 const moment = require('moment');
 const { insertCurrentVoteData } = require('./CurrentVoteDataService');
+const { createArweave } = require('../functions');
 
 async function handleVoting(props) {
   return new Promise(async (resolve, reject) => {
@@ -161,9 +162,16 @@ async function handleVoting(props) {
 
           if (shouldTally) {
             // change endedAt of current vote data to moment for this checkpoint
-            await supabase
+            const { current_vote_data } = await supabase
               .from('current_vote_data')
               .update({ endedAt: moment().format(), tallyResult: tallyResult })
+              .eq('id', mission_vote_details[0].cvd_id)
+              .select('*');
+
+            const { arweave_id } = await createArweave(current_vote_data[0]);
+            await supabase
+              .from('current_vote_data')
+              .update({ arweave_id: arweave_id })
               .eq('id', mission_vote_details[0].cvd_id);
 
             let startToVote = moment().format();
@@ -266,7 +274,7 @@ async function handleSubbmission(props) {
           if (mission_vote_details.length === 0) {
             resolve({
               status: 'ERR',
-              message: 'This mission is not created or publish!',
+              message: 'This mission is not created or publish',
             });
             return;
           }
@@ -286,7 +294,7 @@ async function handleSubbmission(props) {
 
           // 3️⃣ check if fallback
           const { fallback, error: f_error } = voteMachineController.fallBack();
-
+          
           if (fallback) {
             console.log('Move this mission to fallback checkpoint');
             resolve({

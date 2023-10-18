@@ -7,6 +7,7 @@ const { Veto } = require('../models/votemachines/Veto');
 const { UpVote } = require('../models/votemachines/Upvote');
 
 const moment = require('moment');
+const { createArweave } = require('../functions');
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: new SingleVote({}),
@@ -15,13 +16,22 @@ const VoteMachineValidate = {
   UpVote: new UpVote({}),
 };
 
-
 async function insertMission(props) {
   return new Promise(async (resolve, reject) => {
     try {
+      const { arweave_id, error: arweave_err } = await createArweave(props);
+
+      if (arweave_err) {
+        resolve({
+          status: 'ERR',
+          message: 'Cannot save this proposal to arweave',
+        });
+        return;
+      }
+
       const { data: newMission, error } = await supabase
         .from('mission')
-        .insert(props)
+        .insert({ ...props, arweave_id: arweave_id })
         .select('*');
 
       if (!error) {
