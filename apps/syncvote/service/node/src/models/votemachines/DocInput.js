@@ -3,8 +3,6 @@ const { VotingMachine } = require('.');
 class DocInput extends VotingMachine {
   constructor(props) {
     super(props);
-    const { docs } = props;
-    this.docs = docs;
   }
 
   validate(checkpoint) {
@@ -32,21 +30,17 @@ class DocInput extends VotingMachine {
       return { notRecorded: true, error: 'You need to pick one' };
     }
 
-    // check if contain enough submit
-    if (this.docs.length !== voteData.submission.length) {
-      return { notRecorded: true, error: 'Your doc required is not enough' };
-    }
+    // // check if contain enough submit
+    // if (this.docs.length !== voteData.submission.length) {
+    //   return { notRecorded: true, error: 'Your doc required is not enough' };
+    // }
 
     this.who = [voteData.identify];
     this.result = voteData.submission;
-    // [
-    //   {
-    //     arweaveId: 'arweaveId',
-    //     action: 'Edit || New || Appendix',
-    //     docId: '',
-    //   },
-    // ];
-    this.tallyResult = [voteData.option];
+    this.tallyResult = {
+      index: voteData.option[0],
+      submission: voteData.submission,
+    };
     return {};
   }
 

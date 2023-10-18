@@ -52,6 +52,13 @@ class VoteMachineController {
 
   getResult() {
     if (this.votingTypes[this.vote_machine_type]) {
+      if (this.vote_machine_type === 'DocInput') {
+        return {
+          who: this.votingTypes[this.vote_machine_type].who,
+          result: this.votingTypes[this.vote_machine_type].result,
+          tallyResult: this.votingTypes[this.vote_machine_type].tallyResult,
+        };
+      }
       return {
         who: this.votingTypes[this.vote_machine_type].who,
         result: this.votingTypes[this.vote_machine_type].result,
