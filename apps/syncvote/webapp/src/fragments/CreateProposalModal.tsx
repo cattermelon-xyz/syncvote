@@ -105,7 +105,7 @@ export const CreateProposalModal = ({
               title: 'Success',
               content: 'Create a new proposal successfully',
               onOk: () => {
-                navigate(`/${orgIdString}/`);
+                navigate(`/${orgIdString}`);
               },
             });
           },

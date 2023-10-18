@@ -191,14 +191,14 @@ const EditWorkflow = ({
           <Space direction='vertical' size='small' className='w-full'>
             <div>Workflow name</div>
             <Input
-              value={tempTitle}
+              value={tempTitle || workflow?.title}
               onChange={(e) => setTempTitle(e.target.value)}
             />
           </Space>
           <Space direction='vertical' size='small' className='w-full'>
             <div>Description</div>
             <TextEditor
-              value={tempDesc}
+              value={tempDesc || workflow?.desc}
               setValue={(val: any) => setTempDesc(val)}
             />
           </Space>
