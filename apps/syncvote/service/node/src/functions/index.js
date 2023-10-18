@@ -14,13 +14,16 @@ async function createArweave(metadata) {
       timeout: 20000,
       logging: false,
     });
+    console.log(1);
     const wallet = JSON.parse(process.env.ARWEAVE_KEY);
+    console.log(2);
     const metadataRequest = JSON.stringify(metadata);
+    console.log(3);
     const metadataTransaction = await arweave.createTransaction({
       data: metadataRequest,
     });
+    console.log(4);
     await arweave.transactions.sign(metadataTransaction, wallet);
-
     console.log('https://arweave.net/' + metadataTransaction.id);
 
     const response = await fetch('https://arweave.net/tx', {
