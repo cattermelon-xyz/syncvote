@@ -8,7 +8,7 @@ async function uploadMetadata(props) {
       if (error) {
         resolve({
           status: 'ERR',
-          message: 'Cannot upload this metadata',
+          message: `Cannot upload this metadata: ${error}`,
         });
       } else {
         resolve({
