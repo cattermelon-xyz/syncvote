@@ -14,7 +14,7 @@ async function createArweave(metadata) {
       timeout: 20000,
       logging: false,
     });
-    const wallet = JSON.parse(fs.readFileSync('arweave_wallet.json', 'utf-8'));
+    const wallet = JSON.parse(process.env.ARWEAVE_KEY);
     const metadataRequest = JSON.stringify(metadata);
     const metadataTransaction = await arweave.createTransaction({
       data: metadataRequest,
