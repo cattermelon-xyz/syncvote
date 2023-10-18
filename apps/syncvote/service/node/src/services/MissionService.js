@@ -4,7 +4,7 @@ const { insertCurrentVoteData } = require('./CurrentVoteDataService');
 const { SingleVote } = require('../models/votemachines/SingleVote');
 const { DocInput } = require('../models/votemachines/DocInput');
 const { Veto } = require('../models/votemachines/Veto');
-const { UpVote } = require('../models/votemachines/UpVote');
+const { UpVote } = require('../models/votemachines/Upvote');
 
 const moment = require('moment');
 

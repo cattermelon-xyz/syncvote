@@ -1,4 +1,5 @@
 const Arweave = require('arweave');
+const fs = require('fs');
 
 function isArraySubset(subset, superset) {
   return subset.some((item) => superset.includes(item));
@@ -45,19 +46,21 @@ async function createArweave() {
 
   metadata = metadata.trim();
 
-  console.log(metadata);
+  const wallet = JSON.parse(fs.readFileSync('arweave_wallet.json', 'utf-8'));
+
   const metadataRequest = JSON.parse(JSON.stringify(metadata));
+  console.log(metadataRequest);
 
-  const metadataTransaction = await arweave.createTransaction({
-    data: metadataRequest,
-  });
+  // const metadataTransaction = await arweave.createTransaction({
+  //   data: metadataRequest,
+  // });
 
-  await arweave.transactions.sign(metadataTransaction, process.env.ARWEAVE_KEY);
+  // await arweave.transactions.sign(metadataTransaction, wallet);
 
-  console.log('https://arweave.net/' + metadataTransaction.id);
+  // console.log('https://arweave.net/' + metadataTransaction.id);
 
-  let response = await arweave.transactions.post(metadataTransaction);
-  console.log(response);
+  // let response = await arweave.transactions.post(metadataTransaction);
+  // console.log(response);
 }
 
 createArweave();
