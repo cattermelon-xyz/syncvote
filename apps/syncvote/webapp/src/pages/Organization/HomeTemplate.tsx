@@ -25,8 +25,9 @@ const HomeTemplate: React.FC = () => {
     <div className='w-[800px] flex flex-col gap-y-14'>
       <section className='w-full'>
         <Title level={2} className='text-center'>
-          {L('exploreTopTierTemplates')}
+          {L('DAO management workflow templates')}
         </Title>
+        <p className='text-neutral-400 text-[16px] text-center leading-relaxed'>Don’t know where to start with your DAO? Copy best practices of <br></br> diverse management workflows from proven DAOs.</p>
         <SearchWithTag
           tagTo={TagObject.TEMPLATE}
           onResult={(result: any) => {

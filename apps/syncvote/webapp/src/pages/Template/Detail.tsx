@@ -11,7 +11,7 @@ import {
   queryATemplate,
   queryCurrentTemplateVersion,
 } from '@dal/data/template';
-import { Button, Modal, Skeleton, Space, Tag } from 'antd';
+import { Button, Modal, Skeleton, Space, Tag, message } from 'antd';
 import { DirectedGraph, emptyStage } from 'directed-graph';
 import Icon from 'icon/src/Icon';
 import moment from 'moment';
@@ -22,6 +22,7 @@ import { extractIdFromIdString, useGetDataHook } from 'utils';
 import ModalWorkflowFromTemplate from '@fragments/ModalWorkflowFromTemplate';
 import { AuthContext } from '@layout/context/AuthContext';
 import { config } from '@dal/config';
+import { MdEmail } from 'react-icons/md';
 
 const Detail = () => {
   const { templateIdString } = useParams();
@@ -36,7 +37,7 @@ const Detail = () => {
   const [template, setTemplate] = useState<any>(
     templates.find((tmpl: any) => tmpl.id === id)
   );
-  
+
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const [versionData, setVersionData] = useState(emptyStage);
@@ -79,6 +80,48 @@ const Detail = () => {
       }
     }
   }, []);
+  const handleLinkClick = () => {
+    const baseUrl = `${window.location.protocol}//${window.location.host}`;
+    navigator.clipboard
+      .writeText(`${baseUrl}/template/${templateIdString}`)
+      .then(() => {
+        message.success('Link copied to clipboard');
+      })
+      .catch((err) => {
+        message.error('Failed to copy link');
+      });
+  };
+
+  const handleTwitterClick = () => {
+    if (template) {
+      const templateName = template.title;
+      const baseUrl = `${window.location.protocol}//${window.location.host}`;
+      const templateLink = `${baseUrl}/template/${templateIdString}`;
+      const tweetText = `Check out ${templateName} on Syncvote: ${templateLink}`;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURI(tweetText)}`;
+      window.open(twitterUrl, '_blank');
+    } else {
+      message.error('Template data not available');
+    }
+  };
+
+  const handleEmailClick = () => {
+    if (template) {
+      const templateName = template.title;
+      const baseUrl = `${window.location.protocol}//${window.location.host}`;
+      const templateLink = `${baseUrl}/template/${templateIdString}`;
+      const subject = `Check out ${templateName} on Syncvote`;
+      const body = `Check out ${templateName} on Syncvote: ${templateLink}`;
+  
+      const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  
+      window.open(emailUrl, '_blank');
+    } else {
+      message.error('Template data not available');
+    }
+  };
+  
+
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
@@ -179,9 +222,21 @@ const Detail = () => {
             <Space direction='vertical'>
               <div className='font-bold text-md'>Share</div>
               <Space direction='horizontal'>
-                <Button icon={<LinkOutlined />} shape='round' />
-                <Button icon={<TwitterOutlined />} shape='round' />
-                <Button icon={<FacebookOutlined />} shape='round' />
+                <Button
+                  icon={<LinkOutlined />}
+                  shape='round'
+                  onClick={handleLinkClick}
+                />
+                <Button
+                  icon={<TwitterOutlined />}
+                  shape='round'
+                  onClick={handleTwitterClick}
+                />
+                <Button
+                  icon={<MdEmail />}
+                  shape='round'
+                  onClick={handleEmailClick}
+                />
               </Space>
             </Space>
           </Space>

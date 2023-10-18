@@ -47,6 +47,10 @@ function Header({ session }: HeaderProps) {
 
   const handleClearStore = () => {};
 
+  const redirectToLogin = () => {
+    navigate('/login');
+  };
+
   useEffect(() => {
     setCurrentOrg(orgs.find((org: any) => org.id === orgId));
   }, [orgs, orgId]);
@@ -142,20 +146,17 @@ function Header({ session }: HeaderProps) {
                     navigate('/');
                   }}
                 >
-                  <div className='flex top-[2%] left-[1.3%] gap-2'>
+                  <div className='flex top-[2%] pb-2 left-[1.3%]'>
                     <LogoSyncVote />
-                    <div className='text-violet-700 text-[20px] font-bold '>
-                      Syncvote
-                    </div>
                   </div>
                 </span>
               )}
             </span>
           </div>
         </div>
-        <div className='flex row'>
+        <div className='flex row items-center'>
           {!isAuth ? (
-            <Button type='link' icon={<TbBolt />}>
+            <Button type='link' icon={<TbBolt />} onClick={redirectToLogin}>
               Create your own workflow
             </Button>
           ) : null}
