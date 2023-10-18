@@ -94,37 +94,41 @@ const ModalVoterInfo: React.FC<Props> = ({
         return;
       }
 
-      // vote({
-      //   data: voteData,
-      //   onSuccess: (res: any) => {
-      //     if (res.data.status === 'FALLBACK') {
-      //       Modal.error({
-      //         title: 'Error',
-      //         content: res.data.message,
-      //       });
-      //     } else if (res.data.status === 'ERR') {
-      //       Modal.error({
-      //         title: 'Error',
-      //         content: res.data.message,
-      //       });
-      //     } else {
-      //       Modal.success({
-      //         title: 'Success',
-      //         content: 'Voting successfully',
-      //         onOk: () => {
-      //           window.location.reload();
-      //         },
-      //       });
-      //     }
-      //   },
-      //   onError: () => {
-      //     Modal.error({
-      //       title: 'Error',
-      //       content: 'Voting error',
-      //     });
-      //   },
-      //   dispatch,
-      // });
+      vote({
+        data: voteData,
+        onSuccess: (res: any) => {
+          if (res.data.status === 'FALLBACK') {
+            Modal.error({
+              title: 'Error',
+              content: res.data.message,
+            });
+          } else if (res.data.status === 'ERR') {
+            Modal.error({
+              title: 'Error',
+              content: res.data.message,
+            });
+          } else {
+            Modal.success({
+              title: 'Success',
+              content: 'Voting successfully',
+              onOk: () => {
+                window.location.reload();
+              },
+            });
+          }
+        },
+        onError: () => {
+          Modal.error({
+            title: 'Error',
+            content: 'Voting error',
+          });
+        },
+        dispatch,
+        typeVote:
+          currentCheckpointData.vote_machine_type === 'DocInput'
+            ? 'DocInput'
+            : undefined,
+      });
 
       onClose();
     } catch (error) {

@@ -8,22 +8,30 @@ export const vote = async ({
     console.error(e);
   },
   dispatch,
+  typeVote,
 }: {
   data: any;
   onSuccess: (data: any) => void;
   onError?: (error: any) => void;
   dispatch: any;
+  typeVote?: any;
 }) => {
   dispatch(startLoading({}));
 
+  const apiUrl =
+    typeVote === 'DocInput'
+      ? `${import.meta.env.VITE_SERVER_URL}/vote/submit-doc`
+      : `${import.meta.env.VITE_SERVER_URL}/vote/create`;
+
   axios
-    .post(`${import.meta.env.VITE_SERVER_URL}/vote/create`, data)
+    .post(apiUrl, data)
     .then((response) => {
       onSuccess(response);
+      dispatch(finishLoading({}));
     })
     .catch((error) => {
       console.log('Error', error);
       onError(error);
+      dispatch(finishLoading({}));
     });
-  dispatch(finishLoading({}));
 };
