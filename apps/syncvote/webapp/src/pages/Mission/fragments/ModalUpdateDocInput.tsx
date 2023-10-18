@@ -57,9 +57,7 @@ const ModalUpdateDocInput: React.FC<Props> = ({
     onClose();
   };
 
-  const handleInsertDocInput = async (optionDocId: string) => {
-    const content = editorValues[optionDocId] || '';
-    console.log('prepare content', content);
+  const handleInsertDocInput = async (content: string) => {
     insertDocInput({
       content,
       onSuccess: (res: any) => {
