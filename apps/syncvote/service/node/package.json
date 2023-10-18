@@ -6,7 +6,6 @@
   "scripts": {
     "start": "nodemon src/server.js",
     "test": "ts-node src/functions/index.js"
-
   },
   "author": "",
   "license": "ISC",
@@ -22,6 +21,7 @@
     "postgres": "^3.3.5",
     "moment": "^2.29.4",
     "@supabase/supabase-js": "^2.21.0",
-    "arweave": "1.14.4"
+    "arweave": "1.14.4",
+    "node-cron": "3.0.2"
   }
 }

@@ -10,6 +10,23 @@ class SingleVote extends VotingMachine {
     this.options = options;
   }
 
+  validate(checkpoint) {
+    let isValid = true;
+    const message = [];
+    if (!checkpoint?.children || checkpoint.children.length === 0) {
+      isValid = false;
+      message.push('Missing options');
+    }
+    if (!checkpoint?.data.max) {
+      isValid = false;
+      message.push('Missing number of vote need to win');
+    }
+    return {
+      isValid,
+      message,
+    };
+  }
+
   initDataForCVD() {
     const options = this.options;
     if (options.length === 0) {
@@ -83,6 +100,19 @@ class SingleVote extends VotingMachine {
     // check if abstain, dont increase the result, abstain send option [-1]'
     if (!this.includedAbstain && voteData.option[0] === -1) {
       return { notRecorded: true, error: 'Cannot vote abstain option' };
+    }
+
+    if (!this.who || this.who.length === 0) {
+      this.who = [voteData.identify];
+    } else {
+      this.who = this.who.concat(voteData.identify);
+    }
+
+    if (this.participation.type === 'identity') {
+      this.result[voteData.option[0]].count += 1;
+      this.result[voteData.option[0]].voting_power += 1;
+    } else {
+      // Dont have vote by token
     }
 
     if (!this.who || this.who.length === 0) {

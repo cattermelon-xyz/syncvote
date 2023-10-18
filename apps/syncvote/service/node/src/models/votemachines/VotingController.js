@@ -1,6 +1,6 @@
 const { Pooling } = require('./Pooling');
 const { Veto } = require('./Veto');
-const { UpVote } = require('./Upvote');
+const { UpVote } = require('./UpVote');
 const { SingleVote } = require('./SingleVote');
 const { DocInput } = require('./DocInput');
 
@@ -15,6 +15,14 @@ class VoteMachineController {
     };
     this.vote_machine_type = props.vote_machine_type;
   }
+
+  // validate(checkpoint) {
+  //   if (this.votingTypes[this.vote_machine_type]) {
+  //     return this.votingTypes[this.vote_machine_type].validate(checkpoint);
+  //   } else {
+  //     throw new Error(`Invalid data`);
+  //   }
+  // }
 
   initDataForCVD() {
     if (this.votingTypes[this.vote_machine_type]) {

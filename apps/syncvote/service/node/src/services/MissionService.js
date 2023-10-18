@@ -1,37 +1,20 @@
 const { supabase } = require('../configs/supabaseClient');
-const { Mission } = require('../models/Mission');
 const { insertCheckpoint } = require('./CheckpointService');
 const { insertCurrentVoteData } = require('./CurrentVoteDataService');
+const { SingleVote } = require('../models/votemachines/SingleVote');
+const { DocInput } = require('../models/votemachines/DocInput');
+const { Veto } = require('../models/votemachines/Veto');
+const { UpVote } = require('../models/votemachines/UpVote');
+
 const moment = require('moment');
 
-async function getAllMission() {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const { data, error } = await supabase.from('mission').select('*');
+const VoteMachineValidate = {
+  SingleChoiceRaceToMax: new SingleVote({}),
+  DocInput: new DocInput({}),
+  Veto: new Veto({}),
+  UpVote: new UpVote({}),
+};
 
-      if (!error) {
-        let missions = [];
-        data.map((m) => {
-          missions.push(
-            new Mission(m.id, m.owner_id, m.status, m.current_vote_data_id)
-          );
-        });
-        resolve({
-          status: 'OK',
-          message: 'SUCCESS',
-          data: missions,
-        });
-      } else {
-        resolve({
-          status: 'ERR',
-          massage: 'Cannot get all mission',
-        });
-      }
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
 
 async function insertMission(props) {
   return new Promise(async (resolve, reject) => {
@@ -44,19 +27,31 @@ async function insertMission(props) {
       if (!error) {
         if (newMission[0].status === 'PUBLIC') {
           newMission[0].data.checkpoints.map(async (checkpoint) => {
-            if (
-              !checkpoint.vote_machine_type ||
-              !checkpoint.title ||
-              !checkpoint.participation ||
-              !checkpoint.quorum ||
-              !checkpoint.thresholds ||
-              !checkpoint.duration
-            ) {
-              resolve({
-                status: 'ERR',
-                message: 'Input is required',
-              });
-              return;
+            if (!checkpoint.isEnd) {
+              const { duration, participation, title, quorum } = checkpoint;
+              const { isValid } =
+                VoteMachineValidate[checkpoint.vote_machine_type].validate(
+                  checkpoint
+                );
+
+              if (duration && participation && title && isValid) {
+                if (checkpoint.vote_machine_type !== 'DocInput') {
+                  if (!quorum) {
+                    resolve({
+                      status: 'ERR',
+                      message:
+                        'Checkpoint of this proposal is missing attributes',
+                    });
+                    return;
+                  }
+                }
+              } else {
+                resolve({
+                  status: 'ERR',
+                  message: 'Checkpoint of this proposal is missing attributes',
+                });
+                return;
+              }
             }
 
             const checkpointData = {
@@ -210,61 +205,7 @@ async function updateMission(props) {
   });
 }
 
-// async function getAMision(props) {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const { missionId } = props;
-//       const { data: newMission, error } = await supabase
-//         .from('mission')
-//         .select('*')
-//         .eq('id', missionId);
-
-//       if (!error) {
-//         if (newMission[0].status === 'PUBLIC') {
-//           newMission[0].data.checkpoints.map(async (checkpoint) => {
-//             const checkpointData = {
-//               id: `${newMission[0].id}-${checkpoint.id}`,
-//               vote_machine_type: checkpoint.vote_machine_type,
-//               title: checkpoint.title,
-//               docs: checkpoint.docs,
-//               mission_id: newMission[0].id,
-//               participation: checkpoint?.participation,
-//               quorum: 60,
-//               options: checkpoint.data?.options,
-//               delays: checkpoint?.delays,
-//               delayUnits: checkpoint?.delayUnits,
-//               duration: checkpoint?.duration,
-//               children: checkpoint?.children,
-//             };
-
-//             const error = await insertCheckpoint(checkpointData);
-//             if (error) {
-//               resolve({
-//                 status: 'ERR',
-//                 message: error,
-//               });
-//             }
-//           });
-//         }
-//         resolve({
-//           status: 'OK',
-//           message: 'SUCCESS',
-//           data: newMission,
-//         });
-//       } else {
-//         resolve({
-//           status: 'ERR',
-//           message: error,
-//         });
-//       }
-//     } catch (e) {
-//       reject(e);
-//     }
-//   });
-// }
-
 module.exports = {
-  // getAllMission,
   insertMission,
   updateMission,
 };

@@ -7,6 +7,19 @@ class DocInput extends VotingMachine {
     this.docs = docs;
   }
 
+  validate(checkpoint) {
+    let isValid = true;
+    const message = [];
+    if (!checkpoint?.children || checkpoint.children.length === 0) {
+      isValid = false;
+      message.push('Missing options');
+    }
+    return {
+      isValid,
+      message,
+    };
+  }
+
   recordVote(voteData) {
     // check recordVote of VotingMachine class
     const { notRecorded, error } = super.recordVote(voteData);
