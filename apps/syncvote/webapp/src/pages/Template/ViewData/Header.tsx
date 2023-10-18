@@ -50,9 +50,6 @@ function Header() {
           >
             <div className='flex items-center cursor-pointer gap-2'>
               <LogoSyncVote />
-              <div className='text-violet-700 text-[20px] font-bold '>
-                Syncvote
-              </div>
             </div>
           </div>
         </Space>

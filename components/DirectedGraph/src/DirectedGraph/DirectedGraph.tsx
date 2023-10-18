@@ -219,8 +219,8 @@ const Flow = () => {
         fitView={true}
         fitViewOptions={{
           padding: 20,
-          maxZoom: 4,
-          minZoom: 1,
+          maxZoom: 8,
+          minZoom: 0.5,
         }}
       >
         {window.innerWidth > 700 ? (
