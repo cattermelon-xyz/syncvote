@@ -361,11 +361,11 @@ async function handleSubbmission(props) {
             return;
           }
 
-          const { arweave_id } = await createArweave(current_vote_data[0]);
-          await supabase
-            .from('current_vote_data')
-            .update({ arweave_id: arweave_id })
-            .eq('id', mission_vote_details[0].cvd_id);
+          // const { arweave_id } = await createArweave(current_vote_data[0]);
+          // await supabase
+          //   .from('current_vote_data')
+          //   .update({ arweave_id: arweave_id })
+          //   .eq('id', mission_vote_details[0].cvd_id);
 
           let startToVote = moment().format();
           const index = tallyResult.index;
