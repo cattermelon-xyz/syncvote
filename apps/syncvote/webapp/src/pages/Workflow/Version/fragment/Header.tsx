@@ -196,11 +196,8 @@ function Header({
               navigate('/');
             }}
           >
-            <div className='flex items-center cursor-pointer gap-2'>
+            <div className='flex items-center pb-2 cursor-pointer gap-2'>
               <LogoSyncVote />
-              <div className='text-violet-700 text-[20px] font-bold '>
-                Syncvote
-              </div>
             </div>
           </div>
           <Divider type='vertical' />

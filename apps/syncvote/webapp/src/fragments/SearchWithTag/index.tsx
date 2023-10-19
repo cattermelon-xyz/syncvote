@@ -14,6 +14,7 @@ type SearchWithTagProps = {
   tagTo: TagObject;
   onResult: (result: any) => void;
   showSearchTag?: boolean;
+  //tags
 };
 
 
