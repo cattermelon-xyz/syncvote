@@ -19,19 +19,24 @@ const VoteMachineValidate = {
 async function insertMission(props) {
   return new Promise(async (resolve, reject) => {
     try {
-      const { arweave_id, error: arweave_err } = await createArweave(props);
+      // const { arweave_id, error: arweave_err } = await createArweave(props);
 
-      if (arweave_err) {
-        resolve({
-          status: 'ERR',
-          message: 'Cannot save this proposal to arweave',
-        });
-        return;
-      }
+      // if (arweave_err) {
+      //   resolve({
+      //     status: 'ERR',
+      //     message: 'Cannot save this proposal to arweave',
+      //   });
+      //   return;
+      // }
+
+      // const { data: newMission, error } = await supabase
+      //   .from('mission')
+      //   .insert({ ...props, arweave_id: arweave_id })
+      //   .select('*');
 
       const { data: newMission, error } = await supabase
         .from('mission')
-        .insert({ ...props, arweave_id: arweave_id })
+        .insert(props)
         .select('*');
 
       if (!error) {
