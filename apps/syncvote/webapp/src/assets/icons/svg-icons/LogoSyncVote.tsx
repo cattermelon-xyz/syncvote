@@ -4,7 +4,7 @@ type Props = {
 };
 
 function LogoSyncVote(props: Props) {
-  const { width = '150', height = '70' } = props;
+  const { width = '122', height = '32' } = props;
   return (
     <svg
       width={width}
