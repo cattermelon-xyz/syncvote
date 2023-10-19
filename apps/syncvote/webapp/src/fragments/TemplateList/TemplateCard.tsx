@@ -60,7 +60,7 @@ export const TemplateCard = ({
           />
         </div>
         <div className='flex items-center justify-between w-full my-1'>
-          <div className='w-2/3 flex'>
+          <div className='w-full flex'>
             <div
               className='text-xs text-[#252422] truncate-2-lines cursor-pointer hover:text-violet-500'
               onClick={() => {
