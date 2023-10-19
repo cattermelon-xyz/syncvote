@@ -4,7 +4,7 @@ type Props = {
 };
 
 function LogoSyncVote(props: Props) {
-  const { width = '150', height = '70' } = props;
+  const { width = '122', height = '32' } = props;
   return (
     <svg
       width={width}
@@ -13,7 +13,6 @@ function LogoSyncVote(props: Props) {
       viewBox='0 0 750 187' // Updated viewBox to fit the new path
       fill='none'
     >
-      {/* Replaced Path */}
       <path
         d='m107.11 105.83c0 8.422-7.088 15.201-15.634 14.673-7.3267-0.452-13.289-6.415-13.741-13.74-0.5267-8.5466 6.2506-15.636 14.673-15.636 1.612 0 3.1573 0.256 4.6067 0.74-0.9054 1.388-1.3627 3.092-1.168 4.912 0.3693 3.448 3.1613 6.245 6.6078 6.625 1.553 0.171 3.031-0.136 4.296-0.797 0.236 1.033 0.36 2.113 0.36 3.223z'
         fill='#6200EE'

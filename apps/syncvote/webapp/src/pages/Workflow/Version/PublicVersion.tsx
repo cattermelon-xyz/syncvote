@@ -44,6 +44,7 @@ import { L } from '@utils/locales/L';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import './public-version.scss';
 import { config } from '@dal/config';
+import LogoSyncVoteShort from '@assets/icons/svg-icons/LogoSyncVoteShort';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -189,7 +190,7 @@ export const PublicVersion = () => {
               {showRegisterInvitation ? (
                 <div className='absolute w-full h-full flex items-center justify-center z-50'>
                   <div className='flex items-center flex-row p-4 bg-white rounded-lg'>
-                    <LogoSyncVote />
+                    <LogoSyncVoteShort />
                     <div className='mx-4'>
                       <span className='font-bold mr-2'>
                         Welcome to Syncvote!
