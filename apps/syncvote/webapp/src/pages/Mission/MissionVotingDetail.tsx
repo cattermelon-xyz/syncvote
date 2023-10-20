@@ -18,6 +18,7 @@ import { extractCurrentCheckpointId } from '@utils/helpers';
 import MissionProgress from './fragments/MissionProgress';
 import VoteSection from './fragments/VoteSection';
 import ShowDescription from './fragments/ShowDescription';
+import ProposalDocuments from './fragments/ProposalDocuments';
 
 const MissionVotingDetail = () => {
   const { missionIdString } = useParams();
@@ -168,6 +169,12 @@ const MissionVotingDetail = () => {
                 titleDescription={'Checkpoint description'}
                 description={currentCheckpointData?.description}
               />
+              {missionData?.progress && (
+                <ProposalDocuments
+                  titleDescription={'Proposal documents'}
+                  missionData={missionData}
+                />
+              )}
               {!currentCheckpointData.isEnd && (
                 <VoteSection
                   currentCheckpointData={currentCheckpointData}
