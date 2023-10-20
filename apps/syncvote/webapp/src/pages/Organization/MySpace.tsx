@@ -130,10 +130,10 @@ const MySpace: React.FC = () => {
       setWorkflows(allWorkflows);
     }
     setLoading(false);
-    const url = PublicPageRedirect.getRedirectUrl();
-    if (url) {
-      navigate(url);
-    }
+    // const url = PublicPageRedirect.getRedirectUrl();
+    // if (url) {
+    //   navigate(url);
+    // }
   };
   const navigate = useNavigate();
 
