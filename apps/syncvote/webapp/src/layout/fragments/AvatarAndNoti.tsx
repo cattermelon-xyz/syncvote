@@ -2,14 +2,14 @@ import React, { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from 'icon';
 import { L } from '@utils/locales/L';
-import { Button, Popover, Space } from 'antd';
+import { Button, Popover, Space, Modal } from 'antd';
 import {
   BellOutlined,
   SettingOutlined,
   LogoutOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import { supabase, useGetDataHook } from 'utils';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { AuthContext } from '@layout/context/AuthContext';
@@ -27,6 +27,33 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
+
+  const handleLoginClick = async () => {
+    dispatch(startLoading({}));
+    
+    // Store the current page URL for redirection after OAuth
+    const currentURL = window.location.href;
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+        redirectTo: currentURL,
+      },
+    });
+
+    dispatch(finishLoading({}));
+
+    if (error) {
+      Modal.error({
+        title: L('error'),
+        content: error.message || '',
+      });
+    }
+};
 
   const { isAuth } = useContext(AuthContext);
 
@@ -100,9 +127,7 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
           type='default'
           icon={<UserOutlined />}
           className='rounded-full'
-          onClick={() => {
-            navigate('/login');
-          }}
+          onClick={handleLoginClick}
         >
           Login
         </Button>

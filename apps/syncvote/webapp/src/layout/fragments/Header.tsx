@@ -48,6 +48,7 @@ function Header({ session }: HeaderProps) {
   const handleClearStore = () => {};
 
   const redirectToLogin = () => {
+    sessionStorage.setItem('lastVisitedPage', location.pathname);
     navigate('/login');
   };
 

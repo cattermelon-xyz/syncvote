@@ -1,21 +1,34 @@
 import { AuthContext } from '@layout/context/AuthContext';
-import { useContext } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useContext, useEffect } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { isAuth } = useContext(AuthContext);
   let location = useLocation();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (isAuth) { // Check if the user is authenticated
+      const lastVisitedPage = sessionStorage.getItem('lastVisitedPage');
+      if (lastVisitedPage) {
+        navigate(lastVisitedPage); // Navigate to the stored page
+        sessionStorage.removeItem('lastVisitedPage'); // Clear the stored page
+      } else {
+        navigate('/'); // Default redirection if no stored page found
+      }
+    }
+  }, [isAuth, navigate]);
 
   if (!isAuth) {
-    // Redirect them to the workflow public view page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience
-    // than dropping them off on the home page.
-    const redirectToPublic = `/public${location.pathname}`;
-    return <Navigate to={redirectToPublic} state={{ from: location }} />;
+    // If user is not authenticated, store the current location
+    sessionStorage.setItem('lastVisitedPage', location.pathname);
+
+    const redirectToLogin = '/login';
+    return <Navigate to={redirectToLogin} />;
   }
 
   return children;
 }
+
 
 export default RequireAuth;
