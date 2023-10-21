@@ -305,3 +305,54 @@ export const insertMission = async ({
     console.log(error);
   }
 };
+
+export const insertDocInput = async ({
+  content,
+  onSuccess = (data) => {},
+  onError = (data) => {},
+  dispatch,
+}: {
+  content: string;
+  onSuccess?: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  dispatch(startLoading({}));
+  console.log('content', content);
+  const { data, error } = await supabase
+    .from('arweave')
+    .insert([{ content: content }])
+    .select();
+  if (!error) {
+    console.log('data return create doc', data);
+    onSuccess(data[0]);
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
+};
+
+export const queryDocInput = async ({
+  idDocInput,
+  onSuccess = (data) => {},
+  onError = (data) => {},
+  dispatch,
+}: {
+  idDocInput: number;
+  onSuccess?: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  // dispatch(startLoading({}));
+  const { data, error } = await supabase
+    .from('arweave')
+    .select('*')
+    .eq('id', idDocInput);
+  if (!error) {
+    console.log('data return create doc', data);
+    onSuccess(data[0]);
+  } else {
+    onError(error);
+  }
+  // dispatch(finishLoading({}));
+};

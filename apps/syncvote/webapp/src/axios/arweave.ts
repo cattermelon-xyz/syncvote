@@ -1,30 +1,24 @@
 import axios from 'axios';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 
-export const vote = async ({
+export const uploadArweave = async ({
   data,
   onSuccess,
   onError = (e: any) => {
     console.error(e);
   },
   dispatch,
-  typeVote,
 }: {
   data: any;
   onSuccess: (data: any) => void;
   onError?: (error: any) => void;
   dispatch: any;
-  typeVote?: any;
 }) => {
   dispatch(startLoading({}));
 
-  const apiUrl =
-    typeVote === 'DocInput'
-      ? `${import.meta.env.VITE_SERVER_URL}/vote/submit-doc`
-      : `${import.meta.env.VITE_SERVER_URL}/vote/create`;
-
+  console.log('chau beo', data);
   axios
-    .post(apiUrl, data)
+    .post(`${import.meta.env.VITE_SERVER_URL}/arweave/upload`, { data: data })
     .then((response) => {
       onSuccess(response);
       dispatch(finishLoading({}));
