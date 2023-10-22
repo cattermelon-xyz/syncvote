@@ -150,10 +150,13 @@ export const PublicVersion = () => {
 
     fetchData();
   }, []);
+
   const handleLogin = async () => {
     dispatch(startLoading({}));
-    PublicPageRedirect.confirm();
-    const redirectTo = import.meta.env.VITE_BASE_URL;
+    
+    // Store the current page URL for redirection after OAuth
+    const currentURL = window.location.href;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -161,17 +164,20 @@ export const PublicVersion = () => {
           access_type: 'offline',
           prompt: 'consent',
         },
-        redirectTo,
+        redirectTo: currentURL,
       },
     });
+
     dispatch(finishLoading({}));
+
     if (error) {
       Modal.error({
         title: L('error'),
         content: error.message || '',
       });
     }
-  };
+};
+
   const isDesktop = window.innerWidth > 700;
   return (
     <>
