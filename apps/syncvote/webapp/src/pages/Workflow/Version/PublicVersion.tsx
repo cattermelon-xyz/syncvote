@@ -44,6 +44,7 @@ import { L } from '@utils/locales/L';
 import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import './public-version.scss';
 import { config } from '@dal/config';
+import LogoSyncVoteShort from '@assets/icons/svg-icons/LogoSyncVoteShort';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -149,10 +150,13 @@ export const PublicVersion = () => {
 
     fetchData();
   }, []);
+
   const handleLogin = async () => {
     dispatch(startLoading({}));
-    PublicPageRedirect.confirm();
-    const redirectTo = import.meta.env.VITE_BASE_URL;
+    
+    // Store the current page URL for redirection after OAuth
+    const currentURL = window.location.href;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -160,17 +164,20 @@ export const PublicVersion = () => {
           access_type: 'offline',
           prompt: 'consent',
         },
-        redirectTo,
+        redirectTo: currentURL,
       },
     });
+
     dispatch(finishLoading({}));
+
     if (error) {
       Modal.error({
         title: L('error'),
         content: error.message || '',
       });
     }
-  };
+};
+
   const isDesktop = window.innerWidth > 700;
   return (
     <>
@@ -189,7 +196,7 @@ export const PublicVersion = () => {
               {showRegisterInvitation ? (
                 <div className='absolute w-full h-full flex items-center justify-center z-50'>
                   <div className='flex items-center flex-row p-4 bg-white rounded-lg'>
-                    <LogoSyncVote />
+                    <LogoSyncVoteShort />
                     <div className='mx-4'>
                       <span className='font-bold mr-2'>
                         Welcome to Syncvote!

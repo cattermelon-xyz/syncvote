@@ -67,6 +67,31 @@ async function insertMission(props) {
                 });
                 return;
               }
+            if (!checkpoint.isEnd) {
+              const { duration, participation, title, quorum } = checkpoint;
+              const { isValid } =
+                VoteMachineValidate[checkpoint.vote_machine_type].validate(
+                  checkpoint
+                );
+
+              if (duration && participation && title && isValid) {
+                if (checkpoint.vote_machine_type !== 'DocInput') {
+                  if (!quorum) {
+                    resolve({
+                      status: 'ERR',
+                      message:
+                        'Checkpoint of this proposal is missing attributes',
+                    });
+                    return;
+                  }
+                }
+              } else {
+                resolve({
+                  status: 'ERR',
+                  message: 'Checkpoint of this proposal is missing attributes',
+                });
+                return;
+              }
             }
 
             const checkpointData = {

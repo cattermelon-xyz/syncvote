@@ -24,6 +24,13 @@
   width: 100% !important;
 }
 
+.truncate-2-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .react-transform-wrapper:active {
   cursor: grabbing;
 }

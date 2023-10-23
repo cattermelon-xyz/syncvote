@@ -1,6 +1,6 @@
 const { Pooling } = require('./Pooling');
 const { Veto } = require('./Veto');
-const { UpVote } = require('./Upvote');
+const { UpVote } = require('./UpVote');
 const { SingleVote } = require('./SingleVote');
 const { DocInput } = require('./DocInput');
 

@@ -13,6 +13,7 @@ import { ReloadOutlined } from '@ant-design/icons';
 const Home: React.FC = () => {
   const dispatch = useDispatch();
   const [OrgsData, setOrgsData] = useState<any[]>([]);
+  const [originalOrgsData, setOriginalOrgsData] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -33,7 +34,7 @@ const Home: React.FC = () => {
       to,
       onSuccess: (data: any) => {
         setPage(page + 1);
-        setOrgsData((currentData: any) => [...currentData, ...data]);
+        setOriginalOrgsData((currentData: any) => [...currentData, ...data]);
       },
       onError: (error) => {
         Modal.error({
@@ -58,9 +59,12 @@ const Home: React.FC = () => {
         <SearchWithTag
           tagTo={TagObject.ORGANIZATION}
           onResult={(result: any) => {
-            if (result) {
+            if (result && result.length > 0) {
               setOrgsData(result);
               setIsSearching(true);
+            } else {
+              setOrgsData(originalOrgsData);
+              setIsSearching(false);
             }
           }}
           showSearchTag={false}
