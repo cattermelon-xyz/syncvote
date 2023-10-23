@@ -7,6 +7,9 @@
     "start": "nodemon src/server.js",
     "test": "ts-node src/functions/index.js"
   },
+  "engines": {
+    "node": ">=18.16.0"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
