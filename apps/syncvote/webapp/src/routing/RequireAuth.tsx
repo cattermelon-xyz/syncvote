@@ -3,11 +3,15 @@ import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 import { AuthContext } from '@layout/context/AuthContext';
 import { useContext, useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import {
-  HomeTemplate,
-} from '@pages/Organization';
+import { HomeTemplate } from '@pages/Organization';
 
-function RequireAuth({ children, homeTemplate }: { children: JSX.Element, homeTemplate: JSX.Element }) {
+function RequireAuth({
+  children,
+  homeTemplate,
+}: {
+  children: JSX.Element;
+  homeTemplate?: JSX.Element;
+}) {
   const { isAuth } = useContext(AuthContext);
   let location = useLocation();
   const navigate = useNavigate();
@@ -23,8 +27,12 @@ function RequireAuth({ children, homeTemplate }: { children: JSX.Element, homeTe
   }, [isAuth, navigate]);
 
   // If user is at the root path and is not authenticated, show HomeTemplate
-  if (!isAuth && location.pathname === '/') {
-    return <WebLayoutWithoutSider><HomeTemplate /></WebLayoutWithoutSider>;
+  if (!isAuth && location.pathname === '/' && homeTemplate) {
+    return (
+      <WebLayoutWithoutSider>
+        <HomeTemplate />
+      </WebLayoutWithoutSider>
+    );
   }
 
   if (!isAuth) {
