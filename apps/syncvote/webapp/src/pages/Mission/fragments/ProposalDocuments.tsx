@@ -37,7 +37,19 @@ const ProposalDocuments: React.FC<Props> = ({
       );
       setVersionOfADoc(versions);
     }
+
+     if(listVersionDocs) {
+      
+     }
   }, [listVersionDocs, currentDocId]);
+
+  useEffect(() => {
+    console.log('missionData', missionData);
+    console.log('currentDocId', currentDocId);
+    console.log('currentDoc', currentDoc);
+    console.log('listVersionDocs', listVersionDocs);
+    console.log('versionOfADoc', versionOfADoc);
+  }, [missionData, currentDocId, currentDoc, listVersionDocs, versionOfADoc]);
 
   return (
     <>
