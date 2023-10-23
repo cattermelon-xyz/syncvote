@@ -6,6 +6,8 @@ import NotFound404 from '@pages/NotFound404';
 import PublicRoutes from './PublicRoutes';
 import AuthRoutes from './AuthRoutes';
 import OrgRoutes from './OrgRoutes';
+import HomeRoutes from './HomeRoutes';
+import TemplateRoutes from './TemplateRoutes';
 import AccountRoutes from './AccountRoutes';
 import EditorRoutes from './EditorRoutes';
 import VotingRoutes from './VotingRoutes';
@@ -23,7 +25,6 @@ import {
 } from '@pages/Organization';
 import WebLayout from '@layout/WebLayout';
 import TemplateDetail from '@pages/Template/Detail';
-import { TemplateViewData } from '@pages/Template/ViewData';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { config } from '@dal/config';
 import DocDetail from '@pages/Mission/DocDetail';
@@ -80,39 +81,14 @@ const AppRoutes = () => {
           {OrgRoutes}
           {AccountRoutes}
           {VotingRoutes}
-          <Route path='/' element={<App layout={WebLayoutWithoutSider} />}>
-            <Route
-              path='template/:templateIdString'
-              element={<TemplateDetail />}
-            />
-          </Route>
+          {HomeRoutes}
+          {TemplateRoutes}
           <Route path='/' element={<App layout={WebLayoutWithoutSider} />}>
             <Route
               path='doc/:orgIdString/:workflowIdString/:versionIdString/:docId'
               element={<DocDetail />}
             />
           </Route>
-          <Route path='/' element={<App layout={NoHeaderAppLayout} />}>
-            <Route
-              path='template/detail/:templateIdString'
-              element={<TemplateViewData />}
-            />
-          </Route>
-          {env === 'production' && session !== null ? (
-            <Route path='/' element={<App layout={WebLayout} />}>
-              <Route index element={<MySpace />} />
-              <Route path='/explore' element={<OrganizationExplore />} />
-              <Route path='/templates' element={<HomeTemplate />} />
-            </Route>
-          ) : null}
-          {env === 'dev' && session !== null ? (
-            <Route path='/' element={<App layout={WebLayout} />}>
-              <Route index element={<MySpace />} />
-              <Route path='/explore' element={<OrganizationExplore />} />
-              <Route path='/shared' element={<SharedSpace />} />
-              <Route path='/templates' element={<HomeTemplate />} />
-            </Route>
-          ) : null}
           {session === null ? (
             <Route path='*' element={<App layout={WebLayoutWithoutSider} />}>
               <Route index element={<HomeTemplate />} />
