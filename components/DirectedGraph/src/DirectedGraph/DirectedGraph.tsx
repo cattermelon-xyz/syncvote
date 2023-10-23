@@ -45,6 +45,7 @@ import EdgeConfigPanel from './EdgeConfigPanel';
 import { renderVoteMachineConfigPanel } from './renderVoteMachineConfigPanel';
 import DocsConfigPanel from './DocsConfigPanel';
 
+const env = import.meta.env.VITE_ENV;
 const nodeTypes = { ...MultipleDirectNode.getType() };
 const edgeTypes = {
   ...SelfConnectingEdge.getType(),
@@ -277,14 +278,16 @@ const Flow = () => {
           <>
             <Panel position='bottom-center'>
               <Space direction='horizontal'>
-                <div
-                  className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100'
-                  onClick={() => setIsDocsShown(true)}
-                  title='List of document'
-                >
-                  <PaperClipOutlined />
-                  <Badge count={docs.length ? docs.length : 0} />
-                </div>
+                {env === 'dev' ? (
+                  <div
+                    className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100'
+                    onClick={() => setIsDocsShown(true)}
+                    title='List of document'
+                  >
+                    <PaperClipOutlined />
+                    <Badge count={docs.length ? docs.length : 0} />
+                  </div>
+                ) : null}
                 <div
                   className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100'
                   onClick={onResetPosition}
