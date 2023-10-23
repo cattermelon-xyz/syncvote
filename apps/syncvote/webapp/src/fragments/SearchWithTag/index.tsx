@@ -14,10 +14,28 @@ type SearchWithTagProps = {
   tagTo: TagObject;
   onResult: (result: any) => void;
   showSearchTag?: boolean;
-  //tags
+  onSelectedTagsChange?: (selectedTags: string[]) => void;
 };
 
+const fixedTags = [
+  { value: 'Governance & Voting', count: 0 },
+  { value: 'Recruitment', count: 0 },
+  { value: 'Community Engagement', count: 0 },
+  { value: 'Budget & Payment', count: 0 },
+  { value: 'Grants & Investment', count: 0 },
+  { value: 'Social', count: 0 },
+  { value: 'Other', count: 0 },
+];
 
+const calculateTagCounts = (data: any[]) => {
+  const updatedTags = [...fixedTags];
+  updatedTags.forEach((tag) => {
+    tag.count = data.filter((item) =>
+      item.tags?.some((itemTag: any) => itemTag.label === tag.value)
+    ).length;
+  });
+  return updatedTags;
+};
 
 const SearchWithTag = ({
   className = '',
@@ -25,6 +43,7 @@ const SearchWithTag = ({
   tagTo = TagObject.TEMPLATE,
   onResult,
   showSearchTag = true,
+  onSelectedTagsChange, 
 }: SearchWithTagProps) => {
   const tags: ITag[] = useGetDataHook({
     params: { tagTo: tagTo },
@@ -34,20 +53,22 @@ const SearchWithTag = ({
   const dispatch = useDispatch();
 
   let data: any;
-    switch (tagTo) {
-      case TagObject.TEMPLATE:
-        data = useGetDataHook({
-          configInfo: config.queryTemplate,
-        }).data;
-        break;
-      default:
-        break;
-    }
+  switch (tagTo) {
+    case TagObject.TEMPLATE:
+      data = useGetDataHook({
+        configInfo: config.queryTemplate,
+      }).data;
+      break;
+    default:
+      break;
+  }
 
-  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const updatedTags = calculateTagCounts(data);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [inputSearchText, setInputSearchText] = useState('');
   const [toSearch, setToSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  
   const extractCount = (t: any) => {
     switch (tagTo) {
       case TagObject.TEMPLATE:
@@ -62,6 +83,13 @@ const SearchWithTag = ({
   };
 
   useEffect(() => {
+    if (onSelectedTagsChange) {
+      onSelectedTagsChange(selectedTagIds);
+    }
+  }, [selectedTagIds, onSelectedTagsChange]);
+
+
+  useEffect(() => {
     if (!inputSearchText && selectedTagIds.length === 0) {
       onResult(data);
     }
@@ -69,18 +97,47 @@ const SearchWithTag = ({
 
   const search = async ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
+    
+    const searchParams = {
+      inputSearch: text,
+      tags,  // Add tags here
+    };
 
-    if (text){
-      console.log("text in searchWithTag", text)
-
-      // TODO: change to search api
+    console.log("searchParams", searchParams)
+  
+    if (text || tags.length > 0) {  // Modified to also trigger when tags are selected
       switch (tagTo) {
         case TagObject.TEMPLATE:
+          await useSetData({
+            params: searchParams,  // Modified to include tags
+            configInfo: config.searchTemplate,
+            dispatch,
+            onSuccess: (data) => {
+              console.log('Success Data:', data);
+              onResult(data);
+              setLoading(false);
+            },
+            onError: (error: any) => {
+              console.log('Error Object:', JSON.stringify(error));
+              let contentMessage = 'Search failed';
+              
+              if (error.code === '42601') {
+                contentMessage = 'Syntax error in query';
+              }
+              
+              Modal.error({
+                title: 'Error',
+                content: contentMessage,
+              });
+            }
+          });
+          break;
+        case TagObject.ORGANIZATION: // New case for organization
           await useSetData({
             params: {
               inputSearch: text,
             },
-            configInfo: config.searchTemplate,
+            configInfo: config.querySearchOrgForExplore,
             dispatch,
             onSuccess: (data) => {
               onResult(data);
@@ -94,26 +151,6 @@ const SearchWithTag = ({
             },
           });
           break;
-  
-        case TagObject.ORGANIZATION: // New case for organization
-            await useSetData({
-              params: {
-                inputSearch: text,
-              },
-              configInfo: config.querySearchOrgForExplore,
-              dispatch,
-              onSuccess: (data) => {
-                onResult(data);
-                setLoading(false);
-              },
-              onError: () => {
-                Modal.error({
-                  title: 'Error',
-                  content: 'Search failed',
-                });
-              },
-            });
-            break;
         default:
           break;
       }
@@ -162,38 +199,37 @@ const SearchWithTag = ({
         }}
       />
       {showSearchTag && (
-
-      <div className='w-full'>
-        {tags.map((tag: any) => {
-          return (
-            <Tag
-              className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full ${
-                selectedTagIds.indexOf(tag.value) !== -1
-                  ? 'bg-violet-500 text-white'
-                  : ''
-              }`}
-              onClick={() => {
-                const newselectedTagIds = structuredClone(selectedTagIds);
-                const idx = selectedTagIds.indexOf(tag.value);
-                if (idx !== -1) {
-                  newselectedTagIds.splice(idx, 1);
-                } else {
-                  newselectedTagIds.push(tag.value);
-                }
-                setSelectedTagIds(newselectedTagIds);
-                setInputSearchText('');
-                search({ tags: newselectedTagIds, text: '' });
-              }}
-              key={tag.value}
-            >
-              {tag.label} ({extractCount(tag)})
-            </Tag>
-          );
-        })}
-      </div>
-      )}
-    </Space>
-  );
+  <div className="flex flex-wrap">
+    {updatedTags.map((tag: { value: string; count: number }) => (
+      <Tag
+        className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full mb-3 ${
+          selectedTagIds.indexOf(tag.value) !== -1
+            ? 'bg-violet-500 text-white'
+            : ''
+        }`}
+        onClick={() => {
+          const newselectedTagIds = [...selectedTagIds];
+          const idx = selectedTagIds.indexOf(tag.value);
+          if (idx !== -1) {
+            newselectedTagIds.splice(idx, 1);
+          } else {
+            newselectedTagIds.push(tag.value);
+          }
+          setSelectedTagIds(newselectedTagIds);
+          setInputSearchText('');
+          search({ tags: newselectedTagIds, text: '' });
+        }}
+        
+        key={tag.value}
+      >
+        {tag.value} ({tag.count})
+      </Tag>
+    ))}
+  </div>
+)}
+</Space>
+);
 };
 
 export default SearchWithTag;
+

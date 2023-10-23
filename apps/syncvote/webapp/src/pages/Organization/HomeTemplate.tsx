@@ -10,6 +10,7 @@ import { config } from '@dal/config';
 
 const HomeTemplate: React.FC = () => {
   const [templates, setTemplates] = useState([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const dataTemplates = useGetDataHook({
     configInfo: config.queryTemplate,
@@ -21,23 +22,34 @@ const HomeTemplate: React.FC = () => {
     }
   }, [dataTemplates]);
 
+
+  const filterTemplates = () => {
+    if (selectedTags.length === 0) return templates;
+
+    return templates.filter((template: any) => {
+      return selectedTags.every((tag) => 
+        template.tags?.some((templateTag: any) => templateTag.label === tag)
+      );
+    });
+  };
+
   return (
     <div className='w-[800px] flex flex-col gap-y-14'>
       <section className='w-full'>
         <Title level={2} className='text-center'>
           {L('DAO management workflow templates')}
         </Title>
-        <p className='text-neutral-400 text-[16px] text-center leading-relaxed'>Don’t know where to start with your DAO? Copy best practices of <br></br> diverse management workflows from proven DAOs.</p>
         <SearchWithTag
           tagTo={TagObject.TEMPLATE}
           onResult={(result: any) => {
             setTemplates(result);
           }}
+          onSelectedTagsChange={(tags: string[]) => setSelectedTags(tags)}  // Added this line
         />
         <>
           {templates && (
             <TemplateList
-              templates={templates.filter((tmpl: any) => tmpl.status === true)}
+              templates={filterTemplates().filter((tmpl: any) => tmpl.status === true)}  // Used filterTemplates here
             />
           )}
         </>

@@ -261,11 +261,23 @@ export class TemplateFunctionClass {
     dispatch(startLoading({}));
     const { data, error } = await supabase
       .from('template')
-      .select('*')
-      .eq('id', templateId);
+      .select(`
+      *,
+      tag_template (
+        tag_id,
+        tag: tag_id (
+          label
+        )
+      )
+    `)
+    .eq('id', templateId);
     if (!error) {
-      dispatch(addTemplate(data[0]));
-      onSuccess(data[0]);
+      const templateWithTags = {
+        ...data[0],
+        tags: data[0].tag_template.map((t: { tag: any }) => t.tag),
+      };
+      dispatch(addTemplate(templateWithTags));
+      onSuccess(templateWithTags);
     } else {
       onError(error);
     }

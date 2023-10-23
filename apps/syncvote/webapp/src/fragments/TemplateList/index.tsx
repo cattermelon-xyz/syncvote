@@ -13,28 +13,40 @@ import { config } from '@dal/config';
 type TemplateListProps = {
   templates: any[];
   orgId?: number;
+  selectedTags?: string[];  // Added this line
 };
 
 interface SortProps {
   by: string;
   type: 'asc' | 'des';
 }
-/*
- * This component include both list of TemplateCard and PublishTemplate button
- */
-const TemplateList = ({ templates, orgId }: TemplateListProps) => {
+
+const TemplateList = ({ templates, orgId, selectedTags }: TemplateListProps) => {  // Included selectedTags
   const orgs = useGetDataHook({
     configInfo: config.queryOrgs,
   }).data;
+
+  // Added this function to filter templates based on selected tags
+  const filterTemplatesByTags = () => {
+    if (!selectedTags || selectedTags.length === 0) return filterTemplateByOptions;
+
+    return filterTemplateByOptions.filter((template: any) => {
+      return selectedTags.every((tag) => 
+        template.tags?.some((templateTag: any) => templateTag.label === tag)
+      );
+    });
+  };
 
   const [sortTemplateOptions, setSortTemplateOptions] = useState<SortProps>({
     by: 'Last modified',
     type: 'des',
   });
+
   const filterTemplateByOptions = useFilteredData(
     templates || [],
     sortTemplateOptions
   );
+
   const navigate = useNavigate();
   const [editingTemplateId, setEditingTemplateId] = useState(-1);
   const [showModalEditTemplate, setShowModalEditTemplate] = useState(false);
@@ -81,7 +93,7 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
         template={selectedTemplate}
         selectedOrgId={orgId}
       />
-      {filterTemplateByOptions && filterTemplateByOptions.length > 0 ? (
+     {filterTemplatesByTags() && filterTemplatesByTags().length > 0 ? (
         <ListItem
           handleSort={handleSortTemplate}
           items={
@@ -173,7 +185,11 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
             <Button
               type='primary'
               icon={<PlusOutlined />}
-              onClick={() => setShowModalEditTemplate(true)}
+              onClick={() => {
+                setEditingTemplateId(-1);
+                setSelectedTemplate({});
+                setShowModalEditTemplate(true);
+              }}
               disabled={!canPublishTemplate}
             >
               New Template

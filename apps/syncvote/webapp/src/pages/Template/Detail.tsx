@@ -38,6 +38,8 @@ const Detail = () => {
     templates.find((tmpl: any) => tmpl.id === id)
   );
 
+  const tags = template?.tags || [];
+
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const [versionData, setVersionData] = useState(emptyStage);
@@ -98,7 +100,9 @@ const Detail = () => {
       const baseUrl = `${window.location.protocol}//${window.location.host}`;
       const templateLink = `${baseUrl}/template/${templateIdString}`;
       const tweetText = `Check out ${templateName} on Syncvote: ${templateLink}`;
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURI(tweetText)}`;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURI(
+        tweetText
+      )}`;
       window.open(twitterUrl, '_blank');
     } else {
       message.error('Template data not available');
@@ -112,15 +116,16 @@ const Detail = () => {
       const templateLink = `${baseUrl}/template/${templateIdString}`;
       const subject = `Check out ${templateName} on Syncvote`;
       const body = `Check out ${templateName} on Syncvote: ${templateLink}`;
-  
-      const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  
+
+      const emailUrl = `mailto:?subject=${encodeURIComponent(
+        subject
+      )}&body=${encodeURIComponent(body)}`;
+
       window.open(emailUrl, '_blank');
     } else {
       message.error('Template data not available');
     }
   };
-  
 
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -211,12 +216,14 @@ const Detail = () => {
             <div>{parse(template?.desc || '')}</div>
           </div>
           <Space direction='vertical' className='full'>
-            <Space direction='vertical'>
+            <Space direction='vertical' className='mb-2'>
               <div className='font-bold text-md'>Tags</div>
-              <div className='flex inline'>
-                <Tag>Governance</Tag>
-                <Tag>Decision-making</Tag>
-                <Tag>Uniswap</Tag>
+              <div className='flex'>
+                {tags.length > 0 ? (
+                  tags.map((tag:any) => <Tag key={tag.id}>{tag.label}</Tag>)
+                ) : (
+                  <span className='text-neutral-500'>No tags available</span>
+                )}
               </div>
             </Space>
             <Space direction='vertical'>
