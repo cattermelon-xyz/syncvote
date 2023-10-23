@@ -1,6 +1,6 @@
 import App from '@App';
 import WebLayout from '@layout/WebLayout';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Route } from 'react-router-dom';
 const env = import.meta.env.VITE_ENV;
 import {
@@ -18,7 +18,7 @@ export default (
         <Route
           path='/'
           element={
-            <RequireAuth>
+            <RequireAuth homeTemplate={<HomeTemplate />}>
               <App layout={WebLayout} />
             </RequireAuth>
           }
@@ -35,7 +35,7 @@ export default (
         <Route
           path='/'
           element={
-            <RequireAuth>
+            <RequireAuth homeTemplate={<HomeTemplate />}>
               <App layout={WebLayout} />
             </RequireAuth>
           }
