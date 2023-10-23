@@ -86,6 +86,7 @@ export class TemplateFunctionClass {
       bannerUrl?: string;
       status?: boolean;
       workflowVersionId?: number;
+      workflowId?: number;
     };
     onSuccess?: (data: any) => void;
     onError?: (data: any) => void;
@@ -101,6 +102,7 @@ export class TemplateFunctionClass {
       bannerUrl,
       status,
       workflowVersionId,
+      workflowId,
     } = params;
 
     let errorMsg = undefined;
@@ -145,6 +147,11 @@ export class TemplateFunctionClass {
       dispatch(changeTemplate(toUpdateRedux));
       return { data, error };
     } else {
+      const { data: workflow, error: w_error } = await supabase
+        .from('workflow')
+        .select('desc')
+        .eq('id', workflowId);
+
       const { data, error } = await supabase
         .from('template')
         .insert({
@@ -154,6 +161,7 @@ export class TemplateFunctionClass {
           icon_url: iconUrl,
           banner_url: bannerUrl,
           status: true,
+          workflow_description: workflow ? workflow[0].desc : '',
         })
         .select('id');
       if (data) {
@@ -549,4 +557,3 @@ export const queryCurrentTemplateVersion = async ({
   }
   return { data: undefined, error };
 };
-
