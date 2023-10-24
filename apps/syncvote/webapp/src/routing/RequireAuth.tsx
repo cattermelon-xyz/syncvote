@@ -7,7 +7,7 @@ import {
   HomeTemplate,
 } from '@pages/Organization';
 
-function RequireAuth({ children, homeTemplate }: { children: JSX.Element, homeTemplate: JSX.Element }) {
+function RequireAuth({ children, homeTemplate }: { children: JSX.Element, homeTemplate?: JSX.Element }) {
   const { isAuth } = useContext(AuthContext);
   let location = useLocation();
   const navigate = useNavigate();
