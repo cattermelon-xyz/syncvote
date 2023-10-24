@@ -65,6 +65,8 @@ export const TemplateViewData = () => {
         });
       if (!error) {
         setVersion(versionData);
+        console.log(data);
+        
         setTemplate({
           title: data.title,
           id: data.id,
@@ -73,6 +75,7 @@ export const TemplateViewData = () => {
           owner_org_id: data.owner_org_id,
           created_at: data.created_at,
           tags: data.tag_template,
+          workflow_description: data.workflow_description || '',
         });
       } else {
         Modal.error({
@@ -284,9 +287,9 @@ export const TemplateViewData = () => {
                   </Space>
                 </Space>
                 <div className='overflow-y-scroll'>
-                  {template.desc ? (
+                  {template.workflow_description ? (
                     <div className='m-4 p-4 bg-white rounded-lg public-desc-wrapper'>
-                      {parse(template.desc)}
+                      {parse(template.workflow_description)}
                     </div>
                   ) : (
                     <Empty />
