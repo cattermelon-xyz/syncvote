@@ -49,6 +49,7 @@ async function insertMission(props) {
                   checkpoint
                 );
 
+                
               if (duration && participation && title && isValid) {
                 if (checkpoint.vote_machine_type !== 'DocInput') {
                   if (!quorum) {
