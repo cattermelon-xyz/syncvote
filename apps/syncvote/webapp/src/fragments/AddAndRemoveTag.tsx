@@ -14,6 +14,18 @@ type AddAndRemoveTagProps = {
   setOptionTags?: (optionTags: any) => void;
 };
 
+const fixedTags = [
+  'Governance & Voting',
+  'Recruitment',
+  'Community Engagement',
+  'Budget & Payment',
+  'Grants & Investment',
+  'Social',
+  'Other',
+];
+
+const { Option, OptGroup } = Select;
+
 const AddAndRemoveTag = ({
   templateId = -1,
   onTagsChange,
@@ -51,6 +63,26 @@ const AddAndRemoveTag = ({
   useEffect(() => {
     setExistedTags(template?.tags || []);
   }, [template]);
+
+  useEffect(() => {
+    const fixedTagOptions = fixedTags.map((tag) => ({
+      label: tag,
+      value: tag,
+    }));
+
+    const fixedTagLabels = new Set(fixedTags.map((tag) => tag));
+
+    const uniqueOptions = options.filter(
+      (option) =>
+        typeof option.label === 'string' && !fixedTagLabels.has(option.label)
+    );
+
+    const mergedOptions = [...uniqueOptions, ...fixedTagOptions];
+
+    if (setOptionTags) {
+      setOptionTags(mergedOptions);
+    }
+  }, [options]);
 
   const onChangeTagValue = async (tagIds: any[]) => {
     if (templateId === -1) {
@@ -97,23 +129,23 @@ const AddAndRemoveTag = ({
     <Space direction='vertical' className='w-full'>
       <div>Tags</div>
 
-      {templateId === -1 ? (
-        <Select
-          mode='tags'
-          style={{ width: '100%' }}
-          onChange={onChangeTagValue}
-          options={options}
-        />
-      ) : (
-        <Select
-          className='w-full'
-          mode='tags'
-          options={options}
-          onChange={onChangeTagValue}
-          value={existedTags}
-          loading={false}
-        />
-      )}
+      <Select mode='tags' style={{ width: '100%' }} onChange={onChangeTagValue}>
+        <OptGroup label='Categories'>
+          {fixedTags.map((tag, index) => (
+            <Option key={`fixed-${tag}`} value={tag}>
+              {tag}
+            </Option>
+          ))}
+        </OptGroup>
+
+        <OptGroup label='Popular Tags'>
+          {options.map((option, index) => (
+            <Option key={`dynamic-${option.value}`} value={option.value}>
+              {option.label}
+            </Option>
+          ))}
+        </OptGroup>
+      </Select>
     </Space>
   );
 };
