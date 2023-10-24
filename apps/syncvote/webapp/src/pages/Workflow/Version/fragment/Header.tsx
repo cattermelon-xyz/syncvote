@@ -267,6 +267,10 @@ function Header({
                     '_blank'
                   );
                 } else if (env === 'dev') {
+                  window.open(
+                    `/public/${orgIdString}/${workflowIdString}/${versionIdString}`,
+                    '_blank'
+                  );
                   setViewMode(
                     viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
                       ? GraphViewMode.VIEW_ONLY

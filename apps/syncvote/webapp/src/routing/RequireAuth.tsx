@@ -1,27 +1,34 @@
+import App from '@App';
+import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 import { AuthContext } from '@layout/context/AuthContext';
 import { useContext, useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import {
+  HomeTemplate,
+} from '@pages/Organization';
 
-function RequireAuth({ children }: { children: JSX.Element }) {
+function RequireAuth({ children, homeTemplate }: { children: JSX.Element, homeTemplate?: JSX.Element }) {
   const { isAuth } = useContext(AuthContext);
   let location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuth) {
-      // Check if the user is authenticated
       const lastVisitedPage = sessionStorage.getItem('lastVisitedPage');
       if (lastVisitedPage) {
-        navigate(lastVisitedPage); // Navigate to the stored page
-        sessionStorage.removeItem('lastVisitedPage'); // Clear the stored page
+        navigate(lastVisitedPage);
+        sessionStorage.removeItem('lastVisitedPage');
       }
     }
   }, [isAuth, navigate]);
 
-  if (!isAuth) {
-    // If user is not authenticated, store the current location
-    sessionStorage.setItem('lastVisitedPage', location.pathname);
+  // If user is at the root path and is not authenticated, show HomeTemplate
+  if (!isAuth && location.pathname === '/') {
+    return <WebLayoutWithoutSider><HomeTemplate /></WebLayoutWithoutSider>;
+  }
 
+  if (!isAuth) {
+    sessionStorage.setItem('lastVisitedPage', location.pathname);
     const redirectToLogin = '/login';
     return <Navigate to={redirectToLogin} />;
   }

@@ -130,11 +130,11 @@ const VerticalNav = () => {
           {
             label: (
               <>
-                <GlobalOutlined />
-                Explore
+                <ShareAltOutlined />
+                Shared workspaces
               </>
             ),
-            destinationUrl: '/explore',
+            destinationUrl: '/shared',
           },
           {
             label: (
