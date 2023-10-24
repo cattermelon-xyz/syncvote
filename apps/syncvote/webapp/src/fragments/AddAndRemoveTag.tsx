@@ -129,7 +129,13 @@ const AddAndRemoveTag = ({
     <Space direction='vertical' className='w-full'>
       <div>Tags</div>
 
-      <Select mode='tags' style={{ width: '100%' }} onChange={onChangeTagValue}>
+      <Select 
+        mode='multiple' 
+        style={{ width: '100%' }} 
+        onChange={onChangeTagValue}
+        showSearch={false}
+        autoClearSearchValue
+      >
         <OptGroup label='Categories'>
           {fixedTags.map((tag, index) => (
             <Option key={`fixed-${tag}`} value={tag}>
@@ -138,13 +144,13 @@ const AddAndRemoveTag = ({
           ))}
         </OptGroup>
 
-        <OptGroup label='Popular Tags'>
+        {/* <OptGroup label='Popular Tags'>
           {options.map((option, index) => (
             <Option key={`dynamic-${option.value}`} value={option.value}>
               {option.label}
             </Option>
           ))}
-        </OptGroup>
+        </OptGroup> */}
       </Select>
     </Space>
   );
