@@ -165,6 +165,7 @@ function Header({
         workflow={workflow}
         onSave={handleSaveWorkflowInfo}
         onStatusChange={handleWorkflowStatusChanged}
+        handleSave={handleSave}
       />
       <VersionHistoryDialog
         workflow={workflow}

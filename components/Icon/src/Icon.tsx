@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Modal } from 'antd';
+import { Avatar, Modal, Button } from 'antd';
 import {
   UserOutlined,
   CameraOutlined,
@@ -14,14 +14,20 @@ const ChooseImageModal = ({
   onCancel,
   uploadIcon,
   presetIcons,
+  setShouldShowDialog,
 }: {
   isOpen?: boolean;
   onCancel: () => void;
   uploadIcon: (args: any) => void;
   presetIcons: any;
+  setShouldShowDialog: (show: boolean) => void;
 }) => {
   return (
-    <Modal open={isOpen} title={'Choose Icon'} onCancel={onCancel}>
+    <Modal open={isOpen} title={'Choose Icon'} onCancel={onCancel} footer={[
+      <Button key="submit" type="primary" onClick={() => setShouldShowDialog(false)}>
+        OK
+      </Button>
+    ]}>
       <p>Choose or upload one</p>
       <input type='file' id='icon-single' accept='image/*' onChange={uploadIcon} />
       <div className='grid grid-cols-6 mt-4'>
@@ -80,9 +86,9 @@ const UploadBtn = ({
         onCancel={() => setShouldShowDialog(false)}
         // uploading={uploading}
         uploadIcon={(args: UploadIconProps) => {
-          setShouldShowDialog(false);
           uploadIcon(args);
         }}
+        setShouldShowDialog={setShouldShowDialog}
       />
     </div>
   );

@@ -414,23 +414,46 @@ export const EditVersion = () => {
     });
     setDataHasChanged(true);
   };
+  
+  const [gridX, setGridX] = useState(0);  // initialize gridX with 0
+  const [gridY, setGridY] = useState(0);  // initialize gridY with 0
+  
+
   const onAddNewNode = () => {
     const newData = structuredClone(version?.data);
     const newId = `node-${new Date().getTime()}`;
+    const nodeSpacing = 130;
+
+    let newPos = {
+      x: centerPos.x + gridX * nodeSpacing,
+      y: centerPos.y + gridY * nodeSpacing,
+    };
+
     newData.checkpoints.push({
+      title: `Checkpoint `+ version?.data?.checkpoints?.length,
       id: newId,
-      position: centerPos,
+      position: newPos,
       isEnd: true,
     });
+
+    if (gridX < 5) {
+        setGridX(gridX + 1);
+    } else {
+        setGridX(0);
+        setGridY(gridY + 1);
+    }
+
     setVersion({
       ...version,
       data: newData,
     });
+
     setSelectedNodeId(newId);
     if (selectedNodeId) {
       setDataHasChanged(true);
     }
-  };
+};
+
   const onViewPortChange = (viewport: any) => {
     setCenterPos({
       x: (-viewport.x + 600) / viewport.zoom,

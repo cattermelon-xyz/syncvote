@@ -24,6 +24,7 @@ const EditWorkflow = ({
   workflow,
   onSave,
   onStatusChange,
+  handleSave,
 }: {
   open: boolean;
   setOpen: (data: boolean) => void;
@@ -50,6 +51,7 @@ const EditWorkflow = ({
     onSuccess: (data: any) => void;
     onError: (error: any) => void;
   }) => void;
+  handleSave: (mode: 'data' | 'info' | undefined, changedData?: any) => void;
 }) => {
   const {
     title: workflowTitle,
@@ -251,6 +253,7 @@ const EditWorkflow = ({
             await onSave({ title: tempTitle, desc: tempDesc, bannerUrl: tempBannerUrl, iconUrl: tempIconUrl });
             setTitle(tempTitle);
             setOpen(true);
+            handleSave('data');
           }}
         >
           Save
