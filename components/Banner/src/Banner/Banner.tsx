@@ -36,6 +36,9 @@ const Banner = ({
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [showButtonPanel, setShowButtonPanel] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState('');
+  const [selectedBanner, setSelectedBanner] = useState<string | null>(null);
+
   const uploadBanner = async (event: any) => {
     setUploading(true);
     try {
@@ -52,6 +55,7 @@ const Banner = ({
       if (uploadError) {
         throw uploadError;
       }
+      setUploadedFileName(file.name);
       onChange
         ? onChange({
             filePath: newFilePath,
@@ -59,7 +63,7 @@ const Banner = ({
           })
         : null;
       setUploading(false);
-      setShouldShowModal(false);
+      // setShouldShowModal(false);
     } catch (error: any) {
       Modal.error({
         title: 'Upload image error',
@@ -84,7 +88,18 @@ const Banner = ({
         onCancel={() => {
           setShouldShowModal(false);
         }}
-        footer={null}
+        footer={[
+          <Button key='cancel' onClick={() => setShouldShowModal(false)}>
+            Cancel
+          </Button>,
+          <Button
+            key='submit'
+            type='primary'
+            onClick={() => setShouldShowModal(false)}
+          >
+            OK
+          </Button>,
+        ]}
         width={600}
       >
         <Tabs
@@ -108,9 +123,11 @@ const Banner = ({
                           {arr.map((idx) => (
                             <div
                               key={idx}
-                              className='flex items-center w-[167px] h-[100px] p-1 cursor-pointer bg-center outline-violet-500 hover:outline rounded-md bg-cover'
+                              tabIndex={0}
+                              className={`flex items-center w-[167px] h-[100px] p-1 cursor-pointer bg-center outline-violet-500 hover:outline rounded-md bg-cover focus:outline focus:outline-violet-500`}
                               onClick={() => {
-                                setShouldShowModal(false);
+                                setSelectedBanner(idx + '.jpg');
+                                // setShouldShowModal(false);
                                 onChange
                                   ? onChange({
                                       filePath: idx + '.jpg',
@@ -160,7 +177,7 @@ const Banner = ({
                     >
                       <div className='flex items-center w-full justify-center'>
                         {uploading ? <LoadingOutlined className='mr-2' /> : ''}
-                        Upload file
+                        {uploadedFileName ? uploadedFileName : 'Upload file'}
                       </div>
                     </Button>
                   </div>
