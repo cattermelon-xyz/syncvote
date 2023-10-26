@@ -351,6 +351,7 @@ async function handleSubbmission(props) {
               tallyResult: tallyResult,
               endedAt: moment().format(),
             })
+            .select('*')
             .eq('id', mission_vote_details[0].cvd_id);
 
           if (cvd_err) {
@@ -427,7 +428,6 @@ async function handleSubbmission(props) {
           console.log(error);
         }
       }
-
     } catch (e) {
       reject(e);
     }
