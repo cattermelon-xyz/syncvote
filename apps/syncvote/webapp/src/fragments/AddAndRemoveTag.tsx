@@ -123,11 +123,12 @@ const AddAndRemoveTag = ({
         },
       });
     }
+    setExistedTags(tagIds);
   };
 
   return (
     <Space direction='vertical' className='w-full'>
-      <div>Tags</div>
+      <div>Categories</div>
 
       <Select 
         mode='multiple' 
@@ -135,6 +136,7 @@ const AddAndRemoveTag = ({
         onChange={onChangeTagValue}
         showSearch={false}
         autoClearSearchValue
+        value={existedTags}
       >
         <OptGroup label='Categories'>
           {fixedTags.map((tag, index) => (

@@ -219,7 +219,7 @@ function Header({
               iconUrl={workflow?.icon_url}
               size='medium'
             />
-            <div className='flex items-center font-bold'>{workflow?.title}</div>
+            <div className='flex items-center font-semibold mr-4 max-w-md'>{workflow?.title}</div>
           </Space>
         </Space>
         <Space
@@ -233,10 +233,10 @@ function Header({
                 {dataChanged ? (
                   <div>
                     <Button
-                      type='text'
-                      shape='round'
+                      type='primary'
+                      shape='circle'
                       icon={<SaveOutlined />}
-                      className='flex items-center text-violet-500'
+                      className='text-violet-500 bg-violet-100'
                       onClick={() => handleSave('data')}
                     />
                   </div>
@@ -245,7 +245,7 @@ function Header({
                     <CheckOutlined className='text-green-500' />
                   </div>
                 )}
-                <div className='text-zinc-500'>
+                <div className='text-zinc-500 text-xs flex truncate'>
                   {lastSaved !== -1 ? moment(lastSaved).fromNow() : ''}
                 </div>
               </Space>
