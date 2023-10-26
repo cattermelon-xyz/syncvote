@@ -4,6 +4,7 @@ import { getTimeRemainingToEnd } from '@utils/helpers';
 import { IDoc } from 'directed-graph';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { TextEditor } from 'rich-text-editor';
+import ShowDescription from './ShowDescription';
 
 interface Props {
   currentCheckpointData: any;
@@ -12,6 +13,8 @@ interface Props {
   missionData: any;
   setSubmission: any;
   submission: any;
+  dataOfAllDocs: any;
+  listVersionDocs: any;
 }
 
 const VoteSection: React.FC<Props> = ({
@@ -20,7 +23,8 @@ const VoteSection: React.FC<Props> = ({
   setOpenModalVoterInfo,
   missionData,
   setSubmission,
-  submission,
+  dataOfAllDocs,
+  listVersionDocs,
 }) => {
   const [selectedOption, setSelectedOption] = useState<number>();
   const [optionDocs, setOptionDocs] = useState<any>([]);
@@ -34,22 +38,83 @@ const VoteSection: React.FC<Props> = ({
     if (selectedOption) {
       onSelectedOption(selectedOption);
     }
-    if (currentCheckpointData?.vote_machine_type === 'DocInput') {
+    if (
+      currentCheckpointData?.vote_machine_type === 'DocInput' &&
+      dataOfAllDocs &&
+      listVersionDocs &&
+      missionData
+    ) {
       const checkpointDocs = currentCheckpointData.data.docs;
       const missionDocs: IDoc[] = missionData.data.docs;
 
-      // filteredDocs is only contain docs in missionDocs have the same id with doc in checkpointDocs
-      const filteredDocs = missionDocs.filter((missionDoc) =>
-        checkpointDocs.some(
-          (checkpointDoc: any) => checkpointDoc.id === missionDoc.id
+      const filteredDocs = missionDocs
+        .filter((missionDoc) =>
+          checkpointDocs.some(
+            (checkpointDoc: any) => checkpointDoc.id === missionDoc.id
+          )
         )
-      );
+        .map((filteredDoc) => {
+          const correspondingCheckpointDoc = checkpointDocs.find(
+            (checkpointDoc: any) => checkpointDoc.id === filteredDoc.id
+          );
 
+          // Check if the doc exists in listVersionDocs
+          const versionDocEntry = listVersionDocs.find(
+            (entry: any) => entry[correspondingCheckpointDoc.id]
+          );
+
+          // If exists, get the content from dataOfAllDocs with the latest created_at
+          if (versionDocEntry) {
+            const latestDocVersion = dataOfAllDocs
+              .filter(
+                (doc: any) => doc.doc_input_id === correspondingCheckpointDoc.id
+              )
+              .sort(
+                (a: any, b: any) =>
+                  new Date(b.created_at).getTime() -
+                  new Date(a.created_at).getTime()
+              )[0];
+
+            if (latestDocVersion) {
+              filteredDoc.template = latestDocVersion.content;
+            }
+          }
+
+          return {
+            ...filteredDoc,
+            action: correspondingCheckpointDoc?.action,
+          };
+        });
       setOptionDocs(filteredDocs);
     }
+  }, [
+    selectedOption,
+    dataOfAllDocs,
+    currentCheckpointData,
+    listVersionDocs,
+    missionData,
+    editorValues,
+  ]);
 
-    console.log('editorValues', editorValues);
-  }, [selectedOption, currentCheckpointData, missionData, editorValues]);
+  useEffect(() => {
+    console.log('optionDocs', optionDocs);
+    console.log('listVersionDocs', listVersionDocs);
+  }, [optionDocs, editorValues, listVersionDocs]);
+
+  const handleConfirm = () => {
+    const finalValues = Object.keys(editorValues).reduce((acc: any, docId) => {
+      const optionDoc = optionDocs.find((doc: any) => doc.id === docId);
+      if (optionDoc.action === 'Append ') {
+        acc[docId] = optionDoc.template + editorValues[docId];
+      } else {
+        acc[docId] = editorValues[docId];
+      }
+      return acc;
+    }, {});
+
+    setSubmission(finalValues);
+    setOpenModalVoterInfo(true);
+  };
 
   return (
     <div className='flex flex-col gap-4'>
@@ -78,7 +143,7 @@ const VoteSection: React.FC<Props> = ({
                         }`}
                       >
                         <div className='flex flex-col gap-2 mt-1'>
-                          <p>status</p>
+                          <p>{optionDoc?.action}</p>
                           <p>{optionDoc?.title}</p>
                         </div>
                         {expandedDocIds.includes(optionDoc.id) ? (
@@ -100,22 +165,44 @@ const VoteSection: React.FC<Props> = ({
                           />
                         )}
                       </div>
-                      {expandedDocIds.includes(optionDoc.id) && (
-                        <div>
-                          <TextEditor
-                            value={
-                              editorValues[optionDoc.id] || optionDoc?.template
-                            }
-                            id={`text-editor-${optionDoc.id}`}
-                            setValue={(newValue: any) => {
-                              setEditorValues((prevValues) => ({
-                                ...prevValues,
-                                [optionDoc.id]: newValue,
-                              }));
-                            }}
-                          />
-                        </div>
-                      )}
+                      {expandedDocIds.includes(optionDoc.id) &&
+                        (optionDoc?.action === 'Append ' ? (
+                          <>
+                            <ShowDescription
+                              titleDescription={''}
+                              description={optionDoc.template}
+                              isAppendDocInput={true}
+                              bgColor='bg-[#F6F6F6]'
+                            />
+                            <div className='mt-4'>
+                              <TextEditor
+                                value={editorValues[optionDoc.id]}
+                                id={`text-editor-${optionDoc.id}`}
+                                setValue={(newValue: any) => {
+                                  setEditorValues((prevValues) => ({
+                                    ...prevValues,
+                                    [optionDoc.id]: newValue,
+                                  }));
+                                }}
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <div>
+                            <TextEditor
+                              value={
+                                editorValues[optionDoc.id] || optionDoc.template
+                              }
+                              id={`text-editor-${optionDoc.id}`}
+                              setValue={(newValue: any) => {
+                                setEditorValues((prevValues) => ({
+                                  ...prevValues,
+                                  [optionDoc.id]: newValue,
+                                }));
+                              }}
+                            />
+                          </div>
+                        ))}
                     </div>
                   </div>
                 );
@@ -167,10 +254,7 @@ const VoteSection: React.FC<Props> = ({
             <Button
               type='primary'
               className='w-full'
-              onClick={() => {
-                setSubmission(editorValues);
-                setOpenModalVoterInfo(true);
-              }}
+              onClick={handleConfirm}
               disabled={
                 selectedOption &&
                 getTimeRemainingToEnd(currentCheckpointData.endToVote) !=
