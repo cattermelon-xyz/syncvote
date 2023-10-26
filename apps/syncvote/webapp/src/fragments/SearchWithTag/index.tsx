@@ -17,7 +17,15 @@ type SearchWithTagProps = {
   //tags
 };
 
-
+const fixedTags = [
+  { value: 'Governance & Voting', count: 0 },
+  { value: 'Recruitment', count: 0 },
+  { value: 'Community Engagement', count: 0 },
+  { value: 'Budget & Payment', count: 0 },
+  { value: 'Grants & Investment', count: 0 },
+  { value: 'Social', count: 0 },
+  { value: 'Other', count: 0 },
+];
 
 const SearchWithTag = ({
   className = '',
@@ -26,33 +34,52 @@ const SearchWithTag = ({
   onResult,
   showSearchTag = true,
 }: SearchWithTagProps) => {
-  
-  const tags: ITag[] = useGetDataHook({
-    params: { tagTo: tagTo },
-    configInfo: config.queryTag,
-  }).data;
+  const tags = fixedTags.map((tag) => ({
+    label: tag.value,
+    value: tag.value,
+    count_template: tag.count,
+  }));
 
   const dispatch = useDispatch();
 
   let data: any;
-    switch (tagTo) {
-      case TagObject.TEMPLATE:
-        data = useGetDataHook({
-          configInfo: config.queryTemplate,
-        }).data;
-        break;
-      default:
-        break;
-    }
+  switch (tagTo) {
+    case TagObject.TEMPLATE:
+      data = useGetDataHook({
+        configInfo: config.queryTemplate,
+      }).data;
+      break;
+    default:
+      break;
+  }
+  const countTags = (data: ITemplate[]) => {
+    const tagCounts: { [key: string]: number } = {};
+
+    data.forEach((item: ITemplate) => {
+      if (item.tags && Array.isArray(item.tags) && item.status === true) {
+        item.tags.forEach((tag) => {
+          const tagLabel = tag.label;
+          if (tagCounts[tagLabel]) {
+            tagCounts[tagLabel]++;
+          } else {
+            tagCounts[tagLabel] = 1;
+          }
+        });
+      }
+    });
+
+    return tagCounts;
+  };
 
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [inputSearchText, setInputSearchText] = useState('');
   const [toSearch, setToSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const tagCounts = data && Array.isArray(data) ? countTags(data) : {};
   const extractCount = (t: any) => {
     switch (tagTo) {
       case TagObject.TEMPLATE:
-        return t.count_template;
+        return tagCounts[t.label] || 0;
       case TagObject.WORKFLOW:
         return t.count_workflow;
       case TagObject.MISSION:
@@ -71,9 +98,9 @@ const SearchWithTag = ({
   const search = async ({ tags, text }: { tags: any[]; text: string }) => {
     setLoading(true);
 
-    if (text){
-      console.log("text in searchWithTag", text)
+    console.log('Incoming tags and text: ', tags, text);
 
+    if (text) {
       // TODO: change to search api
       switch (tagTo) {
         case TagObject.TEMPLATE:
@@ -95,44 +122,48 @@ const SearchWithTag = ({
             },
           });
           break;
-  
+
         case TagObject.ORGANIZATION: // New case for organization
-            await useSetData({
-              params: {
-                inputSearch: text,
-              },
-              configInfo: config.querySearchOrgForExplore,
-              dispatch,
-              onSuccess: (data) => {
-                onResult(data);
-                setLoading(false);
-              },
-              onError: () => {
-                Modal.error({
-                  title: 'Error',
-                  content: 'Search failed',
-                });
-              },
-            });
-            break;
+          await useSetData({
+            params: {
+              inputSearch: text,
+            },
+            configInfo: config.querySearchOrgForExplore,
+            dispatch,
+            onSuccess: (data) => {
+              onResult(data);
+              setLoading(false);
+            },
+            onError: () => {
+              Modal.error({
+                title: 'Error',
+                content: 'Search failed',
+              });
+            },
+          });
+          break;
         default:
           break;
       }
     } else {
+      console.log('Data before filter: ', data);
       let result;
       switch (tagTo) {
         case TagObject.TEMPLATE:
-          result = data.filter(
-            (item: ITemplate) =>
+          result = data.filter((item: ITemplate) => {
+            console.log("Item's tags: ", item.tags);
+            return (
               item.status === true &&
               tags.every((tag) =>
-                item.tags?.map((tag) => tag.value).includes(tag)
+                item.tags?.map((tagItem) => tagItem.label).includes(tag)
               )
-          );
+            );
+          });
           break;
         default:
           break;
       }
+      console.log('Result after filter: ', result);
       onResult(result);
     }
     setLoading(false);
@@ -163,35 +194,38 @@ const SearchWithTag = ({
         }}
       />
       {showSearchTag && (
-
-      <div className='w-full'>
-        {tags.map((tag: any) => {
-          return (
-            <Tag
-              className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full ${
-                selectedTagIds.indexOf(tag.value) !== -1
-                  ? 'bg-violet-500 text-white'
-                  : ''
-              }`}
-              onClick={() => {
-                const newselectedTagIds = structuredClone(selectedTagIds);
-                const idx = selectedTagIds.indexOf(tag.value);
-                if (idx !== -1) {
-                  newselectedTagIds.splice(idx, 1);
-                } else {
-                  newselectedTagIds.push(tag.value);
-                }
-                setSelectedTagIds(newselectedTagIds);
-                setInputSearchText('');
-                search({ tags: newselectedTagIds, text: '' });
-              }}
-              key={tag.value}
-            >
-              {tag.label} ({extractCount(tag)})
-            </Tag>
-          );
-        })}
-      </div>
+        <div className='flex flex-wrap'>
+          {tags.map((tag: any) => {
+            const tagCount = extractCount(tag);
+            if (tagCount > 0) {
+              return (
+                <Tag
+                  className={`inline cursor-pointer hover:bg-violet-500 hover:text-white py-1 px-2 rounded-full mb-3 ${
+                    selectedTagIds.indexOf(tag.value) !== -1
+                      ? 'bg-violet-500 text-white'
+                      : ''
+                  }`}
+                  onClick={() => {
+                    const newselectedTagIds = [...selectedTagIds];
+                    const idx = selectedTagIds.indexOf(tag.value);
+                    if (idx !== -1) {
+                      newselectedTagIds.splice(idx, 1);
+                    } else {
+                      newselectedTagIds.push(tag.value);
+                    }
+                    setSelectedTagIds(newselectedTagIds);
+                    setInputSearchText('');
+                    search({ tags: newselectedTagIds, text: '' });
+                  }}
+                  key={tag.value}
+                >
+                  {tag.label} ({tagCount})
+                </Tag>
+              );
+            }
+            return null;
+          })}
+        </div>
       )}
     </Space>
   );

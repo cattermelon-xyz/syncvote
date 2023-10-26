@@ -207,26 +207,25 @@ const Detail = () => {
             }`}
           />
         </div>
-        <Space
-          direction='horizontal'
-          className='w-full justify-between items-start'
-        >
-          <div>
+        <div className='flex w-full'>
+          <div className='flex-1.5 pr-8'>
             <div className='font-bold mb-2 text-md'>Template description</div>
             <div>{parse(template?.desc || '')}</div>
           </div>
-          <Space direction='vertical' className='full'>
-            <Space direction='vertical' className='mb-2'>
+
+          <div className='flex-1'>
+            <Space direction='vertical' className='w-full mb-4'>
               <div className='font-bold text-md'>Tags</div>
-              <div className='flex'>
+              <div className='flex flex-wrap'>
                 {tags.length > 0 ? (
-                  tags.map((tag:any) => <Tag key={tag.id}>{tag.label}</Tag>)
+                  tags.map((tag: any) => <Tag key={tag.id} className='mb-2'>{tag.label}</Tag>)
                 ) : (
                   <span className='text-neutral-500'>No tags available</span>
                 )}
               </div>
             </Space>
-            <Space direction='vertical'>
+
+            <Space direction='vertical' className='w-full'>
               <div className='font-bold text-md'>Share</div>
               <Space direction='horizontal'>
                 <Button
@@ -246,8 +245,8 @@ const Detail = () => {
                 />
               </Space>
             </Space>
-          </Space>
-        </Space>
+          </div>
+        </div>
       </Space>
     </div>
   );
