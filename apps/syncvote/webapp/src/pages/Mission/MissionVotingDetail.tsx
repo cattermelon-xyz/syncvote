@@ -178,7 +178,7 @@ const MissionVotingDetail = () => {
                 <Icon presetIcon='' iconUrl='' size='large' />
                 <div className='flex flex-col ml-2'>
                   <p className='font-semibold text-xl	'>{missionData.m_title}</p>
-                  <p>Investment Process</p>
+                  <p>{missionData.workflow_title}</p>
                 </div>
               </div>
             </div>

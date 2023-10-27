@@ -27,7 +27,8 @@ import { config } from '@dal/config';
 import ModalEditTemplate from '@fragments/ModalEditTemplate';
 import { ModalChooseTemplate } from '@fragments/ModalChooseTemplate';
 const env = import.meta.env.VITE_ENV;
-const baseUrl = import.meta.env.VITE_BASE_URL;
+const baseUrl =
+  env === 'dev' ? `https://main.syncvote.com` : `https://app.syncvote.com`;
 
 type TabProps = {
   workflow: IWorkflow;
@@ -267,36 +268,37 @@ const PublishedWorkflow = ({
         </Button>
       </Space.Compact>
       {env === 'dev' ? (
-        <Space className='w-full bg-zinc-100 justify-between p-2 rounded-lg'>
-          <div>Publish to Syncvote community?</div>
-          <Switch
-            checked={status === 'PUBLIC_COMMUNITY'}
-            onClick={(val) => {
-              setShowShareModal(false);
-              handleWorkflowStatusChanged({
-                versionId: workflow?.workflow_version[0]?.id,
-                status: val ? 'PUBLIC_COMMUNITY' : 'PUBLIC',
-                onSuccess: () => {
-                  Modal.success({
-                    title: 'Success',
-                    content: `Workflow ${
-                      val
-                        ? 'is published to community'
-                        : 'is no longer published to community'
-                    }!`,
-                  });
-                },
-                onError: () => {
-                  Modal.error({
-                    title: 'Error',
-                    content: 'Something went wrong, cannot change status',
-                  });
-                },
-              });
-            }}
-          />
-        </Space>
-      ) : null}
+        <></>
+      ) : // <Space className='w-full bg-zinc-100 justify-between p-2 rounded-lg'>
+      //   <div>Publish to Syncvote community?</div>
+      //   <Switch
+      //     checked={status === 'PUBLIC_COMMUNITY'}
+      //     onClick={(val) => {
+      //       setShowShareModal(false);
+      //       handleWorkflowStatusChanged({
+      //         versionId: workflow?.workflow_version[0]?.id,
+      //         status: val ? 'PUBLIC_COMMUNITY' : 'PUBLIC',
+      //         onSuccess: () => {
+      //           Modal.success({
+      //             title: 'Success',
+      //             content: `Workflow ${
+      //               val
+      //                 ? 'is published to community'
+      //                 : 'is no longer published to community'
+      //             }!`,
+      //           });
+      //         },
+      //         onError: () => {
+      //           Modal.error({
+      //             title: 'Error',
+      //             content: 'Something went wrong, cannot change status',
+      //           });
+      //         },
+      //       });
+      //     }}
+      //   />
+      // </Space>
+      null}
 
       <Space className='w-full flex justify-between'>
         <Button
@@ -478,11 +480,11 @@ const ShareModal = ({
   const items: TabsProps['items'] =
     env === 'dev'
       ? [
-          {
-            key: '1',
-            label: 'Invite',
-            children: <InviteTab workflow={workflow} />,
-          },
+          // {
+          //   key: '1',
+          //   label: 'Invite',
+          //   children: <InviteTab workflow={workflow} />,
+          // },
           {
             key: '2',
             label: 'Publish',
@@ -511,6 +513,11 @@ const ShareModal = ({
                 setShowShareModal={setShowShareModal}
               />
             ),
+          },
+          {
+            key: '3',
+            label: 'Community',
+            children: <PublishTemplate workflow={workflow} />,
           },
         ];
   return (
