@@ -86,6 +86,7 @@ const Flow = () => {
     onConfigEdgePanelClose,
     shouldExportImage,
     setExportImage,
+    fitViewOptions,
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -218,11 +219,15 @@ const Flow = () => {
         proOptions={proOptions}
         onEdgeClick={onEdgeClick}
         fitView={true}
-        fitViewOptions={{
-          padding: 20,
-          maxZoom: 8,
-          minZoom: 0.5,
-        }}
+        fitViewOptions={
+          fitViewOptions
+            ? fitViewOptions
+            : {
+                padding: 20,
+                maxZoom: 8,
+                minZoom: 0.5,
+              }
+        }
       >
         {window.innerWidth > 700 ? (
           <Controls position='bottom-left' showInteractive={false} />
