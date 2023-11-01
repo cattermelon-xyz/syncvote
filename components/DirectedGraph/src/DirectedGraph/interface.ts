@@ -192,6 +192,11 @@ export interface IGraph {
   onConfigEdgePanelClose?: () => void;
   onChangeLayout?: (data: IWorkflowVersionLayout) => void;
   openCreateProposalModal?: () => void;
+  fitViewOptions?: {
+    padding?: number;
+    maxZoom?: number;
+    minZoom?: number;
+  };
 }
 
 export interface IConfigPanel {
