@@ -3,6 +3,7 @@ const {
   VoteMachineController,
 } = require('../models/votemachines/VotingController');
 const moment = require('moment');
+var CronJob = require('cron').CronJob;
 const { createArweave, convertToCron } = require('../functions');
 
 async function handleVoting(props) {
@@ -43,7 +44,8 @@ async function handleVoting(props) {
           let voteMachineController = new VoteMachineController(
             mission_vote_details[0]
           );
-
+          let firstTimeToVote = false;
+          
           // 3️⃣ check if the fisrt time of voting
           if (!mission_vote_details[0].result) {
             // update data of current vote data
@@ -80,16 +82,126 @@ async function handleVoting(props) {
               mission_vote_details[0]
             );
 
+            firstTimeToVote = true;
+          }
+
+          // 4️⃣ check if fallback
+          const { fallback, error: f_error } = voteMachineController.fallBack();
+          if (fallback) {
+            console.log('Move this mission to fallback checkpoint');
+            const tallyResult = { index: 0 };
+
+            // change endedAt of current vote data to moment for this checkpoint
+            const { data: current_vote_data, error } = await supabase
+              .from('current_vote_data')
+              .update({
+                endedAt: moment().format(),
+                tallyResult: tallyResult,
+              })
+              .eq('id', mission_vote_details[0].cvd_id)
+              .select('*');
+            if (error) {
+              console.log(error);
+            }
+
+            const { arweave_id } = await createArweave(current_vote_data[0]);
+            await supabase
+              .from('current_vote_data')
+              .update({ arweave_id: arweave_id })
+              .eq('id', mission_vote_details[0].cvd_id);
+
+            let startToVote = moment().format();
+            const index = tallyResult.index;
+
+            // check if delays
+            if (mission_vote_details[0].delays) {
+              if (mission_vote_details[0].delays[index]) {
+                let delayUnits = `${mission_vote_details[0].delayUnits[index]}s`;
+
+                startToVote = moment().add(
+                  mission_vote_details[0].delays[index],
+                  delayUnits
+                );
+              }
+            }
+
+            // check if next checkpoint is end checkpoint
+            const next_checkpoint_id = `${mission_id}-${
+              mission_vote_details[0].children[tallyResult.index]
+            }`;
+
+            // get data of next checkpoint
+            const { data: next_checkpoint } = await supabase
+              .from('checkpoint')
+              .select('*')
+              .eq('id', next_checkpoint_id);
+
+            let endedAt = null;
+            let mission_status = 'PUBLIC';
+
+            if (next_checkpoint[0].isEnd) {
+              endedAt = startToVote;
+              mission_status = 'STOPPED';
+            }
+
+            // create current vote data for next checkpoint
+            const { data: new_current_vote_data } = await supabase
+              .from('current_vote_data')
+              .insert({
+                checkpoint_id: next_checkpoint_id,
+                initData: tallyResult,
+                startToVote: startToVote,
+                endedAt: endedAt,
+              })
+              .select('*');
+
+            if (!endedAt) {
+              // create a job for to start this
+              const cronSyntax = convertToCron(moment(startToVote));
+              const job = new CronJob(cronSyntax, async function () {
+                await fetch(`${process.env.BACKEND_API}/vote/create`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    identify: `cronjob-${checkpointData.id}`,
+                    option: ['fake option'],
+                    voting_power: 9999,
+                    mission_id: mission_vote_details[0].id,
+                  }),
+                });
+              });
+              job.start();
+              console.log(`create job to start ${job}`);
+            }
+
+            await supabase
+              .from('mission')
+              .update({
+                current_vote_data_id: new_current_vote_data[0].id,
+                status: mission_status,
+              })
+              .eq('id', mission_id);
+
+            resolve({
+              status: `Move to fallback checkpoint ${next_checkpoint_id}`,
+              message: f_error,
+            });
+            return;
+          }
+
+          if (firstTimeToVote) {
             // create a job to stop this
-            const startToVoteMoment = moment(
-              mission_vote_details[0].startToVote
-            ).unix();
-            const stopTime = moment
-              .unix(startToVoteMoment + mission_vote_details[0].duration)
-              .format();
+            const stopTime = moment(mission_vote_details[0].startToVote).add(
+              mission_vote_details[0].duration,
+              'seconds'
+            );
+
             const cronSyntax = convertToCron(stopTime);
+
             const job = new CronJob(cronSyntax, async function () {
-              await fetch('http://localhost:3000/api/vote/create', {
+              await fetch(`${process.env.BACKEND_API}/vote/create`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -103,17 +215,6 @@ async function handleVoting(props) {
               });
             });
             job.start();
-          }
-
-          // 4️⃣ check if fallback
-          const { fallback, error: f_error } = voteMachineController.fallBack();
-          if (fallback) {
-            console.log('Move this mission to fallback checkpoint');
-            resolve({
-              status: 'FALLBACK',
-              message: f_error,
-            });
-            return;
           }
 
           // 5️⃣ check if recorded
@@ -185,7 +286,7 @@ async function handleVoting(props) {
 
           if (shouldTally) {
             // change endedAt of current vote data to moment for this checkpoint
-            const { current_vote_data } = await supabase
+            const { data: current_vote_data } = await supabase
               .from('current_vote_data')
               .update({
                 endedAt: moment().format(),
@@ -212,24 +313,6 @@ async function handleVoting(props) {
                   mission_vote_details[0].delays[index],
                   delayUnits
                 );
-
-                // create a job for to start this
-                const cronSyntax = convertToCron(startToVote);
-                const job = new CronJob(cronSyntax, async function () {
-                  await fetch('http://localhost:3000/api/vote/create', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      identify: `cronjob-${checkpointData.id}`,
-                      option: ['fake option'],
-                      voting_power: 9999,
-                      mission_id: mission_vote_details[0].id,
-                    }),
-                  });
-                });
-                job.start();
               }
             }
 
@@ -262,6 +345,27 @@ async function handleVoting(props) {
                 endedAt: endedAt,
               })
               .select('*');
+
+            if (!endedAt) {
+              // create a job for to start this
+              const cronSyntax = convertToCron(moment(startToVote));
+              const job = new CronJob(cronSyntax, async function () {
+                await fetch(`${process.env.BACKEND_API}/vote/create`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    identify: `cronjob-${checkpointData.id}`,
+                    option: ['fake option'],
+                    voting_power: 9999,
+                    mission_id: mission_vote_details[0].id,
+                  }),
+                });
+              });
+              job.start();
+              console.log(`create job to start ${job}`);
+            }
 
             await supabase
               .from('mission')

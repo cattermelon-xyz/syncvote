@@ -39,8 +39,8 @@ function convertToCron(momentDate) {
   const minutes = momentDate.minutes();
   const hours = momentDate.hours();
   const dayOfMonth = momentDate.date();
-  const month = momentDate.month() + 1; // Moment.js months are 0 indexed.
-  const dayOfWeek = '?'; // '?' in cron means "no specific value". Depending on your cron implementation, you might not use this.
+  const month = momentDate.month() + 1;
+  const dayOfWeek = '*';
 
   // Return in the format "minutes hours dayOfMonth month dayOfWeek"
   return `${minutes} ${hours} ${dayOfMonth} ${month} ${dayOfWeek}`;

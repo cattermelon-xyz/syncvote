@@ -16,14 +16,6 @@ class VoteMachineController {
     this.vote_machine_type = props.vote_machine_type;
   }
 
-  // validate(checkpoint) {
-  //   if (this.votingTypes[this.vote_machine_type]) {
-  //     return this.votingTypes[this.vote_machine_type].validate(checkpoint);
-  //   } else {
-  //     throw new Error(`Invalid data`);
-  //   }
-  // }
-
   initDataForCVD() {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].initDataForCVD();
