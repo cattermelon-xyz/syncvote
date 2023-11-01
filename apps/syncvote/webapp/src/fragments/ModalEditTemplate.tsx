@@ -108,7 +108,8 @@ const ModalEditTemplate = ({
         for (var i = 0; i < versions.length; i++) {
           if (
             versions[i].status === 'PUBLISHED' ||
-            versions[i].status === 'PUBLIC_COMMUNITY'
+            versions[i].status === 'PUBLIC_COMMUNITY' ||
+            versions[i].status === 'DRAFT'
           ) {
             w.published_version_id = versions[i].id;
             break;
@@ -134,7 +135,8 @@ const ModalEditTemplate = ({
         for (var i = 0; i < versions.length; i++) {
           if (
             versions[i].status === 'PUBLISHED' ||
-            versions[i].status === 'PUBLIC_COMMUNITY'
+            versions[i].status === 'PUBLIC_COMMUNITY' ||
+            versions[i].status === 'DRAFT'
           ) {
             workflow.published_version_id = versions[i].id;
             break;
