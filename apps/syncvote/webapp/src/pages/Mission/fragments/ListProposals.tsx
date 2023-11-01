@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Icon } from 'icon';
 import { useGetDataHook, createIdString } from 'utils';
 import { config } from '@dal/config';
-import { Space, Button } from 'antd';
+import { Space, Button, Tag } from 'antd';
 import { SortAscendingOutlined } from '@ant-design/icons';
 import { Empty } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { ThunderboltOutlined, EditOutlined } from '@ant-design/icons';
+import { formatDate } from '@utils/helpers';
 
 interface Props {
   title?: string;
@@ -23,6 +25,10 @@ const ListProposals: React.FC<Props> = ({
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
+
+  useEffect(() => {
+    console.log('listProposals', listProposals);
+  }, [listProposals]);
 
   const navigate = useNavigate();
 
@@ -78,9 +84,13 @@ const ListProposals: React.FC<Props> = ({
         style={{ border: '1px solid #E3E3E2' }}
       >
         <div className='flex mb-4'>
-          <p className='w-[50%]'>Proposal</p>
-          <p className='w-[25%]'>{type === 'owner' ? 'status' : 'stage'}</p>
-          <p className='w-[25%]'>{type === 'all' ? 'Voting ends on' : ''}</p>
+          <p className='w-[50%] text-[#898988]'>Proposal</p>
+          <p className='w-[25%] text-[#898988]'>
+            {type === 'owner' ? 'status' : 'stage'}
+          </p>
+          <p className='w-[25%] text-[#898988] text-end'>
+            {type === 'all' ? 'Due date' : ''}
+          </p>
         </div>
         <div className='flex flex-col gap-2'>
           {filteredProposals.length === 0 ? (
@@ -88,31 +98,89 @@ const ListProposals: React.FC<Props> = ({
               <Empty />
             </div>
           ) : (
-            filteredProposals.map((proposal, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  handleNavigate(proposal);
-                }}
-                className='cursor-pointer'
-              >
-                <div className='flex items-center'>
-                  <div className='w-[50%] flex'>
-                    <Icon
-                      presetIcon={presetIcons}
-                      iconUrl={proposal?.org_icon_url}
-                      size='large'
-                    />
-                    <div className='flex flex-col ml-2'>
-                      <p>{proposal?.title}</p>
-                      <p>{proposal.workflow_title}</p>
+            filteredProposals.map((proposal, index) => {
+              const currentTimestamp = new Date().toISOString();
+              const isInTimeLock =
+                proposal?.progress[0]?.startToVote > currentTimestamp;
+              let endToVote;
+              if (
+                proposal?.progress[0]?.duration &&
+                proposal?.progress[0]?.startToVote
+              ) {
+                const startToVoteDate = new Date(
+                  proposal?.progress[0]?.startToVote
+                );
+                const endToVoteDate = new Date(
+                  startToVoteDate.getTime() +
+                    proposal?.progress[0]?.duration * 1000
+                );
+                endToVote = endToVoteDate.toISOString();
+              }
+              return (
+                <div
+                  key={index}
+                  onClick={() => {
+                    handleNavigate(proposal);
+                  }}
+                  className='cursor-pointer'
+                >
+                  <div className='flex items-center'>
+                    <div className='w-[50%] flex'>
+                      <Icon
+                        presetIcon={presetIcons}
+                        iconUrl={proposal?.org_icon_url}
+                        size='large'
+                      />
+                      <div className='flex flex-col ml-2'>
+                        <p className='text-base'>{proposal?.title}</p>
+                        <p className='text-[13px] text-[#898988]'>
+                          {proposal.workflow_title}
+                        </p>
+                      </div>
                     </div>
+                    <p className='w-[25%]'>
+                      {proposal?.status === 'DRAFT' ? (
+                        <Tag color='default'>draft</Tag>
+                      ) : proposal?.status === 'STOPPED' ? (
+                        <Tag color='default'>close</Tag>
+                      ) : isInTimeLock ? (
+                        <Tag color='orange'>In time-lock</Tag>
+                      ) : proposal?.progress[0]?.vote_machine_type ===
+                        'DocInput' ? (
+                        <Tag color='orange'>Update document</Tag>
+                      ) : (
+                        <Tag color='green'>
+                          {proposal?.progress[0]?.checkpoint_title
+                            ? proposal?.progress[0]?.checkpoint_title
+                            : 'N/A'}
+                        </Tag>
+                      )}
+                    </p>
+
+                    <p className='w-[25%] text-end'>
+                      {proposal?.status === 'DRAFT' && type === 'owner' ? (
+                        <Button icon={<ThunderboltOutlined />}>Publish</Button>
+                      ) : proposal?.status === 'STOPPED' ? (
+                        <p>
+                          {formatDate(proposal?.progress[0]?.startToVote, true)}
+                        </p>
+                      ) : isInTimeLock ? (
+                        <p className='italic text-[#898988]'>
+                          {`until ${formatDate(
+                            proposal?.progress[0]?.startToVote
+                          )}`}
+                        </p>
+                      ) : proposal?.progress[0]?.vote_machine_type ===
+                          'DocInput' && type === 'owner' ? (
+                        <Button icon={<EditOutlined />}>Update</Button>
+                      ) : (
+                        <p>{endToVote ? formatDate(endToVote) : <></>}</p>
+                      )}
+                    </p>
                   </div>
-                  <p className='w-[25%]'>Unknow Data</p>
-                  <p className='w-[25%]'>Unknow Data</p>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
