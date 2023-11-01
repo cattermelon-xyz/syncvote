@@ -9,7 +9,7 @@ import { Icon } from 'icon';
 import { Avatar } from 'antd';
 import { useFilteredData } from '@utils/hooks/useFilteredData';
 import { FiShield } from 'react-icons/fi';
-import { queryOrgByIdForExplore } from '@dal/data';
+import { queryOrgByIdForExplore, queryMission } from '@dal/data';
 import { randomIcon } from '@utils/helpers';
 import {
   createIdString,
@@ -25,8 +25,6 @@ import TemplateList from '@fragments/TemplateList';
 import { config } from '@dal/config';
 import ListProposals from '@pages/Mission/fragments/ListProposals';
 
-// TODO: this file is placed in wrong folder!
-
 interface SortProps {
   by: string;
   type: 'asc' | 'des';
@@ -40,9 +38,13 @@ const BluePrint = () => {
   const dispatch = useDispatch();
   const orgId = [extractIdFromIdString(orgIdString)];
   const [loading, setLoading] = useState(true);
-  const [runGetMission, setRunGetMission] = useState(false);
   const [myProposals, setMyProposals] = useState<any[]>([]);
   const [allProposals, setAllProposals] = useState<any[]>([]);
+
+  useEffect(() => {
+    console.log('myProposals', myProposals);
+    console.log('allProposals', allProposals);
+  }, [myProposals, allProposals]);
 
   const user = useGetDataHook({
     configInfo: config.queryUserById,
@@ -56,32 +58,34 @@ const BluePrint = () => {
     configInfo: config.queryOrgs,
   }).data;
 
-  const missionData = useGetDataHook({
-    params: {
+  const fetchMission = () => {
+    queryMission({
       orgIds: orgId,
-    },
-    start: runGetMission,
-    configInfo: config.queryMission,
-    cacheOption: false,
-  }).data;
+      onSuccess: (missionData: any) => {
+        console.log("missionData", missionData)
+        const missionDataArray = Object.values(missionData);
+
+        const getMyProposals = missionDataArray.filter(
+          (mission: any) => mission.creator_id === user.id
+        );
+        setMyProposals(getMyProposals);
+        setAllProposals(missionDataArray);
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: error,
+        });
+      },
+      dispatch,
+    });
+  };
 
   useEffect(() => {
-    if (orgId && orgId.length > 0) {
-      setRunGetMission(true);
+    if (orgId && orgId.length > 0 && user) {
+      fetchMission();
     }
-  }, [JSON.stringify(orgId), setRunGetMission]);
-
-  useEffect(() => {
-    if (missionData && user) {
-      const missionDataArray = Object.values(missionData);
-
-      const getMyProposals = missionDataArray.filter(
-        (mission: any) => mission.creator_id === user.id
-      );
-      setMyProposals(getMyProposals);
-      setAllProposals(missionDataArray);
-    }
-  }, [missionData, user]);
+  }, [JSON.stringify(orgId), user]);
 
   const org = orgs.find(
     (tmp: any) => tmp.id === extractIdFromIdString(orgIdString)
