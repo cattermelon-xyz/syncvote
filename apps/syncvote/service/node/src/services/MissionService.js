@@ -5,6 +5,7 @@ const { SingleVote } = require('../models/votemachines/SingleVote');
 const { DocInput } = require('../models/votemachines/DocInput');
 const { Veto } = require('../models/votemachines/Veto');
 const { UpVote } = require('../models/votemachines/Upvote');
+var CronJob = require('cron').CronJob;
 
 const moment = require('moment');
 const { createArweave } = require('../functions');
@@ -33,11 +34,6 @@ async function insertMission(props) {
         .from('mission')
         .insert({ ...props, arweave_id: arweave_id })
         .select('*');
-
-      // const { data: newMission, error } = await supabase
-      //   .from('mission')
-      //   .insert(props)
-      //   .select('*');
 
       if (!error) {
         if (newMission[0].status === 'PUBLIC') {
@@ -101,6 +97,31 @@ async function insertMission(props) {
                 checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
                 startToVote: moment().format(),
               });
+
+              // create a job to close this current vote data in expected time close
+              const now = new Date();
+              const scheduledTime = new Date(
+                now.getTime() + checkpointData.duration * 1000
+              );
+              const cronSyntax = `${scheduledTime.getSeconds()} ${scheduledTime.getMinutes()} ${scheduledTime.getHours()} ${scheduledTime.getDate()} ${
+                scheduledTime.getMonth() + 1
+              } *`;
+
+              const job = new CronJob(cronSyntax, async function () {
+                await fetch('http://localhost:3000/api/vote/create', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    identify: `cronjob-${checkpointData.id}`,
+                    option: ['fake option'],
+                    voting_power: 9999,
+                    mission_id: newMission[0].id,
+                  }),
+                });
+              });
+              job.start();
 
               const { u_error } = await supabase
                 .from('mission')

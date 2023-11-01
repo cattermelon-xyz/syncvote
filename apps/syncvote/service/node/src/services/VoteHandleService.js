@@ -3,8 +3,7 @@ const {
   VoteMachineController,
 } = require('../models/votemachines/VotingController');
 const moment = require('moment');
-const { insertCurrentVoteData } = require('./CurrentVoteDataService');
-const { createArweave } = require('../functions');
+const { createArweave, convertToCron } = require('../functions');
 
 async function handleVoting(props) {
   return new Promise(async (resolve, reject) => {
@@ -80,6 +79,30 @@ async function handleVoting(props) {
             voteMachineController = new VoteMachineController(
               mission_vote_details[0]
             );
+
+            // create a job to stop this
+            const startToVoteMoment = moment(
+              mission_vote_details[0].startToVote
+            ).unix();
+            const stopTime = moment
+              .unix(startToVoteMoment + mission_vote_details[0].duration)
+              .format();
+            const cronSyntax = convertToCron(stopTime);
+            const job = new CronJob(cronSyntax, async function () {
+              await fetch('http://localhost:3000/api/vote/create', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  identify: `cronjob-${checkpointData.id}`,
+                  option: ['fake option'],
+                  voting_power: 9999,
+                  mission_id: mission_vote_details[0].id,
+                }),
+              });
+            });
+            job.start();
           }
 
           // 4️⃣ check if fallback
@@ -164,15 +187,18 @@ async function handleVoting(props) {
             // change endedAt of current vote data to moment for this checkpoint
             const { current_vote_data } = await supabase
               .from('current_vote_data')
-              .update({ endedAt: moment().format(), tallyResult: tallyResult })
+              .update({
+                endedAt: moment().format(),
+                tallyResult: tallyResult,
+              })
               .eq('id', mission_vote_details[0].cvd_id)
               .select('*');
 
-            // const { arweave_id } = await createArweave(current_vote_data[0]);
-            // await supabase
-            //   .from('current_vote_data')
-            //   .update({ arweave_id: arweave_id })
-            //   .eq('id', mission_vote_details[0].cvd_id);
+            const { arweave_id } = await createArweave(current_vote_data[0]);
+            await supabase
+              .from('current_vote_data')
+              .update({ arweave_id: arweave_id })
+              .eq('id', mission_vote_details[0].cvd_id);
 
             let startToVote = moment().format();
             const index = tallyResult.index;
@@ -186,6 +212,24 @@ async function handleVoting(props) {
                   mission_vote_details[0].delays[index],
                   delayUnits
                 );
+
+                // create a job for to start this
+                const cronSyntax = convertToCron(startToVote);
+                const job = new CronJob(cronSyntax, async function () {
+                  await fetch('http://localhost:3000/api/vote/create', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      identify: `cronjob-${checkpointData.id}`,
+                      option: ['fake option'],
+                      voting_power: 9999,
+                      mission_id: mission_vote_details[0].id,
+                    }),
+                  });
+                });
+                job.start();
               }
             }
 
