@@ -131,9 +131,9 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
-
+  console.log(new URL('/AutoSave.ts', import.meta.url));
   // const autoSaveWorker: Worker = useMemo(
-  //   () => new Worker(new URL('/workers/AutoSave.ts', import.meta.url)),
+  //   () => new Worker(new URL('/AutoSave.ts', import.meta.url)),
   //   []
   // );
   // autoSaveWorker.onmessage = (e) => {
