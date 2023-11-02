@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, Button, Progress, Space, Tag } from 'antd';
+import { Card, Button, Progress, Space, Tag, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { Icon } from 'icon';
 import { useParams } from 'react-router-dom';
@@ -170,6 +170,12 @@ const MissionVotingDetail = () => {
                   style={{ border: 'None', padding: '0px', boxShadow: 'None' }}
                   className='text-[#6200EE]'
                   icon={<UploadOutlined />}
+                  onClick={() => navigator.clipboard.writeText(window.location.href)
+                    .then(() => message.success('URL copied to clipboard!'))
+                    .catch(err => {
+                      console.error('Failed to copy URL: ', err);
+                      message.error('Failed to copy URL');
+                    })}
                 >
                   Share
                 </Button>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Modal, Button } from 'antd';
+import { Typography, Modal, Button, Empty } from 'antd';
 const { Title } = Typography;
 import { L } from '@utils/locales/L';
 import OrgCard from './fragments/OrgCard';
@@ -62,6 +62,9 @@ const Home: React.FC = () => {
             if (result && result.length > 0) {
               setOrgsData(result);
               setIsSearching(true);
+            } else if (result && result.length === 0) {
+              setOrgsData([]);
+              setIsSearching(true);
             } else {
               setOrgsData(originalOrgsData);
               setIsSearching(false);
@@ -69,28 +72,28 @@ const Home: React.FC = () => {
           }}
           showSearchTag={false}
         />
-        <ListItem
-          // handleSort={handleSortSpaceDetail}
-          items={
-            OrgsData &&
-            OrgsData.map((OrgData, index) => (
-              <OrgCard key={index} orgData={OrgData} />
-            ))
-          }
-          columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
-        />
-        {isSearching ? (
-          <div></div>
+        {OrgsData && OrgsData.length > 0 ? (
+          <>
+            <ListItem
+              items={OrgsData.map((OrgData, index) => (
+                <OrgCard key={index} orgData={OrgData} />
+              ))}
+              columns={{ xs: 2, md: 3, xl: 4, '2xl': 4 }}
+            />
+            {!isSearching && (
+              <div className='w-full flex justify-center items-center'>
+                <Button
+                  onClick={fetchData}
+                  className='mt-4'
+                  icon={<ReloadOutlined />}
+                >
+                  View More
+                </Button>
+              </div>
+            )}
+          </>
         ) : (
-          <div className='w-full flex justify-center items-center'>
-            <Button
-              onClick={fetchData}
-              className='mt-4'
-              icon={<ReloadOutlined />}
-            >
-              View More
-            </Button>
-          </div>
+          <Empty description='No Organizations Found' />
         )}
       </section>
     </div>
