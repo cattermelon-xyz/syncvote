@@ -76,8 +76,8 @@ async function insertMission(props) {
               thresholds: checkpoint.data?.max,
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
-              // duration: checkpoint?.duration,
-              duration: 10,
+              duration: checkpoint?.duration,
+              // duration: 10,
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
               includedAbstain: checkpoint?.includedAbstain,
@@ -108,22 +108,22 @@ async function insertMission(props) {
                 scheduledTime.getMonth() + 1
               } *`;
 
-              const job = new CronJob(cronSyntax, async function () {
-                await fetch(`${process.env.BACKEND_API}/vote/create`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    identify: `cronjob-${checkpointData.id}`,
-                    option: ['fake option'],
-                    voting_power: 9999,
-                    mission_id: newMission[0].id,
-                  }),
-                });
-              });
-              job.start();
-              console.log(`create job to stop at start`);
+              // const job = new CronJob(cronSyntax, async function () {
+              //   await fetch(`${process.env.BACKEND_API}/vote/create`, {
+              //     method: 'POST',
+              //     headers: {
+              //       'Content-Type': 'application/json',
+              //     },
+              //     body: JSON.stringify({
+              //       identify: `cronjob-${checkpointData.id}`,
+              //       option: ['fake option'],
+              //       voting_power: 9999,
+              //       mission_id: newMission[0].id,
+              //     }),
+              //   });
+              // });
+              // job.start();
+              // console.log(`create job to stop at start`);
 
               const { u_error } = await supabase
                 .from('mission')
