@@ -441,16 +441,16 @@ const PublishTemplate = ({ workflow }: { workflow: any }) => {
             }
           />
           <div className='flex'>
-            <Button
+            {/* <Button
               className='bg-[#6200EE] text-[#E3E3E2] h-10 w-1/2 mr-8'
               onClick={() => {
                 setShowModalChooseTemplate(true);
               }}
             >
               Replace another template
-            </Button>
+            </Button> */}
             <Button
-              className='bg-[#6200EE] text-[#E3E3E2] h-10 w-1/2'
+              className='bg-[#6200EE] text-[#E3E3E2] h-10 w-full'
               onClick={() => {
                 setShowModalEditTemplate(true);
               }}
