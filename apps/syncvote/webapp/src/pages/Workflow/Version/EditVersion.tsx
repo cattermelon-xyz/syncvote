@@ -414,10 +414,9 @@ export const EditVersion = () => {
     });
     setDataHasChanged(true);
   };
-  
-  const [gridX, setGridX] = useState(0);  // initialize gridX with 0
-  const [gridY, setGridY] = useState(0);  // initialize gridY with 0
-  
+
+  const [gridX, setGridX] = useState(0); // initialize gridX with 0
+  const [gridY, setGridY] = useState(0); // initialize gridY with 0
 
   const onAddNewNode = () => {
     const newData = structuredClone(version?.data);
@@ -430,17 +429,17 @@ export const EditVersion = () => {
     };
 
     newData.checkpoints.push({
-      title: `Checkpoint `+ version?.data?.checkpoints?.length,
+      title: `Checkpoint ` + version?.data?.checkpoints?.length,
       id: newId,
       position: newPos,
       isEnd: true,
     });
 
     if (gridX < 5) {
-        setGridX(gridX + 1);
+      setGridX(gridX + 1);
     } else {
-        setGridX(0);
-        setGridY(gridY + 1);
+      setGridX(0);
+      setGridY(gridY + 1);
     }
 
     setVersion({
@@ -452,7 +451,7 @@ export const EditVersion = () => {
     if (selectedNodeId) {
       setDataHasChanged(true);
     }
-};
+  };
 
   const onViewPortChange = (viewport: any) => {
     setCenterPos({
@@ -599,6 +598,7 @@ export const EditVersion = () => {
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
+                    dataHasChanged={dataHasChanged}
                     openCreateProposalModal={() => {
                       setOpenCreateProposalModal(true);
                     }}
