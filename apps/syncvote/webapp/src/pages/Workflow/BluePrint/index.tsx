@@ -62,7 +62,7 @@ const BluePrint = () => {
     queryMission({
       orgIds: orgId,
       onSuccess: (missionData: any) => {
-        console.log("missionData", missionData)
+        console.log('missionData', missionData);
         const missionDataArray = Object.values(missionData);
 
         const getMyProposals = missionDataArray.filter(
@@ -187,7 +187,7 @@ const BluePrint = () => {
       children: myProposals && allProposals && (
         <div className='flex flex-col gap-6'>
           {isExplorePage ? (
-            ''
+            <></>
           ) : (
             <ListProposals
               listProposals={myProposals}
@@ -200,7 +200,7 @@ const BluePrint = () => {
             listProposals={allProposals}
             title={isExplorePage ? '' : 'All proposals'}
             type='all'
-            isExcludeDraftMission={isExplorePage ? true : false}
+            isExcludeDraftMission={true}
           />
         </div>
       ),

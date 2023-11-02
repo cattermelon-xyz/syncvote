@@ -101,18 +101,18 @@ const ListProposals: React.FC<Props> = ({
             filteredProposals.map((proposal, index) => {
               const currentTimestamp = new Date().toISOString();
               const isInTimeLock =
-                proposal?.progress[0]?.startToVote > currentTimestamp;
+                proposal?.startToVote > currentTimestamp;
               let endToVote;
               if (
-                proposal?.progress[0]?.duration &&
-                proposal?.progress[0]?.startToVote
+                proposal?.duration &&
+                proposal?.startToVote
               ) {
                 const startToVoteDate = new Date(
-                  proposal?.progress[0]?.startToVote
+                  proposal?.startToVote
                 );
                 const endToVoteDate = new Date(
                   startToVoteDate.getTime() +
-                    proposal?.progress[0]?.duration * 1000
+                    proposal?.duration * 1000
                 );
                 endToVote = endToVoteDate.toISOString();
               }
@@ -145,13 +145,13 @@ const ListProposals: React.FC<Props> = ({
                         <Tag color='default'>close</Tag>
                       ) : isInTimeLock ? (
                         <Tag color='orange'>In time-lock</Tag>
-                      ) : proposal?.progress[0]?.vote_machine_type ===
+                      ) : proposal?.vote_machine_type ===
                         'DocInput' ? (
                         <Tag color='orange'>Update document</Tag>
                       ) : (
                         <Tag color='green'>
-                          {proposal?.progress[0]?.checkpoint_title
-                            ? proposal?.progress[0]?.checkpoint_title
+                          {proposal?.checkpoint_title
+                            ? proposal?.checkpoint_title
                             : 'N/A'}
                         </Tag>
                       )}
@@ -162,15 +162,15 @@ const ListProposals: React.FC<Props> = ({
                         <Button icon={<ThunderboltOutlined />}>Publish</Button>
                       ) : proposal?.status === 'STOPPED' ? (
                         <p>
-                          {formatDate(proposal?.progress[0]?.startToVote, true)}
+                          {formatDate(proposal?.startToVote, true)}
                         </p>
                       ) : isInTimeLock ? (
                         <p className='italic text-[#898988]'>
                           {`until ${formatDate(
-                            proposal?.progress[0]?.startToVote
+                            proposal?.startToVote
                           )}`}
                         </p>
-                      ) : proposal?.progress[0]?.vote_machine_type ===
+                      ) : proposal?.vote_machine_type ===
                           'DocInput' && type === 'owner' ? (
                         <Button icon={<EditOutlined />}>Update</Button>
                       ) : (
