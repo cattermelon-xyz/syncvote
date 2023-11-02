@@ -431,11 +431,6 @@ export const PublicVersion = () => {
                       y: (-viewport.y + 250) / viewport.zoom,
                     });
                   }}
-                  fitViewOptions={{
-                    padding: 20,
-                    maxZoom: 4,
-                    minZoom: 0.9,
-                  }}
                 />
               </Layout>
               <Sider
