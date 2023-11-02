@@ -15,6 +15,7 @@ import { deepEqual } from '@utils/helpers';
 import { supabase, subtractArray } from 'utils';
 import { ITemplate } from '@dal/redux/reducers/template.reducer/interface';
 import { ITag } from '@dal/redux/reducers/preset.reducer/interface';
+import moment from 'moment';
 
 export class TemplateFunctionClass {
   async queryTemplate({
@@ -115,7 +116,7 @@ export class TemplateFunctionClass {
       status !== undefined ? (toUpdate.status = status) : null;
       const { data, error } = await supabase
         .from('template')
-        .update(toUpdate)
+        .update({...toUpdate, last_updated: moment().format()})
         .eq('id', templateId)
         .select('*');
 
