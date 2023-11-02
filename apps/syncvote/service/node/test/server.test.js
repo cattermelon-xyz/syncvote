@@ -9,15 +9,28 @@ describe('Testing voting function', function () {
     identify: `chaukhac4@gmail.com`,
     option: [1],
     voting_power: 1,
-    mission_id: 4,
+    mission_id: 5,
   };
-  it('1. The side length of the Cube', async function (done) {
+
+  it('1. Vote in time', async function () {
+    this.timeout(5000);
+
     try {
-      const response = await axios.post(`${process.env.BACKEND_API}/vote/create`, voteData);
+      const response = await axios.post(
+        `${process.env.BACKEND_API}/vote/create`,
+        voteData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
       console.log(response.data);
-    } catch (error) {
-      console.log(error);
-      throw error;
+      expect(response.data.message).to.eq('Vote successfully');
+    } catch (e) {
+      console.log(e);
+      throw e;
     }
   });
 });

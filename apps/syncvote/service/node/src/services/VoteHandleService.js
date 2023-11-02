@@ -45,7 +45,7 @@ async function handleVoting(props) {
             mission_vote_details[0]
           );
           let firstTimeToVote = false;
-          
+
           // 3️⃣ check if the fisrt time of voting
           if (!mission_vote_details[0].result) {
             // update data of current vote data
@@ -191,31 +191,31 @@ async function handleVoting(props) {
             return;
           }
 
-          if (firstTimeToVote) {
-            // create a job to stop this
-            const stopTime = moment(mission_vote_details[0].startToVote).add(
-              mission_vote_details[0].duration,
-              'seconds'
-            );
+          // if (firstTimeToVote) {
+          //   // create a job to stop this
+          //   const stopTime = moment(mission_vote_details[0].startToVote).add(
+          //     mission_vote_details[0].duration,
+          //     'seconds'
+          //   );
 
-            const cronSyntax = convertToCron(stopTime);
+          //   const cronSyntax = convertToCron(stopTime);
 
-            const job = new CronJob(cronSyntax, async function () {
-              await fetch(`${process.env.BACKEND_API}/vote/create`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  identify: `cronjob-${checkpointData.id}`,
-                  option: ['fake option'],
-                  voting_power: 9999,
-                  mission_id: mission_vote_details[0].id,
-                }),
-              });
-            });
-            job.start();
-          }
+          //   const job = new CronJob(cronSyntax, async function () {
+          //     await fetch(`${process.env.BACKEND_API}/vote/create`, {
+          //       method: 'POST',
+          //       headers: {
+          //         'Content-Type': 'application/json',
+          //       },
+          //       body: JSON.stringify({
+          //         identify: `cronjob-${checkpointData.id}`,
+          //         option: ['fake option'],
+          //         voting_power: 9999,
+          //         mission_id: mission_vote_details[0].id,
+          //       }),
+          //     });
+          //   });
+          //   job.start();
+          // }
 
           // 5️⃣ check if recorded
           const { notRecorded, error: r_error } =
@@ -258,7 +258,6 @@ async function handleVoting(props) {
             .from('current_vote_data')
             .update({ who: who, result: result })
             .eq('id', mission_vote_details[0].cvd_id);
-
           if (cvd_err) {
             resolve({
               status: 'ERR',
