@@ -281,7 +281,7 @@ const MissionVotingDetail = () => {
           </div>
           <div className='flex-1 flex flex-col gap-4'>
             {missionData?.progress && (
-              <MissionProgress progress={missionData?.progress} />
+              <MissionProgress missionData={missionData} />
             )}
             {missionData.result ? (
               <Card className=''>
