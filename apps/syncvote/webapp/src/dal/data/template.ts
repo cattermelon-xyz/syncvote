@@ -127,7 +127,7 @@ export class TemplateFunctionClass {
           .select('data')
           .eq('id', workflowVersionId);
 
-        if (wversion) {
+          if (wversion && wversion.length > 0) {
           await supabase
             .from('template_version')
             .update({

@@ -76,8 +76,11 @@ export const PublicVersion = () => {
     setSession(_session);
     setShowRegisterInvitation(_session?.user?.user_metadata ? false : true);
   };
-  const [searchParams, setSearchParams] = useSearchParams();
-  const diagramFullScreen = searchParams.get('view') === 'full' ? true : false;
+  const [searchParams, setSearchParams] = useSearchParams('');
+  console.log(searchParams);
+
+  const diagramFullScreen =
+    searchParams.get('view') === 'not-full' ? false : true;
   PublicPageRedirect.attempt(
     `/public/${orgIdString}/${workflowIdString}/${versionIdString}`
   );
@@ -107,7 +110,7 @@ export const PublicVersion = () => {
     configInfo: config.queryPresetBanners,
   }).data;
 
-  const isFullScreen = searchParams.get('view') === 'full' ? true : false;
+  const isFullScreen = searchParams.get('view') === 'not-full' ? false : true;
 
   useEffect(() => {
     queryWeb2Integration({
@@ -153,7 +156,7 @@ export const PublicVersion = () => {
 
   const handleLogin = async () => {
     dispatch(startLoading({}));
-    
+
     // Store the current page URL for redirection after OAuth
     const currentURL = window.location.href;
 
@@ -176,7 +179,7 @@ export const PublicVersion = () => {
         content: error.message || '',
       });
     }
-};
+  };
 
   const isDesktop = window.innerWidth > 700;
   return (
@@ -353,9 +356,9 @@ export const PublicVersion = () => {
                       }
                       onClick={() => {
                         if (isFullScreen) {
-                          navigate(window.location.pathname);
+                          navigate(window.location.pathname + '?view=not-full');
                         } else {
-                          navigate(window.location.pathname + '?view=full');
+                          navigate(window.location.pathname);
                         }
                       }}
                     />

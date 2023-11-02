@@ -191,7 +191,6 @@ export interface IGraph {
   onConfigPanelClose?: () => void;
   onConfigEdgePanelClose?: () => void;
   onChangeLayout?: (data: IWorkflowVersionLayout) => void;
-  openCreateProposalModal?: () => void;
 }
 
 export interface IConfigPanel {

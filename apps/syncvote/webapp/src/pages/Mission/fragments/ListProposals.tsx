@@ -105,7 +105,7 @@ const ListProposals: React.FC<Props> = ({
                     />
                     <div className='flex flex-col ml-2'>
                       <p>{proposal?.title}</p>
-                      <p>{`${proposal?.org_title} progress`}</p>
+                      <p>{proposal.workflow_title}</p>
                     </div>
                   </div>
                   <p className='w-[25%]'>Unknow Data</p>

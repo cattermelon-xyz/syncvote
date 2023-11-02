@@ -30,10 +30,11 @@ const ModalVoterInfo: React.FC<Props> = ({
     console.log('submission', submission);
   }, [submission]);
 
-  const handleInsertDocInput = async (content: any) => {
+  const handleInsertDocInput = async (content: any, docInputId: string) => {
     let arweaveData: any;
     await insertDocInput({
       content,
+      docInputId,
       onSuccess: (data: any) => {
         arweaveData = data;
       },
@@ -63,8 +64,8 @@ const ModalVoterInfo: React.FC<Props> = ({
         submission
       ) {
         const arweaveIds: any[] = [];
-        for (const content of Object.values(submission)) {
-          const data = await handleInsertDocInput(content);
+        for (const [docId, content] of Object.entries(submission)) {
+          const data = await handleInsertDocInput(content, docId);
           if (data) {
             arweaveIds.push(data);
           }

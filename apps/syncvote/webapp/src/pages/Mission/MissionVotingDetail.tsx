@@ -19,6 +19,7 @@ import MissionProgress from './fragments/MissionProgress';
 import VoteSection from './fragments/VoteSection';
 import ShowDescription from './fragments/ShowDescription';
 import ProposalDocuments from './fragments/ProposalDocuments';
+import { queryDocInput } from '@dal/data';
 
 const MissionVotingDetail = () => {
   const { missionIdString } = useParams();
@@ -32,6 +33,8 @@ const MissionVotingDetail = () => {
   const [selectedOption, onSelectedOption] = useState<number>(-1);
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
   const [submission, setSubmission] = useState<any>();
+  const [listVersionDocs, setListVersionDocs] = useState<any[]>();
+  const [dataOfAllDocs, setDataOfAllDocs] = useState<any[]>([]);
 
   const dispatch = useDispatch();
 
@@ -44,6 +47,10 @@ const MissionVotingDetail = () => {
         const checkpointData = data?.data?.checkpoints.filter(
           (checkpoint: any) => checkpoint.id === currentCheckpointId
         );
+        const listVersionDocs = data?.progress.flatMap((progress: any) => {
+          return progress?.tallyResult?.submission || [];
+        });
+        setListVersionDocs(listVersionDocs);
         console.log('missiondata', data);
         console.log('checkpointData', checkpointData[0]);
         let checkpointDataAfterHandle = checkpointData[0];
@@ -98,8 +105,30 @@ const MissionVotingDetail = () => {
   }, []);
 
   useEffect(() => {
+    if (listVersionDocs) {
+      listVersionDocs?.map((versionItem: any) => {
+        const idDocInput = versionItem[Object.keys(versionItem)[0]];
+        queryDocInput({
+          idDocInput,
+          onSuccess: (data: any) => {
+            setDataOfAllDocs((prevData) => [...prevData, data]);
+          },
+          onError: (error) => {
+            Modal.error({
+              title: 'Error',
+              content: error,
+            });
+          },
+          dispatch,
+        });
+      });
+    }
+  }, [listVersionDocs]);
+
+  useEffect(() => {
     console.log('missionData', missionData);
-  }, [missionData, listParticipants]);
+    console.log('dataOfAllDocs', dataOfAllDocs);
+  }, [missionData, listParticipants, dataOfAllDocs]);
 
   useEffect(() => {
     if (missionData && currentCheckpointData) {
@@ -149,7 +178,7 @@ const MissionVotingDetail = () => {
                 <Icon presetIcon='' iconUrl='' size='large' />
                 <div className='flex flex-col ml-2'>
                   <p className='font-semibold text-xl	'>{missionData.m_title}</p>
-                  <p>Investment Process</p>
+                  <p>{missionData.workflow_title}</p>
                 </div>
               </div>
             </div>
@@ -168,11 +197,14 @@ const MissionVotingDetail = () => {
               <ShowDescription
                 titleDescription={'Checkpoint description'}
                 description={currentCheckpointData?.description}
+                bgColor='bg-[#F6F6F6]'
               />
               {missionData?.progress && (
                 <ProposalDocuments
                   titleDescription={'Proposal documents'}
                   missionData={missionData}
+                  listVersionDocs={listVersionDocs}
+                  dataOfAllDocs={dataOfAllDocs}
                 />
               )}
               {!currentCheckpointData.isEnd && (
@@ -183,6 +215,8 @@ const MissionVotingDetail = () => {
                   missionData={missionData}
                   setSubmission={setSubmission}
                   submission={submission}
+                  dataOfAllDocs={dataOfAllDocs}
+                  listVersionDocs={listVersionDocs}
                 />
               )}
               {!currentCheckpointData.isEnd &&
@@ -263,12 +297,12 @@ const MissionVotingDetail = () => {
                     let percentage;
                     if (currentCheckpointData.quorum >= totalVotingPower) {
                       percentage =
-                        (missionData.result[index].voting_power /
+                        (missionData.result[index]?.voting_power /
                           currentCheckpointData.quorum) *
                         100;
                     } else {
                       percentage =
-                        (missionData.result[index].voting_power /
+                        (missionData.result[index]?.voting_power /
                           totalVotingPower) *
                         100;
                     }

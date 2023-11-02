@@ -104,6 +104,9 @@ const Flow = () => {
     });
     setNodes(obj.nodes);
     setEdges(obj.edges);
+    setTimeout(() => {
+      fitView();
+    }, 50);
     if (shouldExportImage) {
       selfDownloadImage({ imageWidth: 1344, imageHeight: 768 });
       setExportImage ? setExportImage(false) : null;
@@ -125,7 +128,8 @@ const Flow = () => {
   const [showQuickStartDialog, setShowQuickStartDialog] = useState(false);
   const selectedEdge = edges?.find((edge: any) => edge.id === selectedEdgeId);
 
-  const { getNodes } = useReactFlow();
+  const { getNodes, fitView } = useReactFlow();
+
   const selfDownloadImage = ({
     imageWidth = 1344,
     imageHeight = 768,
@@ -218,11 +222,6 @@ const Flow = () => {
         proOptions={proOptions}
         onEdgeClick={onEdgeClick}
         fitView={true}
-        fitViewOptions={{
-          padding: 20,
-          maxZoom: 8,
-          minZoom: 0.5,
-        }}
       >
         {window.innerWidth > 700 ? (
           <Controls position='bottom-left' showInteractive={false} />

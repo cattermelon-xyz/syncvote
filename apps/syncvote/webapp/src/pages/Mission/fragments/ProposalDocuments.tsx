@@ -1,20 +1,27 @@
 import { Card, Empty } from 'antd';
 import ModalHistoryOfADoc from './ModalHistoryOfADoc';
 import { useEffect, useState } from 'react';
+import { formatDate } from '@utils/helpers';
 
 interface Props {
   titleDescription: string;
   missionData: any;
+  listVersionDocs: any;
+  dataOfAllDocs: any;
 }
 
 const ProposalDocuments: React.FC<Props> = ({
   titleDescription,
   missionData,
+  listVersionDocs,
+  dataOfAllDocs,
 }) => {
   const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   const [currentDoc, setCurrentDoc] = useState<any>();
-  const [listVersionDocs, setListVersionDocs] = useState<any[]>();
   const [versionOfADoc, setVersionOfADoc] = useState<any[]>();
+  const [latestCreatedAt, setLatestCreatedAt] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     const currentDoc = missionData?.data?.docs.find(
@@ -24,13 +31,6 @@ const ProposalDocuments: React.FC<Props> = ({
   }, [currentDocId, listVersionDocs]);
 
   useEffect(() => {
-    const listVersionDocs = missionData?.progress.flatMap((progress: any) => {
-      return progress?.tallyResult?.submission || [];
-    });
-    setListVersionDocs(listVersionDocs);
-  }, [missionData]);
-
-  useEffect(() => {
     if (listVersionDocs && currentDocId) {
       const versions = listVersionDocs.filter(
         (version: any) => version[currentDocId] !== undefined
@@ -38,6 +38,47 @@ const ProposalDocuments: React.FC<Props> = ({
       setVersionOfADoc(versions);
     }
   }, [listVersionDocs, currentDocId]);
+
+  const getLatestCreatedAtForEachDoc = (
+    listVersionDocs: any[],
+    dataOfAllDocs: any[]
+  ): Record<string, string> => {
+    const docIds: Record<string, number[]> = {};
+
+    listVersionDocs.forEach((doc: any) => {
+      const [docInput, id] = Object.entries(doc)[0];
+      docIds[docInput] = [...(docIds[docInput] || []), Number(id)];
+    });
+
+    const latestCreatedAt: Record<string, string> = {};
+
+    Object.keys(docIds).forEach((docInput) => {
+      let latestDoc: any = null;
+      docIds[docInput].forEach((id: number) => {
+        const currentDoc = dataOfAllDocs.find((doc: any) => doc.id === id);
+        if (
+          currentDoc &&
+          (!latestDoc ||
+            new Date(currentDoc.created_at) > new Date(latestDoc.created_at))
+        ) {
+          latestDoc = currentDoc;
+        }
+      });
+      if (latestDoc) {
+        latestCreatedAt[docInput] = latestDoc.created_at;
+      }
+    });
+
+    return latestCreatedAt;
+  };
+
+  useEffect(() => {
+    const latestCreatedAtResults = getLatestCreatedAtForEachDoc(
+      listVersionDocs,
+      dataOfAllDocs
+    );
+    setLatestCreatedAt(latestCreatedAtResults);
+  }, [listVersionDocs, dataOfAllDocs]);
 
   return (
     <>
@@ -49,10 +90,15 @@ const ProposalDocuments: React.FC<Props> = ({
           {missionData?.data?.docs.length !== 0 ? (
             <div className='flex flex-col gap-6'>
               {missionData?.data?.docs.map((doc: any, index: any) => (
-                <div className='flex justify-between w-full' key={index}>
-                  <div>{doc?.title}</div>
+                <div className='flex w-full' key={index}>
+                  <div className='w-3/5'>{doc?.title}</div>
+                  <p className='w-1/5'>
+                    {latestCreatedAt[doc.id]
+                      ? formatDate(latestCreatedAt[doc.id])
+                      : 'N/A'}
+                  </p>
                   <p
-                    className='text-[#6200EE] cursor-pointer'
+                    className='text-[#6200EE] cursor-pointer w-1/5 text-right'
                     onClick={() => setCurrentDocId(doc.id)}
                   >
                     View
@@ -73,6 +119,7 @@ const ProposalDocuments: React.FC<Props> = ({
           open={!!currentDocId}
           onClose={() => setCurrentDocId(null)}
           versionOfADoc={versionOfADoc}
+          dataOfAllDocs={dataOfAllDocs}
         />
       )}
     </>
