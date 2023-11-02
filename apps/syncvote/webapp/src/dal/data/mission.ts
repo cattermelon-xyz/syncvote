@@ -46,22 +46,22 @@ export class MissionFunctionClass {
         mList.forEach(async (d: any) => {
           const newd = { ...d };
           console.log('newd', newd);
-          //handle get progress
-          const { data: dataProgress, error: errorProgress } = await supabase
-            .from('progress_mission_view')
-            .select('*')
-            .eq('mission_id', newd.id);
+          // //handle get progress
+          // const { data: dataProgress, error: errorProgress } = await supabase
+          //   .from('progress_mission_view')
+          //   .select('*')
+          //   .eq('mission_id', newd.id);
 
-          if (!errorProgress) {
-            const progress = dataProgress.sort(
-              (a, b) =>
-                new Date(a.created_at).getTime() -
-                new Date(b.created_at).getTime()
-            );
-            newd.progress = progress;
-          } else {
-            onError(errorProgress);
-          }
+          // if (!errorProgress) {
+          //   const progress = dataProgress.sort(
+          //     (a, b) =>
+          //       new Date(a.created_at).getTime() -
+          //       new Date(b.created_at).getTime()
+          //   );
+          //   newd.progress = progress;
+          // } else {
+          //   onError(errorProgress);
+          // }
 
           //handle icon
           newd.mission_icon_url = d.mission_icon_url
@@ -177,21 +177,6 @@ export const queryMission = async ({
 
     for (let d of mList) {
       const newd = { ...d };
-
-      const { data: dataProgress, error: errorProgress } = await supabase
-        .from('progress_mission_view')
-        .select('*')
-        .eq('mission_id', newd.id);
-
-      if (!errorProgress) {
-        const progress = dataProgress.sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-        newd.progress = progress;
-      } else {
-        onError(errorProgress);
-      }
 
       newd.mission_icon_url = d.mission_icon_url
         ? d.mission_icon_url
