@@ -131,21 +131,20 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
-  console.log(new URL('/AutoSave.ts', import.meta.url));
-  // const autoSaveWorker: Worker = useMemo(
-  //   () => new Worker(new URL('/AutoSave.ts', import.meta.url)),
-  //   []
-  // );
-  // autoSaveWorker.onmessage = (e) => {
-  //   if (dataHasChanged) {
-  //     handleSave('data');
-  //     console.log('try auto save');
-  //     autoSaveWorker.postMessage(null);
-  //   }
-  // };
-  // useEffect(() => {
-  //   autoSaveWorker.postMessage(null);
-  // }, [dataHasChanged]);
+  const autoSaveWorker: Worker = useMemo(
+    () => new Worker(new URL('/autosave.ts', import.meta.url)),
+    []
+  );
+  autoSaveWorker.onmessage = (e) => {
+    if (dataHasChanged) {
+      handleSave('data');
+      console.log('try auto save');
+      autoSaveWorker.postMessage(null);
+    }
+  };
+  useEffect(() => {
+    autoSaveWorker.postMessage(null);
+  }, [dataHasChanged]);
   const fetchDataFromServer = () => {
     setIsDataFetchedFromServer(true);
     setIsLoadingData(true);
