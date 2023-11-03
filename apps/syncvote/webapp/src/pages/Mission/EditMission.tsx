@@ -74,7 +74,7 @@ const EditMission = () => {
   const onDelete = () => {
     deleteMission({
       id: currentMission.id || -1,
-      onLoad: () => {
+      onSuccess: () => {
         navigate(`/${orgIdString}`);
         Modal.success({
           title: 'Success',
