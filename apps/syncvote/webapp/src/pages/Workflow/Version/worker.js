@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-globals */
-import React from 'react';
+// import React from 'react';
 // Dummy import to prevent build from failure
 
-const sleep = (milliseconds: number) => {
+const sleep = (milliseconds) => {
   const date = Date.now();
   let currentDate;
   do {
