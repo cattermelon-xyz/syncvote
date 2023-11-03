@@ -597,6 +597,7 @@ export const EditVersion = () => {
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
+                    dataHasChanged={dataHasChanged}
                     openCreateProposalModal={() => {
                       setOpenCreateProposalModal(true);
                     }}

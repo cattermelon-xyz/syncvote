@@ -16,6 +16,7 @@ interface CreateProposalModalProps {
   onCancel: () => void;
   workflowVersion?: any;
   missionId?: number;
+  onUpdateProposals?: any;
 }
 
 export const CreateProposalModal = ({
@@ -24,6 +25,7 @@ export const CreateProposalModal = ({
   workflow,
   workflowVersion,
   missionId = -1,
+  onUpdateProposals,
 }: CreateProposalModalProps) => {
   const dispatch = useDispatch();
   const { orgIdString } = useParams();
@@ -41,19 +43,33 @@ export const CreateProposalModal = ({
 
   const [missionDesc, setMissionDesc] = useState<any>('');
 
+  const [optionWorkflows, setOptionWorkflows] = useState<any>([]);
+
   useEffect(() => {
     if (missionId !== -1) {
       queryAMission({
         missionId: missionId,
         onLoad: (data: any) => {
           const mission = data[0];
-          setName(mission.title);
+          setName(mission?.title);
           setMissionDesc(mission?.desc);
         },
         dispatch,
       });
     }
-  }, []);
+  }, [missionId]);
+
+  useEffect(() => {
+    if (workflow) {
+      setOptionWorkflows([
+        {
+          key: workflow.id,
+          label: <div className='flex items-center'>{workflow.title}</div>,
+          value: workflow.id,
+        },
+      ]);
+    }
+  }, [workflow]);
 
   const handleClick = async (kind: string, status: string) => {
     if (!name) {
@@ -77,6 +93,21 @@ export const CreateProposalModal = ({
             Modal.success({
               title: 'Success',
               content: 'Edit proposal successfully',
+              onOk:
+                status === 'PUBLIC'
+                  ? () => {
+                      window.location.reload();
+                    }
+                  : () => {},
+            });
+            onUpdateProposals((prevProposals: any) => {
+              const newProposals = prevProposals.map((proposal: any) => {
+                if (proposal?.id === missionId) {
+                  return { ...proposal, title: name, desc: missionDesc };
+                }
+                return proposal;
+              });
+              return newProposals;
             });
           },
           onError: (msg) => {
@@ -85,6 +116,7 @@ export const CreateProposalModal = ({
               content: msg,
             });
           },
+          dispatch,
         });
       } else if (kind === 'New') {
         const missionData = {
@@ -133,14 +165,6 @@ export const CreateProposalModal = ({
   //   setTemplateOfDoc(doc?.template);
   //   setDocsOfMission(data?.docs);
   // };
-
-  const [optionWorkflows, setOptionWorkflows] = useState<any>([
-    {
-      key: workflow.id,
-      label: <div className='flex items-center'>{workflow.title}</div>,
-      value: workflow.id,
-    },
-  ]);
 
   return (
     <>
@@ -200,15 +224,21 @@ export const CreateProposalModal = ({
                     </div>
                   )}
                 </div>
-                <div className='text-sm text-[#575655]'>Workflow</div>
-                <div>
-                  <Select
-                    className='w-full'
-                    options={optionWorkflows}
-                    defaultValue={optionWorkflows[0]}
-                    disabled
-                  ></Select>
-                </div>
+                {missionId === -1 && (
+                  <>
+                    <div className='text-sm text-[#575655]'>Workflow</div>
+                    <div>
+                      {optionWorkflows.length > 0 && (
+                        <Select
+                          className='w-full'
+                          options={optionWorkflows}
+                          defaultValue={optionWorkflows[0]?.value}
+                          disabled
+                        />
+                      )}
+                    </div>
+                  </>
+                )}
                 <div className='text-sm text-[#575655] mb-2'>
                   Proposal description
                 </div>
