@@ -76,12 +76,15 @@ export const updateMission = async ({
   missionData,
   onSuccess = () => {},
   onError = () => {},
+  dispatch,
 }: {
   missionId: number;
   missionData: any;
   onSuccess?: (msg: any) => void;
   onError?: (mgs: any) => void;
+  dispatch: any;
 }) => {
+  dispatch(startLoading({}));
   axios
     .post(`${import.meta.env.VITE_SERVER_URL}/mission/update`, {
       params: missionData,
@@ -93,9 +96,11 @@ export const updateMission = async ({
         onError(response.data.message);
       }
       onSuccess('');
+      dispatch(finishLoading({}));
     })
     .catch((error) => {
       console.log('Error', error);
       onError('Error to edit a proposal');
+      dispatch(finishLoading({}));
     });
 };
