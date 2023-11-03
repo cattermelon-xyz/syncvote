@@ -193,7 +193,6 @@ export const queryMission = async ({
       delete newd.preset_banner_url;
       newMissions.push(newd);
     }
-    console.log('newMissions', newMissions);
 
     onSuccess(newMissions);
     dispatch(finishLoading({}));
@@ -292,14 +291,14 @@ export const upsertAMission = async ({
 };
 export const deleteMission = async ({
   id,
-  onLoad,
+  onSuccess,
   onError = (error) => {
     console.error(error); // eslint-disable-line
   },
   dispatch,
 }: {
   id: number;
-  onLoad: (data: any) => void;
+  onSuccess: (data: any) => void;
   onError?: (data: any) => void;
   dispatch: any;
 }) => {
@@ -307,12 +306,7 @@ export const deleteMission = async ({
   const { data, error } = await supabase.from('mission').delete().eq('id', id);
   dispatch(finishLoading({}));
   if (!error) {
-    dispatch(
-      reduxDeleteMission({
-        id,
-      })
-    );
-    onLoad(data);
+    onSuccess(data);
   } else {
     onError(error);
   }
