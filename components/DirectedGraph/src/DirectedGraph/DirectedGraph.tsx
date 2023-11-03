@@ -86,7 +86,7 @@ const Flow = () => {
     onConfigEdgePanelClose,
     shouldExportImage,
     setExportImage,
-    dataHasChanged,
+    shouldFitView,
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -105,9 +105,11 @@ const Flow = () => {
     });
     setNodes(obj.nodes);
     setEdges(obj.edges);
-    
-    if (!dataHasChanged) {
+
+    if (shouldFitView) {
+      console.log('setTimeout ** attempt to fit view');
       setTimeout(() => {
+        console.log('attempt to fit view');
         fitView();
       }, 50);
     }

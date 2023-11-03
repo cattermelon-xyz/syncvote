@@ -39,6 +39,7 @@ import Header from './fragment/Header';
 import NotFound404 from '@pages/NotFound404';
 import Debug from '@components/Debug/Debug';
 import { CreateProposalModal } from '@fragments/CreateProposalModal';
+import autoSaveWorkerString from './worker.js?raw';
 
 const extractVersion = ({
   workflows,
@@ -131,19 +132,30 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
-  const autoSaveWorker: Worker = useMemo(
-    () => new Worker(new URL('/autosave.ts', import.meta.url)),
-    []
-  );
+  // const autoSaveWorker: Worker = useMemo(
+  //   () => new Worker(new URL('/autosave.ts', import.meta.url)),
+  //   []
+  // );
+  const workerBlob = new Blob([autoSaveWorkerString], {
+    type: 'text/javascript',
+  });
+  const workerURL = URL.createObjectURL(workerBlob);
+  const autoSaveWorker = new Worker(workerURL, { type: 'classic' });
   autoSaveWorker.onmessage = (e) => {
+    console.log('message from worker: ', e);
     if (dataHasChanged) {
-      handleSave('data');
+      console.log('dataHasChanged: ', dataHasChanged);
+      // handleSave('data');
       console.log('try auto save');
       autoSaveWorker.postMessage(null);
+      setDataHasChanged(false);
     }
   };
   useEffect(() => {
-    autoSaveWorker.postMessage(null);
+    if (dataHasChanged) {
+      console.log('from useEffect: autoSaveWorker');
+      autoSaveWorker.postMessage(null);
+    }
   }, [dataHasChanged]);
   const fetchDataFromServer = () => {
     setIsDataFetchedFromServer(true);
@@ -203,54 +215,6 @@ export const EditVersion = () => {
   }, [workflows]);
   let timerHandler: any = undefined;
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
-  // useEffect(() => {
-  //   if (
-  //     dataHasChanged &&
-  //     isLoadingData === false &&
-  //     lastSaved === -1 &&
-  //     version.data
-  //   ) {
-  //     // this is the first time data is loaded
-  //     setLastSaved(Date.now());
-  //     setAutoSaveStatus('first time, lastSaved is set');
-  //     return;
-  //   }
-  //   if (
-  //     dataHasChanged &&
-  //     isLoadingData === false &&
-  //     lastSaved !== -1 &&
-  //     version.data
-  //   ) {
-  //     const now = Date.now();
-  //     if (now - lastSaved > 10000) {
-  //       // let' save data to server
-  //       // TODO: this data is not the latest data, it's the data when the timer is set
-  //       handleSave('data');
-  //       setAutoSaveStatus('auto save');
-  //       // setDataHasChanged(false);
-  //     } else {
-  //       // if there is a timer then do nothing
-  //       if (timerHandler !== undefined) {
-  //         return;
-  //       } else {
-  //         // else, let's set a timer
-  //         setAutoSaveStatus(
-  //           'a timer is set to 10s to save. Tick tock tick tock'
-  //         );
-  //         timerHandler = setTimeout(() => {
-  //           // TODO: this data is not the latest data, it's the data when the timer is set
-  //           handleSave('data');
-  //           // setDataHasChanged(false);
-  //           // setLastSaved(Date.now());
-  //           clearTimeout(timerHandler);
-  //           timerHandler = undefined;
-  //           setAutoSaveStatus('saved & clear timeout');
-  //         }, 10000 - (now - lastSaved));
-  //       }
-  //     }
-  //     return;
-  //   }
-  // }, [dataHasChanged]);
 
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
@@ -268,14 +232,15 @@ export const EditVersion = () => {
         recommended: versionToSave?.recommended,
       },
       onSuccess: () => {
-        queryWorkflow({
-          orgId,
-          onLoad: (_data: any) => {
-            extractWorkflowFromList(_data);
-          },
-          dispatch,
-        });
-        setLastSaved(Date.now());
+        // queryWorkflow({
+        //   orgId,
+        //   onLoad: (_data: any) => {
+        //     extractWorkflowFromList(_data);
+        //   },
+        //   dispatch,
+        // });
+        // setLastSaved(Date.now());
+        console.log('do nothing onSuccess');
       },
       onError: (error) => {
         Modal.error({
@@ -511,6 +476,7 @@ export const EditVersion = () => {
           <div className='w-full bg-slate-100 h-screen'>
             <Debug>
               <div>
+                {dataHasChanged}
                 {viewMode}-{GraphViewMode.VIEW_ONLY}
               </div>
               <div className='block'>
@@ -599,7 +565,8 @@ export const EditVersion = () => {
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
-                    dataHasChanged={dataHasChanged}
+                    // TODO: should once fit view once!
+                    // shouldFitView={dataHasChanged}
                     openCreateProposalModal={() => {
                       setOpenCreateProposalModal(true);
                     }}
