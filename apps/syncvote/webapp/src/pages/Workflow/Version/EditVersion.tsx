@@ -40,6 +40,11 @@ import NotFound404 from '@pages/NotFound404';
 import Debug from '@components/Debug/Debug';
 import { CreateProposalModal } from '@fragments/CreateProposalModal';
 import autoSaveWorkerString from './worker.js?raw';
+const workerBlob = new Blob([autoSaveWorkerString], {
+  type: 'text/javascript',
+});
+const workerURL = URL.createObjectURL(workerBlob);
+const autoSaveWorker = new Worker(workerURL, { type: 'classic' });
 
 const extractVersion = ({
   workflows,
@@ -132,28 +137,15 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
-  // const autoSaveWorker: Worker = useMemo(
-  //   () => new Worker(new URL('/autosave.ts', import.meta.url)),
-  //   []
-  // );
-  const workerBlob = new Blob([autoSaveWorkerString], {
-    type: 'text/javascript',
-  });
-  const workerURL = URL.createObjectURL(workerBlob);
-  const autoSaveWorker = new Worker(workerURL, { type: 'classic' });
   autoSaveWorker.onmessage = (e) => {
-    console.log('message from worker: ', e);
     if (dataHasChanged) {
-      console.log('dataHasChanged: ', dataHasChanged);
-      // handleSave('data');
-      console.log('try auto save');
+      handleSave('data');
       autoSaveWorker.postMessage(null);
       setDataHasChanged(false);
     }
   };
   useEffect(() => {
     if (dataHasChanged) {
-      console.log('from useEffect: autoSaveWorker');
       autoSaveWorker.postMessage(null);
     }
   }, [dataHasChanged]);
@@ -476,9 +468,11 @@ export const EditVersion = () => {
           <div className='w-full bg-slate-100 h-screen'>
             <Debug>
               <div>
-                {dataHasChanged}
-                {viewMode}-{GraphViewMode.VIEW_ONLY}
+                {dataHasChanged ? 'data has changed' : 'data has not changed'}
               </div>
+              {/* <div>
+                {viewMode}-{GraphViewMode.VIEW_ONLY}
+              </div> */}
               <div className='block'>
                 {version ? 'version is TRUE' : 'version is FALSE'}
               </div>
