@@ -16,6 +16,8 @@ async function handleVoting(props) {
         .select(`*`)
         .eq('mission_id', mission_id);
 
+      console.log(mission_vote_details[0].cvd_id);
+
       if (mvd_error) {
         resolve({
           status: 'ERR',
@@ -85,6 +87,8 @@ async function handleVoting(props) {
             firstTimeToVote = true;
           }
 
+          // check if this check point not ready to vote
+
           // 4️⃣ check if fallback
           const { fallback, error: f_error } = voteMachineController.fallBack();
           if (fallback) {
@@ -104,13 +108,16 @@ async function handleVoting(props) {
               console.log(error);
             }
 
-            const { arweave_id } = await createArweave(current_vote_data[0]);
-            await supabase
-              .from('current_vote_data')
-              .update({ arweave_id: arweave_id })
-              .eq('id', mission_vote_details[0].cvd_id);
+            // const { arweave_id } = await createArweave(current_vote_data[0]);
+            // await supabase
+            //   .from('current_vote_data')
+            //   .update({ arweave_id: arweave_id })
+            //   .eq('id', mission_vote_details[0].cvd_id);
 
-            let startToVote = moment().format();
+            let startToVote = moment(mission_vote_details[0].startToVote).add(
+              mission_vote_details[0].duration,
+              'seconds'
+            );
             const index = tallyResult.index;
 
             // check if delays
@@ -118,7 +125,7 @@ async function handleVoting(props) {
               if (mission_vote_details[0].delays[index]) {
                 let delayUnits = `${mission_vote_details[0].delayUnits[index]}s`;
 
-                startToVote = moment().add(
+                startToVote = startToVote.add(
                   mission_vote_details[0].delays[index],
                   delayUnits
                 );
@@ -155,26 +162,26 @@ async function handleVoting(props) {
               })
               .select('*');
 
-            if (!endedAt) {
-              // create a job for to start this
-              const cronSyntax = convertToCron(moment(startToVote));
-              const job = new CronJob(cronSyntax, async function () {
-                await fetch(`${process.env.BACKEND_API}/vote/create`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    identify: `cronjob-${checkpointData.id}`,
-                    option: ['fake option'],
-                    voting_power: 9999,
-                    mission_id: mission_vote_details[0].id,
-                  }),
-                });
-              });
-              job.start();
-              console.log(`create job to start ${job}`);
-            }
+            // if (!endedAt) {
+            //   // create a job for to start this
+            //   const cronSyntax = convertToCron(moment(startToVote));
+            //   const job = new CronJob(cronSyntax, async function () {
+            //     await fetch(`${process.env.BACKEND_API}/vote/create`, {
+            //       method: 'POST',
+            //       headers: {
+            //         'Content-Type': 'application/json',
+            //       },
+            //       body: JSON.stringify({
+            //         identify: `cronjob-${checkpointData.id}`,
+            //         option: ['fake option'],
+            //         voting_power: 9999,
+            //         mission_id: mission_vote_details[0].id,
+            //       }),
+            //     });
+            //   });
+            //   job.start();
+            //   console.log(`create job to start ${job}`);
+            // }
 
             await supabase
               .from('mission')
@@ -185,8 +192,8 @@ async function handleVoting(props) {
               .eq('id', mission_id);
 
             resolve({
-              status: `Move to fallback checkpoint ${next_checkpoint_id}`,
-              message: f_error,
+              status: 'OK',
+              message: `Move to fallback checkpoint ${next_checkpoint_id}`,
             });
             return;
           }
@@ -345,26 +352,26 @@ async function handleVoting(props) {
               })
               .select('*');
 
-            if (!endedAt) {
-              // create a job for to start this
-              const cronSyntax = convertToCron(moment(startToVote));
-              const job = new CronJob(cronSyntax, async function () {
-                await fetch(`${process.env.BACKEND_API}/vote/create`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    identify: `cronjob-${checkpointData.id}`,
-                    option: ['fake option'],
-                    voting_power: 9999,
-                    mission_id: mission_vote_details[0].id,
-                  }),
-                });
-              });
-              job.start();
-              console.log(`create job to start ${job}`);
-            }
+            // if (!endedAt) {
+            //   // create a job for to start this
+            //   const cronSyntax = convertToCron(moment(startToVote));
+            //   const job = new CronJob(cronSyntax, async function () {
+            //     await fetch(`${process.env.BACKEND_API}/vote/create`, {
+            //       method: 'POST',
+            //       headers: {
+            //         'Content-Type': 'application/json',
+            //       },
+            //       body: JSON.stringify({
+            //         identify: `cronjob-${checkpointData.id}`,
+            //         option: ['fake option'],
+            //         voting_power: 9999,
+            //         mission_id: mission_vote_details[0].id,
+            //       }),
+            //     });
+            //   });
+            //   job.start();
+            //   console.log(`create job to start ${job}`);
+            // }
 
             await supabase
               .from('mission')

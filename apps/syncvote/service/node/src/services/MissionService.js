@@ -77,7 +77,6 @@ async function insertMission(props) {
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
               duration: checkpoint?.duration,
-              // duration: 10,
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
               includedAbstain: checkpoint?.includedAbstain,

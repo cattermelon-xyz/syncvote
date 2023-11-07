@@ -26,31 +26,39 @@ class VotingMachine {
     this.participation = JSON.parse(participation || `{}`);
   }
 
-  isStarted() {
-    if (this.startToVote) {
-      return true;
-    }
-    return false;
-  }
-
   fallBack() {
-    // check if this checkpoint is ended
-    if (this.endedAt) {
-      return { fallback: true, error: 'This checkpoint is ended' };
-    }
-
     // check if this checkpoint is outdate
     const startToVoteMoment = moment(this.startToVote).unix();
     const now = moment().unix();
 
     if (now > startToVoteMoment + this.duration) {
-      return { fallback: true, error: 'This checkpoint suppose to be closed' };
+      return {
+        fallback: true,
+        error: 'This checkpoint suppose to be closed',
+      };
     }
 
     return {};
   }
 
   recordVote(voteData) {
+    if (this.endedAt) {
+      return {
+        notRecorded: true,
+        error: `This checkpoint is ended`,
+      };
+    }
+
+    const startToVoteMoment = moment(this.startToVote).unix();
+    const now = moment().unix();
+    // check if this checkpoint is not ready to vote
+    if (now - startToVoteMoment < 0) {
+      return {
+        notRecorded: true,
+        error: `This checkpoint was not ready to vote`,
+      };
+    }
+
     // check if user was allow to vote, check participation
     if (this.participation.type === 'identity') {
       // check if user was allow to vote, check participation
