@@ -86,6 +86,7 @@ const Flow = () => {
     onConfigEdgePanelClose,
     shouldExportImage,
     setExportImage,
+    dataHasChanged,
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -104,9 +105,13 @@ const Flow = () => {
     });
     setNodes(obj.nodes);
     setEdges(obj.edges);
-    setTimeout(() => {
-      fitView();
-    }, 50);
+    
+    if (!dataHasChanged) {
+      setTimeout(() => {
+        fitView();
+      }, 50);
+    }
+
     if (shouldExportImage) {
       selfDownloadImage({ imageWidth: 1344, imageHeight: 768 });
       setExportImage ? setExportImage(false) : null;

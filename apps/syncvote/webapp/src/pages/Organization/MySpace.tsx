@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dropdown, MenuProps, Space, Tabs, Empty } from 'antd';
+import { Button, Dropdown, MenuProps, Space, Tabs, Empty, Modal } from 'antd';
 import { L } from '@utils/locales/L';
 import SpaceCard from '@pages/Organization/fragments/SpaceCard';
 import { ListItem } from 'list-item';
@@ -10,10 +10,11 @@ import { FileOutlined, FolderOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import CreateSpaceModal from '@/fragments/CreateNewDialog/CreateSpaceModal';
 import CreateWorkflowModal from '@/fragments/CreateNewDialog/CreateWorkflowModal';
-import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import { useGetDataHook } from 'utils';
 import { config } from '@dal/config';
 import ListProposals from '@pages/Mission/fragments/ListProposals';
+import { queryMission } from '@dal/data';
+import { useDispatch } from 'react-redux';
 
 const env = import.meta.env.VITE_ENV;
 
@@ -32,28 +33,35 @@ const MySpace: React.FC = () => {
     configInfo: config.queryOrgs,
   }).data;
 
-  const [runGetMission, setRunGetMission] = useState(false);
-
+  const [missionData, setMissionData] = useState<any[]>([]);
+  const dispatch = useDispatch();
   const user = useGetDataHook({
     configInfo: config.queryUserById,
   }).data;
 
   const [orgIds, setOrgIds] = useState<any>([]);
 
-  const missionData = useGetDataHook({
-    params: {
+  const fetchMission = () => {
+    queryMission({
       orgIds,
-    },
-    start: runGetMission,
-    configInfo: config.queryMission,
-    cacheOption: false,
-  }).data;
+      onSuccess: (data: any) => {
+        setMissionData(data);
+      },
+      onError: (error) => {
+        Modal.error({
+          title: 'Error',
+          content: error,
+        });
+      },
+      dispatch,
+    });
+  };
 
   useEffect(() => {
     if (orgIds && orgIds.length > 0) {
-      setRunGetMission(true);
+      fetchMission();
     }
-  }, [JSON.stringify(orgIds), setRunGetMission]);
+  }, [JSON.stringify(orgIds)]);
 
   const [myProposals, setMyProposals] = useState<any[]>([]);
   const [allProposals, setAllProposals] = useState<any[]>([]);

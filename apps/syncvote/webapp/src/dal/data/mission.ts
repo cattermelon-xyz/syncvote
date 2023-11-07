@@ -43,8 +43,27 @@ export class MissionFunctionClass {
       if (data) {
         const newMissions: IMission[] = [];
         const mList = Array.isArray(data) ? data : [data];
-        mList.forEach((d: any) => {
+        mList.forEach(async (d: any) => {
           const newd = { ...d };
+          console.log('newd', newd);
+          // //handle get progress
+          // const { data: dataProgress, error: errorProgress } = await supabase
+          //   .from('progress_mission_view')
+          //   .select('*')
+          //   .eq('mission_id', newd.id);
+
+          // if (!errorProgress) {
+          //   const progress = dataProgress.sort(
+          //     (a, b) =>
+          //       new Date(a.created_at).getTime() -
+          //       new Date(b.created_at).getTime()
+          //   );
+          //   newd.progress = progress;
+          // } else {
+          //   onError(errorProgress);
+          // }
+
+          //handle icon
           newd.mission_icon_url = d.mission_icon_url
             ? d.mission_icon_url
             : `preset:${d.mission_preset_icon_url}`;
@@ -62,9 +81,11 @@ export class MissionFunctionClass {
         });
         if (deepEqual(newMissions, missions)) {
           onSuccess(missions);
+          console.log('missions', missions);
         } else {
           dispatch(setLastFetch({}));
           dispatch(setReducerMissions(newMissions));
+          console.log('newMissions', newMissions);
           onSuccess(newMissions);
         }
       } else if (error) {
@@ -131,44 +152,56 @@ export const queryAMissionDetail = async ({
 };
 
 export const queryMission = async ({
-  orgId,
-  onLoad,
+  orgIds,
+  onSuccess,
   onError = (error) => {
     console.error(error); // eslint-disable-line
   },
   dispatch,
-  filter = {}, // eslint-disable-line
 }: {
-  orgId: number;
-  onLoad: (data: any) => void;
+  orgIds: number[];
+  onSuccess: (data: any) => void;
   onError?: (data: any) => void;
   dispatch: any;
-  filter?: any;
 }) => {
   dispatch(startLoading({}));
   const { data, error } = await supabase
-    .from('mission')
-    .select('*, workflow_version(id, workflow(owner_org_id))')
-    .eq('workflow_version.workflow.owner_org_id', orgId);
-  dispatch(finishLoading({}));
-  // TODO: check if data is correct
-  const newMissions: IMission[] = [];
-  const mList = Array.isArray(data) ? data : [data];
-  mList.forEach((d: any) => {
-    const newd = { ...d };
-    newd.icon_url = d.icon_url ? d.icon_url : `preset:${d.preset_icon_url}`;
-    delete newd.preset_icon_url;
-    delete newd.preset_banner_url;
-    newMissions.push(newd);
-  });
-  dispatch(setReducerMissions(data));
-  dispatch(setLastFetch({}));
+    .from('mission_view')
+    .select('*')
+    .in('org_id', orgIds);
+
   if (data) {
-    onLoad(newMissions);
+    // TODO: check if data is correct
+    const newMissions: IMission[] = [];
+    const mList = Array.isArray(data) ? data : [data];
+
+    for (let d of mList) {
+      const newd = { ...d };
+
+      newd.mission_icon_url = d.mission_icon_url
+        ? d.mission_icon_url
+        : `preset:${d.mission_preset_icon_url}`;
+
+      const orgPresetIcon = d?.org_preset_icon_url
+        ? `preset:${d?.org_preset_icon_url}`
+        : d?.preset_icon_url;
+
+      newd.org_icon_url = d?.org_icon_url ? d?.org_icon_url : orgPresetIcon;
+
+      delete newd.org_preset_icon_url;
+      delete newd.mission_preset_icon_url;
+      delete newd.preset_banner_url;
+      newMissions.push(newd);
+    }
+
+    onSuccess(newMissions);
+    dispatch(finishLoading({}));
   } else if (error) {
     onError(error);
+    dispatch(finishLoading({}));
   }
 };
+
 export const queryAMission = async ({
   missionId,
   onLoad,
@@ -258,14 +291,14 @@ export const upsertAMission = async ({
 };
 export const deleteMission = async ({
   id,
-  onLoad,
+  onSuccess,
   onError = (error) => {
     console.error(error); // eslint-disable-line
   },
   dispatch,
 }: {
   id: number;
-  onLoad: (data: any) => void;
+  onSuccess: (data: any) => void;
   onError?: (data: any) => void;
   dispatch: any;
 }) => {
@@ -273,12 +306,7 @@ export const deleteMission = async ({
   const { data, error } = await supabase.from('mission').delete().eq('id', id);
   dispatch(finishLoading({}));
   if (!error) {
-    dispatch(
-      reduxDeleteMission({
-        id,
-      })
-    );
-    onLoad(data);
+    onSuccess(data);
   } else {
     onError(error);
   }
