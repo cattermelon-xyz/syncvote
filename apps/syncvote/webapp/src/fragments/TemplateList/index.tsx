@@ -70,6 +70,11 @@ const TemplateList = ({ templates, orgId }: TemplateListProps) => {
     }
     setCanPublishTemplate(foundPublishableWorkflow);
   }, [orgs]);
+
+  useEffect(() => {
+    console.log(filterTemplateByOptions);
+  },[filterTemplateByOptions])
+
   return (
     <>
       <ModalEditTemplate

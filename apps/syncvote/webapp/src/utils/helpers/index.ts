@@ -140,18 +140,21 @@ export function deepEqual(obj1: any, obj2: any): boolean {
   return true;
 }
 
-export const formatDate = (dateString: string) => {
+export const formatDate = (dateString: string, includeYear = false) => {
   const date = new Date(dateString);
 
   const day = date.getUTCDate().toString().padStart(2, '0');
   const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(
     date
   );
+  const year = date.getUTCFullYear();
   const hours = date.getUTCHours().toString().padStart(2, '0');
   const minutes = date.getUTCMinutes().toString().padStart(2, '0');
   const amOrPm = date.getUTCHours() >= 12 ? 'PM' : 'AM';
 
-  return `${month} ${day}th, ${hours}:${minutes}${amOrPm}`;
+  return includeYear
+    ? `${month} ${day}th, ${year} ${hours}:${minutes}${amOrPm}`
+    : `${month} ${day}th, ${hours}:${minutes}${amOrPm}`;
 };
 
 const getTimeDifference = (startDate: Date, endDate: Date) => {
