@@ -1,33 +1,33 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { LeftOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
-import WorkflowCard from "../fragments/WorkflowCard";
-import { L } from "@utils/locales/L";
-import { Button, Empty, Modal, Skeleton, Space, Tabs } from "antd";
-import { ListItem } from "list-item";
-import { Icon } from "icon";
-import { Avatar } from "antd";
-import { useFilteredData } from "@utils/hooks/useFilteredData";
-import { FiShield } from "react-icons/fi";
-import { queryOrgByIdForExplore, queryMission } from "@dal/data";
-import { randomIcon } from "@utils/helpers";
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { LeftOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
+import WorkflowCard from '../fragments/WorkflowCard';
+import { L } from '@utils/locales/L';
+import { Button, Empty, Modal, Skeleton, Space, Tabs } from 'antd';
+import { ListItem } from 'list-item';
+import { Icon } from 'icon';
+import { Avatar } from 'antd';
+import { useFilteredData } from '@utils/hooks/useFilteredData';
+import { FiShield } from 'react-icons/fi';
+import { queryOrgByIdForExplore, queryMission } from '@dal/data';
+import { randomIcon } from '@utils/helpers';
 import {
   createIdString,
   extractIdFromIdString,
   useGetDataHook,
   useSetData,
-} from "utils";
-import { useDispatch } from "react-redux";
-import EditOrg from "@pages/Organization/home/EditOrg";
-import { emptyStage } from "directed-graph";
-import NotFound404 from "@pages/NotFound404";
-import TemplateList from "@fragments/TemplateList";
-import { config } from "@dal/config";
-import ListProposals from "@pages/Mission/fragments/ListProposals";
+} from 'utils';
+import { useDispatch } from 'react-redux';
+import EditOrg from '@pages/Organization/home/EditOrg';
+import { emptyStage } from 'directed-graph';
+import NotFound404 from '@pages/NotFound404';
+import TemplateList from '@fragments/TemplateList';
+import { config } from '@dal/config';
+import ListProposals from '@pages/Mission/fragments/ListProposals';
 
 interface SortProps {
   by: string;
-  type: "asc" | "des";
+  type: 'asc' | 'des';
 }
 
 const BluePrint = () => {
@@ -43,8 +43,8 @@ const BluePrint = () => {
   const env = import.meta.env.VITE_ENV;
 
   useEffect(() => {
-    console.log("myProposals", myProposals);
-    console.log("allProposals", allProposals);
+    console.log('myProposals', myProposals);
+    console.log('allProposals', allProposals);
   }, [myProposals, allProposals]);
 
   const user = useGetDataHook({
@@ -63,7 +63,7 @@ const BluePrint = () => {
     queryMission({
       orgIds: orgId,
       onSuccess: (missionData: any) => {
-        console.log("missionData", missionData);
+        console.log('missionData', missionData);
         const missionDataArray = Object.values(missionData);
 
         const getMyProposals = missionDataArray.filter(
@@ -74,7 +74,7 @@ const BluePrint = () => {
       },
       onError: (error) => {
         Modal.error({
-          title: "Error",
+          title: 'Error',
           content: error,
         });
       },
@@ -96,8 +96,8 @@ const BluePrint = () => {
   const [isExplorePage, setIsExplorePage] = useState<boolean>(false);
 
   const [sortWorkflowOptions, setSortWorkflowOption] = useState<SortProps>({
-    by: "Last modified",
-    type: "des",
+    by: 'Last modified',
+    type: 'des',
   });
   const filterWorkflowByOptions = useFilteredData(
     workflows || [],
@@ -127,7 +127,7 @@ const BluePrint = () => {
             }));
 
             const publicCommunityworkflows = workflowsData.filter(
-              (workflow: any) => workflow?.versions[0]?.status === "PUBLISHED"
+              (workflow: any) => workflow?.versions[0]?.status === 'PUBLISHED'
             );
             setWorkflows(publicCommunityworkflows);
             setTemplates(org?.templates || []);
@@ -135,7 +135,7 @@ const BluePrint = () => {
           },
           onError: (error) => {
             Modal.error({
-              title: "Error",
+              title: 'Error',
               content: error,
             });
           },
@@ -159,11 +159,11 @@ const BluePrint = () => {
     const orgIdString = createIdString(`${org.title}`, `${org.id}`);
     // navigate(`${orgIdString}/new-workflow/`);
     const props = {
-      title: "Untitled Workflow",
-      desc: "",
+      title: 'Untitled Workflow',
+      desc: '',
       owner_org_id: org.id,
       emptyStage: emptyStage,
-      iconUrl: "preset:" + randomIcon(),
+      iconUrl: 'preset:' + randomIcon(),
       authority: user.id,
     };
 
@@ -183,32 +183,32 @@ const BluePrint = () => {
 
   const tabItems = [
     {
-      key: "1",
-      label: "Proposal",
+      key: '1',
+      label: 'Proposal',
       children: myProposals && allProposals && (
-        <div className="flex flex-col gap-6">
+        <div className='flex flex-col gap-6'>
           {isExplorePage ? (
             <></>
           ) : (
             <ListProposals
               listProposals={myProposals}
-              title={"My proposals"}
-              type="owner"
+              title={'My proposals'}
+              type='owner'
             />
           )}
 
           <ListProposals
             listProposals={allProposals}
-            title={isExplorePage ? "" : "All proposals"}
-            type="all"
+            title={isExplorePage ? '' : 'All proposals'}
+            type='all'
             isExcludeDraftMission={true}
           />
         </div>
       ),
     },
     {
-      key: "2",
-      label: "Workflows",
+      key: '2',
+      label: 'Workflows',
       children:
         filterWorkflowByOptions && filterWorkflowByOptions.length > 0 ? (
           <ListItem
@@ -223,10 +223,10 @@ const BluePrint = () => {
                 />
               ))
             }
-            columns={{ sm: 2, md: 3, xl: 3, "2xl": 3 }}
+            columns={{ sm: 2, md: 3, xl: 3, '2xl': 3 }}
             extra={
               <Button
-                type="primary"
+                type='primary'
                 icon={<PlusOutlined />}
                 onClick={() => handleNewWorkflow()}
               >
@@ -235,10 +235,10 @@ const BluePrint = () => {
             }
           />
         ) : (
-          <Space className="w-full" direction="vertical">
-            <div className="w-full flex flex-col items-end">
+          <Space className='w-full' direction='vertical'>
+            <div className='w-full flex flex-col items-end'>
               <Button
-                type="primary"
+                type='primary'
                 icon={<PlusOutlined />}
                 onClick={() => handleNewWorkflow()}
               >
@@ -253,8 +253,8 @@ const BluePrint = () => {
 
   if (!isExplorePage) {
     tabItems.push({
-      key: "3",
-      label: "Templates",
+      key: '3',
+      label: 'Templates',
       children: (
         <TemplateList
           templates={templates}
@@ -265,7 +265,7 @@ const BluePrint = () => {
   }
 
   return (
-    <div className="lg:w-[800px] md:w-[640px] sm:w-[400px]">
+    <div className='lg:w-[800px] md:w-[640px] sm:w-[400px]'>
       <EditOrg
         dataOrg={data}
         // isOpen={showEditOrg}
@@ -274,71 +274,71 @@ const BluePrint = () => {
           setShowEditOrg(false);
         }}
         onDeleted={() => {
-          navigate("/");
+          navigate('/');
         }}
         profile={data?.profile || []}
       />
       {org === undefined && isExplorePage === false ? (
         loading ? (
-          <Skeleton className="mt-4" />
+          <Skeleton className='mt-4' />
         ) : (
           <NotFound404 />
         )
       ) : (
         <>
           <div
-            className="flex my-4 gap-1 cursor-pointer"
+            className='flex my-4 gap-1 cursor-pointer'
             onClick={() => {
               if (isExplorePage) {
-                navigate("/explore");
+                navigate('/explore');
               } else {
-                navigate("/");
+                navigate('/');
               }
             }}
           >
-            <LeftOutlined style={{ color: "#6200ee" }} />
-            <p className="font-medium text-[#6200ee] self-center">
-              {isExplorePage ? L("backToExplore") : L("backToMySpaces")}
+            <LeftOutlined style={{ color: '#6200ee' }} />
+            <p className='font-medium text-[#6200ee] self-center'>
+              {isExplorePage ? L('backToExplore') : L('backToMySpaces')}
             </p>
           </div>
           <Space
-            direction="horizontal"
-            className="flex justify-between items-center mb-6 mt-2"
+            direction='horizontal'
+            className='flex justify-between items-center mb-6 mt-2'
           >
-            <div className="flex gap-2 items-center">
+            <div className='flex gap-2 items-center'>
               {data?.icon_url ? (
                 <Icon
                   iconUrl={data?.icon_url}
-                  size="large"
+                  size='large'
                   presetIcon={presetIcons}
                 />
               ) : (
                 <Avatar
-                  shape="circle"
-                  className="w-11 h-11"
+                  shape='circle'
+                  className='w-11 h-11'
                   style={{
-                    backgroundColor: "#D3D3D3",
+                    backgroundColor: '#D3D3D3',
                   }}
                 />
               )}
               <div
-                className="text-3xl font-semibold text-[#252422] flex items-center hover:text-violet-500 cursor-pointer"
+                className='text-3xl font-semibold text-[#252422] flex items-center hover:text-violet-500 cursor-pointer'
                 onClick={() => {
-                  data?.role === "ADMIN" && env === "dev"
-                    ? navigate("setting")
+                  data?.role === 'ADMIN' && env === 'dev'
+                    ? navigate('setting')
                     : null;
                 }}
                 title={
-                  data?.role === "ADMIN"
-                    ? "You are an ADMIN"
-                    : "You are a Member"
+                  data?.role === 'ADMIN'
+                    ? 'You are an ADMIN'
+                    : 'You are a Member'
                 }
               >
                 {data?.title}
-                {data?.role === "ADMIN" ? (
-                  <FiShield className="ml-1" />
+                {data?.role === 'ADMIN' ? (
+                  <FiShield className='ml-1' />
                 ) : (
-                  <TeamOutlined className="ml-1" />
+                  <TeamOutlined className='ml-1' />
                 )}
               </div>
             </div>
