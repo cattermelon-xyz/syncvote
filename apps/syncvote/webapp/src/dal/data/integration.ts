@@ -1,10 +1,10 @@
-import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { finishLoading, startLoading } from "@redux/reducers/ui.reducer";
 import {
   setWeb2Integrations,
   deleteWeb2Integration as deleteWeb2IntegrationReducer,
   setLastFetch,
-} from '@dal/redux/reducers/integration.reducer';
-import { supabase } from 'utils';
+} from "@dal/redux/reducers/integration.reducer";
+import { supabase } from "utils";
 
 export const queryWeb2Integration = async ({
   orgId,
@@ -21,10 +21,10 @@ export const queryWeb2Integration = async ({
 }) => {
   dispatch(startLoading({}));
   const { data, error } = await supabase
-    .from('web2_key')
-    .select('*')
-    .eq('org_id', orgId)
-    .order('created_at', { ascending: false });
+    .from("web2_key")
+    .select("*")
+    .eq("org_id", orgId)
+    .order("created_at", { ascending: false });
   dispatch(finishLoading({}));
   if (data) {
     const newData: any[] = [];
@@ -42,13 +42,13 @@ export const queryWeb2Integration = async ({
     });
     if (newData) {
       newData.push({
-        id: '-1',
-        username: ' ', // every integration come with a username aka user identifier
-        provider: 'custom',
+        id: "-1",
+        username: " ", // every integration come with a username aka user identifier
+        provider: "custom",
         integrationId: -1,
         params: {
-          key: '',
-          value: '',
+          key: "",
+          value: "",
         },
       });
     }
@@ -74,7 +74,7 @@ export const deleteWeb2Integration = async ({
   dispatch: any;
 }) => {
   dispatch(startLoading({}));
-  const { data, error } = await supabase.from('web2_key').delete().eq('id', id);
+  const { data, error } = await supabase.from("web2_key").delete().eq("id", id);
   dispatch(finishLoading({}));
   dispatch(deleteWeb2IntegrationReducer({ id }));
   if (!error) {
@@ -82,4 +82,76 @@ export const deleteWeb2Integration = async ({
   } else {
     onError(error);
   }
+};
+
+export const upsertDiscourseIntegration = async ({
+  discourseData,
+  onSuccess = (data) => {},
+  onError = (data) => {},
+  dispatch,
+}: {
+  discourseData: {
+    orgId: number;
+    apiKey: string;
+    username: string;
+    categoryId: number;
+    discourseUrl: string;
+  };
+  onSuccess?: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  dispatch(startLoading({}));
+  const { orgId, apiKey, username, categoryId, discourseUrl } = discourseData;
+
+  const { data, error } = await supabase
+    .from("web2_key")
+    .select("*")
+    .eq("org_id", orgId);
+
+  if (!error) {
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === "discourse"
+    );
+    if (filteredDiscourse.length === 1) {
+      const { data: dataUpdate, error: errorUpdate } = await supabase
+        .from("web2_key")
+        .update([
+          {
+            access_token: apiKey,
+            username: username,
+            category_id: categoryId,
+            id_string: discourseUrl,
+          },
+        ])
+        .eq("id", filteredDiscourse[0].id);
+      if (!errorUpdate) {
+        onSuccess(dataUpdate);
+      } else {
+        onError(errorUpdate);
+      }
+    } else {
+      const { data: dataInsert, error: errorInsert } = await supabase
+        .from("web2_key")
+        .insert([
+          {
+            access_token: apiKey,
+            provider: "discourse",
+            username: username,
+            category_id: categoryId,
+            id_string: discourseUrl,
+            org_id: orgId,
+          },
+        ])
+        .select();
+      if (!errorInsert) {
+        onSuccess(dataInsert);
+      } else {
+        onError(errorInsert);
+      }
+    }
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
 };
