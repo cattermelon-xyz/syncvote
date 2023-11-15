@@ -26,10 +26,10 @@
 //   background-color: white !important;
 // }
 
-.height-editor .ql-editor {
+.ck-editor__editable {
   height: 200px !important;
 }
 
-.ql-editor a {
-  color: #6200EE !important;
+.ck-editor__editable ol {
+  padding-left: 15px !important;
 }

@@ -1,24 +1,8 @@
 import React, { useState } from 'react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-import ReactQuill from 'react-quill';
-
-import 'react-quill/dist/quill.snow.css';
 import './style.scss';
-
-const modules = {
-  toolbar: [
-    [{ font: [] }],
-    ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
-    [{ align: [] }],
-    ['link'],
-    ['clean'], // remove formatting button
-  ],
-  clipboard: {
-    matchVisual: false,
-  },
-};
 
 interface TextEditorProps {
   setValue?: any;
@@ -27,19 +11,15 @@ interface TextEditorProps {
   id?: string;
 }
 
-const TextEditor: React.FC<TextEditorProps> = ({
-  setValue,
-  value,
-  onBlur,
-}) => {
+const TextEditor: React.FC<TextEditorProps> = ({ setValue, value, onBlur }) => {
   return (
-    <ReactQuill
+    <CKEditor
+      editor={ClassicEditor}
+      data={value}
       onBlur={onBlur}
-      theme='snow'
-      value={value}
-      onChange={setValue}
-      modules={modules}
-      className='height-editor'
+      onChange={(event, editor) => {
+        setValue(editor.getData());
+      }}
     />
   );
 };
