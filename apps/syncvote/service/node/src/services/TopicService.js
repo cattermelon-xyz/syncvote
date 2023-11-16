@@ -1,37 +1,26 @@
 const { supabase } = require('../configs/supabaseClient');
 const axios = require('axios');
 
-const createTopic = async (reqBody) => {
+const createTopic = async (props) => {
+  const { discourseConfig } = props;
   try {
-    if (!reqBody.title || !reqBody.raw || !reqBody.org_id) {
+    if (!props.title || !props.raw || !props.org_id) {
       throw new Error('Title, content, and org_id are all required!');
     }
 
-    const { data, error } = await supabase
-      .from('web2_key')
-      .select('*')
-      .eq('org_id', reqBody.org_id);
-
-    if (error || data.length === 0) {
-      throw new Error(error || 'No Discourse configuration found.');
-    }
-
-    const filteredDiscourse = data.filter(
-      (integration) => integration.provider === 'discourse'
-    );
-    const discourseConfig = filteredDiscourse[0];
-
     console.log('discourseConfig', discourseConfig);
-    console.log(`https://${discourseConfig.id_string}/posts`);
+    console.log(`http://${discourseConfig.id_string}/posts`);
+
+    const discourseData = {
+      title: props.title,
+      raw: props.raw,
+      category: discourseConfig.category_id,
+    };
 
     // Make API call to Discourse
     const response = await axios.post(
       `http://${discourseConfig.id_string}/posts`,
-      {
-        title: reqBody.title,
-        raw: reqBody.raw,
-        category: discourseConfig.category_id,
-      },
+      discourseData,
       {
         headers: {
           'Api-Key': discourseConfig.access_token,
@@ -40,10 +29,12 @@ const createTopic = async (reqBody) => {
       }
     );
 
-    return response.data;
+    return {
+      data: response.data,
+    };
   } catch (e) {
     console.error('Error creating topic:', e);
-    throw e;
+    return { error: e };
   }
 };
 
