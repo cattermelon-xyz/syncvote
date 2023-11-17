@@ -301,6 +301,7 @@ export default (props: IVoteMachineConfigProps) => {
                 </Popover>
               </div>
               <Select
+                value={data.type}
                 className='w-full'
                 options={selectOptions}
                 onChange={(value) => {
