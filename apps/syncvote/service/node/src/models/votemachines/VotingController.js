@@ -1,6 +1,6 @@
 const { Pooling } = require('./Pooling');
 const { Veto } = require('./Veto');
-const { UpVote } = require('./UpVote');
+const { UpVote } = require('./Upvote');
 const { SingleVote } = require('./SingleVote');
 const { DocInput } = require('./DocInput');
 
@@ -15,15 +15,7 @@ class VoteMachineController {
     };
     this.vote_machine_type = props.vote_machine_type;
   }
-
-  // validate(checkpoint) {
-  //   if (this.votingTypes[this.vote_machine_type]) {
-  //     return this.votingTypes[this.vote_machine_type].validate(checkpoint);
-  //   } else {
-  //     throw new Error(`Invalid data`);
-  //   }
-  // }
-
+  
   initDataForCVD() {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].initDataForCVD();
@@ -52,6 +44,13 @@ class VoteMachineController {
 
   getResult() {
     if (this.votingTypes[this.vote_machine_type]) {
+      if (this.vote_machine_type === 'DocInput') {
+        return {
+          who: this.votingTypes[this.vote_machine_type].who,
+          result: this.votingTypes[this.vote_machine_type].result,
+          tallyResult: this.votingTypes[this.vote_machine_type].tallyResult,
+        };
+      }
       return {
         who: this.votingTypes[this.vote_machine_type].who,
         result: this.votingTypes[this.vote_machine_type].result,
