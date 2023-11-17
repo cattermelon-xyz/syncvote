@@ -296,10 +296,9 @@ const VoteSection: React.FC<Props> = ({
                 setOpenModalVoterInfo(true);
               }}
               disabled={
-                selectedOption &&
-                getTimeRemainingToEnd(currentCheckpointData.endToVote) !=
-                  'expired'
-                  ? false
+                selectedOption
+                  ? // && getTimeRemainingToEnd(currentCheckpointData.endToVote) !='expired'
+                    false
                   : true
               }
             >

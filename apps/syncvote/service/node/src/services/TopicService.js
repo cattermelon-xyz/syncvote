@@ -29,7 +29,7 @@ const createTopic = async (props) => {
       }
     );
 
-    return {};
+    return { data: response.data };
   } catch (e) {
     console.error('Error creating topic:', e);
     return { error: e };

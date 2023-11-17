@@ -30,6 +30,7 @@ const createPost = async (props) => {
         },
       }
     );
+    return {};
   } catch (e) {
     console.error('Error creating post:', e);
     return { error: e };
