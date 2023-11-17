@@ -132,7 +132,7 @@ async function insertMission(props) {
 
                   const topicData = {
                     title: `Proposal: ${missionViewData[0].title} has been created`,
-                    raw: `New proposal ${missionViewData[0].title} has been created from ${missionViewData[0].workflow_title}`,
+                    raw: `Proposal description: ${missionViewData[0].desc}`,
                     org_id: missionViewData[0].org_id,
                     discourseConfig,
                   };
