@@ -264,7 +264,7 @@ export const buildATree = ({
       label = label.length > 30 ? label.substr(0, 30) + '...' : label;
       if (vmIcon) {
         label = (
-          <div className='flex gap-1'>
+          <div className='flex gap-1 items-center'>
             {vmIcon}
             {label}
           </div>

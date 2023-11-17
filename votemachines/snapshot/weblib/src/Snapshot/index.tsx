@@ -1,9 +1,9 @@
 import {
-  ShareAltOutlined,
   SolutionOutlined,
   TwitterOutlined,
   VerticalAlignTopOutlined,
 } from '@ant-design/icons';
+import { HiOutlineBolt } from 'react-icons/hi2';
 import moment from 'moment';
 import {
   DelayUnit,
@@ -59,7 +59,7 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
 // label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
 
 const getIcon = () => {
-  return <ShareAltOutlined />;
+  return <HiOutlineBolt />;
 };
 
 const explain = ({
