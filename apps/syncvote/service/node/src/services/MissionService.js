@@ -6,7 +6,6 @@ const { DocInput } = require('../models/votemachines/DocInput');
 const { Veto } = require('../models/votemachines/Veto');
 const { UpVote } = require('../models/votemachines/Upvote');
 var CronJob = require('cron').CronJob;
-const { UpVote } = require('../models/votemachines/UpVote');
 const TopicService = require('./TopicService');
 const PostService = require('./PostService');
 
@@ -100,6 +99,75 @@ async function insertMission(props) {
                 checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
                 startToVote: moment().format(),
               });
+              const { data: missionViewData, error: errorMissionViewData } =
+                await supabase
+                  .from('mission_view')
+                  .select('*')
+                  .eq('id', newMission[0].id);
+
+              console.log('missionViewData', missionViewData);
+
+              const { data: web2KeyData, error: errorWeb2KeyData } =
+                await supabase
+                  .from('web2_key')
+                  .select('*')
+                  .eq('org_id', missionViewData[0].org_id);
+
+              if (errorWeb2KeyData || errorMissionViewData) {
+                resolve({
+                  status: 'ERR',
+                  message: 'error to create mission',
+                });
+                return;
+              }
+
+              let topicId;
+              if (web2KeyData.length > 0) {
+                const filteredDiscourse = web2KeyData.filter(
+                  (integration) => integration.provider === 'discourse'
+                );
+
+                if (filteredDiscourse.length === 1) {
+                  const discourseConfig = filteredDiscourse[0];
+
+                  const topicData = {
+                    title: `Proposal: ${missionViewData[0].title} has been created`,
+                    raw: `New proposal ${missionViewData[0].title} has been created from ${missionViewData[0].workflow_title}`,
+                    org_id: missionViewData[0].org_id,
+                    discourseConfig,
+                  };
+
+                  const { data: createTopicData, error: errorCreateTopicData } =
+                    await TopicService.createTopic(topicData);
+                  topicId = createTopicData.topic_id;
+
+                  if (errorCreateTopicData) {
+                    resolve({
+                      status: 'ERR',
+                      message: 'error to create mission',
+                    });
+                    return;
+                  }
+
+                  const postData = {
+                    topic_id: topicId,
+                    raw: `Checkpoint ${checkpointData.title} has been started`,
+                    org_id: missionViewData[0].org_id,
+                    discourseConfig,
+                  };
+
+                  const { error: errorCreatePostData } =
+                    await PostService.createPost(postData);
+
+                  if (errorCreatePostData) {
+                    resolve({
+                      status: 'ERR',
+                      message: 'error to create mission',
+                    });
+                    return;
+                  }
+                }
+              }
 
               // create a job to close this current vote data in expected time close
               const now = new Date();
