@@ -83,3 +83,75 @@ export const deleteWeb2Integration = async ({
     onError(error);
   }
 };
+
+export const upsertDiscourseIntegration = async ({
+  discourseData,
+  onSuccess = (data) => {},
+  onError = (data) => {},
+  dispatch,
+}: {
+  discourseData: {
+    orgId: number;
+    apiKey: string;
+    username: string;
+    categoryId: number;
+    discourseUrl: string;
+  };
+  onSuccess?: (data: any) => void;
+  onError?: (data: any) => void;
+  dispatch: any;
+}) => {
+  dispatch(startLoading({}));
+  const { orgId, apiKey, username, categoryId, discourseUrl } = discourseData;
+
+  const { data, error } = await supabase
+    .from('web2_key')
+    .select('*')
+    .eq('org_id', orgId);
+
+  if (!error) {
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === 'discourse'
+    );
+    if (filteredDiscourse.length === 1) {
+      const { data: dataUpdate, error: errorUpdate } = await supabase
+        .from('web2_key')
+        .update([
+          {
+            access_token: apiKey,
+            username: username,
+            category_id: categoryId,
+            id_string: discourseUrl,
+          },
+        ])
+        .eq('id', filteredDiscourse[0].id);
+      if (!errorUpdate) {
+        onSuccess(dataUpdate);
+      } else {
+        onError(errorUpdate);
+      }
+    } else {
+      const { data: dataInsert, error: errorInsert } = await supabase
+        .from('web2_key')
+        .insert([
+          {
+            access_token: apiKey,
+            provider: 'discourse',
+            username: username,
+            category_id: categoryId,
+            id_string: discourseUrl,
+            org_id: orgId,
+          },
+        ])
+        .select();
+      if (!errorInsert) {
+        onSuccess(dataInsert);
+      } else {
+        onError(errorInsert);
+      }
+    }
+  } else {
+    onError(error);
+  }
+  dispatch(finishLoading({}));
+};

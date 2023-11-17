@@ -6,6 +6,9 @@ const { DocInput } = require('../models/votemachines/DocInput');
 const { Veto } = require('../models/votemachines/Veto');
 const { UpVote } = require('../models/votemachines/Upvote');
 var CronJob = require('cron').CronJob;
+const { UpVote } = require('../models/votemachines/UpVote');
+const TopicService = require('./TopicService');
+const PostService = require('./PostService');
 
 const moment = require('moment');
 const { createArweave } = require('../functions');
@@ -77,7 +80,6 @@ async function insertMission(props) {
               delays: checkpoint?.delays,
               delayUnits: checkpoint?.delayUnits,
               duration: checkpoint?.duration,
-              // duration: 10,
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
               includedAbstain: checkpoint?.includedAbstain,
@@ -129,6 +131,7 @@ async function insertMission(props) {
                 .from('mission')
                 .update({
                   current_vote_data_id: current_vote_data.id,
+                  topic_id: topicId ? topicId : null,
                 })
                 .eq('id', newMission[0].id)
                 .select('*');
