@@ -5,6 +5,7 @@ const {
 const moment = require('moment');
 var CronJob = require('cron').CronJob;
 const { createArweave, convertToCron } = require('../functions');
+const PostService = require('./PostService');
 
 async function handleVoting(props) {
   return new Promise(async (resolve, reject) => {
@@ -161,6 +162,56 @@ async function handleVoting(props) {
                 endedAt: endedAt,
               })
               .select('*');
+
+            //create cronjob for create post when checkpoint start for fallback
+            if (mission_vote_details[0].topic_id !== null) {
+              const { data: web2KeyData, error: errorWeb2KeyData } =
+                await supabase
+                  .from('web2_key')
+                  .select('*')
+                  .eq('org_id', mission_vote_details[0].org_id);
+
+              if (errorWeb2KeyData) {
+                resolve({
+                  status: 'ERR',
+                  message: 'error to post',
+                });
+                return;
+              }
+              if (web2KeyData.length > 0) {
+                const filteredDiscourse = web2KeyData.filter(
+                  (integration) => integration.provider === 'discourse'
+                );
+
+                if (filteredDiscourse.length === 1) {
+                  const discourseConfig = filteredDiscourse[0];
+                  // create a job for create post
+                  const cronSyntax = convertToCron(moment(startToVote));
+                  const job = new CronJob(cronSyntax, async function () {
+                    const postData = {
+                      topic_id: mission_vote_details[0].topic_id,
+                      raw: `<p>Checkpoint ${mission_vote_details[0].title} has been started</p>
+                            <p>Checkpoint description: ${mission_vote_details[0].desc} </p>`,
+                      org_id: mission_vote_details[0].org_id,
+                      discourseConfig,
+                    };
+
+                    const { error: errorCreatePostData } =
+                      await PostService.createPost(postData);
+
+                    if (errorCreatePostData) {
+                      resolve({
+                        status: 'ERR',
+                        message: 'error to create mission',
+                      });
+                      return;
+                    }
+                  });
+                  job.start();
+                  console.log(`create job to start ${job}`);
+                }
+              }
+            }
 
             // if (!endedAt) {
             //   // create a job for to start this
@@ -351,6 +402,56 @@ async function handleVoting(props) {
                 endedAt: endedAt,
               })
               .select('*');
+
+            //create cronjob for create post when checkpoint start for tally
+            if (mission_vote_details[0].topic_id !== null) {
+              const { data: web2KeyData, error: errorWeb2KeyData } =
+                await supabase
+                  .from('web2_key')
+                  .select('*')
+                  .eq('org_id', mission_vote_details[0].org_id);
+
+              if (errorWeb2KeyData) {
+                resolve({
+                  status: 'ERR',
+                  message: 'error to post',
+                });
+                return;
+              }
+              if (web2KeyData.length > 0) {
+                const filteredDiscourse = web2KeyData.filter(
+                  (integration) => integration.provider === 'discourse'
+                );
+
+                if (filteredDiscourse.length === 1) {
+                  const discourseConfig = filteredDiscourse[0];
+                  // create a job for create post
+                  const cronSyntax = convertToCron(moment(startToVote));
+                  const job = new CronJob(cronSyntax, async function () {
+                    const postData = {
+                      topic_id: mission_vote_details[0].topic_id,
+                      raw: `<p>Checkpoint ${next_checkpoint[0].title} has been started</p>
+                              <p>Checkpoint description: ${next_checkpoint[0].desc} </p>`,
+                      org_id: mission_vote_details[0].org_id,
+                      discourseConfig,
+                    };
+
+                    const { error: errorCreatePostData } =
+                      await PostService.createPost(postData);
+
+                    if (errorCreatePostData) {
+                      resolve({
+                        status: 'ERR',
+                        message: 'error to create mission',
+                      });
+                      return;
+                    }
+                  });
+                  job.start();
+                  console.log(`create job to start ${job}`);
+                }
+              }
+            }
 
             // if (!endedAt) {
             //   // create a job for to start this
