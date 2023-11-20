@@ -41,8 +41,8 @@ async function insertMission(props) {
         if (newMission[0].status === 'PUBLIC') {
           newMission[0].data.checkpoints.map(async (checkpoint) => {
             if (
-              !checkpoint.isEnd ||
-              checkpoint.vote_machine_type !== 'Snapshot'
+              !checkpoint.isEnd &&
+              checkpoint?.vote_machine_type !== 'Snapshot'
             ) {
               const { duration, participation, title, quorum } = checkpoint;
               const { isValid } =
@@ -97,8 +97,9 @@ async function insertMission(props) {
               });
               return;
             }
-
+            
             if (checkpoint.id === newMission[0].start) {
+              console.log(checkpointData.vote_machine_type);
               // create current_vote_data
               const current_vote_data = await insertCurrentVoteData({
                 checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,

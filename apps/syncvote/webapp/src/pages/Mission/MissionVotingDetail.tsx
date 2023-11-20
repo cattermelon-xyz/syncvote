@@ -20,6 +20,12 @@ import VoteSection from './fragments/VoteSection';
 import ShowDescription from './fragments/ShowDescription';
 import ProposalDocuments from './fragments/ProposalDocuments';
 import { queryDocInput } from '@dal/data';
+// =============================== METAMASK SECTION ===============================
+import { useSDK } from '@metamask/sdk-react';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import snapshot from '@snapshot-labs/snapshot.js';
+import moment from 'moment';
+// =============================== METAMASK SECTION ===============================
 
 const MissionVotingDetail = () => {
   const { missionIdString } = useParams();
@@ -35,8 +41,59 @@ const MissionVotingDetail = () => {
   const [submission, setSubmission] = useState<any>();
   const [listVersionDocs, setListVersionDocs] = useState<any[]>();
   const [dataOfAllDocs, setDataOfAllDocs] = useState<any[]>([]);
-
   const dispatch = useDispatch();
+
+  // =============================== METAMASK SECTION ===============================
+  const [account, setAccount] = useState<string>('');
+  const [web3, setWeb3] = useState<Web3Provider>();
+  const { sdk, connected } = useSDK();
+  const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+  const client = new snapshot.Client712(hub);
+
+  function isExternalProvider(provider: any): provider is ExternalProvider {
+    return provider && typeof provider.request === 'function';
+  }
+
+  const disconnect = () => {
+    setAccount('');
+  };
+
+  const createProposal = async () => {
+    let web3;
+    if (isExternalProvider(window.ethereum)) {
+      web3 = new Web3Provider(window.ethereum);
+    }
+    let choices: string[] = currentCheckpointData.data.options;
+    if (currentCheckpointData.includedAbstain) {
+      choices.push('Abstain');
+    }
+
+    if (web3) {
+      const accounts = await web3.listAccounts();
+      const receipt = await client.proposal(web3, accounts[0], {
+        space: currentCheckpointData?.data?.space,
+        type: currentCheckpointData?.data?.type?.value,
+        title: currentCheckpointData.title,
+        body: 'This is the content of the proposal',
+        choices: choices,
+        start: moment().unix(),
+        end: moment().unix() + currentCheckpointData?.duration,
+        snapshot: 13620822,
+        plugins: JSON.stringify({}),
+        app: 'my-app',
+        discussion: '',
+      });
+
+      console.log(receipt);
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window.ethereum !== 'undefined') {
+    }
+  }, []);
+
+  // =============================== METAMASK SECTION ===============================
 
   const fetchData = () => {
     queryAMissionDetail({
@@ -192,13 +249,32 @@ const MissionVotingDetail = () => {
               </div>
             </div>
             <Space direction='vertical' size={16} className='w-full'>
-              <Card className='w-[271px]'>
-                <Space direction='horizontal' size={'small'}>
-                  <p>Author</p>
-                  <Icon iconUrl='' presetIcon='' size='medium' />
-                  <p className='w-[168px] truncate ...'>{missionData.author}</p>
-                </Space>
-              </Card>
+              <Space direction='horizontal'>
+                <Card className='w-[271px]'>
+                  <Space direction='horizontal' size={'small'}>
+                    <p>Author</p>
+                    <Icon iconUrl='' presetIcon='' size='medium' />
+                    <p className='w-[168px] truncate ...'>
+                      {missionData.author}
+                    </p>
+                  </Space>
+                </Card>
+
+                {/* =============================== METAMASK SECTION =============================== */}
+                {connected ? (
+                  <>
+                    <Button className='h-12 rounded-3xl'>
+                      Create Snapshot Proposal
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={createProposal} className='h-12 rounded-3xl'>
+                    Connect wallet
+                  </Button>
+                )}
+                {/* =============================== METAMASK SECTION =============================== */}
+              </Space>
+
               <ShowDescription
                 titleDescription={'Proposal content'}
                 description={missionData?.m_desc}
@@ -216,19 +292,21 @@ const MissionVotingDetail = () => {
                   dataOfAllDocs={dataOfAllDocs}
                 />
               )}
-              {!currentCheckpointData.isEnd && (
-                <VoteSection
-                  currentCheckpointData={currentCheckpointData}
-                  setOpenModalVoterInfo={setOpenModalVoterInfo}
-                  onSelectedOption={onSelectedOption}
-                  missionData={missionData}
-                  setSubmission={setSubmission}
-                  submission={submission}
-                  dataOfAllDocs={dataOfAllDocs}
-                  listVersionDocs={listVersionDocs}
-                />
-              )}
               {!currentCheckpointData.isEnd &&
+                currentCheckpointData.vote_machine_type !== 'Snapshot' && (
+                  <VoteSection
+                    currentCheckpointData={currentCheckpointData}
+                    setOpenModalVoterInfo={setOpenModalVoterInfo}
+                    onSelectedOption={onSelectedOption}
+                    missionData={missionData}
+                    setSubmission={setSubmission}
+                    submission={submission}
+                    dataOfAllDocs={dataOfAllDocs}
+                    listVersionDocs={listVersionDocs}
+                  />
+                )}
+              {!currentCheckpointData.isEnd &&
+                currentCheckpointData.vote_machine_type !== 'Snapshot' &&
                 currentCheckpointData.vote_machine_type !== 'DocInput' && (
                   <Card className='p-4'>
                     <div className='flex flex-col gap-4'>
@@ -342,74 +420,75 @@ const MissionVotingDetail = () => {
             ) : (
               <></>
             )}
-            {!currentCheckpointData.isEnd && (
-              <Card className=''>
-                <p className='mb-4 text-base font-semibold'>
-                  Rules & conditions
-                </p>
-                <div className='flex flex-col gap-2'>
-                  <div className='flex justify-between'>
-                    <p className='text-base '>Start time</p>
-                    <p className='text-base font-semibold'>
-                      {getTimeElapsedSinceStart(missionData.startToVote)}
-                    </p>
-                  </div>
-                  <p className='text-right'>
-                    {formatDate(missionData.startToVote)}
+            {!currentCheckpointData.isEnd &&
+              currentCheckpointData.vote_machine_type !== 'Snapshot' && (
+                <Card className=''>
+                  <p className='mb-4 text-base font-semibold'>
+                    Rules & conditions
                   </p>
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <div className='flex justify-between'>
-                    <p className='text-base '>Remaining duration</p>
-                    <p className='text-base font-semibold'>
-                      {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
-                    </p>
-                  </div>
-                  {currentCheckpointData.isEnd ? (
-                    <></>
-                  ) : (
+                  <div className='flex flex-col gap-2'>
+                    <div className='flex justify-between'>
+                      <p className='text-base '>Start time</p>
+                      <p className='text-base font-semibold'>
+                        {getTimeElapsedSinceStart(missionData.startToVote)}
+                      </p>
+                    </div>
                     <p className='text-right'>
-                      {formatDate(currentCheckpointData.endToVote)}
+                      {formatDate(missionData.startToVote)}
                     </p>
-                  )}
-                </div>
-                <hr className='w-full my-4' />
-                <div className='flex justify-between'>
-                  <p className='text-base '>Who can vote</p>
-                  <p
-                    className='text-base font-semibold text-[#6200EE] cursor-pointer'
-                    onClick={() => setOpenModalListParticipants(true)}
-                  >
-                    View details
-                  </p>
-                </div>
-                <hr className='w-full my-4' />
-                {currentCheckpointData?.data?.threshold ? (
-                  <div>
-                    <div className='flex justify-between'>
-                      <p className='text-base '>Threshold counted by</p>
-                      <p className='text-base font-semibold'>
-                        Total votes made
-                      </p>
-                    </div>
-                    <div className='flex justify-between'>
-                      <p className='text-base '>Threshold</p>
-                      <p className='text-base font-semibold'>
-                        {currentCheckpointData?.data?.threshold}
-                      </p>
-                    </div>
                   </div>
-                ) : (
-                  <></>
-                )}
-                <div className='flex justify-between'>
-                  <p className='text-base '>Quorum</p>
-                  <p className='text-base font-semibold'>
-                    {currentCheckpointData.quorum} votes
-                  </p>
-                </div>
-              </Card>
-            )}
+                  <div className='flex flex-col gap-2'>
+                    <div className='flex justify-between'>
+                      <p className='text-base '>Remaining duration</p>
+                      <p className='text-base font-semibold'>
+                        {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
+                      </p>
+                    </div>
+                    {currentCheckpointData.isEnd ? (
+                      <></>
+                    ) : (
+                      <p className='text-right'>
+                        {formatDate(currentCheckpointData.endToVote)}
+                      </p>
+                    )}
+                  </div>
+                  <hr className='w-full my-4' />
+                  <div className='flex justify-between'>
+                    <p className='text-base '>Who can vote</p>
+                    <p
+                      className='text-base font-semibold text-[#6200EE] cursor-pointer'
+                      onClick={() => setOpenModalListParticipants(true)}
+                    >
+                      View details
+                    </p>
+                  </div>
+                  <hr className='w-full my-4' />
+                  {currentCheckpointData?.data?.threshold ? (
+                    <div>
+                      <div className='flex justify-between'>
+                        <p className='text-base '>Threshold counted by</p>
+                        <p className='text-base font-semibold'>
+                          Total votes made
+                        </p>
+                      </div>
+                      <div className='flex justify-between'>
+                        <p className='text-base '>Threshold</p>
+                        <p className='text-base font-semibold'>
+                          {currentCheckpointData?.data?.threshold}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  <div className='flex justify-between'>
+                    <p className='text-base '>Quorum</p>
+                    <p className='text-base font-semibold'>
+                      {currentCheckpointData.quorum} votes
+                    </p>
+                  </div>
+                </Card>
+              )}
           </div>
         </div>
       )}
@@ -418,6 +497,7 @@ const MissionVotingDetail = () => {
         onClose={() => setOpenModalListParticipants(false)}
         listParticipants={listParticipants}
       />
+
       <ModalVoterInfo
         option={selectedOption === -1 ? [-1] : [selectedOption - 1]}
         open={openModalVoterInfo}
