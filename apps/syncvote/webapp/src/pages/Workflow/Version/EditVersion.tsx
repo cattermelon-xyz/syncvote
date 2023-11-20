@@ -123,6 +123,7 @@ export const EditVersion = () => {
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
+  const [fitScreen, setFitScreen] = useState(0); // 0: never fit, 1: should fit, 2: fitted
   const extractWorkflowFromList = (wfList: any) => {
     let extractedVersion = extractVersion({
       workflows: wfList,
@@ -139,7 +140,7 @@ export const EditVersion = () => {
   };
   autoSaveWorker.onmessage = (e) => {
     if (dataHasChanged) {
-      handleSave('data');
+      handleSave('data', undefined, true);
       autoSaveWorker.postMessage(null);
       setDataHasChanged(false);
     }
@@ -172,6 +173,9 @@ export const EditVersion = () => {
           content: error.message,
         });
         setIsLoadingData(false);
+        if (fitScreen === 0) {
+          setFitScreen(1);
+        }
       },
     });
   };
@@ -205,12 +209,10 @@ export const EditVersion = () => {
       window.removeEventListener('beforeunload', handleTabClose);
     };
   }, [workflows]);
-  let timerHandler: any = undefined;
-  const [autoSaveStatus, setAutoSaveStatus] = useState('');
-
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
-    changedData?: any | undefined
+    changedData?: any | undefined,
+    hideLoading?: boolean
   ) => {
     const versionToSave = changedData || version;
     await upsertWorkflowVersion({
@@ -224,15 +226,7 @@ export const EditVersion = () => {
         recommended: versionToSave?.recommended,
       },
       onSuccess: () => {
-        // queryWorkflow({
-        //   orgId,
-        //   onLoad: (_data: any) => {
-        //     extractWorkflowFromList(_data);
-        //   },
-        //   dispatch,
-        // });
-        // setLastSaved(Date.now());
-        console.log('do nothing onSuccess');
+        setLastSaved(Date.now());
       },
       onError: (error) => {
         Modal.error({
@@ -241,11 +235,13 @@ export const EditVersion = () => {
         });
       },
       mode,
+      hideLoading,
     });
-    // clearSelectedVersion();
   };
-  
   const onChange = (changedData: any) => {
+    if (fitScreen === 1) {
+      setFitScreen(2);
+    }
     const newData = changeVersion({
       versionData: version?.data || emptyStage,
       selectedNodeId,
@@ -259,7 +255,6 @@ export const EditVersion = () => {
       setDataHasChanged(true);
     }
   };
-
   const onDeleteNode = (id: any) => {
     if (id === version?.data.start) {
       Modal.error({
@@ -372,10 +367,8 @@ export const EditVersion = () => {
     });
     setDataHasChanged(true);
   };
-
   const [gridX, setGridX] = useState(0); // initialize gridX with 0
   const [gridY, setGridY] = useState(0); // initialize gridY with 0
-
   const onAddNewNode = () => {
     const newData = structuredClone(version?.data);
     const newId = `node-${new Date().getTime()}`;
@@ -418,13 +411,11 @@ export const EditVersion = () => {
     });
   };
   const onAddNewDoc = (doc: IDoc) => {
-    console.log('add new doc: ', doc);
     const newData = structuredClone(version?.data);
     if (!newData.docs) {
       newData.docs = [];
     }
     newData.docs.push({ ...doc, id: `doc-${new Date().getTime()}` });
-    console.log('newData: ', newData);
     setVersion({
       ...version,
       data: newData,
@@ -436,7 +427,6 @@ export const EditVersion = () => {
       const idx = newData.docs.findIndex((d: IDoc) => d.id === docId);
       if (idx !== -1) {
         newData.docs.splice(docId, 1);
-        console.log('newData: ', newData);
         setVersion({
           ...version,
           data: newData,
@@ -475,9 +465,6 @@ export const EditVersion = () => {
               </div> */}
               <div className='block'>
                 {version ? 'version is TRUE' : 'version is FALSE'}
-              </div>
-              <div className='block'>
-                {autoSaveStatus ? autoSaveStatus : ''}
               </div>
             </Debug>
             <Header
@@ -559,8 +546,7 @@ export const EditVersion = () => {
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
-                    // TODO: should once fit view once!
-                    // shouldFitView={dataHasChanged}
+                    shouldFitView={fitScreen === 1 ? true : false}
                     openCreateProposalModal={() => {
                       setOpenCreateProposalModal(true);
                     }}

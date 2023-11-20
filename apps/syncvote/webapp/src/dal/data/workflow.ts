@@ -584,6 +584,7 @@ export const upsertWorkflowVersion = async ({
     console.error(error);
   }, // es-lint-disable-line
   mode,
+  hideLoading = false,
 }: {
   workflowVersion: {
     versionId: number;
@@ -597,8 +598,11 @@ export const upsertWorkflowVersion = async ({
   onSuccess: (data: any) => void;
   onError?: (data: any) => void;
   mode?: 'data' | 'info' | undefined;
+  hideLoading?: boolean;
 }) => {
-  dispatch(startLoading({}));
+  if (!hideLoading) {
+    dispatch(startLoading({}));
+  }
   const { versionId, workflowId, version, status, versionData, recommended } =
     workflowVersion;
   const toUpsert: any = {
@@ -623,7 +627,9 @@ export const upsertWorkflowVersion = async ({
   } else {
     onError(error);
   }
-  dispatch(finishLoading({}));
+  if (!hideLoading) {
+    dispatch(finishLoading({}));
+  }
 };
 
 export const queryWorkflow = async ({
