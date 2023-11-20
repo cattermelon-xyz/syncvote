@@ -46,8 +46,19 @@ function convertToCron(momentDate) {
   return `${minutes} ${hours} ${dayOfMonth} ${month} ${dayOfWeek}`;
 }
 
+function extractCurrentCheckpointId(inputStr) {
+  const parts = inputStr.split('-');
+  if (parts.length <= 1) {
+    return null;
+  }
+  parts.shift();
+  return parts.join('-');
+}
+
+
 module.exports = {
   convertToCron,
   isArraySubset,
   createArweave,
+  extractCurrentCheckpointId
 };

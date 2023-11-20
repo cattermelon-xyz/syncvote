@@ -39,6 +39,12 @@ import Header from './fragment/Header';
 import NotFound404 from '@pages/NotFound404';
 import Debug from '@components/Debug/Debug';
 import { CreateProposalModal } from '@fragments/CreateProposalModal';
+import autoSaveWorkerString from './worker.js?raw';
+const workerBlob = new Blob([autoSaveWorkerString], {
+  type: 'text/javascript',
+});
+const workerURL = URL.createObjectURL(workerBlob);
+const autoSaveWorker = new Worker(workerURL, { type: 'classic' });
 
 const extractVersion = ({
   workflows,
@@ -117,6 +123,7 @@ export const EditVersion = () => {
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
+  const [fitScreen, setFitScreen] = useState(0); // 0: never fit, 1: should fit, 2: fitted
   const extractWorkflowFromList = (wfList: any) => {
     let extractedVersion = extractVersion({
       workflows: wfList,
@@ -131,21 +138,18 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
-
-  // const autoSaveWorker: Worker = useMemo(
-  //   () => new Worker(new URL('/workers/AutoSave.ts', import.meta.url)),
-  //   []
-  // );
-  // autoSaveWorker.onmessage = (e) => {
-  //   if (dataHasChanged) {
-  //     handleSave('data');
-  //     console.log('try auto save');
-  //     autoSaveWorker.postMessage(null);
-  //   }
-  // };
-  // useEffect(() => {
-  //   autoSaveWorker.postMessage(null);
-  // }, [dataHasChanged]);
+  autoSaveWorker.onmessage = (e) => {
+    if (dataHasChanged) {
+      handleSave('data', undefined, true);
+      autoSaveWorker.postMessage(null);
+      setDataHasChanged(false);
+    }
+  };
+  useEffect(() => {
+    if (dataHasChanged) {
+      autoSaveWorker.postMessage(null);
+    }
+  }, [dataHasChanged]);
   const fetchDataFromServer = () => {
     setIsDataFetchedFromServer(true);
     setIsLoadingData(true);
@@ -169,6 +173,9 @@ export const EditVersion = () => {
           content: error.message,
         });
         setIsLoadingData(false);
+        if (fitScreen === 0) {
+          setFitScreen(1);
+        }
       },
     });
   };
@@ -202,60 +209,10 @@ export const EditVersion = () => {
       window.removeEventListener('beforeunload', handleTabClose);
     };
   }, [workflows]);
-  let timerHandler: any = undefined;
-  const [autoSaveStatus, setAutoSaveStatus] = useState('');
-  // useEffect(() => {
-  //   if (
-  //     dataHasChanged &&
-  //     isLoadingData === false &&
-  //     lastSaved === -1 &&
-  //     version.data
-  //   ) {
-  //     // this is the first time data is loaded
-  //     setLastSaved(Date.now());
-  //     setAutoSaveStatus('first time, lastSaved is set');
-  //     return;
-  //   }
-  //   if (
-  //     dataHasChanged &&
-  //     isLoadingData === false &&
-  //     lastSaved !== -1 &&
-  //     version.data
-  //   ) {
-  //     const now = Date.now();
-  //     if (now - lastSaved > 10000) {
-  //       // let' save data to server
-  //       // TODO: this data is not the latest data, it's the data when the timer is set
-  //       handleSave('data');
-  //       setAutoSaveStatus('auto save');
-  //       // setDataHasChanged(false);
-  //     } else {
-  //       // if there is a timer then do nothing
-  //       if (timerHandler !== undefined) {
-  //         return;
-  //       } else {
-  //         // else, let's set a timer
-  //         setAutoSaveStatus(
-  //           'a timer is set to 10s to save. Tick tock tick tock'
-  //         );
-  //         timerHandler = setTimeout(() => {
-  //           // TODO: this data is not the latest data, it's the data when the timer is set
-  //           handleSave('data');
-  //           // setDataHasChanged(false);
-  //           // setLastSaved(Date.now());
-  //           clearTimeout(timerHandler);
-  //           timerHandler = undefined;
-  //           setAutoSaveStatus('saved & clear timeout');
-  //         }, 10000 - (now - lastSaved));
-  //       }
-  //     }
-  //     return;
-  //   }
-  // }, [dataHasChanged]);
-
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
-    changedData?: any | undefined
+    changedData?: any | undefined,
+    hideLoading?: boolean
   ) => {
     const versionToSave = changedData || version;
     await upsertWorkflowVersion({
@@ -269,13 +226,6 @@ export const EditVersion = () => {
         recommended: versionToSave?.recommended,
       },
       onSuccess: () => {
-        queryWorkflow({
-          orgId,
-          onLoad: (_data: any) => {
-            extractWorkflowFromList(_data);
-          },
-          dispatch,
-        });
         setLastSaved(Date.now());
       },
       onError: (error) => {
@@ -285,10 +235,13 @@ export const EditVersion = () => {
         });
       },
       mode,
+      hideLoading,
     });
-    // clearSelectedVersion();
   };
   const onChange = (changedData: any) => {
+    if (fitScreen === 1) {
+      setFitScreen(2);
+    }
     const newData = changeVersion({
       versionData: version?.data || emptyStage,
       selectedNodeId,
@@ -414,10 +367,8 @@ export const EditVersion = () => {
     });
     setDataHasChanged(true);
   };
-
   const [gridX, setGridX] = useState(0); // initialize gridX with 0
   const [gridY, setGridY] = useState(0); // initialize gridY with 0
-
   const onAddNewNode = () => {
     const newData = structuredClone(version?.data);
     const newId = `node-${new Date().getTime()}`;
@@ -460,13 +411,11 @@ export const EditVersion = () => {
     });
   };
   const onAddNewDoc = (doc: IDoc) => {
-    console.log('add new doc: ', doc);
     const newData = structuredClone(version?.data);
     if (!newData.docs) {
       newData.docs = [];
     }
     newData.docs.push({ ...doc, id: `doc-${new Date().getTime()}` });
-    console.log('newData: ', newData);
     setVersion({
       ...version,
       data: newData,
@@ -478,7 +427,6 @@ export const EditVersion = () => {
       const idx = newData.docs.findIndex((d: IDoc) => d.id === docId);
       if (idx !== -1) {
         newData.docs.splice(docId, 1);
-        console.log('newData: ', newData);
         setVersion({
           ...version,
           data: newData,
@@ -510,13 +458,13 @@ export const EditVersion = () => {
           <div className='w-full bg-slate-100 h-screen'>
             <Debug>
               <div>
-                {viewMode}-{GraphViewMode.VIEW_ONLY}
+                {dataHasChanged ? 'data has changed' : 'data has not changed'}
               </div>
+              {/* <div>
+                {viewMode}-{GraphViewMode.VIEW_ONLY}
+              </div> */}
               <div className='block'>
                 {version ? 'version is TRUE' : 'version is FALSE'}
-              </div>
-              <div className='block'>
-                {autoSaveStatus ? autoSaveStatus : ''}
               </div>
             </Debug>
             <Header
@@ -598,7 +546,7 @@ export const EditVersion = () => {
                   <DirectedGraph
                     shouldExportImage={shouldDownloadImage}
                     setExportImage={setShouldDownloadImage}
-                    dataHasChanged={dataHasChanged}
+                    shouldFitView={fitScreen === 1 ? true : false}
                     openCreateProposalModal={() => {
                       setOpenCreateProposalModal(true);
                     }}
