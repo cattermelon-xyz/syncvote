@@ -244,6 +244,7 @@ export const EditVersion = () => {
     });
     // clearSelectedVersion();
   };
+  
   const onChange = (changedData: any) => {
     const newData = changeVersion({
       versionData: version?.data || emptyStage,
@@ -258,6 +259,7 @@ export const EditVersion = () => {
       setDataHasChanged(true);
     }
   };
+
   const onDeleteNode = (id: any) => {
     if (id === version?.data.start) {
       Modal.error({

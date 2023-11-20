@@ -40,6 +40,7 @@ const BluePrint = () => {
   const [loading, setLoading] = useState(true);
   const [myProposals, setMyProposals] = useState<any[]>([]);
   const [allProposals, setAllProposals] = useState<any[]>([]);
+  const env = import.meta.env.VITE_ENV;
 
   useEffect(() => {
     console.log('myProposals', myProposals);
@@ -323,7 +324,9 @@ const BluePrint = () => {
               <div
                 className='text-3xl font-semibold text-[#252422] flex items-center hover:text-violet-500 cursor-pointer'
                 onClick={() => {
-                  data?.role === 'ADMIN' ? setShowEditOrg(true) : null;
+                  data?.role === 'ADMIN' && env === 'dev'
+                    ? navigate('setting')
+                    : null;
                 }}
                 title={
                   data?.role === 'ADMIN'
