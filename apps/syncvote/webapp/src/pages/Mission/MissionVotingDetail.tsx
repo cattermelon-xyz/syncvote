@@ -170,12 +170,15 @@ const MissionVotingDetail = () => {
                   style={{ border: 'None', padding: '0px', boxShadow: 'None' }}
                   className='text-[#6200EE]'
                   icon={<UploadOutlined />}
-                  onClick={() => navigator.clipboard.writeText(window.location.href)
-                    .then(() => message.success('URL copied to clipboard!'))
-                    .catch(err => {
-                      console.error('Failed to copy URL: ', err);
-                      message.error('Failed to copy URL');
-                    })}
+                  onClick={() =>
+                    navigator.clipboard
+                      .writeText(window.location.href)
+                      .then(() => message.success('URL copied to clipboard!'))
+                      .catch((err) => {
+                        console.error('Failed to copy URL: ', err);
+                        message.error('Failed to copy URL');
+                      })
+                  }
                 >
                   Share
                 </Button>

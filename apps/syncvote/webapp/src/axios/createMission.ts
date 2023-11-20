@@ -30,7 +30,7 @@ export const createMission = async ({
   const data = missionData.data;
   let isValidate = false;
   data.checkpoints.forEach((checkpoint: ICheckPoint, index: number) => {
-    if (!checkpoint?.isEnd) {
+    if (!checkpoint?.isEnd || checkpoint.vote_machine_type !== 'Snapshot') {
       const { duration, participation, title, quorum } = checkpoint;
       if (checkpoint.vote_machine_type) {
         const { isValid, message } = VoteMachineValidate[
