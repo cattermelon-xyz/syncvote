@@ -4,7 +4,12 @@ const {
 } = require('../models/votemachines/VotingController');
 const moment = require('moment');
 var CronJob = require('cron').CronJob;
-const { createArweave, convertToCron } = require('../functions');
+const {
+  createArweave,
+  convertToCron,
+  extractCurrentCheckpointId,
+} = require('../functions');
+const PostService = require('./PostService');
 
 async function handleVoting(props) {
   return new Promise(async (resolve, reject) => {
@@ -91,6 +96,7 @@ async function handleVoting(props) {
 
           // 4️⃣ check if fallback
           const { fallback, error: f_error } = voteMachineController.fallBack();
+
           if (fallback) {
             console.log('Move this mission to fallback checkpoint');
             const tallyResult = { index: 0 };
@@ -161,6 +167,40 @@ async function handleVoting(props) {
                 endedAt: endedAt,
               })
               .select('*');
+
+            //create cronjob for create post when checkpoint start for fallback
+            if (mission_vote_details[0].topic_id !== null) {
+              const { data: web2KeyData, error: errorWeb2KeyData } =
+                await supabase
+                  .from('web2_key')
+                  .select('*')
+                  .eq('org_id', mission_vote_details[0].org_id);
+
+              if (web2KeyData.length > 0) {
+                const filteredDiscourse = web2KeyData.filter(
+                  (integration) => integration.provider === 'discourse'
+                );
+
+                if (filteredDiscourse.length === 1) {
+                  const discourseConfig = filteredDiscourse[0];
+                  // create a job for create post
+                  const cronSyntax = convertToCron(moment(startToVote));
+                  const job = new CronJob(cronSyntax, async function () {
+                    const postData = {
+                      topic_id: mission_vote_details[0].topic_id,
+                      raw: `<p>Checkpoint ${next_checkpoint[0].title} has been started</p>
+                            <p>Checkpoint description: ${next_checkpoint[0].desc} </p>`,
+                      org_id: mission_vote_details[0].org_id,
+                      discourseConfig,
+                    };
+
+                    PostService.createPost(postData);
+                  });
+                  job.start();
+                  console.log(`create job to start ${job}`);
+                }
+              }
+            }
 
             // if (!endedAt) {
             //   // create a job for to start this
@@ -351,6 +391,125 @@ async function handleVoting(props) {
                 endedAt: endedAt,
               })
               .select('*');
+
+            //create post forum
+            if (mission_vote_details[0].topic_id !== null) {
+              const { data: web2KeyData, error: errorWeb2KeyData } =
+                await supabase
+                  .from('web2_key')
+                  .select('*')
+                  .eq('org_id', mission_vote_details[0].org_id);
+
+              if (web2KeyData.length > 0) {
+                const filteredDiscourse = web2KeyData.filter(
+                  (integration) => integration.provider === 'discourse'
+                );
+
+                if (filteredDiscourse.length === 1) {
+                  const discourseConfig = filteredDiscourse[0];
+
+                  // create post result of previous checkpoint
+                  const currentCheckpointId = extractCurrentCheckpointId(
+                    current_vote_data[0]?.checkpoint_id
+                  );
+                  const checkpointData =
+                    mission_vote_details[0]?.data?.checkpoints.filter(
+                      (checkpoint) => checkpoint.id === currentCheckpointId
+                    );
+                  let checkpointDataAfterHandle = checkpointData[0];
+                  switch (checkpointData[0]?.vote_machine_type) {
+                    case 'SingleChoiceRaceToMax':
+                      if (checkpointData[0]?.includedAbstain === true) {
+                        checkpointDataAfterHandle.data.options.push('Abstain');
+                      }
+                      break;
+                    case 'UpVote':
+                      checkpointDataAfterHandle.data.options = [];
+                      checkpointDataAfterHandle.data.options.push('Upvote');
+                      if (checkpointData[0]?.includedAbstain === true) {
+                        checkpointDataAfterHandle.data.options.push('Abstain');
+                      }
+                      break;
+                    case 'Veto':
+                      checkpointDataAfterHandle.data.options = [];
+                      checkpointDataAfterHandle.data.options.push('Upvote');
+                      if (checkpointData[0]?.includedAbstain === true) {
+                        checkpointDataAfterHandle.data.options.push('Abstain');
+                      }
+                      break;
+                    default:
+                      break;
+                  }
+
+                  console.log(
+                    'checkpointDataAfterHandle',
+                    checkpointDataAfterHandle?.data?.options
+                  );
+                  console.log(
+                    'current_vote_data result',
+                    current_vote_data[0]?.result
+                  );
+
+                  const votingResult =
+                    checkpointDataAfterHandle?.data?.options.map(
+                      (option, index) => {
+                        if (option === 'Abstain') {
+                          return {
+                            [option]: current_vote_data[0]?.result[-1]?.count,
+                          };
+                        } else {
+                          return {
+                            [option]:
+                              current_vote_data[0]?.result[index]?.count,
+                          };
+                        }
+                      }
+                    );
+
+                  const formattedVotingResult = votingResult
+                    .map((result) => {
+                      const [key, value] = Object.entries(result)[0];
+                      return `${key}: ${value}`;
+                    })
+                    .join(', ');
+
+                  const postDataResult = {
+                    topic_id: mission_vote_details[0].topic_id,
+                    raw: `<p>Checkpoint ${mission_vote_details[0].title} has been ended</p>
+                          <p>Result voting: ${formattedVotingResult} </p>`,
+                    org_id: mission_vote_details[0].org_id,
+                    discourseConfig,
+                  };
+
+                  PostService.createPost(postDataResult);
+
+                  // create cronjob for create post when checkpoint start
+                  let startCronjob = startToVote;
+                  if (mission_vote_details[0].delays[index] === '0') {
+                    startCronjob = moment().add(60, 'seconds').format();
+                  }
+
+                  const cronSyntax = convertToCron(moment(startCronjob));
+
+                  const job = new CronJob(cronSyntax, async function () {
+                    console.log('Running cronjob');
+
+                    const postData = {
+                      topic_id: mission_vote_details[0].topic_id,
+                      raw: `<p>Checkpoint ${next_checkpoint[0].title} has been started</p>
+                            <p>Checkpoint description: ${next_checkpoint[0].desc} </p>`,
+                      org_id: mission_vote_details[0].org_id,
+                      discourseConfig,
+                    };
+
+                    PostService.createPost(postData);
+                  });
+
+                  job.start();
+                  console.log(`create job to start ${job}`);
+                }
+              }
+            }
 
             // if (!endedAt) {
             //   // create a job for to start this
