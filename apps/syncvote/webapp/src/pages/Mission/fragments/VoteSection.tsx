@@ -5,6 +5,13 @@ import { IDoc } from 'directed-graph';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { TextEditor } from 'rich-text-editor';
 import ShowDescription from './ShowDescription';
+// =============================== METAMASK SECTION ===============================
+import { isExternalProvider } from '../MissionVotingDetail';
+import { Web3Provider } from '@ethersproject/providers';
+import moment from 'moment';
+import { supabase } from 'utils';
+import Client from '@snapshot-labs/snapshot.js/dist/sign';
+// =============================== METAMASK SECTION ===============================
 
 interface Props {
   currentCheckpointData: any;
@@ -15,6 +22,8 @@ interface Props {
   submission: any;
   dataOfAllDocs: any;
   listVersionDocs: any;
+  proposal?: any;
+  client?: Client;
 }
 
 const VoteSection: React.FC<Props> = ({
@@ -25,6 +34,8 @@ const VoteSection: React.FC<Props> = ({
   setSubmission,
   dataOfAllDocs,
   listVersionDocs,
+  proposal,
+  client,
 }) => {
   const [selectedOption, setSelectedOption] = useState<number>();
   const [optionDocs, setOptionDocs] = useState<any>([]);
@@ -33,6 +44,29 @@ const VoteSection: React.FC<Props> = ({
   const [editorValues, setEditorValues] = useState<{ [key: string]: string }>(
     {}
   );
+
+  const createProposal = async () => {
+    let web3;
+    if (isExternalProvider(window.ethereum)) {
+      web3 = new Web3Provider(window.ethereum);
+    }
+    let choices: string[] = currentCheckpointData.data.options;
+    if (currentCheckpointData.includedAbstain) {
+      choices.push('Abstain');
+    }
+
+    if (web3 && client) {
+      const accounts = await web3.listAccounts();
+      const receipt = await client.vote(web3, accounts[0], {
+        space: currentCheckpointData?.data?.space,
+        proposal: proposal?.id,
+        type: currentCheckpointData?.data,
+        choice: 1,
+        reason: 'Choice 1 make lot of sense',
+        app: 'my-app',
+      });
+    }
+  };
 
   useEffect(() => {
     if (selectedOption) {
@@ -292,8 +326,11 @@ const VoteSection: React.FC<Props> = ({
               type='primary'
               className='w-full'
               onClick={() => {
-                setSubmission(editorValues);
-                setOpenModalVoterInfo(true);
+                if (!proposal) {
+                  setSubmission(editorValues);
+                  setOpenModalVoterInfo(true);
+                } else {
+                }
               }}
               disabled={
                 selectedOption

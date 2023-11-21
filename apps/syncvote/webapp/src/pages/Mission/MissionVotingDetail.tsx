@@ -25,6 +25,12 @@ import { useSDK } from '@metamask/sdk-react';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import snapshot from '@snapshot-labs/snapshot.js';
 import moment from 'moment';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+export function isExternalProvider(
+  provider: any
+): provider is ExternalProvider {
+  return provider && typeof provider.request === 'function';
+}
 // =============================== METAMASK SECTION ===============================
 
 const MissionVotingDetail = () => {
@@ -46,11 +52,9 @@ const MissionVotingDetail = () => {
   // =============================== METAMASK SECTION ===============================
   const [proposalId, setProposalId] = useState(null);
   const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-  const client = new snapshot.Client712(hub);
+  const [proposal, setProposal] = useState<any>(null);
 
-  function isExternalProvider(provider: any): provider is ExternalProvider {
-    return provider && typeof provider.request === 'function';
-  }
+  const client = new snapshot.Client712(hub);
 
   const createProposal = async () => {
     let web3;
@@ -67,7 +71,8 @@ const MissionVotingDetail = () => {
       const receipt = await client.proposal(web3, accounts[0], {
         space: currentCheckpointData?.data?.space,
         type: currentCheckpointData?.data?.type?.value,
-        title: currentCheckpointData.title,
+        // title: currentCheckpointData.title,
+        title: '<p>Test</p>',
         body: 'This is the content of the proposal',
         choices: choices,
         start: moment().unix(),
@@ -87,6 +92,8 @@ const MissionVotingDetail = () => {
 
         if (data) {
           setProposalId(data[0].initData.id);
+
+          getDataSnapshot(data[0]?.initData.id);
         }
       }
     }
@@ -104,8 +111,56 @@ const MissionVotingDetail = () => {
 
       if (data && data[0]?.initData?.id) {
         setProposalId(data[0]?.initData.id);
+
+        getDataSnapshot(data[0]?.initData.id);
       }
     }
+  };
+
+  const getDataSnapshot = async (proposalId: string) => {
+    const clientApollo = new ApolloClient({
+      uri: 'https://hub.snapshot.org/graphql',
+      cache: new InMemoryCache(),
+    });
+
+    clientApollo
+      .query({
+        query: gql`
+          query {
+            proposal(id: "${proposalId}") {
+              id
+              title
+              body
+              choices
+              start
+              end
+              snapshot
+              state
+              author
+              created
+              scores
+              scores_by_strategy
+              scores_total
+              scores_updated
+              plugins
+              network
+              strategies {
+                name
+                network
+                params
+              }
+              space {
+                id
+                name
+              }
+            }
+          }
+        `,
+      })
+      .then((result) => {
+        console.log(result);
+        setProposal(result.data.proposal);
+      });
   };
 
   useEffect(() => {
@@ -284,21 +339,17 @@ const MissionVotingDetail = () => {
                 </Card>
 
                 {/* =============================== METAMASK SECTION =============================== */}
-                {proposalId ? (
+                {currentCheckpointData.vote_machine_type === 'Snapshot' && (
                   <>
-                    <Button
-                      className='h-12 rounded-3xl'
-                      onClick={() => {
-                        console.log('Async');
-                      }}
-                    >
-                      Async vote result
-                    </Button>
+                    {!proposalId && (
+                      <Button
+                        onClick={createProposal}
+                        className='h-12 rounded-3xl'
+                      >
+                        Create Snapshot Proposal
+                      </Button>
+                    )}
                   </>
-                ) : (
-                  <Button onClick={createProposal} className='h-12 rounded-3xl'>
-                    Create Snapshot Proposal
-                  </Button>
                 )}
                 {/* =============================== METAMASK SECTION =============================== */}
               </Space>
@@ -320,19 +371,22 @@ const MissionVotingDetail = () => {
                   dataOfAllDocs={dataOfAllDocs}
                 />
               )}
-              {!currentCheckpointData.isEnd &&
-                currentCheckpointData.vote_machine_type !== 'Snapshot' && (
-                  <VoteSection
-                    currentCheckpointData={currentCheckpointData}
-                    setOpenModalVoterInfo={setOpenModalVoterInfo}
-                    onSelectedOption={onSelectedOption}
-                    missionData={missionData}
-                    setSubmission={setSubmission}
-                    submission={submission}
-                    dataOfAllDocs={dataOfAllDocs}
-                    listVersionDocs={listVersionDocs}
-                  />
-                )}
+              {currentCheckpointData.isEnd ||
+              (currentCheckpointData.vote_machine_type === 'Snapshot' &&
+                !proposal) ? null : (
+                <VoteSection
+                  currentCheckpointData={currentCheckpointData}
+                  setOpenModalVoterInfo={setOpenModalVoterInfo}
+                  onSelectedOption={onSelectedOption}
+                  missionData={missionData}
+                  setSubmission={setSubmission}
+                  submission={submission}
+                  dataOfAllDocs={dataOfAllDocs}
+                  listVersionDocs={listVersionDocs}
+                  proposal={proposal}
+                  client={client}
+                />
+              )}
 
               {!currentCheckpointData.isEnd &&
                 currentCheckpointData.vote_machine_type !== 'Snapshot' &&
@@ -393,47 +447,60 @@ const MissionVotingDetail = () => {
             {missionData?.progress && (
               <MissionProgress missionData={missionData} />
             )}
-            {missionData.result ? (
+
+            {missionData.result || proposal ? (
               <Card className=''>
                 <p className='mb-6 text-base font-semibold'>Voting results</p>
+
                 {currentCheckpointData.data.options.map(
                   (option: any, index: any) => {
                     // still calculate voting_power of Abstain but not show in result
                     if (option === 'Abstain') {
                       return <div key={-1}></div>;
                     }
-                    const totalVotingPower = Object.values(
-                      missionData.result
-                    ).reduce(
-                      (acc: number, voteData: any) =>
-                        acc + voteData.voting_power,
-                      0
-                    );
+                    let totalVotingPower = 0;
+                    let percentage = 0;
 
-                    let percentage;
-                    if (currentCheckpointData.quorum >= totalVotingPower) {
-                      percentage =
-                        (missionData.result[index]?.voting_power /
-                          currentCheckpointData.quorum) *
-                        100;
+                    if (!proposal) {
+                      totalVotingPower = Object.values(
+                        missionData.result
+                      ).reduce(
+                        (acc: number, voteData: any) =>
+                          acc + voteData.voting_power,
+                        0
+                      );
+
+                      if (currentCheckpointData.quorum >= totalVotingPower) {
+                        percentage =
+                          (missionData.result[index]?.voting_power /
+                            currentCheckpointData.quorum) *
+                          100;
+                      } else {
+                        percentage =
+                          (missionData.result[index]?.voting_power /
+                            totalVotingPower) *
+                          100;
+                      }
+                      percentage = parseFloat(percentage.toFixed(2));
                     } else {
-                      percentage =
-                        (missionData.result[index]?.voting_power /
-                          totalVotingPower) *
-                        100;
+                      totalVotingPower = proposal?.scores_total;
+                      percentage = parseFloat(
+                        (proposal?.scores[index] / totalVotingPower).toFixed(2)
+                      );
                     }
-                    percentage = parseFloat(percentage.toFixed(2));
+
                     return (
                       <div key={index} className='flex flex-col gap-2'>
                         <p className='text-base font-semibold'>{option}</p>
                         <p className='text-base'>
-                          {missionData.result[option]} votes
+                          {proposal ? 0 : missionData.result[option]} votes
                         </p>
                         <Progress percent={percentage} size='small' />
                       </div>
                     );
                   }
                 )}
+
                 {isReachedQuorum ? (
                   <div className='w-full flex justify-center items-center mt-2'>
                     <Button className='w-full bg-[#EAF6EE] text-[#29A259]'>
@@ -446,11 +513,12 @@ const MissionVotingDetail = () => {
                   </div>
                 )}
               </Card>
-            ) : (
-              <></>
-            )}
-            {!currentCheckpointData.isEnd &&
-              currentCheckpointData.vote_machine_type !== 'Snapshot' && (
+            ) : null}
+
+            {currentCheckpointData.isEnd ||
+            (currentCheckpointData.vote_machine_type === 'Snapshot' &&
+              !proposal) ? null : (
+              <>
                 <Card className=''>
                   <p className='mb-4 text-base font-semibold'>
                     Rules & conditions
@@ -459,20 +527,31 @@ const MissionVotingDetail = () => {
                     <div className='flex justify-between'>
                       <p className='text-base '>Start time</p>
                       <p className='text-base font-semibold'>
-                        {getTimeElapsedSinceStart(missionData.startToVote)}
+                        {proposal
+                          ? getTimeElapsedSinceStart(
+                              moment(proposal.created).format()
+                            )
+                          : getTimeElapsedSinceStart(missionData.startToVote)}
                       </p>
                     </div>
                     <p className='text-right'>
-                      {formatDate(missionData.startToVote)}
+                      {proposal
+                        ? formatDate(moment(proposal.created).format())
+                        : formatDate(missionData.startToVote)}
                     </p>
                   </div>
                   <div className='flex flex-col gap-2'>
                     <div className='flex justify-between'>
                       <p className='text-base '>Remaining duration</p>
                       <p className='text-base font-semibold'>
-                        {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
+                        {proposal
+                          ? getTimeRemainingToEnd(moment(proposal.end).format())
+                          : getTimeRemainingToEnd(
+                              currentCheckpointData.endToVote
+                            )}
                       </p>
                     </div>
+
                     {currentCheckpointData.isEnd ? (
                       <></>
                     ) : (
@@ -481,43 +560,49 @@ const MissionVotingDetail = () => {
                       </p>
                     )}
                   </div>
-                  <hr className='w-full my-4' />
-                  <div className='flex justify-between'>
-                    <p className='text-base '>Who can vote</p>
-                    <p
-                      className='text-base font-semibold text-[#6200EE] cursor-pointer'
-                      onClick={() => setOpenModalListParticipants(true)}
-                    >
-                      View details
-                    </p>
-                  </div>
-                  <hr className='w-full my-4' />
-                  {currentCheckpointData?.data?.threshold ? (
-                    <div>
+
+                  {proposal ? null : (
+                    <>
+                      <hr className='w-full my-4' />
                       <div className='flex justify-between'>
-                        <p className='text-base '>Threshold counted by</p>
-                        <p className='text-base font-semibold'>
-                          Total votes made
+                        <p className='text-base '>Who can vote</p>
+                        <p
+                          className='text-base font-semibold text-[#6200EE] cursor-pointer'
+                          onClick={() => setOpenModalListParticipants(true)}
+                        >
+                          View details
                         </p>
                       </div>
+                      <hr className='w-full my-4' />
+                      {currentCheckpointData?.data?.threshold ? (
+                        <div>
+                          <div className='flex justify-between'>
+                            <p className='text-base '>Threshold counted by</p>
+                            <p className='text-base font-semibold'>
+                              Total votes made
+                            </p>
+                          </div>
+                          <div className='flex justify-between'>
+                            <p className='text-base '>Threshold</p>
+                            <p className='text-base font-semibold'>
+                              {currentCheckpointData?.data?.threshold}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <></>
+                      )}
                       <div className='flex justify-between'>
-                        <p className='text-base '>Threshold</p>
+                        <p className='text-base '>Quorum</p>
                         <p className='text-base font-semibold'>
-                          {currentCheckpointData?.data?.threshold}
+                          {currentCheckpointData.quorum} votes
                         </p>
                       </div>
-                    </div>
-                  ) : (
-                    <></>
+                    </>
                   )}
-                  <div className='flex justify-between'>
-                    <p className='text-base '>Quorum</p>
-                    <p className='text-base font-semibold'>
-                      {currentCheckpointData.quorum} votes
-                    </p>
-                  </div>
                 </Card>
-              )}
+              </>
+            )}
           </div>
         </div>
       )}
