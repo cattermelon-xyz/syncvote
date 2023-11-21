@@ -4,7 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Icon } from 'icon';
 import { useParams } from 'react-router-dom';
 import { queryAMissionDetail } from '@dal/data';
-import { extractIdFromIdString } from 'utils';
+import { extractIdFromIdString, supabase } from 'utils';
 import { Modal } from 'antd';
 import { useDispatch } from 'react-redux';
 import {
@@ -44,19 +44,13 @@ const MissionVotingDetail = () => {
   const dispatch = useDispatch();
 
   // =============================== METAMASK SECTION ===============================
-  const [account, setAccount] = useState<string>('');
-  const [web3, setWeb3] = useState<Web3Provider>();
-  const { sdk, connected } = useSDK();
+  const [proposalId, setProposalId] = useState(null);
   const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
   const client = new snapshot.Client712(hub);
 
   function isExternalProvider(provider: any): provider is ExternalProvider {
     return provider && typeof provider.request === 'function';
   }
-
-  const disconnect = () => {
-    setAccount('');
-  };
 
   const createProposal = async () => {
     let web3;
@@ -84,14 +78,43 @@ const MissionVotingDetail = () => {
         discussion: '',
       });
 
-      console.log(receipt);
+      if (receipt) {
+        const { data } = await supabase
+          .from('current_vote_data')
+          .update({ initData: receipt })
+          .eq('checkpoint_id', `${missionId}-${currentCheckpointData.id}`)
+          .select('initData');
+
+        if (data) {
+          setProposalId(data[0].initData.id);
+        }
+      }
+    }
+  };
+
+  const checkProposalId = async () => {
+    if (
+      currentCheckpointData &&
+      currentCheckpointData?.vote_machine_type === 'Snapshot'
+    ) {
+      const { data } = await supabase
+        .from('current_vote_data')
+        .select('initData')
+        .eq('checkpoint_id', `${missionId}-${currentCheckpointData.id}`);
+
+      if (data && data[0]?.initData?.id) {
+        setProposalId(data[0]?.initData.id);
+      }
     }
   };
 
   useEffect(() => {
     if (typeof window.ethereum !== 'undefined') {
+      console.log('Metamask is installed');
     }
-  }, []);
+
+    checkProposalId();
+  }, [currentCheckpointData]);
 
   // =============================== METAMASK SECTION ===============================
 
@@ -261,15 +284,20 @@ const MissionVotingDetail = () => {
                 </Card>
 
                 {/* =============================== METAMASK SECTION =============================== */}
-                {connected ? (
+                {proposalId ? (
                   <>
-                    <Button className='h-12 rounded-3xl'>
-                      Create Snapshot Proposal
+                    <Button
+                      className='h-12 rounded-3xl'
+                      onClick={() => {
+                        console.log('Async');
+                      }}
+                    >
+                      Async vote result
                     </Button>
                   </>
                 ) : (
                   <Button onClick={createProposal} className='h-12 rounded-3xl'>
-                    Connect wallet
+                    Create Snapshot Proposal
                   </Button>
                 )}
                 {/* =============================== METAMASK SECTION =============================== */}
@@ -305,6 +333,7 @@ const MissionVotingDetail = () => {
                     listVersionDocs={listVersionDocs}
                   />
                 )}
+
               {!currentCheckpointData.isEnd &&
                 currentCheckpointData.vote_machine_type !== 'Snapshot' &&
                 currentCheckpointData.vote_machine_type !== 'DocInput' && (
