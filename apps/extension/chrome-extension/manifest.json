@@ -2,10 +2,12 @@
   "name": "SyncVote extension",
   "version": "1.0.0",
   "manifest_version": 3,
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
-    }
-  ]
+  "action": {
+    "default_title": "Click Me",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["tabs", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  }
 }

@@ -5,7 +5,7 @@ There are 2 folders:
 - chrome-extension
 - react-chrome-app
 
-Code will written in `react-chrome-app` and bundled in to `chrome-extension\content.js`
+Code will written in `react-chrome-app` and bundled in to `chrome-extension`
 
 To build, run `yarn pack-extension`
 
