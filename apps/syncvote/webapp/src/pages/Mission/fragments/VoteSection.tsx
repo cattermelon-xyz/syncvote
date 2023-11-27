@@ -45,23 +45,19 @@ const VoteSection: React.FC<Props> = ({
     {}
   );
 
-  const createProposal = async () => {
+  const createVote = async () => {
     let web3;
     if (isExternalProvider(window.ethereum)) {
       web3 = new Web3Provider(window.ethereum);
     }
-    let choices: string[] = currentCheckpointData.data.options;
-    if (currentCheckpointData.includedAbstain) {
-      choices.push('Abstain');
-    }
 
-    if (web3 && client) {
+    if (web3 && client && selectedOption) {
       const accounts = await web3.listAccounts();
       const receipt = await client.vote(web3, accounts[0], {
         space: currentCheckpointData?.data?.space,
         proposal: proposal?.id,
-        type: currentCheckpointData?.data,
-        choice: 1,
+        type: currentCheckpointData?.data?.type?.value,
+        choice: selectedOption - 1,
         reason: 'Choice 1 make lot of sense',
         app: 'my-app',
       });
@@ -305,31 +301,54 @@ const VoteSection: React.FC<Props> = ({
         <Card className='p-4'>
           <div className='flex flex-col gap-6'>
             <p className='text-xl font-medium'>Vote</p>
-            {currentCheckpointData.data.options.map(
-              (option: any, index: any) => (
-                <Card className='w-full' key={index}>
-                  {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                  <Radio
-                    checked={
-                      selectedOption === (option === 'Abstain' ? -1 : index + 1)
-                    }
-                    onChange={() =>
-                      setSelectedOption(option === 'Abstain' ? -1 : index + 1)
-                    }
-                  >
-                    {`${index + 1}. ${option}`}
-                  </Radio>
-                </Card>
-              )
+            {proposal ? (
+              <>
+                {proposal.choices.map((option: any, index: any) => (
+                  <Card className='w-full' key={index}>
+                    {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
+                    <Radio
+                      checked={selectedOption === index + 1}
+                      onChange={() => setSelectedOption(index + 1)}
+                    >
+                      {`${index + 1}. ${option}`}
+                    </Radio>
+                  </Card>
+                ))}
+              </>
+            ) : (
+              <>
+                {currentCheckpointData.data.options.map(
+                  (option: any, index: any) => (
+                    <Card className='w-full' key={index}>
+                      {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
+                      <Radio
+                        checked={
+                          selectedOption ===
+                          (option === 'Abstain' ? -1 : index + 1)
+                        }
+                        onChange={() =>
+                          setSelectedOption(
+                            option === 'Abstain' ? -1 : index + 1
+                          )
+                        }
+                      >
+                        {`${index + 1}. ${option}`}
+                      </Radio>
+                    </Card>
+                  )
+                )}
+              </>
             )}
+
             <Button
               type='primary'
               className='w-full'
-              onClick={() => {
+              onClick={async () => {
                 if (!proposal) {
                   setSubmission(editorValues);
                   setOpenModalVoterInfo(true);
                 } else {
+                  await createVote();
                 }
               }}
               disabled={
