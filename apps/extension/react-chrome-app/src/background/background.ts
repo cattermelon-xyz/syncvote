@@ -1,4 +1,4 @@
-import { chromeStorageKeys } from "@constants/chrome";
+import { chromeStorageKeys } from '@constants/chrome';
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.action) {
@@ -17,6 +17,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
 
+    case 'handlePostDiscourse': {
+      const url = request.payload.url;
+
+      chrome.tabs.create({ url: url, active: true }, (tab) => {
+        sendResponse(request.action + ' executed');
+      });
+      break;
+    }
+
     default:
       break;
   }
@@ -24,13 +33,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   return true;
 });
 
-
 const setTokens = async (
   tabId: number,
   changeInfo: chrome.tabs.TabChangeInfo,
   tab: chrome.tabs.Tab
 ) => {
-
   // once the tab is loaded
   if (tab.status === 'complete') {
     if (!tab.url) return;
