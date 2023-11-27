@@ -17,8 +17,8 @@ import {
   NumberWithPercentageInput,
 } from 'directed-graph';
 import ConfigPanel from './ConfigPanel';
-import { Snapshot as Interface } from './interface';
-import { Snapshot as Funcs } from './funcs';
+import { AD1 as Interface } from './interface';
+import { AD1 as Funcs } from './funcs';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
 

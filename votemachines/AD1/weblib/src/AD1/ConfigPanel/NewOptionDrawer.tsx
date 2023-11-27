@@ -1,6 +1,6 @@
 import { ArrowRightOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Drawer, Space, Input, Select, Button } from 'antd';
-import { Snapshot as Interface } from '../interface';
+import { AD1 as Interface } from '../interface';
 import { useState } from 'react';
 import { DelayUnit, TimelockPanel } from 'directed-graph';
 

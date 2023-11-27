@@ -1,1 +1,1 @@
-export { default as Snapshot } from './src/Snapshot/index';
+export { default as AD1 } from './src/AD1/index';

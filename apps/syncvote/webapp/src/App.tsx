@@ -11,6 +11,7 @@ import { UpVote } from 'upvote';
 import { DocInput } from 'doc-input';
 import { Snapshot } from '../../../../votemachines/snapshot/weblib/index';
 import { AuthContext } from '@layout/context/AuthContext';
+import { AD1 } from '../../../../votemachines/AD1/weblib/index';
 
 function App({ layout }: { layout: any }) {
   // const [isAuth, setIsAuth] = useState(false);
@@ -25,6 +26,7 @@ function App({ layout }: { layout: any }) {
     registerVoteMachine(UpVote);
     registerVoteMachine(DocInput);
     registerVoteMachine(Snapshot);
+    registerVoteMachine(AD1);
   }, [session]);
 
   const Layout: any = layout;

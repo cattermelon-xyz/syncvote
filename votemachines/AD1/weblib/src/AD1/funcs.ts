@@ -1,14 +1,14 @@
 import { ICheckPoint } from 'directed-graph';
 // import { IData } from './interface';
-import { Snapshot as Interface } from './interface';
+import { AD1 as Interface } from './interface';
 
-export namespace Snapshot {
+export namespace AD1 {
   export const getName = () => {
-    return 'Snapshot';
+    return 'AD1';
   };
 
   export const getProgramAddress = () => {
-    return 'Snapshot';
+    return 'AD1';
   };
 
   /**
@@ -16,7 +16,7 @@ export namespace Snapshot {
    * @returns Type of the voting machine
    */
   export const getType = () => {
-    return 'Snapshot';
+    return 'AD1';
   };
 
   export const deleteChildNode = (
@@ -38,6 +38,8 @@ export namespace Snapshot {
       options: [],
       max: 0,
       token: '',
+      title: '',
+      raw: '',
     };
     return data;
   };

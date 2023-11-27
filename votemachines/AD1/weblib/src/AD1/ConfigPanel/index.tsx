@@ -12,7 +12,7 @@ import {
 import NewOptionDrawer from './NewOptionDrawer';
 import { PlusOutlined } from '@ant-design/icons';
 import '../styles.scss';
-import { Snapshot as Interface } from '../interface';
+import { AD1 as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
 
 /**
@@ -37,8 +37,8 @@ export default (props: IVoteMachineConfigProps) => {
       max: 0,
       token: '', // spl token
       options: [],
-      space: '',
-      type: '',
+      title: '',
+      raw: '',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -150,32 +150,6 @@ export default (props: IVoteMachineConfigProps) => {
       });
     }
   };
-  const selectOptions = [
-    {
-      label: 'Single Choice',
-      value: 'single-choice',
-    },
-    {
-      label: 'Approval',
-      value: 'approval',
-    },
-    {
-      label: 'Quadratic',
-      value: 'quadratic',
-    },
-    {
-      label: 'Ranked Choice',
-      value: 'ranked-choice',
-    },
-    {
-      label: 'Weighted',
-      value: 'weighted',
-    },
-    {
-      label: 'Basic',
-      value: 'basic',
-    },
-  ];
 
   return (
     <>
@@ -270,47 +244,35 @@ export default (props: IVoteMachineConfigProps) => {
             />
           </>
         </CollapsiblePanel>
-        <CollapsiblePanel title='Snapshot Info'>
+        <CollapsiblePanel title='AD1 Info'>
           <Space direction='vertical' size='small' className='w-full'>
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Space
-                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
+                Title
+                <Popover content='This is title of topic.'>
                   <MdHelpOutline />
                 </Popover>
               </div>
               <Input
                 className='w-full'
-                placeholder='hectagon.eth'
-                value={data.space}
+                value={data.title}
                 onChange={(e: any) => {
-                  onChange({
-                    data: {
-                      ...data,
-                      space: e.target.value,
-                    },
-                  });
+                  onChange({ data: { ...data, title: e.target.value } });
                 }}
               />
             </Space>
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Votemachine type
-                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
+                Raw
+                <Popover content='This is raw of the topic'>
                   <MdHelpOutline />
                 </Popover>
               </div>
-              <Select
-                value={data.type}
+              <Input
                 className='w-full'
-                options={selectOptions}
-                onChange={(value) => {
-                  onChange({
-                    data: {
-                      ...data,
-                      type: value,
-                    },
-                  });
+                value={data.raw}
+                onChange={(e: any) => {
+                  onChange({ data: { ...data, raw: e.target.value } });
                 }}
               />
             </Space>

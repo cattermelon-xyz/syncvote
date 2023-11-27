@@ -7,20 +7,14 @@ export declare type ProposalType =
   | 'weighted'
   | 'basic';
 
-export namespace Snapshot {
+export namespace AD1 {
   export interface IData {
     //eslint-disable-line
     options: string[];
     max: number;
     token: string;
-    space?: string;
-    type?: ProposalType;
-    start?: number;
-    end?: number;
-    title?: string;
-    body?: string;
-    discussion?: string;
-    plugins?: string;
+    title: string;
+    raw: string;
   }
 
   export interface IOption {
