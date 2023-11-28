@@ -278,6 +278,43 @@ export default (props: IVoteMachineConfigProps) => {
             </Space>
           </Space>
         </CollapsiblePanel>
+        <CollapsiblePanel title='Result calculation'>
+          <ResultCalculator
+            winnerThreshold={max}
+            quorum={quorum || 0}
+            setValue={(keyValue: any) => {
+              // quorum, winnerThreshold -> max, sideNote -> resultDescription, tokenAddress -> token
+              if (keyValue.hasOwnProperty('quorum')) {
+                onChange({
+                  quorum: keyValue['quorum'],
+                });
+              }
+              if (keyValue.hasOwnProperty('winnerThreshold')) {
+                onChange({
+                  data: {
+                    ...data,
+                    max: keyValue['winnerThreshold'],
+                  },
+                });
+              }
+              if (keyValue.hasOwnProperty('sideNote')) {
+                onChange({
+                  resultDescription: keyValue['sideNote'],
+                });
+              }
+              if (keyValue.hasOwnProperty('tokenAddress')) {
+                onChange({
+                  data: {
+                    ...data,
+                    token: keyValue['tokenAddress'],
+                  },
+                });
+              }
+            }}
+            sideNote={resultDescription}
+            tokenAddress={token}
+          />
+        </CollapsiblePanel>
       </Space>
     </>
   );

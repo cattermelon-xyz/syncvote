@@ -245,6 +245,15 @@ async function updateMission(props) {
       if (!error) {
         if (updateMission[0].status === 'PUBLIC') {
           updateMission[0].data.checkpoints.map(async (checkpoint) => {
+            let custom = {};
+            if (checkpoint.vote_machine_type === 'Snapshot') {
+              
+            } else if (checkpoint.vote_machine_type === 'AD1') {
+              custom = {
+                title: checkpoint?.title,
+                raw: checkpoint?.raw,
+              };
+            }
             const checkpointData = {
               id: `${updateMission[0].id}-${checkpoint.id}`,
               vote_machine_type: checkpoint.vote_machine_type,

@@ -60,6 +60,11 @@ export namespace AD1 {
       isValid = false;
       message.push('Missing number of vote need to win');
     }
+
+    if (!checkpoint?.data.title && !checkpoint?.data.raw) {
+      isValid = false;
+      message.push('Missing props of topic');
+    }
     return {
       isValid,
       message,
