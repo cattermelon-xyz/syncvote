@@ -168,3 +168,64 @@ export const queryOrgs = async ({
     onError(error);
   }
 };
+
+export const queryDemo = async ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  const { data, error } = await supabase.from('demo_missions').select('*');
+
+  if (!error) {
+    onSuccess(data);
+  } else {
+    onError(error);
+  }
+};
+
+export const createProposalDemo = async ({
+  title,
+  onSuccess,
+  onError,
+}: {
+  title: string;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  const { data, error } = await supabase
+    .from('demo_missions')
+    .insert({ title: title, status: 'idea_discussion' })
+    .select('*');
+
+  if (!error) {
+    onSuccess(data[0]);
+  } else {
+    onError(error);
+  }
+};
+
+export const updateProposalDemo = async ({
+  demoProposalId,
+  status,
+  onSuccess,
+  onError,
+}: {
+  demoProposalId: number;
+  status: string;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  const { data, error } = await supabase
+    .from('demo_missions')
+    .update({ status: status })
+    .eq('id', demoProposalId)
+    .select('*');
+
+  if (!error) {
+    onSuccess(data[0]);
+  } else {
+    onError(error);
+  }
+};

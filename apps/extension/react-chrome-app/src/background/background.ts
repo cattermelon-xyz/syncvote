@@ -26,6 +26,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
 
+    case 'handleCreateSnapshot': {
+      const url = request.payload.url;
+
+      chrome.tabs.create({ url: url, active: true }, (tab) => {
+        sendResponse(request.action + ' executed');
+      });
+      break;
+    }
+
     default:
       break;
   }

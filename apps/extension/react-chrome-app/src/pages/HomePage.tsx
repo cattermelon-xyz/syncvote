@@ -6,12 +6,20 @@ import { PAGE_ROUTER } from '@constants/common';
 
 interface Props {
   setPage: any;
+  dataDemo: any;
+  setCurrentProposalId: any;
 }
 
-const HomePage: React.FC<Props> = ({ setPage }) => {
+const HomePage: React.FC<Props> = ({
+  setPage,
+  dataDemo,
+  setCurrentProposalId,
+}) => {
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };
+
+  
 
   const items: TabsProps['items'] = [
     {
@@ -19,8 +27,15 @@ const HomePage: React.FC<Props> = ({ setPage }) => {
       label: 'For you',
       children: (
         <div className='flex flex-col gap-2'>
-          <CheckpointCard />
-          <CheckpointCard />
+          {dataDemo &&
+            dataDemo.map((proposal: any, index: any) => (
+              <CheckpointCard
+                key={index}
+                proposal={proposal}
+                setPage={setPage}
+                setCurrentProposalId={setCurrentProposalId}
+              />
+            ))}
         </div>
       ),
     },
@@ -34,15 +49,10 @@ const HomePage: React.FC<Props> = ({ setPage }) => {
     <div>
       <div className='flex justify-between mb-6'>
         <Select
-          defaultValue='lucy'
+          defaultValue='Idle DAO'
           style={{ width: 120 }}
           onChange={handleChange}
-          options={[
-            { value: 'jack', label: 'Jack' },
-            { value: 'lucy', label: 'Lucy' },
-            { value: 'Yiminghe', label: 'yiminghe' },
-            { value: 'disabled', label: 'Disabled', disabled: true },
-          ]}
+          options={[{ value: 'Idle DAO', label: 'Idle DAO' }]}
         />
         <div className='flex gap-3 items-center'>
           <div className='flex rounded-full h-[28px] w-[28px] bg-[#E6E6E6] justify-center cursor-pointer'>
@@ -62,7 +72,12 @@ const HomePage: React.FC<Props> = ({ setPage }) => {
           <PlusOutlined />
         </div>
       </div>
-      <Tabs defaultActiveKey='1' items={items} onChange={onChangeTabs} />
+      <Tabs
+        className='mb-2'
+        defaultActiveKey='1'
+        items={items}
+        onChange={onChangeTabs}
+      />
     </div>
   );
 };

@@ -1,17 +1,32 @@
 import { Button, Select, Space } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import Input from 'antd/es/input/Input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
+import { createProposalDemo } from '@data/org';
 
 interface Props {
   setPage: any;
+  setCurrentProposalId: any;
 }
 
-const CreateProposal: React.FC<Props> = ({ setPage }) => {
+const CreateProposal: React.FC<Props> = ({ setPage, setCurrentProposalId }) => {
   const [inputValue, setInputValue] = useState('');
   const [selectValue, setSelectValue] = useState('');
   const isButtonDisabled = !inputValue || !selectValue;
+
+  const handleCreateProposal = async () => {
+    createProposalDemo({
+      title: inputValue,
+      onSuccess: (data) => {
+        console.log('create proposal success', data);
+        setCurrentProposalId(data?.id);
+      },
+      onError: (error) => {
+        console.log('error', error);
+      },
+    });
+  };
 
   return (
     <div>
@@ -53,11 +68,7 @@ const CreateProposal: React.FC<Props> = ({ setPage }) => {
             options={[
               {
                 value: '1',
-                label: 'Not Identified',
-              },
-              {
-                value: '2',
-                label: 'Closed',
+                label: 'Idle DAO governance process',
               },
             ]}
           />
@@ -74,7 +85,8 @@ const CreateProposal: React.FC<Props> = ({ setPage }) => {
           type='primary'
           size='large'
           disabled={isButtonDisabled}
-          onClick={() => {
+          onClick={async () => {
+            await handleCreateProposal();
             setPage(PAGE_ROUTER.DONE_CREATE_PROPOSAL);
           }}
         >
