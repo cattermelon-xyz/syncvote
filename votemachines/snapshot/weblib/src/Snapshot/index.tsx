@@ -73,8 +73,8 @@ const explain = ({
     return <></>;
   }
   const noOfOptions = checkpoint.children ? checkpoint.children.length : 0;
-  const resultDescription = checkpoint.resultDescription || '';
-  const quorum = checkpoint.quorum || 0;
+  const voteMachineType = checkpoint.data?.type?.label;
+  const space = checkpoint.data?.space;
   const optionsDescription = checkpoint.optionsDescription;
   const renderOption = ({
     data,
@@ -113,7 +113,15 @@ const explain = ({
       <div className='text-zinc-400'>Voting format</div>
       <ul className='list-disc ml-4'>
         <li>
-          Voting method: <span className='text-violet-500'>Single Choice</span>
+          Space:
+          <span className='text-violet-500'>
+            <a href={`https://snapshot.org/#/${space}`}>{space}</a>
+          </span>
+        </li>
+
+        <li>
+          Voting method:
+          <span className='text-violet-500'> Snapshot - {voteMachineType}</span>
         </li>
 
         <li>
@@ -133,48 +141,6 @@ const explain = ({
         </li>
 
         <SideNote value={optionsDescription} />
-        {quorum !== 0 || data.max !== 0 ? (
-          <>
-            {quorum !== 0 ? (
-              <li>
-                Voting quorum:{' '}
-                <span className='text-violet-500'>
-                  <NumberWithPercentageInput value={quorum} />{' '}
-                  {!data.token ? (
-                    'votes'
-                  ) : (
-                    <>
-                      {' '}
-                      token(s) <TokenInput address={data.token} />
-                    </>
-                  )}
-                </span>
-              </li>
-            ) : null}
-            {data.max !== 0 ? (
-              <li>
-                Wining threshold:{' '}
-                <span className='text-violet-500'>
-                  <NumberWithPercentageInput value={data.max} />{' '}
-                  {!data.token ? (
-                    'votes'
-                  ) : (
-                    <>
-                      {' '}
-                      token(s) <TokenInput address={data.token} />
-                    </>
-                  )}
-                </span>
-                <SideNote value={resultDescription} />
-              </li>
-            ) : null}
-          </>
-        ) : (
-          <li>
-            Result calculation:{' '}
-            {resultDescription ? <SideNote value={resultDescription} /> : null}
-          </li>
-        )}
       </ul>
     </>
   );
@@ -193,27 +159,6 @@ const abstract = ({
 
   return threshold || isRTE(votingLocation) || quorum ? (
     <>
-      {quorum ? (
-        <div className='flex text-ellipsis items-center px-2'>
-          <SolutionOutlined className='mr-2' />
-          <div className='flex gap-1'>
-            <span>Quorum</span>
-            <NumberWithPercentageInput value={quorum} />
-            {token ? <TokenInput address={token} /> : 'votes'}
-          </div>
-        </div>
-      ) : null}
-      {threshold ? (
-        <div className='flex text-ellipsis items-center px-2'>
-          <VerticalAlignTopOutlined className='mr-2' />
-          {/* {`Threshold ${threshold} ${token}`} */}
-          <div className='flex gap-1'>
-            <span>Threshold</span>
-            <NumberWithPercentageInput value={threshold} />
-            {token ? <TokenInput address={token} /> : 'votes'}
-          </div>
-        </div>
-      ) : null}
       <div className='flex text-ellipsis items-center px-2'>
         <VerticalAlignTopOutlined className='mr-2' />
         {/* {`Threshold ${threshold} ${token}`} */}

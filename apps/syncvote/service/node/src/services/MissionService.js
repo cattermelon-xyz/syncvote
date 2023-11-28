@@ -40,7 +40,10 @@ async function insertMission(props) {
       if (!error) {
         if (newMission[0].status === 'PUBLIC') {
           newMission[0].data.checkpoints.map(async (checkpoint) => {
-            if (!checkpoint.isEnd) {
+            if (
+              !checkpoint.isEnd &&
+              checkpoint?.vote_machine_type !== 'Snapshot'
+            ) {
               const { duration, participation, title, quorum } = checkpoint;
               const { isValid } =
                 VoteMachineValidate[checkpoint.vote_machine_type].validate(
@@ -82,6 +85,8 @@ async function insertMission(props) {
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
               includedAbstain: checkpoint?.includedAbstain,
+              space: checkpoint?.data?.space,
+              type: checkpoint?.data?.type,
             };
 
             const error = await insertCheckpoint(checkpointData);
@@ -94,6 +99,7 @@ async function insertMission(props) {
             }
 
             if (checkpoint.id === newMission[0].start) {
+              console.log(checkpointData.vote_machine_type);
               // create current_vote_data
               const current_vote_data = await insertCurrentVoteData({
                 checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
@@ -104,8 +110,6 @@ async function insertMission(props) {
                   .from('mission_view')
                   .select('*')
                   .eq('id', newMission[0].id);
-
-              console.log('missionViewData', missionViewData);
 
               const { data: web2KeyData, error: errorWeb2KeyData } =
                 await supabase
