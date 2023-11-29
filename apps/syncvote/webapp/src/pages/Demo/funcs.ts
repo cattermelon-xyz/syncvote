@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+const { ethers } = require('hardhat');
+import { isExternalProvider } from '@pages/Mission/MissionVotingDetail';
 
 export function useWindowSize() {
   // Initialize state with undefined width/height so server and client renders match
@@ -47,3 +48,39 @@ In the near future, we will broaden our integrations with widely-used DAO apps a
 To gain a better understanding of the context, please refer to this proposal: **[HIP14 - Proposal to utilize treasury for developing Syncvote](https://snapshot.org/#/hectagon.eth/proposal/0xadde5daee982803db92ba838ba3fefe5bc6b935baf44aef9643f010be5bbc7f3).**
 Thanks for reading.</pre>`;
 
+export const MyGovernor_ABI = [
+  {
+    inputs: [
+      { internalType: 'address[]', name: 'targets', type: 'address[]' },
+      { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+      { internalType: 'bytes[]', name: 'calldatas', type: 'bytes[]' },
+      { internalType: 'string', name: 'description', type: 'string' },
+    ],
+    name: 'propose',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+];
+
+export const test = async () => {
+  const accounts = await ethers.getSigners();
+
+  //Deploy Token and mint 1 token to owner
+  const SVToken = await ethers.getContractFactory('SVToken');
+  const svtoken = await SVToken.deploy();
+  await svtoken.deployed();
+  const setsvTOKENTx = await svtoken.safeMint(
+    accounts[0].address,
+    ' String Test '
+  );
+  await setsvTOKENTx.wait(1);
+  const transactionResponse = await svtoken.delegate(accounts[0].address);
+  await transactionResponse.wait(1);
+
+  console.log(`Token Collection address: ${svtoken.address}`);
+  console.log(`Total supply: ${await svtoken.totalSupply()}`);
+  console.log(
+    '---------------------------------------------------------------'
+  );
+};

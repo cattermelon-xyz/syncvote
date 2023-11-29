@@ -5,6 +5,7 @@ import { Route } from 'react-router-dom';
 import RequireAuth from './RequireAuth';
 import { CreateSnapshot } from '@pages/Demo/CreateSnapshot';
 import { CreateTopic } from '@pages/Demo/CreateTopic';
+import { CreateTally } from '@pages/Demo/CreateTally';
 
 export default (
   <React.Fragment>
@@ -21,7 +22,7 @@ export default (
         path='create_snapshot/:missions_demo_id'
         element={<CreateSnapshot />}
       />
-      {/* <Route path='create_tally/:missions_demo_id' element={<EditVersion />} /> */}
+      <Route path='create_tally/:missions_demo_id' element={<CreateTally />} />
     </Route>
   </React.Fragment>
 );
