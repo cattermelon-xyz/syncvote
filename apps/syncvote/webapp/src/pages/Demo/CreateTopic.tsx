@@ -24,6 +24,11 @@ export const CreateTopic = () => {
   const createTopic = async () => {
     dispatch(startLoading({}));
     // logic here
+    Modal.success({
+      title: 'Success',
+      content:
+        'Create a snapshot proposal successfully, continue on your extension',
+    });
     dispatch(finishLoading({}));
   };
   return (

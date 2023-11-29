@@ -1,7 +1,7 @@
 import { Button, Input, Modal, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { snapshotDesc, useWindowSize } from './funcs';
+import { body, snapshotDesc, useWindowSize } from './funcs';
 import TextEditor from 'rich-text-editor/src/TextEditor/TextEditor';
 import parse from 'html-react-parser';
 import './snapshot.scss';
@@ -44,7 +44,7 @@ export const CreateSnapshot = () => {
         space: 'hectagon.eth',
         type: 'basic',
         title: `[${title}] Testing Syncvote MVP`,
-        body: ``,
+        body: body,
         choices: ['For', 'Against', 'Abstain'],
         start: moment().unix(),
         end: moment().unix() + 3600,
