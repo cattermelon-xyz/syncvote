@@ -12,7 +12,7 @@ interface Props {
 
 const CreateProposal: React.FC<Props> = ({ setPage, setCurrentProposalId }) => {
   const [inputValue, setInputValue] = useState('');
-  const [selectValue, setSelectValue] = useState('');
+  const [selectValue, setSelectValue] = useState();
   const isButtonDisabled = !inputValue || !selectValue;
 
   const handleCreateProposal = async () => {
