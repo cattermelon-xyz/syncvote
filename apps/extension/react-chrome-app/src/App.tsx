@@ -16,11 +16,6 @@ function App() {
   const [dataDemo, setDataDemo] = useState<any>();
   const [currentProposalId, setCurrentProposalId] = useState<number>();
   const [currentProposalData, setCurrentProposalData] = useState<any>();
-  const [refreshCounter, setRefreshCounter] = useState(0);
-
-  const refreshPage = () => {
-    setRefreshCounter((prev) => prev + 1);
-  };
 
   useEffect(() => {
     getCurrentUser().then((resp) => {
@@ -53,7 +48,7 @@ function App() {
       );
       setCurrentProposalData(data[0]);
     }
-  }, [currentProposalId, dataDemo, refreshCounter]);
+  }, [currentProposalId, dataDemo]);
 
   useEffect(() => {
     console.log('dataDemo', dataDemo);
@@ -62,7 +57,7 @@ function App() {
   }, [dataDemo, currentProposalData, currentProposalId]);
 
   return (
-    <div className='w-[260px] h-[380px] pt-[13px] px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
+    <div className='w-[260px] h-[380px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
       {user === null || user === undefined ? (
         <Login />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
@@ -83,7 +78,7 @@ function App() {
           setPage={setPage}
           currentProposalData={currentProposalData}
           setCurrentProposalId={setCurrentProposalId}
-          refreshPage={refreshPage}
+          setCurrentProposalData={setCurrentProposalData}
         />
       ) : (
         <></>

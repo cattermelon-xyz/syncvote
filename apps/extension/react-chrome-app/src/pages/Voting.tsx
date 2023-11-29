@@ -10,25 +10,32 @@ import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
 import DoneIcon from '@assets/icons/DoneIcon';
 import { updateProposalDemo } from '@data/org';
+import Success from '@assets/icons/Success';
 
 interface Props {
   setPage: any;
   currentProposalData: any;
   setCurrentProposalId: any;
-  refreshPage: any;
+  setCurrentProposalData: any;
 }
 
 const Voting: React.FC<Props> = ({
   setPage,
   currentProposalData,
   setCurrentProposalId,
-  refreshPage,
+  setCurrentProposalData,
 }) => {
   const [openDescDiscuss, setOpenDescDiscuss] = useState(false);
   const [openDescTempCheck, setOpenDescTempCheck] = useState(false);
+  const [openDescFormalization, setOpenDescFormalization] = useState(false);
+  const [openDescOnchainVoting, setOpenDescOnchainVoting] = useState(false);
   const handleOpenDescDiscuss = () => setOpenDescDiscuss(!openDescDiscuss);
   const handleOpenDescTempCheck = () =>
     setOpenDescTempCheck(!openDescTempCheck);
+  const handleOpenDescFormalization = () =>
+    setOpenDescFormalization(!openDescFormalization);
+  const handleOpenDescOnchainVoting = () =>
+    setOpenDescOnchainVoting(!openDescOnchainVoting);
 
   const handlePostDiscourse = async () => {
     await chrome.runtime.sendMessage({
@@ -44,13 +51,38 @@ const Voting: React.FC<Props> = ({
     });
   };
 
+  const handleMoveDiscourse = async () => {
+    await chrome.runtime.sendMessage({
+      action: 'handleMoveDiscourse',
+      payload: { url: 'https://www.google.com.vn/?hl=vi' },
+    });
+    // updateProposalDemo({
+    //   demoProposalId: currentProposalData?.id,
+    //   status: 'onchain_voting',
+    //   onSuccess: (data) => {
+    //     console.log('update proposal success', data);
+    //     // setCurrentProposalData(data);
+    //   },
+    //   onError: (error) => {
+    //     console.log('error', error);
+    //   },
+    // });
+  };
+
+  const handleCreateTally = async () => {
+    await chrome.runtime.sendMessage({
+      action: 'handleCreateTally',
+      payload: { url: 'https://www.google.com.vn/?hl=vi' },
+    });
+  };
+
   const handleMoveToTempCheck = async () => {
     updateProposalDemo({
       demoProposalId: currentProposalData?.id,
       status: 'temperature_check',
       onSuccess: (data) => {
         console.log('update proposal success', data);
-        refreshPage();
+        setCurrentProposalData(data);
       },
       onError: (error) => {
         console.log('error', error);
@@ -186,8 +218,12 @@ const Voting: React.FC<Props> = ({
               className='w-full mt-1 flex flex-col'
               bodyStyle={{ padding: '12px' }}
             >
-              <Tag color='orange'>Ongoing</Tag>
-              <div className='flex mt-[2px]'>
+              {currentProposalData?.snapshot_status === 'Done' ? (
+                <Tag color='green'>Success</Tag>
+              ) : (
+                <Tag color='orange'>Ongoing</Tag>
+              )}
+              <div className='flex mt-2'>
                 <DoneIcon />
                 <p className='w-[190px] ml-1 text-[10px] truncate ...'>
                   {currentProposalData?.snapshot_idle_id}
@@ -209,8 +245,12 @@ const Voting: React.FC<Props> = ({
               className='w-full mt-1 flex flex-col '
               bodyStyle={{ padding: '12px' }}
             >
-              <Tag color='orange'>Ongoing</Tag>
-              <div className='flex mt-[2px]'>
+              {currentProposalData?.snapshot_status === 'Done' ? (
+                <Tag color='green'>Success</Tag>
+              ) : (
+                <Tag color='orange'>Ongoing</Tag>
+              )}
+              <div className='flex mt-2'>
                 <DoneIcon />
                 <p className='w-[190px] ml-1 text-[10px] truncate ...'>
                   {currentProposalData?.snapshot_stidle_id}
@@ -227,6 +267,216 @@ const Voting: React.FC<Props> = ({
               <p className='text-[13px] ml-[2px]'>Create a Snapshot stkIDLE</p>
             </Button>
           )}
+          {currentProposalData?.snapshot_stidle_id !== null &&
+          currentProposalData?.snapshot_idle_id !== null ? (
+            <></>
+          ) : (
+            <Button
+              className='h-[38px] w-full mb-[18px] flex justify-center items-center my-2'
+              type='default'
+              size='large'
+              icon={<CloseCircleOutlined />}
+            >
+              <p className='text-[13px]'>Abandon</p>
+            </Button>
+          )}
+        </div>
+      )}
+      {/* UI for proposal_formalization */}
+      {currentProposalData?.status !== 'idea_discussion' &&
+        currentProposalData?.status !== 'temperature_check' && (
+          <div className='mt-2'>
+            <hr className='mb-2' />
+            <Card
+              className='w-full flex flex-col  bg-white rounded-lg'
+              bodyStyle={{ padding: '12px' }}
+            >
+              <div className='flex flex-col gap-1'>
+                {currentProposalData?.discourse_topic_move ? (
+                  <p className='text-[10px]'>Completed</p>
+                ) : (
+                  <></>
+                )}
+                <div className='flex justify-between items-center'>
+                  <p className='text-[13px] font-semibold'>
+                    Proposal Formalization
+                  </p>
+                  {openDescFormalization ? (
+                    <UpOutlined onClick={handleOpenDescFormalization} />
+                  ) : (
+                    <DownOutlined onClick={handleOpenDescFormalization} />
+                  )}
+                </div>
+              </div>
+              {openDescFormalization && (
+                <div>
+                  <hr className='my-2' />
+                  <p>
+                    Move your proposal to the Formal Proposals category on
+                    Forum.
+                  </p>
+                </div>
+              )}
+            </Card>
+            {currentProposalData?.discourse_topic_move !== null ? (
+              <Card
+                className='w-full mt-1 flex flex-col'
+                bodyStyle={{ padding: '12px' }}
+              >
+                <div className='flex mt-2'>
+                  <DoneIcon />
+                  <p className='w-[190px] ml-1 text-[10px] truncate ...'>
+                    {currentProposalData?.discourse_topic_move}
+                  </p>
+                </div>
+              </Card>
+            ) : (
+              <Button
+                className='h-[38px] w-full px-4 mt-2 flex justify-center items-center bg-[#000]'
+                type='primary'
+                onClick={handleMoveDiscourse}
+              >
+                <Discourse />
+                <p className='text-[13px] ml-[2px]'>Move a post on Discourse</p>
+              </Button>
+            )}
+            {currentProposalData?.discourse_topic_move !== null ? (
+              <></>
+            ) : (
+              <Button
+                className='h-[38px] w-full mb-[18px] flex justify-center items-center my-2'
+                type='default'
+                size='large'
+                icon={<CloseCircleOutlined />}
+              >
+                <p className='text-[13px]'>Abandon</p>
+              </Button>
+            )}
+          </div>
+        )}
+      {/* UI for onchain_voting */}
+      {currentProposalData?.status !== 'idea_discussion' &&
+        currentProposalData?.status !== 'temperature_check' &&
+        currentProposalData?.status !== 'proposal_formalization' && (
+          <div className='mt-2'>
+            <hr className='mb-2' />
+            <Card
+              className='w-full flex flex-col  bg-white rounded-lg'
+              bodyStyle={{ padding: '12px' }}
+            >
+              <div className='flex flex-col gap-1'>
+                {currentProposalData?.tally_id ? (
+                  <p className='text-[10px]'>Completed</p>
+                ) : (
+                  <></>
+                )}
+                <div className='flex justify-between items-center'>
+                  <p className='text-[13px] font-semibold'>
+                    IDLE on-chain voting
+                  </p>
+                  {openDescOnchainVoting ? (
+                    <UpOutlined onClick={handleOpenDescOnchainVoting} />
+                  ) : (
+                    <DownOutlined onClick={handleOpenDescOnchainVoting} />
+                  )}
+                </div>
+              </div>
+              {openDescOnchainVoting && (
+                <div>
+                  <hr className='my-2' />
+                  <div className='flex flex-col gap-1'>
+                    <p>
+                      1. Move your proposal to the Formal Proposals category on
+                      Forum.
+                    </p>
+                    <p>2. Create an on-chain proposal on Tally.</p>
+                    <p>
+                      3. Create a proposal with content following the template
+                      in the Note below.
+                    </p>
+                    <p>
+                      4. Set up the poll with parameters defined in below rules
+                      & conditions.
+                    </p>
+                    <p>
+                      5. Include a link to the updated governance post as a
+                      reference.
+                    </p>
+                    <p>6. Include executable code.</p>
+                    <p>
+                      7. Include links to the voting pools (IDLE and stkIDLE) as
+                      a reply to your IIP post.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </Card>
+            {currentProposalData?.tally_id !== null ? (
+              <Card
+                className='w-full mt-1 flex flex-col'
+                bodyStyle={{ padding: '12px' }}
+              >
+                {currentProposalData?.tally_status === 'Done' ? (
+                  <Tag color='green'>Success</Tag>
+                ) : (
+                  <Tag color='orange'>Ongoing</Tag>
+                )}
+                <div className='flex mt-2'>
+                  <DoneIcon />
+                  <p className='w-[190px] ml-1 text-[10px] truncate ...'>
+                    {currentProposalData?.tally_id}
+                  </p>
+                </div>
+              </Card>
+            ) : (
+              <Button
+                className='h-[38px] w-full px-4 mt-2 flex justify-center items-center bg-[#000]'
+                type='primary'
+                onClick={handleCreateTally}
+              >
+                {/* <Discourse /> */}
+                <p className='text-[13px] ml-[2px]'>Create a Tally proposal</p>
+              </Button>
+            )}
+            {currentProposalData?.tally_id !== null ? (
+              <></>
+            ) : (
+              <Button
+                className='h-[38px] w-full mb-[18px] flex justify-center items-center my-2'
+                type='default'
+                size='large'
+                icon={<CloseCircleOutlined />}
+              >
+                <p className='text-[13px]'>Abandon</p>
+              </Button>
+            )}
+          </div>
+        )}
+
+      {/* UI for Execution */}
+      {currentProposalData?.status === 'execution' && (
+        <div className='mt-2'>
+          <hr className='mb-2' />
+          <Card
+            className='w-full flex flex-col  bg-white rounded-lg'
+            bodyStyle={{ padding: '12px' }}
+          >
+            <div className='flex flex-col gap-1'>
+              {currentProposalData?.tally_id ? (
+                <p className='text-[10px]'>Completed</p>
+              ) : (
+                <></>
+              )}
+              <div className='flex justify-between items-center'>
+                <p className='text-[13px] font-semibold text-left'>Execution</p>
+                {/* {openDescOnchainVoting ? (
+                  <UpOutlined onClick={handleOpenDescOnchainVoting} />
+                ) : (
+                  <DownOutlined onClick={handleOpenDescOnchainVoting} />
+                )} */}
+              </div>
+            </div>
+          </Card>
         </div>
       )}
     </div>
