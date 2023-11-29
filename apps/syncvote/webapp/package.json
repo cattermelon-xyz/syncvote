@@ -66,7 +66,8 @@
     "@metamask/sdk-react": "^0.12.0",
     "@snapshot-labs/snapshot.js": "^0.8.1",
     "@apollo/client": "3.8.7",
-    "graphql": "16.8.1"
+    "graphql": "16.8.1",
+    "ethers": "6.9.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.0",
