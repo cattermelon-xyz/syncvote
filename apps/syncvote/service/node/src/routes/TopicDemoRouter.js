@@ -5,5 +5,9 @@ const TopicController = require('../controllers/TopicDemoController');
 router.post('/create', TopicController.createTopic);
 router.get('/get-posts', TopicController.getPosts);
 router.post('/update-category', TopicController.updateCategory);
+router.post(
+  '/update-desc-and-move-category',
+  TopicController.updateDescAndMoveCategory
+);
 
 module.exports = router;

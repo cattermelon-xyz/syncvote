@@ -14,8 +14,8 @@ import axios from 'axios';
 const backEndUrl = import.meta.env.VITE_SERVER_URL;
 
 const defaultTitle = 'loading ...';
-
-export const CreateTopic = () => {
+const defaultDesc = 'loading ...';
+export const UpdateDescAndMoveCat = () => {
   const location = useLocation();
   const { missions_demo_id } = useParams();
   const queryParams = new URLSearchParams(location.search);
@@ -24,7 +24,7 @@ export const CreateTopic = () => {
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState(defaultTitle);
-  const [description, setDescription] = useState(snapshotDesc);
+  const [description, setDescription] = useState(defaultDesc);
 
   useEffect(() => {
     supabase
@@ -34,27 +34,33 @@ export const CreateTopic = () => {
       .then((res) => {
         if (res.data) {
           setTitle(res.data[0].title);
+          axios
+            .get(
+              `https://discourse.syncvote.shop/posts/${res.data[0].first_post_id}`
+            )
+            .then((res) => {
+              if (res.data) {
+                setDescription(res.data.raw);
+              }
+            });
         }
       });
   }, [missions_demo_id]);
   const navigate = useNavigate();
-  const createTopic = async () => {
+  const savePost = async () => {
     dispatch(startLoading({}));
     // logic here
     const discourseData = {
-      title: title,
       raw: description,
       id_mission: missions_demo_id,
     };
     await axios
-      .post(`${backEndUrl}/demo/create`, discourseData)
+      .post(`${backEndUrl}/demo/update-desc-and-move-category`, discourseData)
       .then((res) => {
-        setTitle(defaultTitle);
-        setDescription('');
         Modal.success({
           title: 'Success',
           content:
-            'Create a Topic successfully, please continue on your extension',
+            'Update Post successfully, please continue on your extension',
           onOk: () => {
             navigate('/');
           },
@@ -80,7 +86,7 @@ export const CreateTopic = () => {
             className='text-2xl font-bold'
             style={{ color: 'var(--foundation-grey-g-7, #252422)' }}
           >
-            Create a post on Discourse
+            Update Discourse Post
           </span>
         </div>
         <div className='flex w-full mb-4 h-[500px] gap-4'>
@@ -89,7 +95,7 @@ export const CreateTopic = () => {
             <Input
               className='w-full h-12 px-4 py-[13px]'
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              disabled
             />
             <div className='mb-1 font-bold'>Topic content</div>
             <div>
@@ -111,9 +117,9 @@ export const CreateTopic = () => {
           <Button
             type='primary'
             className='h-[46px] text-[17px]'
-            onClick={createTopic}
+            onClick={savePost}
           >
-            Publish topic
+            Save
           </Button>
         </div>
       </div>

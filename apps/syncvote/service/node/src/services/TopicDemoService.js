@@ -8,6 +8,9 @@ const apiUserName = process.env.API_USERNAME;
 const createTopic = async (reqBody) => {
   try {
     // Make API call to Discourse
+    console.log('try: https://discourse.syncvote.shop/posts');
+    console.log('apiKey: ', apiKey);
+    console.log('api-username: ', apiUserName);
     const response = await axios.post(
       `https://discourse.syncvote.shop/posts`,
       {
@@ -41,8 +44,10 @@ const createTopic = async (reqBody) => {
     }
     return response.data;
   } catch (e) {
-    console.error('Error creating topic:', e);
-    throw e;
+    console.error('Error creating topic: ', e.message);
+    throw {
+      message: e.response.data.errors[0],
+    };
   }
 };
 
@@ -127,8 +132,41 @@ const updateCategory = async (reqBody) => {
   }
 };
 
+const updatePost = async (reqBody) => {
+  try {
+    const { data, error } = await supabase
+      .from('demo_missions')
+      .select('*')
+      .eq('id', reqBody.mission_id);
+
+    if (error) {
+      console.log('error update post', error);
+    }
+    console.log('data mission demo', data);
+    const postId = data[0]?.first_post_id;
+
+    const url = `https://discourse.syncvote.shop/posts/${postId}.json`;
+
+    const payload = {
+      raw: reqBody.raw,
+      edit_reason: 'Finalize the proposal',
+    };
+    const response = await axios.put(url, payload, {
+      headers: {
+        'Api-Key': apiKey,
+        'Api-Username': apiUserName,
+      },
+    });
+    return response.data;
+  } catch (e) {
+    console.error('Error get post:', e);
+    throw e;
+  }
+};
+
 module.exports = {
   createTopic,
   getPosts,
   updateCategory,
+  updatePost,
 };

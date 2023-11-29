@@ -1,7 +1,7 @@
 import { Button, Input, Modal, Space } from 'antd';
 import { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
-import { body, snapshotDesc, useWindowSize } from './funcs';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { snapshotDesc, useWindowSize } from './funcs';
 import TextEditor from 'rich-text-editor/src/TextEditor/TextEditor';
 import parse from 'html-react-parser';
 import './snapshot.scss';
@@ -21,30 +21,43 @@ export const CreateSnapshot = () => {
   const size = useWindowSize();
   const dispatch = useDispatch();
 
-  const title =
-    type === 'idle'
-      ? 'IDLE transfer to Leagues'
-      : 'stkIDLE transfer to Leagues';
+  useEffect(() => {
+    supabase
+      .from('demo_missions')
+      .select('*')
+      .eq('id', missions_demo_id)
+      .then((res) => {
+        if (res.data) {
+          type === 'idle'
+            ? setTitle('[IDLE] ' + res.data[0].title)
+            : setTitle('[stIDLE] ' + res.data[0].title);
+        }
+      });
+  }, [missions_demo_id]);
+
+  const [title, setTitle] = useState('loading ...');
   const [description, setDescription] = useState(snapshotDesc);
   const [discussion, setDiscussion] = useState('');
-
+  const navigate = useNavigate();
   const createProposal = async () => {
     dispatch(startLoading({}));
     let web3;
     const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
     const client = new snapshot.Client712(hub);
-
+    console.log('1');
     if (isExternalProvider(window.ethereum)) {
       web3 = new Web3Provider(window.ethereum);
+      console.log('web3 ', web3);
     }
-
+    console.log('web3 ', web3);
+    console.log('2');
     if (web3) {
       const accounts = await web3.listAccounts();
       const receipt = await client.proposal(web3, accounts[0], {
         space: 'hectagon.eth',
         type: 'basic',
         title: `[${title}] Testing Syncvote MVP`,
-        body: body,
+        body: description,
         choices: ['For', 'Against', 'Abstain'],
         start: moment().unix(),
         end: moment().unix() + 3600,
@@ -53,7 +66,7 @@ export const CreateSnapshot = () => {
         app: 'my-app',
         discussion: discussion,
       });
-
+      console.log('3');
       if (receipt) {
         const something: any = receipt;
         const link = `https://snapshot.org/#/hectagon.eth/proposal/${something?.id}`;
@@ -72,14 +85,18 @@ export const CreateSnapshot = () => {
         if (!error) {
           Modal.success({
             title: 'Success',
-            content: 'Create a snapshot proposal successfully',
+            content:
+              'Create a snapshot proposal successfully, please ask your peer to vote for the proposal!',
+            onOk: () => {
+              navigate('/');
+            },
           });
         } else {
           console.log(error);
 
           Modal.error({
             title: 'Error',
-            content: 'Create a snapshot proposal fail',
+            content: 'Fail to create snapshot proposal',
           });
         }
       }
@@ -87,7 +104,7 @@ export const CreateSnapshot = () => {
     }
   };
   return (
-    <>
+    <div className='snapshot'>
       <div className='m-6 w-full'>
         <div className='header mb-4'>
           <span
@@ -111,8 +128,8 @@ export const CreateSnapshot = () => {
               </div>
               <Input
                 className='w-full h-12 px-4 py-[13px]'
-                disabled
                 value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </div>
             <div className='flex-col mb-3'>
@@ -164,6 +181,6 @@ export const CreateSnapshot = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };

@@ -4,6 +4,7 @@ import Input from 'antd/es/input/Input';
 import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
 import { createProposalDemo } from '@data/org';
+import { resetLastProposalId } from '../utils';
 
 interface Props {
   setPage: any;
@@ -27,6 +28,10 @@ const CreateProposal: React.FC<Props> = ({ setPage, setCurrentProposalId }) => {
       },
     });
   };
+
+  useEffect(() => {
+    resetLastProposalId();
+  });
 
   return (
     <div>

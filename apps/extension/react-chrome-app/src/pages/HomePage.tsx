@@ -3,6 +3,8 @@ import { BellOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import CheckpointCard from '@components/CheckpointCard';
 import { PAGE_ROUTER } from '@constants/common';
+import { useEffect } from 'react';
+import { resetLastProposalId } from '../utils';
 
 interface Props {
   setPage: any;
@@ -20,6 +22,10 @@ const HomePage: React.FC<Props> = ({
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };
+
+  useEffect(() => {
+    resetLastProposalId();
+  });
 
   const items: TabsProps['items'] = [
     {

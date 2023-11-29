@@ -1,4 +1,5 @@
 import { getCurrentUser } from '@configs/getCurrentUser';
+import { getLastProposalId } from '@configs/getLastProposalId';
 import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
 import {
@@ -25,10 +26,14 @@ function App() {
         console.log('user is not found');
       }
     });
+    getLastProposalId().then((resp) => {
+      if (resp) {
+        setCurrentProposalId(resp.id);
+      }
+    });
   }, []);
 
   useEffect(() => {
-    console.log('test user', user);
     if (user) {
       queryDemo({
         onSuccess: (data) => {
@@ -47,7 +52,8 @@ function App() {
   }, [user, page]);
 
   useEffect(() => {
-    if (currentProposalId && dataDemo) {
+    console.log('inUseEffect ** currentProposalId', currentProposalId);
+    if (currentProposalId && currentProposalId !== -1 && dataDemo) {
       const data = dataDemo.filter(
         (data: any) => data.id === currentProposalId
       );
@@ -58,13 +64,19 @@ function App() {
   useEffect(() => {
     console.log('dataDemo', dataDemo);
     console.log('currentProposalId', currentProposalId);
-    console.log('currentProposalData on Homepage', currentProposalData);
   }, [dataDemo, currentProposalData, currentProposalId]);
 
   return (
     <div className='w-[260px] h-[380px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
       {user === null || user === undefined ? (
         <Login />
+      ) : currentProposalData ? (
+        <Voting
+          setPage={setPage}
+          currentProposalData={currentProposalData}
+          setCurrentProposalId={setCurrentProposalId}
+          setCurrentProposalData={setCurrentProposalData}
+        />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
         <HomePage
           user={user}
@@ -79,13 +91,6 @@ function App() {
         />
       ) : page === PAGE_ROUTER.DONE_CREATE_PROPOSAL ? (
         <DoneCreateProposal setPage={setPage} />
-      ) : page === PAGE_ROUTER.VOTING && currentProposalData ? (
-        <Voting
-          setPage={setPage}
-          currentProposalData={currentProposalData}
-          setCurrentProposalId={setCurrentProposalId}
-          setCurrentProposalData={setCurrentProposalData}
-        />
       ) : (
         <></>
       )}

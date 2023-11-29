@@ -12,6 +12,7 @@ import DoneIcon from '@assets/icons/DoneIcon';
 import { updateProposalDemo } from '@data/org';
 import Success from '@assets/icons/Success';
 import axios from 'axios';
+import { trimTitle } from '../utils';
 
 interface Props {
   setPage: any;
@@ -71,10 +72,6 @@ const Voting: React.FC<Props> = ({
   };
 
   const handleMoveDiscourse = async () => {
-    // await chrome.runtime.sendMessage({
-    //   action: 'handleMoveDiscourse',
-    //   payload: { url: 'https://www.google.com.vn/?hl=vi' },
-    // });
     updateProposalDemo({
       demoProposalId: currentProposalData?.id,
       status: 'onchain_voting',
@@ -129,6 +126,16 @@ const Voting: React.FC<Props> = ({
 
   useEffect(() => {
     console.log('currentProposalData in voting page', currentProposalData);
+    // let's persist the data
+    if (currentProposalData) {
+      const saveLastProposalId = async () => {
+        await chrome.runtime.sendMessage({
+          action: 'saveLastProposalId',
+          payload: currentProposalData.id,
+        });
+      };
+      saveLastProposalId();
+    }
   }, [currentProposalData]);
 
   return (
@@ -138,9 +145,13 @@ const Voting: React.FC<Props> = ({
         <LeftOutlined
           onClick={() => {
             setPage(PAGE_ROUTER.HOME_PAGE);
+            setCurrentProposalData(null);
+            setCurrentProposalId(-1);
           }}
         />
-        <p className='w-full mt-3 text-[15px]'>{currentProposalData?.title}</p>
+        <p className='w-full mt-3 text-[15px]'>
+          {trimTitle(currentProposalData?.title)}
+        </p>
         <p
           className='w-full mt-2 text-[10px] cursor-pointer text-[#6200EE]'
           onClick={() => openInNewTab(urlViewWorkflow)}

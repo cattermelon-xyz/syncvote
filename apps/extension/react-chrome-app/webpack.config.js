@@ -5,6 +5,7 @@ const tailwindcss = require('tailwindcss');
 const Dotenv = require('dotenv-webpack');
 
 console.log('in webpack.config.js');
+console.log('output path: ', path.resolve(__dirname, '..', 'chrome-extension'));
 module.exports = {
   entry: {
     popup: path.resolve('./src/index.tsx'),

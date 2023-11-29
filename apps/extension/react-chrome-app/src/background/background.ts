@@ -62,6 +62,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
 
+    case 'saveLastProposalId': {
+      chrome.storage.sync.set({
+        [chromeStorageKeys.lastProposalId]: parseInt(request.payload),
+      });
+      break;
+    }
     default:
       break;
   }
