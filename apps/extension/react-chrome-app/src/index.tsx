@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { ConfigProvider } from 'antd';
 
 const rootElement = document.createElement('div');
 rootElement.id = 'react-chrome-app';
@@ -27,7 +28,20 @@ document.body.appendChild(rootElement);
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#5D23BB',
+          colorLink: '#5D23BB',
+          colorSuccessBg: '#EAF6EE',
+          colorSuccessText: '#29A259',
+          colorTextDisabled: '#BDA5E3',
+          colorBgContainerDisabled: '#F4F0FA',
+        },
+      }}
+    >
+      <App />
+    </ConfigProvider>
   </React.StrictMode>
 );
 
