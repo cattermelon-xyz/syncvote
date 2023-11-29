@@ -4,16 +4,13 @@ import { useLocation, useParams } from 'react-router-dom';
 import { snapshotDesc, useWindowSize } from './funcs';
 import TextEditor from 'rich-text-editor/src/TextEditor/TextEditor';
 import parse from 'html-react-parser';
-import './snapshot.scss';
+import './topic.scss';
 import moment from 'moment';
-import { isExternalProvider } from '@pages/Mission/MissionVotingDetail';
-import { Web3Provider } from '@ethersproject/providers';
-import snapshot from '@snapshot-labs/snapshot.js';
 import { supabase } from 'utils';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 
-export const CreateSnapshot = () => {
+export const CreateTopic = () => {
   const location = useLocation();
   const { missions_demo_id } = useParams();
   const queryParams = new URLSearchParams(location.search);
@@ -21,70 +18,13 @@ export const CreateSnapshot = () => {
   const size = useWindowSize();
   const dispatch = useDispatch();
 
-  const title =
-    type === 'idle'
-      ? 'IDLE transfer to Leagues'
-      : 'stkIDLE transfer to Leagues';
+  const title = 'IDLE transfer to Leagues';
   const [description, setDescription] = useState(snapshotDesc);
-  const [discussion, setDiscussion] = useState('');
 
-  const createProposal = async () => {
+  const createTopic = async () => {
     dispatch(startLoading({}));
-    let web3;
-    const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-    const client = new snapshot.Client712(hub);
-
-    if (isExternalProvider(window.ethereum)) {
-      web3 = new Web3Provider(window.ethereum);
-    }
-
-    if (web3) {
-      const accounts = await web3.listAccounts();
-      const receipt = await client.proposal(web3, accounts[0], {
-        space: 'hectagon.eth',
-        type: 'basic',
-        title: `[${title}] Testing Syncvote MVP`,
-        body: ``,
-        choices: ['For', 'Against', 'Abstain'],
-        start: moment().unix(),
-        end: moment().unix() + 3600,
-        snapshot: 13620822,
-        plugins: JSON.stringify({}),
-        app: 'my-app',
-        discussion: discussion,
-      });
-
-      if (receipt) {
-        const something: any = receipt;
-        const link = `https://snapshot.org/#/hectagon.eth/proposal/${something?.id}`;
-
-        const { error } = await supabase
-          .from('demo_missions')
-          .update(
-            type === 'idle'
-              ? { snapshot_idle_id: link }
-              : { snapshot_stidle_id: link }
-          )
-          .eq('id', Number(missions_demo_id || 1));
-
-        dispatch(finishLoading({}));
-
-        if (!error) {
-          Modal.success({
-            title: 'Success',
-            content: 'Create a snapshot proposal successfully',
-          });
-        } else {
-          console.log(error);
-
-          Modal.error({
-            title: 'Error',
-            content: 'Create a snapshot proposal fail',
-          });
-        }
-      }
-      dispatch(finishLoading({}));
-    }
+    // logic here
+    dispatch(finishLoading({}));
   };
   return (
     <>
@@ -94,7 +34,7 @@ export const CreateSnapshot = () => {
             className='text-[20px] font-semibold'
             style={{ color: 'var(--foundation-grey-g-7, #252422)' }}
           >
-            Create a Snapshot IDLE proposal
+            Create a post on Discourse
           </span>
         </div>
         <div className='flex w-full mb-4 h-[630px]'>
@@ -107,7 +47,7 @@ export const CreateSnapshot = () => {
           >
             <div className='flex-col mb-3'>
               <div className='text-[#575655] text-[13px] font-normal mb-2'>
-                Title
+                Topic title
               </div>
               <Input
                 className='w-full h-12 px-4 py-[13px]'
@@ -117,29 +57,16 @@ export const CreateSnapshot = () => {
             </div>
             <div className='flex-col mb-3'>
               <div className='text-[#575655] text-[13px] font-normal mb-2'>
-                Description
+                Topic content
               </div>
               <div>
                 <TextEditor
                   value={description}
                   setValue={(val: string) => {
                     setDescription(val);
-                    console.log(val);
                   }}
                 />
               </div>
-            </div>
-            <div className='flex-col mb-3'>
-              <div className='text-[#575655] text-[13px] font-normal mb-2'>
-                Discussion (optional)
-              </div>
-              <Input
-                value={discussion}
-                onChange={(e: any) => {
-                  setDiscussion(e.target.value);
-                }}
-                className='w-full h-12 px-4 py-[13px]'
-              />
             </div>
           </div>
           <div
@@ -157,9 +84,9 @@ export const CreateSnapshot = () => {
             </Button>
             <Button
               className='mr-4 h-[46px] text-[17px] font-normal flex items-center justify-center bg-[#6200EE] text-white'
-              onClick={createProposal}
+              onClick={createTopic}
             >
-              Publish on Snapshot
+              Publish topic
             </Button>
           </div>
         </div>

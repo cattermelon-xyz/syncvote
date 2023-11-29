@@ -1,10 +1,10 @@
 import App from '@App';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
-import { EditVersion } from '@pages/Workflow/Version';
 import React from 'react';
 import { Route } from 'react-router-dom';
 import RequireAuth from './RequireAuth';
 import { CreateSnapshot } from '@pages/Demo/CreateSnapshot';
+import { CreateTopic } from '@pages/Demo/CreateTopic';
 
 export default (
   <React.Fragment>
@@ -16,7 +16,7 @@ export default (
         </RequireAuth>
       }
     >
-      {/* <Route path='create_topic/:missions_demo_id' element={<EditVersion />} /> */}
+      <Route path='create_topic/:missions_demo_id' element={<CreateTopic />} />
       <Route
         path='create_snapshot/:missions_demo_id'
         element={<CreateSnapshot />}
