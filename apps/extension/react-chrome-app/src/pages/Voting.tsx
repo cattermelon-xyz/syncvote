@@ -52,21 +52,21 @@ const Voting: React.FC<Props> = ({
   };
 
   const handleMoveDiscourse = async () => {
-    await chrome.runtime.sendMessage({
-      action: 'handleMoveDiscourse',
-      payload: { url: 'https://www.google.com.vn/?hl=vi' },
-    });
-    // updateProposalDemo({
-    //   demoProposalId: currentProposalData?.id,
-    //   status: 'onchain_voting',
-    //   onSuccess: (data) => {
-    //     console.log('update proposal success', data);
-    //     // setCurrentProposalData(data);
-    //   },
-    //   onError: (error) => {
-    //     console.log('error', error);
-    //   },
+    // await chrome.runtime.sendMessage({
+    //   action: 'handleMoveDiscourse',
+    //   payload: { url: 'https://www.google.com.vn/?hl=vi' },
     // });
+    updateProposalDemo({
+      demoProposalId: currentProposalData?.id,
+      status: 'onchain_voting',
+      onSuccess: (data) => {
+        console.log('update proposal success', data);
+        setCurrentProposalData(data);
+      },
+      onError: (error) => {
+        console.log('error', error);
+      },
+    });
   };
 
   const handleCreateTally = async () => {
@@ -149,7 +149,9 @@ const Voting: React.FC<Props> = ({
               onClick={handlePostDiscourse}
             >
               <Discourse />
-              <p className='text-[13px] ml-[2px]'>Create a post on Discourse</p>
+              <p className='text-[13px] ml-[2px]'>
+                Create a topic on Discourse
+              </p>
             </Button>
           )}
         </div>
@@ -218,7 +220,7 @@ const Voting: React.FC<Props> = ({
               className='w-full mt-1 flex flex-col'
               bodyStyle={{ padding: '12px' }}
             >
-              {currentProposalData?.snapshot_status === 'Done' ? (
+              {currentProposalData?.snapshot_idle_status === 'Done' ? (
                 <Tag color='green'>Success</Tag>
               ) : (
                 <Tag color='orange'>Ongoing</Tag>
@@ -242,10 +244,10 @@ const Voting: React.FC<Props> = ({
           )}
           {currentProposalData?.snapshot_stidle_id !== null ? (
             <Card
-              className='w-full mt-1 flex flex-col '
+              className='w-full mt-1 flex flex-col'
               bodyStyle={{ padding: '12px' }}
             >
-              {currentProposalData?.snapshot_status === 'Done' ? (
+              {currentProposalData?.snapshot_stidle_status === 'Done' ? (
                 <Tag color='green'>Success</Tag>
               ) : (
                 <Tag color='orange'>Ongoing</Tag>
@@ -292,7 +294,8 @@ const Voting: React.FC<Props> = ({
               bodyStyle={{ padding: '12px' }}
             >
               <div className='flex flex-col gap-1'>
-                {currentProposalData?.discourse_topic_move ? (
+                {currentProposalData?.status === 'onchain_voting' ||
+                currentProposalData?.status === 'execution' ? (
                   <p className='text-[10px]'>Completed</p>
                 ) : (
                   <></>
@@ -318,7 +321,8 @@ const Voting: React.FC<Props> = ({
                 </div>
               )}
             </Card>
-            {currentProposalData?.discourse_topic_move !== null ? (
+            {currentProposalData?.status === 'onchain_voting' ||
+            currentProposalData?.status === 'execution' ? (
               <Card
                 className='w-full mt-1 flex flex-col'
                 bodyStyle={{ padding: '12px' }}
@@ -326,7 +330,7 @@ const Voting: React.FC<Props> = ({
                 <div className='flex mt-2'>
                   <DoneIcon />
                   <p className='w-[190px] ml-1 text-[10px] truncate ...'>
-                    {currentProposalData?.discourse_topic_move}
+                    {currentProposalData?.discourse_topic_id}
                   </p>
                 </div>
               </Card>
@@ -337,10 +341,13 @@ const Voting: React.FC<Props> = ({
                 onClick={handleMoveDiscourse}
               >
                 <Discourse />
-                <p className='text-[13px] ml-[2px]'>Move a post on Discourse</p>
+                <p className='text-[13px] ml-[2px] w-[190px] truncate ...'>
+                  Update and move topic on Discourse
+                </p>
               </Button>
             )}
-            {currentProposalData?.discourse_topic_move !== null ? (
+            {currentProposalData?.status === 'onchain_voting' ||
+            currentProposalData?.status === 'execution' ? (
               <></>
             ) : (
               <Button

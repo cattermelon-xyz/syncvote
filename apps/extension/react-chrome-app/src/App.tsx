@@ -32,6 +32,11 @@ function App() {
     if (user) {
       queryDemo({
         onSuccess: (data) => {
+          data.sort(
+            (a: any, b: any) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+          );
           setDataDemo(data);
         },
         onError: (error) => {
@@ -62,6 +67,7 @@ function App() {
         <Login />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
         <HomePage
+          user={user}
           setPage={setPage}
           dataDemo={dataDemo}
           setCurrentProposalId={setCurrentProposalId}

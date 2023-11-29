@@ -8,18 +8,18 @@ interface Props {
   setPage: any;
   dataDemo: any;
   setCurrentProposalId: any;
+  user: any;
 }
 
 const HomePage: React.FC<Props> = ({
   setPage,
   dataDemo,
   setCurrentProposalId,
+  user,
 }) => {
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };
-
-  
 
   const items: TabsProps['items'] = [
     {
@@ -58,7 +58,7 @@ const HomePage: React.FC<Props> = ({
           <div className='flex rounded-full h-[28px] w-[28px] bg-[#E6E6E6] justify-center cursor-pointer'>
             <BellOutlined style={{ fontSize: '20px' }} />
           </div>
-          <Avatar />
+          <Avatar src={user?.user_metadata?.avatar_url} />
         </div>
       </div>
       <div className='flex justify-between items-center'>
