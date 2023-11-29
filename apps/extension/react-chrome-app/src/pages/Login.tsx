@@ -3,7 +3,8 @@ import LogoSyncVote from '@assets/icons/LogoSyncVote';
 import { Button } from 'antd';
 import Google from '@assets/icons/Google';
 import { supabase } from '@configs/supabaseClient';
-
+import { useEffect } from 'react';
+import { resetLastProposalId } from '../utils';
 
 const Login = () => {
   const signInWithGoogle = async () => {
@@ -17,6 +18,10 @@ const Login = () => {
       payload: { url: data.url },
     });
   };
+
+  useEffect(() => {
+    resetLastProposalId();
+  });
 
   return (
     <div className='flex flex-col mt-[84px] gap-7 justify-between items-center'>
