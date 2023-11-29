@@ -7,7 +7,6 @@ import {
   INavPanelNode,
   CollapsiblePanel,
   SideNote,
-  ResultCalculator,
 } from 'directed-graph';
 import NewOptionDrawer from './NewOptionDrawer';
 import { PlusOutlined } from '@ant-design/icons';
@@ -38,7 +37,7 @@ export default (props: IVoteMachineConfigProps) => {
       token: '', // spl token
       options: [],
       space: '',
-      type: '',
+      type: {},
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -301,14 +300,14 @@ export default (props: IVoteMachineConfigProps) => {
                 </Popover>
               </div>
               <Select
-                value={data.type}
+                value={data.type.label}
                 className='w-full'
                 options={selectOptions}
-                onChange={(value) => {
+                onChange={(value, option) => {
                   onChange({
                     data: {
                       ...data,
-                      type: value,
+                      type: option,
                     },
                   });
                 }}
