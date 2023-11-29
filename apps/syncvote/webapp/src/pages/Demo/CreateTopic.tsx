@@ -13,6 +13,7 @@ import axios from 'axios';
 
 const apiKey = import.meta.env.VITE_API_KEY;
 const apiUserName = import.meta.env.VITE_API_USERNAME;
+const backEndUrl = import.meta.env.VITE_SERVER_URL;
 
 export const CreateTopic = () => {
   const location = useLocation();
@@ -36,7 +37,7 @@ export const CreateTopic = () => {
     };
 
     const response = await axios.post(
-      `http://localhost:3000/api/demo/create`,
+      `${backEndUrl}/demo/create`,
       discourseData
     );
 
