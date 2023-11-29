@@ -40,7 +40,9 @@ const Voting: React.FC<Props> = ({
   const handlePostDiscourse = async () => {
     await chrome.runtime.sendMessage({
       action: 'handlePostDiscourse',
-      payload: { url: 'https://www.google.com.vn/?hl=vi' },
+      payload: {
+        url: `http://localhost:3001/demo/create_topic/${currentProposalData.id}`,
+      },
     });
   };
 
