@@ -3,7 +3,7 @@ import CreateProposal from './CreateProposal';
 import HomePage from './HomePage';
 import DoneCreateProposal from './DoneCreateProposal';
 import Voting from './Voting';
-import ScreenNine from './ScreenNine';
+
 
 export {
   Login,
@@ -11,5 +11,4 @@ export {
   HomePage,
   DoneCreateProposal,
   Voting,
-  ScreenNine,
 };
