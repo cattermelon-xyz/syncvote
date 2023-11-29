@@ -9,6 +9,10 @@ import moment from 'moment';
 import { supabase } from 'utils';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+import axios from 'axios';
+
+const apiKey = import.meta.env.VITE_API_KEY;
+const apiUserName = import.meta.env.VITE_API_USERNAME;
 
 export const CreateTopic = () => {
   const location = useLocation();
@@ -24,6 +28,20 @@ export const CreateTopic = () => {
   const createTopic = async () => {
     dispatch(startLoading({}));
     // logic here
+
+    const discourseData = {
+      title: title,
+      raw: description,
+      id_mission: missions_demo_id,
+    };
+
+    const response = await axios.post(
+      `http://localhost:3000/api/demo/create`,
+      discourseData
+    );
+
+    console.log('create topic', response.data);
+
     Modal.success({
       title: 'Success',
       content:
@@ -31,6 +49,7 @@ export const CreateTopic = () => {
     });
     dispatch(finishLoading({}));
   };
+
   return (
     <>
       <div className='m-6 w-full'>

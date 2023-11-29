@@ -11,6 +11,7 @@ import { PAGE_ROUTER } from '@constants/common';
 import DoneIcon from '@assets/icons/DoneIcon';
 import { updateProposalDemo } from '@data/org';
 import Success from '@assets/icons/Success';
+import axios from 'axios';
 
 interface Props {
   setPage: any;
@@ -37,17 +38,33 @@ const Voting: React.FC<Props> = ({
   const handleOpenDescOnchainVoting = () =>
     setOpenDescOnchainVoting(!openDescOnchainVoting);
 
+  const frontEndUrl = 'http://localhost:3001';
+  const backEndUrl = 'http://localhost:3000';
+
   const handlePostDiscourse = async () => {
     await chrome.runtime.sendMessage({
       action: 'handlePostDiscourse',
-      payload: { url: 'https://www.google.com.vn/?hl=vi' },
+      payload: {
+        url: `${frontEndUrl}/demo/create_topic/${currentProposalData.id}`,
+      },
     });
   };
 
-  const handleCreateSnapshot = async () => {
+  const handleCreateSnapshotIdle = async () => {
     await chrome.runtime.sendMessage({
-      action: 'handleCreateSnapshot',
-      payload: { url: 'https://www.google.com.vn/?hl=vi' },
+      action: 'handleCreateSnapshotIdle',
+      payload: {
+        url: `${frontEndUrl}/demo/create_snapshot/${currentProposalData.id}?type=idle`,
+      },
+    });
+  };
+
+  const handleCreateSnapshotStIdle = async () => {
+    await chrome.runtime.sendMessage({
+      action: 'handleCreateSnapshotStIdle',
+      payload: {
+        url: `${frontEndUrl}/demo/create_snapshot/${currentProposalData.id}?type=stidle`,
+      },
     });
   };
 
@@ -88,6 +105,24 @@ const Voting: React.FC<Props> = ({
         console.log('error', error);
       },
     });
+
+    // call back-end and move to formal proposal
+    const discourseData = {
+      name_category: 'Formal Proposal',
+      mission_id: currentProposalData?.id,
+    };
+    const response = await axios.post(
+      `${backEndUrl}/api/demo/update-category`,
+      discourseData
+    );
+
+    console.log('response update category', response.data);
+  };
+
+  const openInNewTab = (url: any) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
   };
 
   useEffect(() => {
@@ -137,7 +172,12 @@ const Voting: React.FC<Props> = ({
             <Card className='w-full mt-1' bodyStyle={{ padding: '12px' }}>
               <div className='flex'>
                 <DoneIcon />
-                <p className='w-[190px] ml-1 text-[10px] truncate ...'>
+                <p
+                  className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ... '
+                  onClick={() =>
+                    openInNewTab(currentProposalData?.discourse_topic_id)
+                  }
+                >
                   {currentProposalData?.discourse_topic_id}
                 </p>
               </div>
@@ -227,7 +267,12 @@ const Voting: React.FC<Props> = ({
               )}
               <div className='flex mt-2'>
                 <DoneIcon />
-                <p className='w-[190px] ml-1 text-[10px] truncate ...'>
+                <p
+                  className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ...'
+                  onClick={() =>
+                    openInNewTab(currentProposalData?.snapshot_idle_id)
+                  }
+                >
                   {currentProposalData?.snapshot_idle_id}
                 </p>
               </div>
@@ -236,7 +281,7 @@ const Voting: React.FC<Props> = ({
             <Button
               className='h-[38px] w-full px-4 mt-2 flex justify-center items-center bg-[#000]'
               type='primary'
-              onClick={handleCreateSnapshot}
+              onClick={handleCreateSnapshotIdle}
             >
               {/* <Discourse /> */}
               <p className='text-[13px] ml-[2px]'>Create a Snapshot IDLE</p>
@@ -254,7 +299,12 @@ const Voting: React.FC<Props> = ({
               )}
               <div className='flex mt-2'>
                 <DoneIcon />
-                <p className='w-[190px] ml-1 text-[10px] truncate ...'>
+                <p
+                  className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ...'
+                  onClick={() =>
+                    openInNewTab(currentProposalData?.snapshot_stidle_id)
+                  }
+                >
                   {currentProposalData?.snapshot_stidle_id}
                 </p>
               </div>
@@ -263,7 +313,7 @@ const Voting: React.FC<Props> = ({
             <Button
               className='h-[38px] w-full px-4 mt-2 flex justify-center items-center bg-[#000]'
               type='primary'
-              onClick={handleCreateSnapshot}
+              onClick={handleCreateSnapshotStIdle}
             >
               {/* <Discourse /> */}
               <p className='text-[13px] ml-[2px]'>Create a Snapshot stkIDLE</p>
@@ -329,7 +379,12 @@ const Voting: React.FC<Props> = ({
               >
                 <div className='flex mt-2'>
                   <DoneIcon />
-                  <p className='w-[190px] ml-1 text-[10px] truncate ...'>
+                  <p
+                    className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ...'
+                    onClick={() =>
+                      openInNewTab(currentProposalData?.discourse_topic_id)
+                    }
+                  >
                     {currentProposalData?.discourse_topic_id}
                   </p>
                 </div>
@@ -430,7 +485,10 @@ const Voting: React.FC<Props> = ({
                 )}
                 <div className='flex mt-2'>
                   <DoneIcon />
-                  <p className='w-[190px] ml-1 text-[10px] truncate ...'>
+                  <p
+                    className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ...'
+                    onClick={() => openInNewTab(currentProposalData?.tally_id)}
+                  >
                     {currentProposalData?.tally_id}
                   </p>
                 </div>
