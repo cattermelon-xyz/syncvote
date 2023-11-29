@@ -5,6 +5,7 @@ import { Route } from 'react-router-dom';
 import RequireAuth from './RequireAuth';
 import { CreateSnapshot } from '@pages/Demo/CreateSnapshot';
 import { CreateTopic } from '@pages/Demo/CreateTopic';
+import { UpdateDescAndMoveCat } from '@pages/Demo/UpdateDescAndMoveCat';
 
 export default (
   <React.Fragment>
@@ -17,6 +18,10 @@ export default (
       }
     >
       <Route path='create_topic/:missions_demo_id' element={<CreateTopic />} />
+      <Route
+        path='update_desc_move_post/:missions_demo_id'
+        element={<UpdateDescAndMoveCat />}
+      />
       <Route
         path='create_snapshot/:missions_demo_id'
         element={<CreateSnapshot />}
