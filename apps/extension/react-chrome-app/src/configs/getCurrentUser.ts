@@ -11,7 +11,7 @@ export async function getCurrentUser(): Promise<null | {
   const gauthRefreshToken = (
     await chrome.storage.sync.get(chromeStorageKeys.gauthRefreshToken)
   )[chromeStorageKeys.gauthRefreshToken];
-  
+
   if (gauthAccessToken && gauthRefreshToken) {
     try {
       // set user session from access_token and refresh_token
