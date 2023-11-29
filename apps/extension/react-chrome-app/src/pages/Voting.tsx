@@ -38,8 +38,10 @@ const Voting: React.FC<Props> = ({
   const handleOpenDescOnchainVoting = () =>
     setOpenDescOnchainVoting(!openDescOnchainVoting);
 
-  const frontEndUrl = 'http://localhost:3001';
-  const backEndUrl = 'http://localhost:3000';
+  const frontEndUrl = 'https://main.syncvote.com';
+  const backEndUrl = 'https://syncvote-test.onrender.com/api';
+  const urlViewWorkflow =
+    'https://main.syncvote.com/public/idle-governance-process-229/idle-dao-governance-process-300/320';
 
   const handlePostDiscourse = async () => {
     await chrome.runtime.sendMessage({
@@ -139,6 +141,12 @@ const Voting: React.FC<Props> = ({
           }}
         />
         <p className='w-full mt-3 text-[15px]'>{currentProposalData?.title}</p>
+        <p
+          className='w-full mt-2 text-[10px] cursor-pointer text-[#6200EE]'
+          onClick={() => openInNewTab(urlViewWorkflow)}
+        >
+          View workflow on Syncvote
+        </p>
         <div className='mb-3'>
           <Card
             className='w-full mt-9 flex flex-col  bg-white rounded-lg'

@@ -72,12 +72,6 @@ const CreateProposal: React.FC<Props> = ({ setPage, setCurrentProposalId }) => {
               },
             ]}
           />
-
-          {selectValue ? (
-            <p className='text-center'>View workflow on Syncvote</p>
-          ) : (
-            <></>
-          )}
         </div>
 
         <Button
