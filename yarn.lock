@@ -7959,6 +7959,11 @@ html-to-image@^1.11.11:
   resolved "https://registry.yarnpkg.com/html-to-image/-/html-to-image-1.11.11.tgz#c0f8a34dc9e4b97b93ff7ea286eb8562642ebbea"
   integrity sha512-9gux8QhvjRO/erSnDPv28noDZcPZmYE7e1vFsBLKLlRlKDSqNJYebj6Qz1TGd5lsRV+X+xYyjCKjuZdABinWjA==
 
+html-to-md@^0.8.4:
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/html-to-md/-/html-to-md-0.8.4.tgz#72dc14f07badd2083b7d474ffdb6ce02002f8891"
+  integrity sha512-8CkHtDbEAczChyU3uznhfRWavATklvW+tMoJBdasr/HkGKLATAi16gA9oi8KM1OmLZ/W9/0UYk4JlLm7rdw7bg==
+
 html-webpack-plugin@^5.5.0, html-webpack-plugin@^5.5.3:
   version "5.5.3"
   resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-5.5.3.tgz#72270f4a78e222b5825b296e5e3e1328ad525a3e"

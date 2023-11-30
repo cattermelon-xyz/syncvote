@@ -13,6 +13,7 @@ import { supabase } from 'utils';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
 import { useSDK } from '@metamask/sdk-react';
+import html2md from 'html-to-md';
 
 export const CreateSnapshot = () => {
   const location = useLocation();
@@ -61,6 +62,7 @@ export const CreateSnapshot = () => {
   const [description, setDescription] = useState(snapshotDesc);
   const [discussion, setDiscussion] = useState('');
   const navigate = useNavigate();
+  console.log(html2md(description));
   const createProposal = async () => {
     dispatch(startLoading({}));
     let web3;
@@ -79,10 +81,10 @@ export const CreateSnapshot = () => {
         space: 'hectagon.eth',
         type: 'basic',
         title: `${title}`,
-        body: description,
+        body: html2md(description),
         choices: ['For', 'Against', 'Abstain'],
         start: moment().unix(),
-        end: moment().unix() + 3600,
+        end: moment().unix() + 259200,
         snapshot: 13620822,
         plugins: JSON.stringify({}),
         app: 'my-app',
