@@ -150,7 +150,7 @@ const Voting: React.FC<Props> = ({
   }, [currentProposalData]);
 
   return (
-    <div>
+    <div className='pb-2'>
       {/* UI for idea_discussion */}
       <div>
         <LeftOutlined
@@ -200,10 +200,12 @@ const Voting: React.FC<Props> = ({
           </Card>
           {currentProposalData?.discourse_topic_id !== null ? (
             <Card className='w-full mt-1' bodyStyle={{ padding: '12px' }}>
-              <div className='flex'>
-                {currentProposalData.status !== 'idea_discussion' ? (
+              {currentProposalData.status !== 'idea_discussion' ? (
+                <div className='mb-2'>
                   <Tag color='green'>Success</Tag>
-                ) : null}
+                </div>
+              ) : null}
+              <div className='flex'>
                 <DoneIcon />
                 <p
                   className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ... '
@@ -410,8 +412,10 @@ const Voting: React.FC<Props> = ({
                 className='w-full mt-1 flex flex-col'
                 bodyStyle={{ padding: '12px' }}
               >
-                <div className='flex mt-2'>
+                <div>
                   <Tag color='green'>Success</Tag>
+                </div>
+                <div className='flex mt-2'>
                   <DoneIcon />
                   <p
                     className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ...'
@@ -518,7 +522,6 @@ const Voting: React.FC<Props> = ({
                   <Tag color='orange'>Ongoing</Tag>
                 )}
                 <div className='flex mt-2'>
-                  <Tag color='green'>Success</Tag>
                   <DoneIcon />
                   <p
                     className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ...'
@@ -590,6 +593,9 @@ const Voting: React.FC<Props> = ({
                 ) : (
                   <DownOutlined onClick={handleOpenDescOnchainVoting} />
                 )} */}
+              </div>
+              <div className='mt-1'>
+                <Tag color='green'>Success</Tag>
               </div>
             </div>
           </Card>

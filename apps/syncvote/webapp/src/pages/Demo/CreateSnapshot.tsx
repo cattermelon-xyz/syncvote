@@ -78,7 +78,7 @@ export const CreateSnapshot = () => {
       const receipt = await client.proposal(web3, accounts[0], {
         space: 'hectagon.eth',
         type: 'basic',
-        title: `[${title}] Testing Syncvote MVP`,
+        title: `${title}`,
         body: description,
         choices: ['For', 'Against', 'Abstain'],
         start: moment().unix(),
