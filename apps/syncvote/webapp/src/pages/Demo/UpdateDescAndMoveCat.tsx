@@ -35,9 +35,9 @@ export const UpdateDescAndMoveCat = () => {
         if (res.data) {
           setTitle(res.data[0].title);
           axios
-            .get(
-              `https://discourse.syncvote.shop/posts/${res.data[0].first_post_id}`
-            )
+            .post(`${backEndUrl}/demo/get-post`, {
+              id_mission: missions_demo_id,
+            })
             .then((res) => {
               if (res.data) {
                 setDescription(res.data.raw);
@@ -52,7 +52,7 @@ export const UpdateDescAndMoveCat = () => {
     // logic here
     const discourseData = {
       raw: description,
-      id_mission: missions_demo_id,
+      mission_id: missions_demo_id,
     };
     await axios
       .post(`${backEndUrl}/demo/update-desc-and-move-category`, discourseData)
