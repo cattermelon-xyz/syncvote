@@ -229,3 +229,27 @@ export const updateProposalDemo = async ({
     onError(error);
   }
 };
+
+export const updateTallyLink = async ({
+  demoProposalId,
+  linkTally,
+  onSuccess,
+  onError,
+}: {
+  demoProposalId: number;
+  linkTally: string;
+  onSuccess: (data: any) => void;
+  onError: (error: any) => void;
+}) => {
+  const { data, error } = await supabase
+    .from('demo_missions')
+    .update({ tally_id: linkTally })
+    .eq('id', demoProposalId)
+    .select('*');
+
+  if (!error) {
+    onSuccess(data[0]);
+  } else {
+    onError(error);
+  }
+};

@@ -89,6 +89,25 @@ const getPosts = async (reqBody) => {
   }
 };
 
+const getPost = async (reqBody) => {
+  console.log(reqBody);
+  try {
+    const { data, error } = await supabase
+      .from('demo_missions')
+      .select('*')
+      .eq('id', reqBody.id_mission);
+    if (error) {
+      console.log('error get-post', error);
+    }
+    const firstPostId = data[0]?.first_post_id;
+    console.log(`https://discourse.syncvote.shop/posts/${firstPostId}.json`);
+    const response = await axios.get(
+      `https://discourse.syncvote.shop/posts/${firstPostId}.json`
+    );
+    return response.data.raw;
+  } catch (error) {}
+};
+
 const updateCategory = async (reqBody) => {
   try {
     const { data, error } = await supabase
@@ -169,4 +188,5 @@ module.exports = {
   getPosts,
   updateCategory,
   updatePost,
+  getPost,
 };

@@ -62,6 +62,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
 
+    case 'handleEditPostAndMove': {
+      const url = request.payload.url;
+      chrome.tabs.create({ url: url, active: true }, (tab) => {
+        sendResponse(request.action + ' executed');
+      });
+      break;
+    }
+
     case 'saveLastProposalId': {
       chrome.storage.sync.set({
         [chromeStorageKeys.lastProposalId]: parseInt(request.payload),

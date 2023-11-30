@@ -1,4 +1,4 @@
-import { Button, Card, Tag } from 'antd';
+import { Button, Card, Tag, Input } from 'antd';
 import {
   CloseCircleOutlined,
   DownOutlined,
@@ -13,6 +13,7 @@ import { updateProposalDemo } from '@data/org';
 import Success from '@assets/icons/Success';
 import axios from 'axios';
 import { trimTitle } from '../utils';
+import { updateTallyLink } from '@data/org';
 
 interface Props {
   setPage: any;
@@ -72,15 +73,10 @@ const Voting: React.FC<Props> = ({
   };
 
   const handleMoveDiscourse = async () => {
-    updateProposalDemo({
-      demoProposalId: currentProposalData?.id,
-      status: 'onchain_voting',
-      onSuccess: (data) => {
-        console.log('update proposal success', data);
-        setCurrentProposalData(data);
-      },
-      onError: (error) => {
-        console.log('error', error);
+    await chrome.runtime.sendMessage({
+      action: 'handleEditPostAndMove',
+      payload: {
+        url: `${frontEndUrl}/demo/update_desc_move_post/${currentProposalData.id}`,
       },
     });
   };
@@ -88,7 +84,22 @@ const Voting: React.FC<Props> = ({
   const handleCreateTally = async () => {
     await chrome.runtime.sendMessage({
       action: 'handleCreateTally',
-      payload: { url: 'https://www.google.com.vn/?hl=vi' },
+      payload: { url: 'https://www.tally.xyz/gov/bsctestalphagov' },
+    });
+  };
+
+  const [inputValue, setInputValue] = useState('');
+  const handleSubmitTally = async () => {
+    updateTallyLink({
+      demoProposalId: currentProposalData?.id,
+      linkTally: inputValue,
+      onSuccess: (data) => {
+        console.log('update proposal success', data);
+        setCurrentProposalData(data);
+      },
+      onError: (error) => {
+        console.log('error', error);
+      },
     });
   };
 
@@ -513,14 +524,30 @@ const Voting: React.FC<Props> = ({
                 </div>
               </Card>
             ) : (
-              <Button
-                className='h-[38px] w-full px-4 mt-2 flex justify-center items-center bg-[#000]'
-                type='primary'
-                onClick={handleCreateTally}
-              >
-                {/* <Discourse /> */}
-                <p className='text-[13px] ml-[2px]'>Create a Tally proposal</p>
-              </Button>
+              <>
+                <Button
+                  className='h-[38px] w-full px-4 mt-2 mb-2 flex justify-center items-center bg-[#000]'
+                  type='primary'
+                  onClick={handleCreateTally}
+                >
+                  <p className='text-[13px] ml-[2px]'>
+                    Create a Tally proposal
+                  </p>
+                </Button>
+                <Input
+                  className='h-[49px] w-full mb-2'
+                  placeholder='Your tally link'
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                />
+                <Button
+                  className='h-[38px] w-full px-4 mt-2 flex justify-center items-center bg-[#000]'
+                  type='primary'
+                  onClick={handleSubmitTally}
+                >
+                  <p className='text-[13px] ml-[2px]'>Submit link proposal</p>
+                </Button>
+              </>
             )}
             {currentProposalData?.tally_id !== null ? (
               <></>
