@@ -54,7 +54,7 @@ export const CreateTopic = () => {
         Modal.success({
           title: 'Success',
           content:
-            'Create a Topic successfully, please continue on your extension',
+            'Create a Proposal successfully, please continue on your extension',
           onOk: () => {
             navigate('/');
           },
@@ -85,13 +85,13 @@ export const CreateTopic = () => {
         </div>
         <div className='flex w-full mb-4 h-[500px] gap-4'>
           <div className='flex flex-col gap-1 w-1/2'>
-            <div className='font-bold'>Topic title</div>
+            <div className='font-bold'>Proposal title</div>
             <Input
               className='w-full h-12 px-4 py-[13px]'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            <div className='mb-1 font-bold'>Topic content</div>
+            <div className='mb-1 font-bold'>Proposal content</div>
             <div>
               <TextEditor
                 value={description}
@@ -113,7 +113,7 @@ export const CreateTopic = () => {
             className='h-[46px] text-[17px]'
             onClick={createTopic}
           >
-            Publish topic
+            Publish Proposal
           </Button>
         </div>
       </div>

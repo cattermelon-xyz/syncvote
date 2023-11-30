@@ -201,6 +201,9 @@ const Voting: React.FC<Props> = ({
           {currentProposalData?.discourse_topic_id !== null ? (
             <Card className='w-full mt-1' bodyStyle={{ padding: '12px' }}>
               <div className='flex'>
+                {currentProposalData.status !== 'idea_discussion' ? (
+                  <Tag color='green'>Success</Tag>
+                ) : null}
                 <DoneIcon />
                 <p
                   className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ... '
@@ -220,7 +223,7 @@ const Voting: React.FC<Props> = ({
             >
               <Discourse />
               <p className='text-[13px] ml-[2px]'>
-                Create a topic on Discourse
+                Create a Proposal on Discourse
               </p>
             </Button>
           )}
@@ -408,6 +411,7 @@ const Voting: React.FC<Props> = ({
                 bodyStyle={{ padding: '12px' }}
               >
                 <div className='flex mt-2'>
+                  <Tag color='green'>Success</Tag>
                   <DoneIcon />
                   <p
                     className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ...'
@@ -427,7 +431,7 @@ const Voting: React.FC<Props> = ({
               >
                 <Discourse />
                 <p className='text-[13px] ml-[2px] w-[190px] truncate ...'>
-                  Update and move topic on Discourse
+                  Update and move Proposal on Discourse
                 </p>
               </Button>
             )}
@@ -514,6 +518,7 @@ const Voting: React.FC<Props> = ({
                   <Tag color='orange'>Ongoing</Tag>
                 )}
                 <div className='flex mt-2'>
+                  <Tag color='green'>Success</Tag>
                   <DoneIcon />
                   <p
                     className='w-[190px] ml-1 text-[10px] cursor-pointer truncate ...'

@@ -12,6 +12,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import { supabase } from 'utils';
 import { useDispatch } from 'react-redux';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+import { useSDK } from '@metamask/sdk-react';
 
 export const CreateSnapshot = () => {
   const location = useLocation();
@@ -20,6 +21,27 @@ export const CreateSnapshot = () => {
   const type = queryParams.get('type');
   const size = useWindowSize();
   const dispatch = useDispatch();
+
+  const [account, setAccount] = useState<any>();
+  const { sdk, connected } = useSDK();
+
+  const connect = async () => {
+    try {
+      const accounts = await sdk?.connect();
+
+      if (Array.isArray(accounts) && accounts.length > 0) {
+        setAccount(accounts[0]);
+        console.log(accounts[0]);
+      }
+    } catch (err) {
+      console.warn(`failed to connect..`, err);
+    }
+  };
+
+  const disconnect = async () => {
+    sdk?.terminate();
+    setAccount('');
+  };
 
   useEffect(() => {
     supabase
@@ -169,15 +191,28 @@ export const CreateSnapshot = () => {
 
         <div className='footer relative w-full'>
           <div className='absolute right-0 flex items-center'>
-            <Button className='mr-4 h-[46px] text-[17px] font-normal flex items-center justify-center'>
-              Cancel
-            </Button>
-            <Button
-              className='mr-4 h-[46px] text-[17px] font-normal flex items-center justify-center bg-[#6200EE] text-white'
-              onClick={createProposal}
-            >
-              Publish on Snapshot
-            </Button>
+            {connected && account ? (
+              <>
+                <Button className='mr-4 h-[46px] text-[17px] font-normal flex items-center justify-center'>
+                  Cancel
+                </Button>
+                <Button
+                  className='mr-4 h-[46px] text-[17px] font-normal flex items-center justify-center bg-[#6200EE] text-white'
+                  onClick={createProposal}
+                >
+                  Publish on Snapshot
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  className='mr-4 h-[46px] text-[17px] font-normal flex items-center justify-center bg-[#6200EE] text-white'
+                  onClick={connect}
+                >
+                  Connect wallet
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -91,13 +91,13 @@ export const UpdateDescAndMoveCat = () => {
         </div>
         <div className='flex w-full mb-4 h-[500px] gap-4'>
           <div className='flex flex-col gap-1 w-1/2'>
-            <div className='font-bold'>Topic title</div>
+            <div className='font-bold'>Proposal title</div>
             <Input
               className='w-full h-12 px-4 py-[13px]'
               value={title}
               disabled
             />
-            <div className='mb-1 font-bold'>Topic content</div>
+            <div className='mb-1 font-bold'>Proposal content</div>
             <div>
               <TextEditor
                 value={description}
