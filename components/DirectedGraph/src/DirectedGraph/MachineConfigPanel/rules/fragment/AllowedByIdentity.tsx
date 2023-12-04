@@ -119,8 +119,8 @@ const AllowedByIdentity = (props: AllowedByIdentityProps) => {
   return (
     <Space direction='vertical' size='middle' className='w-full'>
       <Space direction='horizontal' className='flex justify-between'>
-        <div className='text-sm'>List of identity</div>
-        <div className='flex gap-2'>
+        {/* <div className='text-sm'>List of identity</div> */}
+        {/* <div className='flex gap-2'>
           <Checkbox
             checked={identity.indexOf('proposer') !== -1}
             onClick={() => {
@@ -134,15 +134,15 @@ const AllowedByIdentity = (props: AllowedByIdentityProps) => {
               setIdentity(newIdentity);
             }}
           />
-          Include proposer?
-        </div>
+          Include the Author?
+        </div> */}
       </Space>
       <Space direction='vertical' size='small' className='w-full'>
         {identity.map((id, index) => (
           <div className='w-full flex justify-between flex-row' key={id}>
             <Input
               className='w-full flex-grow'
-              value={id}
+              value={id === 'proposer' ? 'Author' : id}
               onChange={(e) => {
                 const newIdentity = [...identity];
                 newIdentity[index] = e.target.value;
