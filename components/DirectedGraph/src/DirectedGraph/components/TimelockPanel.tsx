@@ -3,7 +3,7 @@ import { DelayUnit } from '../interface';
 import { displayDelayDuration } from '../utils';
 import { Input, Select, Space } from 'antd';
 import { TextEditor } from 'rich-text-editor';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const TimelockPanel = ({
   delay,
@@ -16,9 +16,17 @@ const TimelockPanel = ({
   delayNote: string;
   setValue: (keyValue: any) => void;
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    setWidth(ref.current?.offsetWidth || 0);
+    console.log(ref.current?.offsetWidth || 0);
+  }, []);
+
   const [tmpDelayNote, setTmpDelayNote] = useState(delayNote);
   return (
-    <Space direction='vertical' size='middle'>
+    <Space direction='vertical' size='middle' ref={ref}>
       <div className='w-full flex justify-between'>
         <div className='text-violet-500'>
           {displayDelayDuration(moment.duration(delay, delayUnit as any))}
@@ -79,7 +87,7 @@ const TimelockPanel = ({
         </div>
         <Space className='w-full' direction='vertical' size='small'>
           <div>Timelock Note</div>
-          <div>
+          <div style={{ width: width }}>
             <TextEditor
               value={tmpDelayNote}
               setValue={(val: any) => {
