@@ -37,15 +37,16 @@ export default (props: IVoteMachineConfigProps) => {
       token: '', // spl token
       options: [],
       space: '',
-      type: {},
+      type: {
+        label: 'Single Choice',
+        value: 'single-choice',
+      },
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
     allNodes = [], //eslint-disable-line
     includedAbstain,
-    quorum,
     optionsDescription,
-    resultDescription,
   } = props;
 
   const { max, token, options } = data;
@@ -300,7 +301,7 @@ export default (props: IVoteMachineConfigProps) => {
                 </Popover>
               </div>
               <Select
-                value={data.type.label}
+                value={data?.type?.label}
                 className='w-full'
                 options={selectOptions}
                 onChange={(value, option) => {
