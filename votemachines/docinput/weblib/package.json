@@ -10,7 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "directed-graph": "1.0.0"
+    "directed-graph": "1.0.0",
+    "rich-text-editor": "1.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",

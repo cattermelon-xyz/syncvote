@@ -1,6 +1,7 @@
 import { ICheckPoint } from 'directed-graph';
 // import { IData } from './interface';
 import { DocInput as Interface } from './interface';
+import moment from 'moment';
 
 export namespace DocInput {
   export const getName = () => {
@@ -58,3 +59,13 @@ export namespace DocInput {
     };
   };
 }
+
+export const getTimeRemainingToEnd = (endToVote: string) => {
+  const now = moment.utc();
+  const end = moment.utc(endToVote);
+  const duration = moment.duration(end.diff(now));
+  if (duration.asMilliseconds() <= 0) {
+    return 'expired';
+  }
+  return duration.humanize(true);
+};

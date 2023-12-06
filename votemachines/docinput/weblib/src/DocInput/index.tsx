@@ -12,6 +12,7 @@ import {
   IDoc,
 } from 'directed-graph';
 import ConfigPanel from './ConfigPanel';
+import VoteUIWeb from './VoteUIWeb';
 import { DocInput, DocInput as Interface } from './interface';
 import { DocInput as Funcs } from './funcs';
 import parse from 'html-react-parser';
@@ -218,6 +219,7 @@ const abstract = ({
 
 const VoteMachine: IVoteMachine = {
   ConfigPanel: ConfigPanel,
+  VoteUIWeb: VoteUIWeb,
   getProgramAddress: Funcs.getProgramAddress,
   getName: Funcs.getName,
   deleteChildNode: Funcs.deleteChildNode,
