@@ -148,7 +148,7 @@ async function insertMission(props) {
                   if (errorCreateTopicData) {
                     resolve({
                       status: 'ERR',
-                      message: 'error to create mission',
+                      message: 'Error to create mission',
                     });
                     return;
                   }
