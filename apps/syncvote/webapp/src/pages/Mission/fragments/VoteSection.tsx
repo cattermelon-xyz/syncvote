@@ -37,12 +37,7 @@ const VoteSection: React.FC<Props> = ({
   const [voteMachine, setVoteMachine] = useState<any>(null);
 
   useEffect(() => {
-    if (
-      (currentCheckpointData &&
-        currentCheckpointData?.vote_machine_type === VM_TYPE.DOC_INPUT) ||
-      currentCheckpointData?.vote_machine_type === VM_TYPE.SINGLE_VOTE ||
-      currentCheckpointData?.vote_machine_type === VM_TYPE.SNAPSHOT
-    ) {
+    if (currentCheckpointData) {
       const machine = getVoteMachine(currentCheckpointData?.vote_machine_type);
       setVoteMachine(machine);
     }
