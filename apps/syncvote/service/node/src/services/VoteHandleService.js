@@ -21,13 +21,12 @@ async function handleVoting(props) {
         .select(`*`)
         .eq('mission_id', mission_id);
 
-      console.log(mission_vote_details[0].cvd_id);
-
       if (mvd_error) {
         resolve({
           status: 'ERR',
           message: mvd_error,
         });
+        return;
       } else {
         try {
           // 1️⃣ check mission is not created or publish
@@ -51,7 +50,6 @@ async function handleVoting(props) {
           let voteMachineController = new VoteMachineController(
             mission_vote_details[0]
           );
-          let firstTimeToVote = false;
 
           // 3️⃣ check if the fisrt time of voting
           if (!mission_vote_details[0].result) {
@@ -91,8 +89,6 @@ async function handleVoting(props) {
 
             firstTimeToVote = true;
           }
-
-          // check if this check point not ready to vote
 
           // 4️⃣ check if fallback
           const { fallback, error: f_error } = voteMachineController.fallBack();
@@ -149,13 +145,7 @@ async function handleVoting(props) {
               .select('*')
               .eq('id', next_checkpoint_id);
 
-            let endedAt = null;
             let mission_status = 'PUBLIC';
-
-            if (next_checkpoint[0].isEnd) {
-              endedAt = startToVote;
-              mission_status = 'STOPPED';
-            }
 
             // create current vote data for next checkpoint
             const { data: new_current_vote_data } = await supabase
@@ -202,26 +192,24 @@ async function handleVoting(props) {
               }
             }
 
-            // if (!endedAt) {
-            //   // create a job for to start this
-            //   const cronSyntax = convertToCron(moment(startToVote));
-            //   const job = new CronJob(cronSyntax, async function () {
-            //     await fetch(`${process.env.BACKEND_API}/vote/create`, {
-            //       method: 'POST',
-            //       headers: {
-            //         'Content-Type': 'application/json',
-            //       },
-            //       body: JSON.stringify({
-            //         identify: `cronjob-${checkpointData.id}`,
-            //         option: ['fake option'],
-            //         voting_power: 9999,
-            //         mission_id: mission_vote_details[0].id,
-            //       }),
-            //     });
-            //   });
-            //   job.start();
-            //   console.log(`create job to start ${job}`);
-            // }
+            // create a job for to start this
+            const cronSyntax = convertToCron(moment(startToVote));
+            const job = new CronJob(cronSyntax, async function () {
+              await fetch(`${process.env.BACKEND_API}/vote/create`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  identify: `cronjob-${checkpointData.id}`,
+                  option: ['fake option'],
+                  voting_power: 9999,
+                  mission_id: mission_vote_details[0].id,
+                }),
+              });
+            });
+            job.start();
+            console.log(`create job to start ${job}`);
 
             await supabase
               .from('mission')
@@ -329,7 +317,7 @@ async function handleVoting(props) {
             });
             return;
           }
-          
+
           // ❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
           // ❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
           if (shouldTally) {
@@ -382,7 +370,7 @@ async function handleVoting(props) {
               endedAt = startToVote;
               mission_status = 'STOPPED';
             }
-              
+
             // create current vote data for next checkpoint
             const { data: new_current_vote_data } = await supabase
               .from('current_vote_data')
@@ -553,7 +541,10 @@ async function handleVoting(props) {
             message: 'Vote successfully',
           });
         } catch (error) {
-          console.log(error);
+          resolve({
+            status: 'ERR',
+            message: error,
+          });
         }
       }
 
