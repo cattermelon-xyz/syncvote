@@ -34,40 +34,14 @@ const VoteSection: React.FC<Props> = ({
   proposalData,
   client,
 }) => {
-  const [selectedOption, setSelectedOption] = useState<number>();
-
   const [voteMachine, setVoteMachine] = useState<any>(null);
-
-  const createVote = async () => {
-    let web3;
-    if (isExternalProvider(window.ethereum)) {
-      web3 = new Web3Provider(window.ethereum);
-    }
-
-    if (web3 && client && selectedOption) {
-      const accounts = await web3.listAccounts();
-      const receipt = await client.vote(web3, accounts[0], {
-        space: currentCheckpointData?.data?.space,
-        proposal: proposalData?.id,
-        type: currentCheckpointData?.data?.type?.value,
-        choice: selectedOption - 1,
-        reason: 'Choice 1 make lot of sense',
-        app: 'my-app',
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (selectedOption) {
-      onSelectedOption(selectedOption);
-    }
-  }, [selectedOption]);
 
   useEffect(() => {
     if (
       (currentCheckpointData &&
         currentCheckpointData?.vote_machine_type === VM_TYPE.DOC_INPUT) ||
-      currentCheckpointData?.vote_machine_type === VM_TYPE.SINGLE_VOTE
+      currentCheckpointData?.vote_machine_type === VM_TYPE.SINGLE_VOTE ||
+      currentCheckpointData?.vote_machine_type === VM_TYPE.SNAPSHOT
     ) {
       const machine = getVoteMachine(currentCheckpointData?.vote_machine_type);
       setVoteMachine(machine);
@@ -100,43 +74,16 @@ const VoteSection: React.FC<Props> = ({
           currentCheckpointData={currentCheckpointData}
           setOpenModalVoterInfo={setOpenModalVoterInfo}
         />
+      ) : voteMachine &&
+        currentCheckpointData?.vote_machine_type === VM_TYPE.SNAPSHOT ? (
+        <voteMachine.VoteUIWeb
+          proposalData={proposalData}
+          onSelectedOption={onSelectedOption}
+          currentCheckpointData={currentCheckpointData}
+          client={client}
+        />
       ) : (
-        <Card className='p-4'>
-          <div className='flex flex-col gap-6'>
-            <p className='text-xl font-medium'>Vote</p>
-            {proposalData && (
-              <>
-                {proposalData.choices.map((option: any, index: any) => (
-                  <Card className='w-full' key={index}>
-                    {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                    <Radio
-                      checked={selectedOption === index + 1}
-                      onChange={() => setSelectedOption(index + 1)}
-                    >
-                      {`${index + 1}. ${option}`}
-                    </Radio>
-                  </Card>
-                ))}
-              </>
-            )}
-
-            <Button
-              type='primary'
-              className='w-full'
-              onClick={async () => {
-                await createVote();
-              }}
-              disabled={
-                selectedOption
-                  ? // && getTimeRemainingToEnd(currentCheckpointData.endToVote) !='expired'
-                    false
-                  : true
-              }
-            >
-              Vote
-            </Button>
-          </div>
-        </Card>
+        <></>
       )}
     </div>
   );

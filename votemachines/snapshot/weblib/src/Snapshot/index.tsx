@@ -21,6 +21,7 @@ import { Snapshot as Interface } from './interface';
 import { Snapshot as Funcs } from './funcs';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
+import VoteUIWeb from './VoteUIWeb';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
@@ -180,6 +181,7 @@ const abstract = ({
 
 const VoteMachine: IVoteMachine = {
   ConfigPanel: ConfigPanel,
+  VoteUIWeb: VoteUIWeb,
   getProgramAddress: Funcs.getProgramAddress,
   getName: Funcs.getName,
   deleteChildNode: Funcs.deleteChildNode,

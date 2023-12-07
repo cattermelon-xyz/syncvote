@@ -9,7 +9,7 @@ import { Polling } from 'polling';
 import { Veto } from 'veto';
 import { UpVote } from 'upvote';
 import { DocInput } from 'doc-input';
-import { Snapshot } from '../../../../votemachines/snapshot/weblib/index';
+import { Snapshot } from 'snapshot';
 import { AuthContext } from '@layout/context/AuthContext';
 
 function App({ layout }: { layout: any }) {
