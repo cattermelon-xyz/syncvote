@@ -19,7 +19,7 @@ interface Props {
   submission: any;
   dataOfAllDocs: any;
   listVersionDocs: any;
-  proposal?: any;
+  proposalData?: any;
   client?: Client;
 }
 
@@ -31,7 +31,7 @@ const VoteSection: React.FC<Props> = ({
   setSubmission,
   dataOfAllDocs,
   listVersionDocs,
-  proposal,
+  proposalData,
   client,
 }) => {
   const [selectedOption, setSelectedOption] = useState<number>();
@@ -48,7 +48,7 @@ const VoteSection: React.FC<Props> = ({
       const accounts = await web3.listAccounts();
       const receipt = await client.vote(web3, accounts[0], {
         space: currentCheckpointData?.data?.space,
-        proposal: proposal?.id,
+        proposal: proposalData?.id,
         type: currentCheckpointData?.data?.type?.value,
         choice: selectedOption - 1,
         reason: 'Choice 1 make lot of sense',
@@ -65,8 +65,9 @@ const VoteSection: React.FC<Props> = ({
 
   useEffect(() => {
     if (
-      currentCheckpointData &&
-      currentCheckpointData?.vote_machine_type === VM_TYPE.DOC_INPUT
+      (currentCheckpointData &&
+        currentCheckpointData?.vote_machine_type === VM_TYPE.DOC_INPUT) ||
+      currentCheckpointData?.vote_machine_type === VM_TYPE.SINGLE_VOTE
     ) {
       const machine = getVoteMachine(currentCheckpointData?.vote_machine_type);
       setVoteMachine(machine);
@@ -92,13 +93,20 @@ const VoteSection: React.FC<Props> = ({
           setSubmission={setSubmission}
           setOpenModalVoterInfo={setOpenModalVoterInfo}
         />
+      ) : voteMachine &&
+        currentCheckpointData?.vote_machine_type === VM_TYPE.SINGLE_VOTE ? (
+        <voteMachine.VoteUIWeb
+          onSelectedOption={onSelectedOption}
+          currentCheckpointData={currentCheckpointData}
+          setOpenModalVoterInfo={setOpenModalVoterInfo}
+        />
       ) : (
         <Card className='p-4'>
           <div className='flex flex-col gap-6'>
             <p className='text-xl font-medium'>Vote</p>
-            {proposal ? (
+            {proposalData && (
               <>
-                {proposal.choices.map((option: any, index: any) => (
+                {proposalData.choices.map((option: any, index: any) => (
                   <Card className='w-full' key={index}>
                     {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
                     <Radio
@@ -110,40 +118,13 @@ const VoteSection: React.FC<Props> = ({
                   </Card>
                 ))}
               </>
-            ) : (
-              <>
-                {currentCheckpointData.data.options.map(
-                  (option: any, index: any) => (
-                    <Card className='w-full' key={index}>
-                      {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                      <Radio
-                        checked={
-                          selectedOption ===
-                          (option === 'Abstain' ? -1 : index + 1)
-                        }
-                        onChange={() =>
-                          setSelectedOption(
-                            option === 'Abstain' ? -1 : index + 1
-                          )
-                        }
-                      >
-                        {`${index + 1}. ${option}`}
-                      </Radio>
-                    </Card>
-                  )
-                )}
-              </>
             )}
 
             <Button
               type='primary'
               className='w-full'
               onClick={async () => {
-                if (!proposal) {
-                  setOpenModalVoterInfo(true);
-                } else {
-                  await createVote();
-                }
+                await createVote();
               }}
               disabled={
                 selectedOption

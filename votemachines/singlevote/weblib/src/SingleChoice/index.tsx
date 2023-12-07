@@ -21,6 +21,7 @@ import { SingleChoice as Interface } from './interface';
 import { SingleChoice as Funcs } from './funcs';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
+import VoteUIWeb from './VoteUIWeb';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
@@ -133,7 +134,7 @@ const explain = ({
         </li>
 
         <SideNote value={optionsDescription} />
-        {(quorum !== 0 || data.max !== 0) ? (
+        {quorum !== 0 || data.max !== 0 ? (
           <>
             {quorum !== 0 ? (
               <li>
@@ -225,6 +226,7 @@ const abstract = ({
 
 const VoteMachine: IVoteMachine = {
   ConfigPanel: ConfigPanel,
+  VoteUIWeb: VoteUIWeb,
   getProgramAddress: Funcs.getProgramAddress,
   getName: Funcs.getName,
   deleteChildNode: Funcs.deleteChildNode,
