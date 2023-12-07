@@ -73,6 +73,7 @@ export interface IVoteMachineGetLabelProps {
 
 export interface IVoteMachine {
   ConfigPanel: (props: IVoteMachineConfigProps) => JSX.Element;
+  VoteUIWeb?: (props: any) => JSX.Element;
   getName: () => string;
   getProgramAddress: () => string;
   getType: () => string;

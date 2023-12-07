@@ -485,7 +485,7 @@ const MissionVotingDetail = () => {
                   submission={submission}
                   dataOfAllDocs={dataOfAllDocs}
                   listVersionDocs={listVersionDocs}
-                  proposal={proposal}
+                  proposalData={proposal}
                   client={client}
                 />
               )}
