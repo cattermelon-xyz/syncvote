@@ -11,12 +11,6 @@ interface Props {
   client?: Client;
 }
 
-interface ExtendedWindow extends Window {
-  ethereum?: ExternalProvider;
-}
-
-declare let window: ExtendedWindow;
-
 function isExternalProvider(provider: any): provider is ExternalProvider {
   return provider && typeof provider.request === 'function';
 }
