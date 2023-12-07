@@ -3,17 +3,125 @@ const { supabase } = require('../src/configs/supabaseClient');
 const dotenv = require('dotenv');
 const axios = require('axios');
 const moment = require('moment');
+const { insertCheckpoint } = require('../src/services/CheckpointService');
+
 dotenv.config();
 
-describe('Test create proposal', function () {
-  it('Test something', async function () {
+describe('Test with 2 Fork and Join Node', function () {
+  this.timeout(50000);
+  after(async function () {
+    // console.log('Delete prepare data');
+    // const { error } = await supabase
+    //   .from('current_vote_data')
+    //   .delete()
+    //   .eq('id', 9999);
+    // expect(error).to.eq(null);
+  });
+
+  it('Test create proposal', async function () {
+    this.timeout(10000);
     try {
+      let testMissonData = missionData;
+      const checkpointIdForkNode = testMissonData.data.checkpoints[1].id;
+
+      // Change the votemachine where have title ForkNode data
+      testMissonData.data.checkpoints[1].vote_machine_type = 'ForkNode';
+      testMissonData.data.checkpoints[1].id = checkpointIdForkNode + '-start';
+
+      expect(testMissonData.data.checkpoints[1].vote_machine_type).to.eq(
+        'ForkNode'
+      );
+      expect(testMissonData.data.checkpoints[1].id).to.eq(
+        checkpointIdForkNode + '-start'
+      );
+
+      // Change the votemachine where have title JoinNode data
+      testMissonData.data.checkpoints[5].vote_machine_type = 'JoinNode';
+      testMissonData.data.checkpoints[5].id = checkpointIdForkNode + '-end';
+
+      expect(testMissonData.data.checkpoints[5].vote_machine_type).to.eq(
+        'JoinNode'
+      );
+      expect(testMissonData.data.checkpoints[5].id).to.eq(
+        checkpointIdForkNode + '-end'
+      );
+
+      // Change the children of endnode in submission
+      testMissonData.data.checkpoints[2].children = null;
+      testMissonData.data.checkpoints[4].children = null;
+
+      expect(testMissonData.data.checkpoints[2].children).to.eq(null);
+      expect(testMissonData.data.checkpoints[4].children).to.eq(null);
+
       const { data: newMission, error } = await supabase
         .from('mission')
-        .insert(missionData)
+        .insert(testMissonData)
         .select('*');
 
       expect(error).to.eq(null);
+
+      for (const checkpoint of newMission[0].data.checkpoints) {
+        const checkpointData = {
+          id: `${newMission[0].id}-${checkpoint.id}`,
+          vote_machine_type: checkpoint.vote_machine_type,
+          mission_id: newMission[0].id,
+          title: checkpoint.title,
+          participation: checkpoint?.participation,
+          quorum: checkpoint?.quorum,
+          options: checkpoint.data?.options,
+          thresholds: checkpoint.data?.max,
+          delays: checkpoint?.delays,
+          delayUnits: checkpoint?.delayUnits,
+          duration: checkpoint?.duration,
+          children: checkpoint?.children,
+          isEnd: checkpoint?.isEnd,
+          includedAbstain: checkpoint?.includedAbstain,
+        };
+
+        // Wait for each insertCheckpoint to finish before continuing
+        await insertCheckpoint(checkpointData);
+
+        // Additional logic for checkpoints
+        if (checkpoint.id === newMission[0].start) {
+          // Insert into current_vote_data and wait for it to finish
+          await supabase
+            .from('current_vote_data')
+            .insert({
+              id: 9999,
+              checkpoint_id: `${newMission[0].id}-${checkpoint.id}`,
+              startToVote: moment().format(),
+            })
+            .select('*');
+
+          // Update mission and wait for it to finish
+          await supabase
+            .from('mission')
+            .update({
+              current_vote_data_id: 9999,
+            })
+            .eq('id', newMission[0].id)
+            .select('*');
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  it('Test move to ForkNode', async function () {
+    this.timeout(10000);
+    try {
+      // const voteData = {
+      //   id: 9999,
+      //   identify: `chaukhac4@gmail.com`,
+      //   option: [0],
+      //   voting_power: 1,
+      //   mission_id: 9999,
+      // };
+      // const response = await axios.post(
+      //   `${process.env.BACKEND_API}/vote/create`,
+      //   voteData
+      // );
     } catch (error) {
       throw error;
     }
@@ -21,168 +129,238 @@ describe('Test create proposal', function () {
 });
 
 const missionData = {
+  id: '9999',
   title: 'Test create proposal',
   status: 'PUBLIC',
+  start: 'root',
   data: {
     checkpoints: [
       {
         id: 'root',
         position: {
-          x: -429.067355476582,
-          y: 6.766765335080947,
+          x: -260.5,
+          y: -49,
         },
         isEnd: false,
         data: {
-          options: ['Yes', 'No'],
-          max: 3,
-          space: 'hectagon.eth',
-          type: {
-            label: 'Single Choice',
-            value: 'single-choice',
-          },
+          options: ['Going to fork'],
+          max: 5,
         },
-        children: ['node-1695788594379', 'node-1695788837818'],
-        vote_machine_type: 'Snapshot',
-        title: 'Proposal',
-        votingLocation:
-          '<p><a href="https://gov.push.org/c/governance-proposals/8" rel="noopener noreferrer" target="_blank">Discourse #Proposal</a></p>',
-        duration: 86400,
+        children: ['node-1701789260746'],
+        vote_machine_type: 'SingleChoiceRaceToMax',
+        title: 'Checkpoint 0',
+        delays: [1],
+        delayUnits: ['hour'],
+        delayNotes: [''],
+        quorum: 10,
         participation: {
           type: 'identity',
           data: [
-            'trungbaotran1701@gmail.com',
             'chaukhac4@gmail.com',
             'chaukhac5@gmail.com',
             'chaukhac6@gmail.com',
             'chaukhac7@gmail.com',
             'chaukhac8@gmail.com',
             'chaukhac9@gmail.com',
-            'chaukhac3@gmail.com',
-            'chaukhac2@gmail.com',
-            'chaukhac1@gmail.com',
+            'chaukhac10@gmail.com',
+            'chaukhac11@gmail.com',
+            'chaukhac12@gmail.com',
+            'chaukhac13@gmail.com',
+            'chaukhac14@gmail.com',
           ],
         },
-        description:
-          '<p>The Proposal phase may be considered as the initial step towards the governance journey. It is meant for you to present your ideas to the community and run a temperature check on whether your proposal gets the support from other community members.</p><p><br></p><h6><strong style="color: rgb(51, 51, 51);">What you need to follow:</strong></h6><ol><li><span style="color: rgb(51, 51, 51);">Draft a proposal following </span><u style="color: rgb(51, 51, 51);">below template</u></li><li><span style="color: rgb(51, 51, 51);">Post the proposal under Discourse forum\'s </span><a href="https://github.com/ethereum-push-notification-service/push-governance/blob/main/draft-proposal-template.md" rel="noopener noreferrer" target="_blank" style="color: rgb(51, 51, 51);">Governance Proposal category</a></li><li>PUSH Champions then check the submitted draft proposal to ensure it follows the <a href="https://github.com/ethereum-push-notification-service/governance/blob/main/governance-rules.md" rel="noopener noreferrer" target="_blank">governance rules</a>. In some cases, you might be asked to resubmit based on the Champions’ discretion.</li><li>Draft proposals are then promoted to the next phase provided they meet the promotion criteria mentioned below.</li></ol>',
-        note: '<p><a href="https://github.com/ethereum-push-notification-service/push-governance/blob/main/draft-proposal-template.md" rel="noopener noreferrer" target="_blank">Proposal template</a></p>',
-        includedAbstain: true,
-        quorum: 5,
-        delays: [1, 0],
-        delayUnits: ['day', 'minute'],
-        delayNotes: ['', ''],
+        duration: 86400,
       },
       {
-        id: 'node-1695788594379',
+        title: 'ForkNode',
+        id: 'node-1701789260746',
         position: {
-          x: -90.98023463810279,
-          y: -99.33552948465524,
+          x: 49.48197149331072,
+          y: -15.399329877977053,
         },
         isEnd: false,
-        title: 'Discussion',
-        children: ['node-1695788631850', 'node-1695788837818'],
+        children: ['node-1701789509670', 'node-1701789584321'],
         data: {
-          pass: 'node-1695788631850',
-          fallback: 'node-1695788837818',
-          token: '',
-          threshold: 5,
+          options: ['Branch 1', 'Branch 2'],
+          space: 'hetagon.eth',
+          type: {
+            label: 'Approval',
+            value: 'approval',
+          },
         },
-        vote_machine_type: 'UpVote',
-        description:
-          '<p>The next step in the governance journey is Discussion. The purpose of this phase is to initiate discussion and allow the community to debate and express approval or disapproval of the proposal. It is the last step before moving on to the formal voting phase.</p><p><br></p><h6><strong style="color: rgb(51, 51, 51);">What you need to follow:</strong></h6><ol><li>A Push Champion will promote your draft proposals from phase 1 to this phase once they have met the criteria to Governance Discussion.</li><li>The draft proposal promoted by PUSH Champions can deviate a bit from what started in the Governance Proposal section owing to the discussion and the spirit of the proposal. In the event of discrepancies between the draft proposal submitted in the Governance Proposal section and the Governance Discussion section, the proposal under the Governance Discussion section will prevail.</li></ol>',
-        duration: 432000,
-        resultDescription:
-          '<p>Proposal must receive at least 10 likes and 3 replies to pass this phase</p>',
-        votingLocation:
-          '<p><a href="https://gov.push.org/c/governance-discussions/5" rel="noopener noreferrer" target="_blank">Discourse #Discussion</a></p>',
+        vote_machine_type: 'Snapshot',
+        delays: [0, 0],
+        delayUnits: ['minute', 'minute'],
+        delayNotes: ['', ''],
         participation: {
           type: 'identity',
+          data: [
+            'chaukhac4@gmail.com',
+            'chaukhac5@gmail.com',
+            'chaukhac6@gmail.com',
+            'chaukhac7@gmail.com',
+            'chaukhac8@gmail.com',
+            'chaukhac9@gmail.com',
+            'chaukhac10@gmail.com',
+            'chaukhac11@gmail.com',
+            'chaukhac12@gmail.com',
+            'chaukhac13@gmail.com',
+            'chaukhac14@gmail.com',
+          ],
         },
-        participationDescription: '<p>Forum members</p>',
-        quorum: 10,
-      },
-      {
-        id: 'node-1695788631850',
-        position: {
-          x: 229.98164169940736,
-          y: -106.60660078095749,
-        },
-        isEnd: false,
-        title: 'Governance',
-        children: ['node-1701155046507'],
-        data: {
-          options: ['Ok'],
-          type: {
-            label: 'Single Choice',
-            value: 'single-choice',
-          },
-          space: 'hectagon.eth',
-        },
-        vote_machine_type: 'Snapshot',
-        participation: {
-          type: 'token',
-          data: {
-            address: 'eth.PUSH.0xf418588522d5dd018b425E472991E52EBBeEEEEE',
-          },
-        },
-        description:
-          '<p>Governance is the final phase of the governance process. Once the proposal on the Governance Discussion section meets the promotion criteria, it’s considered a formal proposal and requires formal voting which takes place on Snapshot. A formal proposal can be defeated or accepted as outlined by <u>the rules below.</u></p>',
-        duration: 604800,
-        quorum: 10,
-        votingLocation:
-          '<p><a href="https://snapshot.org/#/pushdao.eth" rel="noopener noreferrer" target="_blank">Snapshot</a></p>',
-        delays: [0, 0, 0, 0],
-        delayUnits: ['minute', 'minute', 'minute', 'minute'],
-        delayNotes: ['', '', '', ''],
-        note: '<p>Only users who have 75k+ votes (delegated or owned) can initiate the formal proposal. If the user doesn’t have enough votes, then it’s expected of the user to either find a Delegatee to submit their formal proposal or request a Champion to find one for them.</p>',
-        resultDescription:
-          '<p>Votes on Snapshot are weighted by the number of $PUSH delegated to the address used to vote. For a vote to pass on Snapshot, it must achieve a quorum of 4% of the <a href="https://coinmarketcap.com/currencies/epns/" rel="noopener noreferrer" target="_blank">circulating supply of $PUSH</a> voting in the affirmative. The purpose of the quorum is to ensure that the approved proposals have adequate voter participation. This means that if a proposal that had a majority of votes affirmative but didn’t achieve the necessary quorum, it won’t be approved.</p>',
-      },
-      {
-        id: 'node-1695788837818',
-        position: {
-          x: 204.97503855713964,
-          y: 220.69896184204708,
-        },
-        isEnd: true,
-        title: 'Cancel',
-        children: [],
-        description:
-          '<p><span style="color: rgb(87, 86, 85);">If at any point of the process, you decide to give up or your proposal is not supported by the community, it will be moved to Cancel.</span></p>',
-      },
-      {
-        id: 'node-1695791578250',
-        position: {
-          x: 708.318336267242,
-          y: -71.86647069682725,
-        },
-        isEnd: true,
-        title: 'Execution',
-        children: [],
-        description:
-          '<p><span style="color: rgb(87, 86, 85);">Congrats! Your proposal has successfully pass the Governance Process and made it to execution.</span></p>',
-      },
-      {
-        title: 'Manual check',
-        id: 'node-1701155046507',
-        position: {
-          x: 479.63862035217926,
-          y: -70.22340177142942,
-        },
-        isEnd: false,
-        children: ['node-1695791578250'],
-        data: {
-          options: ['Done'],
-          type: {
-            label: 'Single Choice',
-            value: 'single-choice',
-          },
-          space: 'hectagon.eth',
-        },
-        vote_machine_type: 'Snapshot',
-        delays: [0, 0, 0],
-        delayUnits: ['minute', 'minute', 'minute'],
-        delayNotes: ['', '', ''],
         duration: 86400,
+      },
+      {
+        title: 'SubMission 1.1',
+        id: 'node-1701789509670',
+        position: {
+          x: 285.6163855955971,
+          y: -144.67677248695264,
+        },
+        isEnd: false,
+        children: ['node-1701789990766'],
+        data: {
+          options: ['OK'],
+          max: 6,
+        },
+        vote_machine_type: 'SingleChoiceRaceToMax',
+        participation: {
+          type: 'identity',
+          data: [
+            'chaukhac4@gmail.com',
+            'chaukhac5@gmail.com',
+            'chaukhac6@gmail.com',
+            'chaukhac7@gmail.com',
+            'chaukhac8@gmail.com',
+            'chaukhac9@gmail.com',
+            'chaukhac10@gmail.com',
+            'chaukhac11@gmail.com',
+            'chaukhac12@gmail.com',
+            'chaukhac13@gmail.com',
+            'chaukhac14@gmail.com',
+          ],
+        },
+        quorum: 10,
+        duration: 172800,
+        delays: [0],
+        delayUnits: ['minute'],
+        delayNotes: [''],
+      },
+      {
+        title: 'SubMission 2.1',
+        id: 'node-1701789584321',
+        position: {
+          x: 288.0226545729197,
+          y: 67.69400129575857,
+        },
+        isEnd: false,
+        children: ['node-1701789766864'],
+        data: {
+          options: ['OK'],
+          max: 6,
+        },
+        vote_machine_type: 'SingleChoiceRaceToMax',
+        quorum: 10,
+        participation: {
+          type: 'identity',
+          data: [
+            'chaukhac4@gmail.com',
+            'chaukhac5@gmail.com',
+            'chaukhac6@gmail.com',
+            'chaukhac7@gmail.com',
+            'chaukhac8@gmail.com',
+            'chaukhac9@gmail.com',
+            'chaukhac10@gmail.com',
+            'chaukhac11@gmail.com',
+            'chaukhac12@gmail.com',
+            'chaukhac13@gmail.com',
+            'chaukhac14@gmail.com',
+          ],
+        },
+        delays: [0],
+        delayUnits: ['minute'],
+        delayNotes: [''],
+        duration: 86400,
+      },
+      {
+        title: 'SubMission 2.2',
+        id: 'node-1701789766864',
+        position: {
+          x: 565.4095233598287,
+          y: 96.5477261685659,
+        },
+        isEnd: false,
+        children: ['node-1701789990766'],
+        data: {
+          options: ['OK'],
+        },
+        vote_machine_type: 'Snapshot',
+        duration: 86400,
+        participation: {
+          type: 'identity',
+          data: [
+            'chaukhac4@gmail.com',
+            'chaukhac5@gmail.com',
+            'chaukhac6@gmail.com',
+            'chaukhac7@gmail.com',
+            'chaukhac8@gmail.com',
+            'chaukhac9@gmail.com',
+            'chaukhac10@gmail.com',
+            'chaukhac11@gmail.com',
+            'chaukhac12@gmail.com',
+            'chaukhac13@gmail.com',
+            'chaukhac14@gmail.com',
+          ],
+        },
+        delays: [0],
+        delayUnits: ['minute'],
+        delayNotes: [''],
+      },
+      {
+        title: 'JoinNode',
+        id: 'node-1701789990766',
+        position: {
+          x: 840.4045562147472,
+          y: -46.36223588343641,
+        },
+        isEnd: false,
+        data: {
+          options: ['OK'],
+          max: 5,
+        },
+        children: ['node-1701790117491'],
+        vote_machine_type: 'SingleChoiceRaceToMax',
+        delays: [0],
+        delayUnits: ['minute'],
+        delayNotes: [''],
+        quorum: 10,
+        duration: 86400,
+        participation: {
+          type: 'identity',
+          data: [
+            'chaukhac4@gmail.com',
+            'chaukhac5@gmail.com',
+            'chaukhac6@gmail.com',
+            'chaukhac7@gmail.com',
+            'chaukhac8@gmail.com',
+            'chaukhac9@gmail.com',
+            'chaukhac10@gmail.com',
+            'chaukhac11@gmail.com',
+            'chaukhac12@gmail.com',
+            'chaukhac13@gmail.com',
+            'chaukhac14@gmail.com',
+          ],
+        },
+      },
+      {
+        title: 'EndNode',
+        id: 'node-1701790117491',
+        position: {
+          x: 1143.8100306962456,
+          y: -12.440408393044464,
+        },
+        isEnd: true,
+        children: [],
       },
     ],
     cosmetic: {
@@ -198,118 +376,57 @@ const missionData = {
           renderer: '',
           nodes: [
             {
-              id: 'node-1695788594379',
-              position: {
-                x: -90.98023463810279,
-                y: -99.33552948465524,
-              },
-              style: {
-                title: {
-                  backgroundColor: '#A9D3F5',
-                  color: '#252422',
-                },
-                content: {
-                  backgroundColor: '#B0DCFF',
-                  color: '#252422',
-                },
-              },
-            },
-            {
               id: 'root',
               position: {
-                x: -429.067355476582,
-                y: 6.766765335080947,
-              },
-              style: {
-                title: {
-                  backgroundColor: '#A9D3F5',
-                  color: '#252422',
-                },
-                content: {
-                  backgroundColor: '#B0DCFF',
-                  color: '#252422',
-                },
+                x: -260.5,
+                y: -49,
               },
             },
             {
-              id: 'node-1695788631850',
+              id: 'node-1701789260746',
               position: {
-                x: 229.98164169940736,
-                y: -106.60660078095749,
-              },
-              style: {
-                title: {
-                  backgroundColor: '#E7AEF0',
-                  color: '#252422',
-                },
-                content: {
-                  backgroundColor: '#F0B5FA',
-                  color: '#252422',
-                },
+                x: 49.48197149331072,
+                y: -15.399329877977053,
               },
             },
             {
-              id: 'node-1695788837818',
+              id: 'node-1701789509670',
               position: {
-                x: 204.97503855713964,
-                y: 220.69896184204708,
-              },
-              style: {
-                title: {
-                  backgroundColor: '#F0B2AE',
-                  color: '#252422',
-                  strokeWidth: 2,
-                },
-                content: {
-                  backgroundColor: '#FAB9B5',
-                  color: '#252422',
-                },
+                x: 285.6163855955971,
+                y: -144.67677248695264,
               },
             },
             {
-              id: 'node-1695791578250',
-              style: {
-                title: {
-                  backgroundColor: '#9CEAB3',
-                  color: '#252422',
-                },
-                content: {
-                  backgroundColor: '#A2F4BA',
-                  color: '#252422',
-                },
-              },
+              id: 'node-1701789584321',
               position: {
-                x: 708.318336267242,
-                y: -71.86647069682725,
+                x: 288.0226545729197,
+                y: 67.69400129575857,
               },
             },
             {
-              id: 'node-1701155046507',
+              id: 'node-1701789766864',
               position: {
-                x: 479.63862035217926,
-                y: -70.22340177142942,
+                x: 565.4095233598287,
+                y: 96.5477261685659,
+              },
+            },
+            {
+              id: 'node-1701789990766',
+              position: {
+                x: 840.4045562147472,
+                y: -46.36223588343641,
+              },
+            },
+            {
+              id: 'node-1701790117491',
+              position: {
+                x: 1143.8100306962456,
+                y: -12.440408393044464,
               },
             },
           ],
           edges: [],
-          markers: [
-            {
-              color: '#E7AEF0',
-              title: 'Formal voting',
-            },
-            {
-              color: '#A9D3F5',
-              title: 'Informal voting',
-            },
-            {
-              color: '#9CEAB3',
-              title: 'Pass',
-            },
-            {
-              color: '#F0B2AE',
-              title: 'Red',
-            },
-          ],
+          markers: [],
         },
       ],
     },

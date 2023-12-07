@@ -329,7 +329,9 @@ async function handleVoting(props) {
             });
             return;
           }
-
+          
+          // ❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+          // ❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
           if (shouldTally) {
             // change endedAt of current vote data to moment for this checkpoint
             const { data: current_vote_data } = await supabase
@@ -380,7 +382,7 @@ async function handleVoting(props) {
               endedAt = startToVote;
               mission_status = 'STOPPED';
             }
-
+              
             // create current vote data for next checkpoint
             const { data: new_current_vote_data } = await supabase
               .from('current_vote_data')
