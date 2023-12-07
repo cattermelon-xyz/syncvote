@@ -58,6 +58,12 @@ const VoteSection: React.FC<Props> = ({
   };
 
   useEffect(() => {
+    if (selectedOption) {
+      onSelectedOption(selectedOption);
+    }
+  }, [selectedOption]);
+
+  useEffect(() => {
     if (
       currentCheckpointData &&
       currentCheckpointData?.vote_machine_type === VM_TYPE.DOC_INPUT
