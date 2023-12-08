@@ -7,7 +7,7 @@ interface Props {
   setCurrentProposalId: any;
 }
 
-const CheckpointCard: React.FC<Props> = ({
+const MissionCard: React.FC<Props> = ({
   proposal,
   setPage,
   setCurrentProposalId,
@@ -31,4 +31,4 @@ const CheckpointCard: React.FC<Props> = ({
   );
 };
 
-export default CheckpointCard;
+export default MissionCard;
