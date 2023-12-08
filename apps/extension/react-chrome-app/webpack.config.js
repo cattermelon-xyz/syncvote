@@ -56,6 +56,7 @@ module.exports = {
       '@constants': path.resolve(__dirname, 'src/constants/'),
       '@configs': path.resolve(__dirname, 'src/configs/'),
       '@data': path.resolve(__dirname, 'src/data/'),
+      '@axios': path.resolve(__dirname, 'src/axios/'),
     },
   },
   output: {

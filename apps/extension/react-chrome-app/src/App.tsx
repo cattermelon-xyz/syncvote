@@ -17,6 +17,7 @@ function App() {
   const [dataDemo, setDataDemo] = useState<any>();
   const [currentProposalId, setCurrentProposalId] = useState<number>();
   const [currentProposalData, setCurrentProposalData] = useState<any>();
+  const [currentOrgData, setCurrentOrgData] = useState<any>();
 
   useEffect(() => {
     getCurrentUser().then((resp) => {
@@ -63,8 +64,10 @@ function App() {
 
   useEffect(() => {
     console.log('dataDemo', dataDemo);
+    console.log('user', user);
     console.log('currentProposalId', currentProposalId);
-  }, [dataDemo, currentProposalData, currentProposalId]);
+    console.log('currentOrgData', currentOrgData);
+  }, [dataDemo, currentProposalData, currentProposalId, currentOrgData]);
 
   return (
     <div className='w-[260px] h-[380px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
@@ -82,12 +85,15 @@ function App() {
           user={user}
           setPage={setPage}
           dataDemo={dataDemo}
+          setCurrentOrgData={setCurrentOrgData}
           setCurrentProposalId={setCurrentProposalId}
         />
-      ) : page === PAGE_ROUTER.CREATE_PROPOSAL ? (
+      ) : currentOrgData && page === PAGE_ROUTER.CREATE_PROPOSAL ? (
         <CreateProposal
           setPage={setPage}
+          currentOrgData={currentOrgData}
           setCurrentProposalId={setCurrentProposalId}
+          user={user}
         />
       ) : page === PAGE_ROUTER.DONE_CREATE_PROPOSAL ? (
         <DoneCreateProposal setPage={setPage} />

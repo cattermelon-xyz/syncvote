@@ -1,5 +1,6 @@
 import { supabase } from '@configs/supabaseClient';
 
+
 export const queryOrgs = async ({
   params,
   onSuccess,
@@ -54,18 +55,6 @@ export const queryOrgs = async ({
               created_at,
               last_updated
             )
-          ),
-          templates:template (
-            id,
-            title,
-            desc,
-            owner_org_id,
-            icon_url,
-            banner_url,
-            status,
-            created_at,
-            current_version_id,
-            tag_template ( tag (*))
           )
         )
       `
@@ -133,21 +122,6 @@ export const queryOrgs = async ({
         };
       });
 
-      const templates = org?.templates.map((template: any) => {
-        const tags: any[] = [];
-        template.tag_template.map((itm: any) => {
-          tags.push({
-            value: itm.tag.id,
-            label: itm.tag.label,
-          });
-        });
-        delete template.tag_template;
-        template.tags = [...tags];
-        return {
-          ...template,
-        };
-      });
-
       tmp.push({
         id: org?.id,
         role: d.role,
@@ -160,7 +134,6 @@ export const queryOrgs = async ({
         profile: profiles,
         last_updated: org.last_updated,
         workflows: workflows || [],
-        templates: templates || [],
       });
     });
     onSuccess(tmp);
@@ -168,6 +141,8 @@ export const queryOrgs = async ({
     onError(error);
   }
 };
+
+
 
 export const queryDemo = async ({
   onSuccess,
