@@ -1,4 +1,5 @@
-const VoteHandleService = require('../services/VoteHandleService');
+const RegularVotingService = require('../services/VoteHandle/RegularVotingService');
+const DocInputVotingService = require('../services/VoteHandle/DocInputVotingService');
 
 const voting = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ const voting = async (req, res) => {
       });
     }
 
-    const respone = await VoteHandleService.handleVoting(req.body);
+    const respone = await RegularVotingService.handleSubmission(req.body);
     return res.status(200).json(respone);
   } catch (e) {
     return res.status(404).json({
@@ -29,7 +30,7 @@ const submitDoc = async (req, res) => {
       });
     }
 
-    const respone = await VoteHandleService.handleSubbmission(req.body);
+    const respone = await DocInputVotingService.handleSubbmission(req.body);
     return res.status(200).json(respone);
   } catch (e) {
     return res.status(404).json({

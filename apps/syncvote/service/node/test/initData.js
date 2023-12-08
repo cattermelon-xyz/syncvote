@@ -2,6 +2,7 @@ const { supabase } = require('../src/configs/supabaseClient');
 const { insertCheckpoint } = require('../src/services/CheckpointService');
 const moment = require('moment');
 const missionData = process.env.MISSION_DATA;
+
 const addMission = async () => {
   try {
     console.log('---Init data for testing---');
