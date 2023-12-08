@@ -112,34 +112,6 @@ const handleMovingToNextCheckpoint = async (
     // create a job for create post
     const cronSyntax = convertToCron(moment(startToVote));
     const job = new CronJob(cronSyntax, async function () {
-      // post when have topic
-      if (details.topic_id !== null) {
-        const { data: web2KeyData, error: errorWeb2KeyData } = await supabase
-          .from('web2_key')
-          .select('*')
-          .eq('org_id', details.org_id);
-
-        if (web2KeyData.length > 0) {
-          const filteredDiscourse = web2KeyData.filter(
-            (integration) => integration.provider === 'discourse'
-          );
-
-          if (filteredDiscourse.length === 1) {
-            const discourseConfig = filteredDiscourse[0];
-
-            const postData = {
-              topic_id: details.topic_id,
-              raw: `<p>Checkpoint ${next_checkpoint[0].title} has been started</p>
-                            <p>Checkpoint description: ${next_checkpoint[0].desc} </p>`,
-              org_id: details.org_id,
-              discourseConfig,
-            };
-
-            PostService.createPost(postData);
-          }
-        }
-      }
-
       // vote to start checkpoint
       await fetch(`${process.env.BACKEND_API}/vote/create`, {
         method: 'POST',
@@ -176,3 +148,30 @@ module.exports = {
   checkIfFirstTimeOfVoting,
   handleMovingToNextCheckpoint,
 };
+      // // post when have topic
+      // if (details.topic_id !== null) {
+      //   const { data: web2KeyData, error: errorWeb2KeyData } = await supabase
+      //     .from('web2_key')
+      //     .select('*')
+      //     .eq('org_id', details.org_id);
+
+      //   if (web2KeyData.length > 0) {
+      //     const filteredDiscourse = web2KeyData.filter(
+      //       (integration) => integration.provider === 'discourse'
+      //     );
+
+      //     if (filteredDiscourse.length === 1) {
+      //       const discourseConfig = filteredDiscourse[0];
+
+      //       const postData = {
+      //         topic_id: details.topic_id,
+      //         raw: `<p>Checkpoint ${next_checkpoint[0].title} has been started</p>
+      //                       <p>Checkpoint description: ${next_checkpoint[0].desc} </p>`,
+      //         org_id: details.org_id,
+      //         discourseConfig,
+      //       };
+
+      //       PostService.createPost(postData);
+      //     }
+      //   }
+      // }
