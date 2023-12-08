@@ -5,6 +5,7 @@ const { convertToCron } = require('../../functions');
 const {
   checkIfFirstTimeOfVoting,
   handleMovingToNextCheckpoint,
+  handleEndNode,
 } = require('./funcs');
 
 async function handleSubmission(props) {
@@ -47,26 +48,12 @@ async function handleSubmission(props) {
 
           // check if this is ended checkpoint
           if (!details.vote_machine_type) {
-            // update mission
-            await supabase
-              .from('mission')
-              .eq('id', mission_id)
-              .update('STOPPED');
-
-            // update current_vote_data
-            await supabase
-              .from('current_vote_data')
-              .eq('id', details.cvd_id)
-              .update({
-                endedAt: moment().format(),
-              });
-
+            await handleEndNode(details);
+            
             resolve({
               status: 'OK',
               message: 'Stopped this mission',
             });
-
-            
           } else {
             let { firstTimeToVote, voteMachineController } =
               await checkIfFirstTimeOfVoting(details);
