@@ -65,7 +65,6 @@ async function handleSubmission(props) {
               status: 'OK',
               message: 'Stopped this mission',
             });
-
             
           } else {
             let { firstTimeToVote, voteMachineController } =
