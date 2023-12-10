@@ -215,6 +215,14 @@ export const EditVersion = () => {
     hideLoading?: boolean
   ) => {
     const versionToSave = changedData || version;
+    console.log('workflowVersion', {
+      versionId,
+      workflowId: workflow.id,
+      version: versionToSave?.version,
+      status: versionToSave?.status,
+      versionData: versionToSave?.data,
+      recommended: versionToSave?.recommended,
+    });
     await upsertWorkflowVersion({
       dispatch,
       workflowVersion: {

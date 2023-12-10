@@ -10,6 +10,7 @@ import { Veto } from 'veto';
 import { UpVote } from 'upvote';
 import { DocInput } from 'doc-input';
 import { Snapshot } from 'snapshot';
+import { Discourse } from 'discourse';
 import { AuthContext } from '@layout/context/AuthContext';
 
 function App({ layout }: { layout: any }) {
@@ -25,6 +26,7 @@ function App({ layout }: { layout: any }) {
     registerVoteMachine(UpVote);
     registerVoteMachine(DocInput);
     registerVoteMachine(Snapshot);
+    registerVoteMachine(Discourse);
   }, [session]);
 
   const Layout: any = layout;
