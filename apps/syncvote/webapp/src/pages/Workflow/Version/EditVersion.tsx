@@ -1,12 +1,15 @@
 import {
   BranchesOutlined,
   CloseCircleOutlined,
+  DeleteOutlined,
   DownloadOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
+  PlusOutlined,
   SaveOutlined,
 } from '@ant-design/icons';
 import EditIcon from '@assets/icons/svg-icons/EditIcon';
+import NewSubWorkflowModal from './fragment/NewSubWorkflowModal';
 import {
   DirectedGraph,
   IDoc,
@@ -25,7 +28,15 @@ import {
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { shouldUseCachedData } from '@utils/helpers';
 import { extractIdFromIdString } from 'utils';
-import { Button, Drawer, Modal, Skeleton, Space, Typography } from 'antd';
+import {
+  Button,
+  Drawer,
+  Input,
+  Modal,
+  Skeleton,
+  Space,
+  Typography,
+} from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -45,6 +56,7 @@ const workerBlob = new Blob([autoSaveWorkerString], {
 });
 const workerURL = URL.createObjectURL(workerBlob);
 const autoSaveWorker = new Worker(workerURL, { type: 'classic' });
+const env = import.meta.env.VITE_ENV;
 
 const extractVersion = ({
   workflows,
@@ -101,14 +113,15 @@ export const EditVersion = () => {
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
   const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
-  const extractedVersion = extractVersion({
-    workflows,
-    workflowId,
-    versionId,
-  });
   const [openCreateProposalModal, setOpenCreateProposalModal] = useState(false);
   const { web2Integrations } = useSelector((state: any) => state.integration);
-  const [version, setVersion] = useState<any>(extractedVersion);
+  const [version, setVersion] = useState<any>(
+    extractVersion({
+      workflows,
+      workflowId,
+      versionId,
+    })
+  );
   const [web2IntegrationsState, setWeb2IntegrationsState] =
     useState(web2Integrations);
   const [workflow, setWorkflow] = useState<any>(
@@ -117,7 +130,7 @@ export const EditVersion = () => {
   const [selectedNodeId, setSelectedNodeId] = useState('');
   const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [selectedLayoutId, setSelectedLayoutId] = useState(
-    extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
+    version?.data?.cosmetic?.defaultLayout?.horizontal
   );
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [lastSaved, setLastSaved] = useState(-1);
@@ -138,13 +151,15 @@ export const EditVersion = () => {
     setWorkflow(wfList.find((w: any) => w.id === workflowId));
     return extractedVersion.data ? true : false;
   };
-  autoSaveWorker.onmessage = (e) => {
-    if (dataHasChanged) {
-      handleSave('data', undefined, true);
-      autoSaveWorker.postMessage(null);
-      setDataHasChanged(false);
-    }
-  };
+  if (env === 'production') {
+    autoSaveWorker.onmessage = (e) => {
+      if (dataHasChanged) {
+        handleSave('data', undefined, true);
+        autoSaveWorker.postMessage(null);
+        setDataHasChanged(false);
+      }
+    };
+  }
   useEffect(() => {
     if (dataHasChanged) {
       autoSaveWorker.postMessage(null);
@@ -199,16 +214,18 @@ export const EditVersion = () => {
     });
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
-  useEffect(() => {
-    const handleTabClose = (event: any) => {
-      event.preventDefault();
-      return (event.returnValue = 'Are you sure you want to exit?');
-    };
-    window.addEventListener('beforeunload', handleTabClose);
-    return () => {
-      window.removeEventListener('beforeunload', handleTabClose);
-    };
-  }, [workflows]);
+  if (env === 'production') {
+    useEffect(() => {
+      const handleTabClose = (event: any) => {
+        event.preventDefault();
+        return (event.returnValue = 'Are you sure you want to exit?');
+      };
+      window.addEventListener('beforeunload', handleTabClose);
+      return () => {
+        window.removeEventListener('beforeunload', handleTabClose);
+      };
+    }, [workflows]);
+  }
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
     changedData?: any | undefined,
@@ -255,8 +272,10 @@ export const EditVersion = () => {
       setDataHasChanged(true);
     }
   };
+  // TODO: delete elements in cosmetic.layouts
   const onDeleteNode = (id: any) => {
     if (id === version?.data.start) {
+      // TODO: how about start node of a sub workflow?
       Modal.error({
         title: 'Error',
         content: 'Cannot delete start node',
@@ -264,21 +283,48 @@ export const EditVersion = () => {
     } else {
       const newData = structuredClone(version?.data);
       const index = newData.checkpoints.findIndex((v: any) => v.id === id);
-      newData.checkpoints?.forEach((_node: any, cindex: number) => {
-        if (_node.children?.includes(id)) {
-          const newChkpData =
-            getVoteMachine(_node.vote_machine_type)?.deleteChildNode(
-              _node.data,
-              _node.children,
-              id
-            ) || _node.data;
-          newData.checkpoints[cindex].data = newChkpData;
-          if (_node.children) {
-            _node.children.splice(_node.children.indexOf(id));
+      if (index !== -1) {
+        newData.checkpoints?.forEach((_node: any, cindex: number) => {
+          if (_node.children?.includes(id)) {
+            const newChkpData =
+              getVoteMachine(_node.vote_machine_type)?.deleteChildNode(
+                _node.data,
+                _node.children,
+                id
+              ) || _node.data;
+            newData.checkpoints[cindex].data = newChkpData;
+            if (_node.children) {
+              _node.children.splice(_node.children.indexOf(id));
+            }
           }
+        });
+        newData.checkpoints.splice(index, 1);
+      } else {
+        if (newData.subWorkflows) {
+          newData.subWorkflows.map((subWorkflow: any) => {
+            const sIdx = subWorkflow.checkpoints.findIndex(
+              (v: any) => v.id === id
+            );
+            if (sIdx !== -1) {
+              subWorkflow.checkpoints.forEach((_node: any, cindex: number) => {
+                if (_node.children?.includes(id)) {
+                  const newChkpData =
+                    getVoteMachine(_node.vote_machine_type)?.deleteChildNode(
+                      _node.data,
+                      _node.children,
+                      id
+                    ) || _node.data;
+                  subWorkflow.checkpoints[cindex].data = newChkpData;
+                  if (_node.children) {
+                    _node.children.splice(_node.children.indexOf(id));
+                  }
+                }
+              });
+              subWorkflow.checkpoints.splice(sIdx, 1);
+            }
+          });
         }
-      });
-      newData.checkpoints.splice(index, 1);
+      }
       setVersion({
         ...version,
         data: newData,
@@ -317,6 +363,36 @@ export const EditVersion = () => {
   };
   const onNodeChanged = (changedNodes: any) => {
     const newData = structuredClone(version?.data);
+    if (newData.subWorkflows) {
+      newData.subWorkflows.map((subWorkflow: any) => {
+        subWorkflow.checkpoints.forEach((v: any, index: number) => {
+          const changedNode = changedNodes.find((cN: any) => cN.id === v.id);
+          if (changedNode && changedNode.position) {
+            subWorkflow.checkpoints[index].position = changedNode.position;
+            if (selectedLayoutId) {
+              const layout = newData.cosmetic.layouts.find(
+                (l: any) => l.id === selectedLayoutId
+              );
+              if (!layout.nodes) {
+                layout.nodes = [];
+              }
+              const nodes = layout.nodes;
+              const index = nodes.findIndex(
+                (n: any) => n.id === changedNode.id
+              );
+              if (index === -1) {
+                nodes.push({
+                  id: changedNode.id,
+                  position: changedNode.position,
+                });
+              } else {
+                nodes[index].position = changedNode.position;
+              }
+            }
+          }
+        });
+      });
+    }
     newData?.checkpoints?.forEach((v: any, index: number) => {
       const changedNode = changedNodes.find((cN: any) => cN.id === v.id);
       // TODO: position data should come from cosmetic
@@ -356,6 +432,7 @@ export const EditVersion = () => {
     });
     setDataHasChanged(true);
   };
+  // TODO: this function is deprecated, delete it
   const onResetPosition = () => {
     const newData = structuredClone(version?.data);
     newData.checkpoints.forEach((v: any, index: number) => {
@@ -451,22 +528,78 @@ export const EditVersion = () => {
     version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
       ?.markers || [];
   const [showColorLegend, setShowColorLegend] = useState(true);
+  const [showAddNewSubWorkflowModal, setShowAddNewSubWorkflowModal] =
+    useState(false);
+  const allCheckPoints = version?.data?.checkpoints
+    ? [...version.data.checkpoints]
+    : [];
+  version?.data?.subWorkflows?.map((w: any) =>
+    allCheckPoints.push(...(w.checkpoints || []))
+  );
   return (
     <>
       <AuthContext.Consumer>
         {({ session }) => (
           <div className='w-full bg-slate-100 h-screen'>
             <Debug>
-              <div>
-                {dataHasChanged ? 'data has changed' : 'data has not changed'}
-              </div>
-              {/* <div>
-                {viewMode}-{GraphViewMode.VIEW_ONLY}
-              </div> */}
-              <div className='block'>
-                {version ? 'version is TRUE' : 'version is FALSE'}
-              </div>
+              <Button
+                onClick={() => {
+                  console.log(version?.data);
+                }}
+              >
+                Console log verion
+              </Button>
             </Debug>
+            <NewSubWorkflowModal
+              isShown={showAddNewSubWorkflowModal}
+              data={version?.data}
+              onCancel={() => setShowAddNewSubWorkflowModal(false)}
+              onOK={({
+                refIdString,
+                startId,
+              }: {
+                refIdString: string;
+                startId: string;
+              }) => {
+                const existed =
+                  version?.data?.subWorkflows?.filter(
+                    (w: any) => w.refId === refIdString
+                  ) || [];
+                setShowAddNewSubWorkflowModal(false);
+                if (existed.length > 0) {
+                  Modal.error({
+                    title: 'Error',
+                    content: 'Sub-workflow already existed',
+                  });
+                  return;
+                } else {
+                  const newData = { ...version.data };
+                  const subWorkflows = newData.subWorkflows
+                    ? [...newData.subWorkflows]
+                    : [];
+                  const checkpoints = [...newData.checkpoints];
+                  let chkp = undefined;
+                  for (var i = 0; i < checkpoints.length; i++) {
+                    chkp = structuredClone(checkpoints[i]);
+                    if (chkp.id === startId) {
+                      checkpoints.splice(i, 1);
+                      break;
+                    }
+                  }
+                  subWorkflows.push({
+                    refId: refIdString,
+                    start: startId,
+                    checkpoints: [chkp],
+                  });
+                  newData.subWorkflows = [...subWorkflows];
+                  newData.checkpoints = [...checkpoints];
+                  setVersion({
+                    ...version,
+                    data: newData,
+                  });
+                }
+              }}
+            />
             <Header
               session={session}
               workflow={workflow}
@@ -551,7 +684,7 @@ export const EditVersion = () => {
                       setOpenCreateProposalModal(true);
                     }}
                     navPanel={
-                      <Space direction='vertical'>
+                      <Space direction='vertical' size='middle'>
                         <div
                           className='text-gray-400 font-bold flex items-center gap-2'
                           style={{ marginBottom: '0px' }}
@@ -632,6 +765,87 @@ export const EditVersion = () => {
                               </div>
                             );
                           })}
+                        <Space direction='vertical' size='small'>
+                          <div className='flex gap-2 flex-row items-center'>
+                            <div>List of subworkflows</div>
+                            <Button
+                              icon={<PlusOutlined />}
+                              onClick={() => {
+                                setShowAddNewSubWorkflowModal(true);
+                              }}
+                            />
+                          </div>
+                          {version?.data?.subWorkflows?.map((s: any) => {
+                            return (
+                              <div
+                                className='flex gap-2 flex-row items-center'
+                                key={s.refId}
+                              >
+                                <Button
+                                  icon={
+                                    <DeleteOutlined
+                                      onClick={() => {
+                                        const newData = structuredClone(
+                                          version?.data
+                                        );
+
+                                        const index =
+                                          newData.subWorkflows.findIndex(
+                                            (v: any) => v.refId === s.refId
+                                          );
+                                        const subWorkflowStartNode =
+                                          newData.subWorkflows.find(
+                                            (v: any) => v.refId === s.refId
+                                          ).start;
+                                        if (index !== -1) {
+                                          newData.subWorkflows.splice(index, 1);
+                                          const fk = newData.checkpoints.find(
+                                            (ckp: any) =>
+                                              ckp.vote_machine_type ===
+                                                'forkNode' &&
+                                              ckp.data?.start?.includes(s.refId)
+                                          );
+                                          if (fk) {
+                                            fk.data.start.splice(
+                                              fk.data.start.indexOf(s.refId),
+                                              1
+                                            );
+                                            const idxStart =
+                                              fk.children?.indexOf(
+                                                subWorkflowStartNode
+                                              );
+                                            if (idxStart !== -1) {
+                                              fk.children?.splice(idxStart, 1);
+                                            }
+                                            const endIdx = fk.data.end?.indexOf(
+                                              s.refId
+                                            );
+                                            if (endIdx !== -1) {
+                                              fk.data.end.splice(endIdx, 1);
+                                            }
+                                          }
+                                          setVersion({
+                                            ...version,
+                                            data: newData,
+                                          });
+                                        }
+                                      }}
+                                    />
+                                  }
+                                  danger
+                                />
+                                <div>{s.refId}</div>
+                                <div>
+                                  {
+                                    allCheckPoints.find(
+                                      (ckp: any) => ckp.id === s.start
+                                    )?.title
+                                  }
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </Space>
                       </Space>
                     }
                     viewMode={viewMode}

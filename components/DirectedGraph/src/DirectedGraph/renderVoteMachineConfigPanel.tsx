@@ -12,7 +12,15 @@ import { GraphPanelContext } from './context';
 export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
   const { data, selectedNodeId, onChange, onDelete, onClose, viewMode } = props;
   const versionData = data;
-  const selectedNode = versionData.checkpoints?.find(
+  const allCheckPoints = versionData.checkpoints
+    ? [...versionData.checkpoints]
+    : [];
+  versionData.subWorkflows?.map((sw: any) => {
+    sw.checkpoints?.map((chk: any) => {
+      allCheckPoints.push(chk);
+    });
+  });
+  const selectedNode = allCheckPoints?.find(
     (chk: any) => chk.id === selectedNodeId
   );
   let configPanel = <></>;
@@ -29,11 +37,12 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
         <MachineConfigPanel
           vmConfigPanel={
             <ConfigPanel
+              raw={versionData}
               viewMode={viewMode}
               currentNodeId={selectedNodeId}
               onChange={onChange}
               children={selectedNode.children || []}
-              allNodes={versionData.checkpoints}
+              allNodes={allCheckPoints}
               data={structuredClone(data)}
               quorum={selectedNode.quorum}
               includedAbstain={selectedNode.includedAbstain}

@@ -107,9 +107,7 @@ const Flow = () => {
     setEdges(obj.edges);
 
     if (shouldFitView) {
-      console.log('setTimeout ** attempt to fit view');
       setTimeout(() => {
-        console.log('attempt to fit view');
         fitView();
       }, 50);
     }
@@ -294,13 +292,16 @@ const Flow = () => {
                     <Badge count={docs.length ? docs.length : 0} />
                   </div>
                 ) : null}
+
+                {/* 
+                // TODO: remove this feature completely
                 <div
                   className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100'
                   onClick={onResetPosition}
                   title="Reset the graph's position"
                 >
                   <SyncOutlined />
-                </div>
+                </div> */}
                 <div
                   className={`flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100`}
                   onClick={() => {

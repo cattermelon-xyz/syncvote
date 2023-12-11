@@ -1,4 +1,13 @@
-import { Space, Drawer, Tabs, Collapse, Input, Modal, Button } from 'antd';
+import {
+  Space,
+  Drawer,
+  Tabs,
+  Collapse,
+  Input,
+  Modal,
+  Button,
+  Select,
+} from 'antd';
 import { useContext, useState } from 'react';
 import { EditOutlined } from '@ant-design/icons';
 import { GraphViewMode, ICheckPoint, IVoteMachine } from '../interface';
@@ -15,9 +24,20 @@ import SideNote from '../components/SideNote';
 const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
   const { data, selectedNodeId, onChange, viewMode } =
     useContext(GraphPanelContext);
-  const selectedNode = data.checkpoints?.find(
+  const allCheckPoints = data.checkpoints ? [...data.checkpoints] : [];
+  data.subWorkflows?.map((sw: any) => {
+    sw.checkpoints?.map((chk: any) => {
+      allCheckPoints.push({ ...chk, subWorkflowId: sw.refId });
+    });
+  });
+  const selectedNode = allCheckPoints.find(
     (chk: any) => chk.id === selectedNodeId
   );
+  const subWorkflows =
+    data.subWorkflows?.map((s: any) => {
+      return { value: s.refId, label: s.refId };
+    }) || [];
+  subWorkflows.push({ value: '', label: 'Root workflow' });
   const [vmDrawerVisbibility, setvmDrawerVisbibility] = useState(false);
   const setVoteMachine = ({
     type,
@@ -46,6 +66,8 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
   const [votingLocation, setVotingLocation] = useState(
     selectedNode?.votingLocation || ''
   );
+  const type = selectedNode?.vote_machine_type || '';
+  const subWorkflowId = selectedNode?.subWorkflowId || '';
   return (
     <>
       <Drawer
@@ -57,7 +79,7 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
       >
         <ChooseVoteMachine
           changeVoteMachineType={setVoteMachine}
-          currentType={selectedNode?.vote_machine_type}
+          currentType={type}
         />
       </Drawer>
       <Space className='w-full pb-4' direction='vertical' size='large'>
@@ -86,24 +108,48 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
                 }
               }}
             />
+            {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION &&
+            ['forkNode', 'joinNode'].indexOf(
+              selectedNode?.vote_machine_type || ''
+            ) === -1 ? (
+              <div className='flex justify-between items-center'>
+                <div>Select workflow</div>
+                <Select
+                  options={subWorkflows}
+                  value={subWorkflowId}
+                  onChange={(val) => {
+                    onChange({
+                      ...selectedNode,
+                      subWorkflowId: val,
+                    });
+                  }}
+                />
+              </div>
+            ) : (
+              <div>{!subWorkflowId ? 'In root workflow' : subWorkflowId}</div>
+            )}
           </Space>
         </CollapsiblePanel>
-        {!selectedNode?.isEnd ? (
-          <CollapsiblePanel title='Participants'>
-            <VotingPartipation />
-            <SideNote
-              value={selectedNode?.participationDescription}
-              className='mt-4'
-              setValue={(val: string) => {
-                const newNode = structuredClone(selectedNode);
-                if (newNode) {
-                  newNode.participationDescription = val;
-                  onChange(newNode);
-                }
-              }}
-            />
-          </CollapsiblePanel>
-        ) : null}
+        <>
+          {!selectedNode?.isEnd &&
+          type !== 'forkNode' &&
+          type !== 'joinNode' ? (
+            <CollapsiblePanel title='Participants'>
+              <VotingPartipation />
+              <SideNote
+                value={selectedNode?.participationDescription}
+                className='mt-4'
+                setValue={(val: string) => {
+                  const newNode = structuredClone(selectedNode);
+                  if (newNode) {
+                    newNode.participationDescription = val;
+                    onChange(newNode);
+                  }
+                }}
+              />
+            </CollapsiblePanel>
+          ) : null}
+        </>
         <CollapsiblePanel title='Voting method'>
           <>
             {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION &&
@@ -135,27 +181,34 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
           </>
         </CollapsiblePanel>
         {vmConfigPanel}
-        {!selectedNode?.isEnd ? <VotingDuration /> : null}
+        {!selectedNode?.isEnd && type !== 'forkNode' && type !== 'joinNode' ? (
+          <VotingDuration />
+        ) : null}
         <CollapsiblePanel title='Other info'>
           <Space direction='vertical' size='middle' className='w-full'>
-            <Space direction='vertical' size='small' className='w-full'>
-              <div className='text-gray-400'>Voting location</div>
-              <TextEditor
-                value={votingLocation}
-                setValue={(val: any) => {
-                  setVotingLocation(val);
-                }}
-                onBlur={async () => {
-                  if (votingLocation !== selectedNode?.votingLocation) {
-                    const newNode = structuredClone(selectedNode);
-                    if (newNode) {
-                      newNode.votingLocation = votingLocation;
-                      onChange(newNode);
+            {!selectedNode?.isEnd &&
+            type !== 'forkNode' &&
+            type !== 'joinNode' ? (
+              <Space direction='vertical' size='small' className='w-full'>
+                <div className='text-gray-400'>Voting location</div>
+                <TextEditor
+                  value={votingLocation}
+                  setValue={(val: any) => {
+                    setVotingLocation(val);
+                  }}
+                  onBlur={async () => {
+                    if (votingLocation !== selectedNode?.votingLocation) {
+                      const newNode = structuredClone(selectedNode);
+                      if (newNode) {
+                        newNode.votingLocation = votingLocation;
+                        onChange(newNode);
+                      }
                     }
-                  }
-                }}
-              />
-            </Space>
+                  }}
+                />
+              </Space>
+            ) : null}
+
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-gray-400'>Checkpoint color & label</div>
               <MarkerEditNode />

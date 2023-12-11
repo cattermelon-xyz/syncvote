@@ -22,6 +22,7 @@ export interface ICheckPoint {
   resultDescription?: string;
   optionsDescription?: string;
   durationDescription?: string;
+  subWorkflowId?: string;
 }
 
 // TODO: add version
@@ -49,6 +50,7 @@ export interface IVoteMachineConfigProps extends ICheckPoint {
   viewMode: GraphViewMode;
   currentNodeId?: string;
   allNodes: any[];
+  raw?: IWorkflowVersionData;
   onChange: (data: any) => void;
   /**
    * Solana Address
@@ -156,11 +158,19 @@ export interface IDoc {
   template: string;
 }
 
+export interface ISubWorkflow {
+  id: string;
+  start: string;
+  checkpoints: ICheckPoint[];
+}
+
 export interface IWorkflowVersionData {
   start: string;
   checkpoints: ICheckPoint[];
-  docs?: IDoc[];
-  cosmetic?: IWorkflowVersionCosmetic;
+  docs?: IDoc[]; // docs of all workflows
+  cosmetic?: IWorkflowVersionCosmetic; // cosmetic & positions of all checkpoints
+  subWorkflows?: ISubWorkflow[];
+  variables?: string;
 }
 
 export interface IGraph {
