@@ -10,7 +10,7 @@ const TopicService = require('./TopicService');
 const PostService = require('./PostService');
 
 const moment = require('moment');
-const { createArweave } = require('../functions');
+const { createArweave, convertToCron } = require('../functions');
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: new SingleVote({}),
@@ -125,79 +125,77 @@ async function insertMission(props) {
                 return;
               }
 
-              let topicId;
-              if (web2KeyData.length > 0) {
-                const filteredDiscourse = web2KeyData.filter(
-                  (integration) => integration.provider === 'discourse'
-                );
+              // let topicId;
+              // if (web2KeyData.length > 0) {
+              //   const filteredDiscourse = web2KeyData.filter(
+              //     (integration) => integration.provider === 'discourse'
+              //   );
 
-                if (filteredDiscourse.length === 1) {
-                  const discourseConfig = filteredDiscourse[0];
+              //   if (filteredDiscourse.length === 1) {
+              //     const discourseConfig = filteredDiscourse[0];
 
-                  const topicData = {
-                    title: `Proposal: ${missionViewData[0].title} has been created`,
-                    raw: `Proposal description: ${missionViewData[0].desc}`,
-                    org_id: missionViewData[0].org_id,
-                    discourseConfig,
-                  };
+              //     const topicData = {
+              //       title: `Proposal: ${missionViewData[0].title} has been created`,
+              //       raw: `Proposal description: ${missionViewData[0].desc}`,
+              //       org_id: missionViewData[0].org_id,
+              //       discourseConfig,
+              //     };
 
-                  const { data: createTopicData, error: errorCreateTopicData } =
-                    await TopicService.createTopic(topicData);
-                  topicId = createTopicData.topic_id;
+              //     const { data: createTopicData, error: errorCreateTopicData } =
+              //       await TopicService.createTopic(topicData);
+              //     topicId = createTopicData.topic_id;
 
-                  if (errorCreateTopicData) {
-                    resolve({
-                      status: 'ERR',
-                      message: 'Error to create mission',
-                    });
-                    return;
-                  }
+              //     if (errorCreateTopicData) {
+              //       resolve({
+              //         status: 'ERR',
+              //         message: 'Error to create mission',
+              //       });
+              //       return;
+              //     }
 
-                  const postData = {
-                    topic_id: topicId,
-                    raw: `Checkpoint ${checkpointData.title} has been started`,
-                    org_id: missionViewData[0].org_id,
-                    discourseConfig,
-                  };
+              //     const postData = {
+              //       topic_id: topicId,
+              //       raw: `Checkpoint ${checkpointData.title} has been started`,
+              //       org_id: missionViewData[0].org_id,
+              //       discourseConfig,
+              //     };
 
-                  const { error: errorCreatePostData } =
-                    await PostService.createPost(postData);
+              //     const { error: errorCreatePostData } =
+              //       await PostService.createPost(postData);
 
-                  if (errorCreatePostData) {
-                    resolve({
-                      status: 'ERR',
-                      message: 'error to create mission',
-                    });
-                    return;
-                  }
-                }
-              }
+              //     if (errorCreatePostData) {
+              //       resolve({
+              //         status: 'ERR',
+              //         message: 'error to create mission',
+              //       });
+              //       return;
+              //     }
+              //   }
+              // }
 
               // create a job to close this current vote data in expected time close
-              const now = new Date();
-              const scheduledTime = new Date(
-                now.getTime() + checkpointData.duration * 1000
+              const expectEndedAt = moment().add(
+                checkpointData.duration,
+                'seconds'
               );
-              const cronSyntax = `${scheduledTime.getSeconds()} ${scheduledTime.getMinutes()} ${scheduledTime.getHours()} ${scheduledTime.getDate()} ${
-                scheduledTime.getMonth() + 1
-              } *`;
 
-              // const job = new CronJob(cronSyntax, async function () {
-              //   await fetch(`${process.env.BACKEND_API}/vote/create`, {
-              //     method: 'POST',
-              //     headers: {
-              //       'Content-Type': 'application/json',
-              //     },
-              //     body: JSON.stringify({
-              //       identify: `cronjob-${checkpointData.id}`,
-              //       option: ['fake option'],
-              //       voting_power: 9999,
-              //       mission_id: newMission[0].id,
-              //     }),
-              //   });
-              // });
-              // job.start();
-              // console.log(`create job to stop at start`);
+              const cronSyntax = convertToCron(expectEndedAt);
+              const job = new CronJob(cronSyntax, async function () {
+                await fetch(`${process.env.BACKEND_API}/vote/create`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    identify: `cronjob-${checkpointData.id}`,
+                    option: ['fake option'],
+                    voting_power: 9999,
+                    mission_id: newMission[0].id,
+                  }),
+                });
+              });
+              job.start();
+              console.log(`create job to stop at start`);
 
               const { u_error } = await supabase
                 .from('mission')

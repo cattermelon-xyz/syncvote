@@ -6,6 +6,7 @@ const {
   checkIfFirstTimeOfVoting,
   handleMovingToNextCheckpoint,
   handleEndNode,
+  handleForkNode,
 } = require('./funcs');
 
 async function handleSubmission(props) {
@@ -49,10 +50,15 @@ async function handleSubmission(props) {
           // check if this is ended checkpoint
           if (!details.vote_machine_type) {
             await handleEndNode(details);
-            
             resolve({
               status: 'OK',
               message: 'Stopped this mission',
+            });
+          } else if (!details.vote_machine_type === 'ForkNode') {
+            await handleForkNode(details);
+            resolve({
+              status: 'OK',
+              message: 'Seperate this mission',
             });
           } else {
             let { firstTimeToVote, voteMachineController } =

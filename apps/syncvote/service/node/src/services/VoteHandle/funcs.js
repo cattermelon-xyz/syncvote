@@ -6,6 +6,7 @@ const { supabase } = require('../../configs/supabaseClient');
 const moment = require('moment');
 var CronJob = require('cron').CronJob;
 const { createArweave, convertToCron, deepEqual } = require('../../functions');
+const { insertMission } = require('../MissionService');
 
 const checkIfFirstTimeOfVoting = async (details) => {
   let voteMachineController = new VoteMachineController(details);
@@ -143,14 +144,6 @@ const handleMovingToNextCheckpoint = async (
       })
       .eq('id', details.mission_id);
 
-    // if next checkpoint is forknode
-    if (
-      details.submission &&
-      next_checkpoint[0].vote_machine_type === 'ForkNode'
-    ) {
-      // create multiple mission in here
-    }
-
     return { next_checkpoint_id };
   } catch (error) {
     console.log('Handle moving to next checkpoint error', error);
@@ -234,10 +227,99 @@ const handleEndNode = async (details) => {
   }
 };
 
+const handleForkNode = async (details) => {
+  // Assume that ForkNode data from mission will look like this
+
+  const forkNodeData = details?.data?.forkNode[0] || {
+    start: ['submission1', 'submission2', 'submission3'],
+    end: ['submission1', 'submission2'],
+  };
+
+  const subMissionData = details?.data?.subMission || [
+    createSubMissionData('submission1', details.mission_id),
+    createSubMissionData('submission2', details.mission_id),
+    createSubMissionData('submission3', details.mission_id),
+  ];
+
+  let startMissionId = [];
+  let endMissionId = [];
+
+  // create multiple mission in here
+  for (let subMission of subMissionData) {
+    // create mission
+    axios
+      .post(`${process.env.BACKEND_API}/mission/create`, subMission)
+      .then((response) => {
+        console.log('Respone', response.data);
+        if (response.data.status !== 'ERR') {
+          startMissionId.push([response.data.data[0].id]);
+          if (forkNodeData.end.includes(subMission.refId)) {
+            endMissionId.push([response.data.data[0].id]);
+          }
+        }
+      });
+  }
+};
+
 module.exports = {
   checkIfFirstTimeOfVoting,
   handleMovingToNextCheckpoint,
   handleEndNode,
+  handleForkNode,
+};
+
+const createSubMissionData = (refId, parentId) => {
+  return {
+    refId: refId,
+    parentId: parentId,
+    data: {
+      checkpoints: [
+        {
+          id: 'root',
+          position: {
+            x: -260.5,
+            y: -49,
+          },
+          isEnd: false,
+          data: {
+            options: ['Going to fork'],
+            max: 5,
+          },
+          children: ['node-1701790117491'],
+          vote_machine_type: 'SingleChoiceRaceToMax',
+          title: 'Checkpoint 0',
+          delays: [1],
+          delayUnits: ['hour'],
+          delayNotes: [''],
+          quorum: 10,
+          participation: {
+            type: 'identity',
+            data: [
+              'chaukhac4@gmail.com',
+              'chaukhac5@gmail.com',
+              'chaukhac6@gmail.com',
+              'chaukhac7@gmail.com',
+              'chaukhac8@gmail.com',
+              'chaukhac9@gmail.com',
+              'chaukhac10@gmail.com',
+              'chaukhac11@gmail.com',
+              'chaukhac12@gmail.com',
+              'chaukhac13@gmail.com',
+              'chaukhac14@gmail.com',
+            ],
+          },
+          duration: 86400,
+        },
+        {
+          title: 'EndNode',
+          id: 'node-1701790117491',
+          isEnd: true,
+          children: [],
+        },
+      ],
+      start: 'root',
+    },
+  };
 };
 
 // // post when have topic
