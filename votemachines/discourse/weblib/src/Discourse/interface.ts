@@ -1,29 +1,4 @@
 import { DelayUnit } from 'directed-graph';
-export declare type ProposalType =
-  | {
-      label: 'Single Choice';
-      value: 'single-choice';
-    }
-  | {
-      label: 'Approval';
-      value: 'approval';
-    }
-  | {
-      label: 'Quadratic';
-      value: 'quadratic';
-    }
-  | {
-      label: 'Ranked Choice';
-      value: 'ranked-choice';
-    }
-  | {
-      label: 'Weighted';
-      value: 'weighted';
-    }
-  | {
-      label: 'Basic';
-      value: 'basic';
-    };
 
 export namespace Snapshot {
   export interface IData {
@@ -31,8 +6,7 @@ export namespace Snapshot {
     options: string[];
     max: number;
     token: string;
-    space?: string;
-    type?: ProposalType;
+    action?: string;
     start?: number;
     end?: number;
     title?: string;

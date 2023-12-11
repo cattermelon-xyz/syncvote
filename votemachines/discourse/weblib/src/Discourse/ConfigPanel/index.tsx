@@ -8,7 +8,6 @@ import {
   CollapsiblePanel,
   SideNote,
 } from 'directed-graph';
-import { TextEditor } from 'rich-text-editor';
 import NewOptionDrawer from './NewOptionDrawer';
 import { PlusOutlined } from '@ant-design/icons';
 import '../styles.scss';
@@ -274,34 +273,12 @@ export default (props: IVoteMachineConfigProps) => {
                   onChange({
                     data: {
                       ...data,
-                      type: option,
+                      action: value,
                     },
                   });
                 }}
               />
             </Space>
-            <Space direction='vertical' size='small' className='w-full'>
-              <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Title
-                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
-                  <MdHelpOutline />
-                </Popover>
-              </div>
-              <Input
-                className='w-full'
-                placeholder='Title of topic'
-                value={data.space}
-                onChange={(e: any) => {
-                  onChange({
-                    data: {
-                      ...data,
-                      space: e.target.value,
-                    },
-                  });
-                }}
-              />
-            </Space>
-            <TextEditor />
           </Space>
         </CollapsiblePanel>
       </Space>

@@ -54,14 +54,9 @@ export namespace Snapshot {
       message.push('Missing options');
     }
     // if (!checkpoint?.data || !checkpoint.data.max) {
-    if (!checkpoint?.data.type) {
+    if (!checkpoint?.data.action) {
       isValid = false;
-      message.push('Missing type of vote in snapshot');
-    }
-
-    if (!checkpoint?.data.space) {
-      isValid = false;
-      message.push('Missing space of snapshot');
+      message.push('Missing action of vote in discourse');
     }
     return {
       isValid,
