@@ -1,4 +1,4 @@
-import { Select, Avatar, Tabs } from 'antd';
+import { Select, Avatar, Tabs, Empty } from 'antd';
 import { BellOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import MissionCard from '@components/MissionCard';
@@ -9,18 +9,18 @@ import { queryOrgs } from '@data/org';
 
 interface Props {
   setPage: any;
-  dataDemo: any;
   setCurrentProposalId: any;
   setCurrentOrgData: any;
   user: any;
+  dataMissions: any;
 }
 
 const HomePage: React.FC<Props> = ({
   setPage,
-  dataDemo,
   setCurrentProposalId,
   setCurrentOrgData,
   user,
+  dataMissions,
 }) => {
   const [orgsOption, setOrgsOption] = useState<any>();
   const [dataOrgs, setDataOrgs] = useState<any>();
@@ -69,15 +69,18 @@ const HomePage: React.FC<Props> = ({
       label: 'For you',
       children: (
         <div className='flex flex-col gap-2'>
-          {dataDemo &&
-            dataDemo.map((proposal: any, index: any) => (
+          {dataMissions && dataMissions.length > 0 ? (
+            dataMissions.map((proposal: any, index: any) => (
               <MissionCard
                 key={index}
                 proposal={proposal}
                 setPage={setPage}
                 setCurrentProposalId={setCurrentProposalId}
               />
-            ))}
+            ))
+          ) : (
+            <Empty />
+          )}
         </div>
       ),
     },

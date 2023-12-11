@@ -13,6 +13,7 @@
     "votemachines/veto/weblib",
     "votemachines/docinput/weblib",
     "votemachines/snapshot/weblib",
+    "votemachines/discourse/weblib",
     "utils",
     "apps/extension/react-chrome-app"
   ]

@@ -20,12 +20,22 @@ const MissionCard: React.FC<Props> = ({
         setPage(PAGE_ROUTER.VOTING);
       }}
     >
-      <Tag color={proposal?.status === 'execution' ? 'default' : 'green'}>
-        {proposal?.status === 'execution' ? 'Completed' : proposal?.status}
+      <Tag
+        color={
+          proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
+            ? 'default'
+            : 'green'
+        }
+      >
+        {proposal?.status === 'DRAFT'
+          ? 'Draft'
+          : proposal?.status === 'STOPPED'
+          ? 'Closed'
+          : proposal?.status}
       </Tag>
       <div className='flex flex-col gap-1 mt-1'>
         <p className='text-[13px]'>{proposal?.title}</p>
-        <p className='text-[10px]'>{`Updated at ${proposal?.last_updated}`}</p>
+        <p className='text-[10px]'>{`Created at ${proposal?.created_at}`}</p>
       </div>
     </Card>
   );
