@@ -1,10 +1,15 @@
 import { IVoteMachine } from './interface';
+import ForkNode from './VoteMachines/ForkNode';
+import JoinNode from './VoteMachines/JoinNode';
 
 type Machines = {
   [key: string]: IVoteMachine;
 };
 
-const machines: Machines = {};
+const machines: Machines = {
+  forkNode: ForkNode,
+  joinNode: JoinNode,
+};
 export const registerVoteMachine = (machine: IVoteMachine) => {
   machines[machine.getType()] = machine;
 };

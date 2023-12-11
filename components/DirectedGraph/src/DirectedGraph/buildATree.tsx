@@ -143,6 +143,35 @@ const buildEdge = ({
   };
 };
 
+const findSubWorkflowId = (data: any, id: string) => {
+  const subWorkflows = data?.subWorkflows ? data?.subWorkflows : [];
+  let wfId = undefined;
+  let isStart = false;
+  for (var i = 0; i < data?.checkpoints?.length; i++) {
+    if (data?.checkpoints[i].id === id) {
+      wfId = '';
+      if (data?.start === id) {
+        isStart = true;
+      }
+      break;
+    }
+  }
+  if (wfId === undefined) {
+    for (var i = 0; i < subWorkflows.length; i++) {
+      for (var j = 0; j < subWorkflows[i].checkpoints.length; j++) {
+        if (subWorkflows[i].checkpoints[j].id === id) {
+          wfId = subWorkflows[i].refId;
+          if (subWorkflows[i].start === id) {
+            isStart = true;
+          }
+          break;
+        }
+      }
+    }
+  }
+  return { subWorkflowId: wfId, isStart };
+};
+
 export const buildATree = ({
   data,
   selectedNodeId,
@@ -155,7 +184,7 @@ export const buildATree = ({
   selectedEdgeId: string | undefined;
 }) => {
   const checkpoints: Array<any> = [];
-  let newData = { ...data };
+  let newData = structuredClone(data);
   const cosmetic = newData.cosmetic;
   const layouts: IWorkflowVersionLayout[] = cosmetic?.layouts || [];
   const defaultLayout = cosmetic?.defaultLayout;
@@ -164,12 +193,39 @@ export const buildATree = ({
   if (data.checkpoints === undefined || data.checkpoints.length === 0) {
     newData = emptyStage;
   }
+  const forkNodes: any[] = [];
   newData.checkpoints.forEach((checkpoint: any) => {
-    checkpoints.push({
-      ...checkpoint,
-      edgeConstructed: false,
-    });
+    checkpoints.push(
+      structuredClone({
+        ...checkpoint,
+        edgeConstructed: false,
+      })
+    );
+    if (checkpoint.vote_machine_type === 'forkNode') {
+      forkNodes.push(checkpoint);
+    }
   });
+  if (newData.subWorkflows) {
+    newData.subWorkflows.map((subWorkflow: any) => {
+      const fk = forkNodes.find((nd: any) =>
+        nd.data?.start?.includes(subWorkflow.refId)
+      );
+      const connectToJoinNode = fk?.data?.end?.includes(subWorkflow.refId);
+      const joinNodeId = fk?.data?.joinNode;
+      subWorkflow.checkpoints.forEach((checkpoint: any) => {
+        const children = checkpoint.children ? [...checkpoint.children] : [];
+        if (connectToJoinNode && joinNodeId && checkpoint.isEnd) {
+          children.push(joinNodeId);
+        }
+        checkpoints.push({
+          ...checkpoint,
+          children,
+          edgeConstructed: false,
+          subWorkflowId: subWorkflow.refId,
+        });
+      });
+    });
+  }
   const startNodeId = newData.start;
   // each node is 300px away from other horizontally
   // each node is 100px away from other vertically
@@ -203,6 +259,9 @@ export const buildATree = ({
       source: any;
       target: any;
     }) => {
+      if (voteMachine === undefined) {
+        return <span>End</span>;
+      }
       const vm: any = getVoteMachine(voteMachine);
       return vm.getLabel({ source, target });
     };
@@ -270,6 +329,10 @@ export const buildATree = ({
           </div>
         );
       }
+      const { subWorkflowId, isStart } = findSubWorkflowId(
+        newData,
+        checkpoint.id
+      );
       nodes.push({
         id: checkpoint.id,
         data: {
@@ -284,6 +347,8 @@ export const buildATree = ({
             data: checkpoint.data,
             graphData: data,
           }),
+          subWorkflowId,
+          isStart,
         },
         x: checkpoint.x,
         y: checkpoint.y,
