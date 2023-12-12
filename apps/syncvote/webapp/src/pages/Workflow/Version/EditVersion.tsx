@@ -1,24 +1,9 @@
 import {
-  BranchesOutlined,
-  CloseCircleOutlined,
-  DeleteOutlined,
-  DownloadOutlined,
-  EyeInvisibleOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  SaveOutlined,
-} from '@ant-design/icons';
-import EditIcon from '@assets/icons/svg-icons/EditIcon';
-import NewSubWorkflowModal from './fragment/NewSubWorkflowModal';
-import {
   DirectedGraph,
   IDoc,
-  defaultLayout,
-  emptyCosmetic,
   emptyStage,
   getVoteMachine,
 } from 'directed-graph';
-import { Icon } from 'icon';
 import {
   canUserEditWorkflowVersion,
   queryWeb2Integration,
@@ -28,16 +13,8 @@ import {
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { shouldUseCachedData } from '@utils/helpers';
 import { extractIdFromIdString } from 'utils';
-import {
-  Button,
-  Drawer,
-  Input,
-  Modal,
-  Skeleton,
-  Space,
-  Typography,
-} from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { Button, Modal, Skeleton, Space } from 'antd';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -51,6 +28,10 @@ import NotFound404 from '@pages/NotFound404';
 import Debug from '@components/Debug/Debug';
 import { CreateProposalModal } from '@fragments/CreateProposalModal';
 import autoSaveWorkerString from './worker.js?raw';
+import WorkflowList from './fragment/WorkflowList';
+import ColorLegend from './fragment/ColorLegend';
+import PermissionDeniedToView from './fragment/PermissionDeniedToView';
+import PermissionDeniedEdit from './fragment/PermissionDeniedEdit';
 const workerBlob = new Blob([autoSaveWorkerString], {
   type: 'text/javascript',
 });
@@ -58,49 +39,15 @@ const workerURL = URL.createObjectURL(workerBlob);
 const autoSaveWorker = new Worker(workerURL, { type: 'classic' });
 const env = import.meta.env.VITE_ENV;
 
-const extractVersion = ({
-  workflows,
-  workflowId,
-  versionId,
-}: {
-  workflows: any;
-  workflowId: number;
-  versionId: number;
-}) => {
-  const wf = workflows?.find((workflow: any) => workflow.id === workflowId);
-  let extractedVersion: any = {};
-  if (wf) {
-    extractedVersion = structuredClone(
-      wf.workflow_version.find((wv: any) => wv.id === versionId)
-    );
-    // console.log('extractedVersion', extractedVersion);
-    if (!extractedVersion) return {};
-  } else {
-    return {};
-  }
-  const cosmetic = extractedVersion?.data?.cosmetic;
-  if (typeof extractedVersion?.data === 'string') {
-    extractedVersion.data = emptyStage;
-  }
-  if (!cosmetic) {
-    extractedVersion.data.cosmetic = emptyCosmetic;
-  } else if (cosmetic.layouts.length === 0) {
-    extractedVersion.data.cosmetic.layouts = [defaultLayout];
-    extractedVersion.data.cosmetic.defaultLayout = {
-      horizontal: 'default',
-      vertical: 'default',
-    };
-  } else if (
-    !extractedVersion.data.cosmetic.defaultLayout ||
-    extractedVersion.data.cosmetic.defaultLayout?.horizontal === ''
-  ) {
-    extractedVersion.data.cosmetic.defaultLayout = {
-      horizontal: cosmetic.layouts[0].id,
-      vertical: cosmetic.layouts[0].id,
-    };
-  }
-  return extractedVersion;
-};
+import {
+  changeNode,
+  deleteNode,
+  extractVersion,
+  extractWorkflowFromList,
+  newNode,
+  save,
+} from './funcs';
+import VariableList from './fragment/VariableList';
 
 export const EditVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -137,20 +84,7 @@ export const EditVersion = () => {
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
   const [fitScreen, setFitScreen] = useState(0); // 0: never fit, 1: should fit, 2: fitted
-  const extractWorkflowFromList = (wfList: any) => {
-    let extractedVersion = extractVersion({
-      workflows: wfList,
-      workflowId,
-      versionId,
-    });
-    setVersion(extractedVersion);
-    setSelectedLayoutId(
-      extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal || 'default'
-    );
-    setDataHasChanged(false);
-    setWorkflow(wfList.find((w: any) => w.id === workflowId));
-    return extractedVersion.data ? true : false;
-  };
+
   if (env === 'production') {
     autoSaveWorker.onmessage = (e) => {
       if (dataHasChanged) {
@@ -179,7 +113,15 @@ export const EditVersion = () => {
       orgId,
       dispatch,
       onLoad: (wfList: any) => {
-        extractWorkflowFromList(wfList);
+        extractWorkflowFromList(
+          wfList,
+          workflowId,
+          versionId,
+          setVersion,
+          setSelectedLayoutId,
+          setDataHasChanged,
+          setWorkflow
+        );
         setIsLoadingData(false);
       },
       onError: (error: any) => {
@@ -198,7 +140,15 @@ export const EditVersion = () => {
     if (!shouldUseCachedData(lastFetch)) {
       fetchDataFromServer();
     } else {
-      const isDataInRedux = extractWorkflowFromList(workflows);
+      const isDataInRedux = extractWorkflowFromList(
+        workflows,
+        workflowId,
+        versionId,
+        setVersion,
+        setSelectedLayoutId,
+        setDataHasChanged,
+        setWorkflow
+      );
       if (!isDataInRedux && isDataFetchedFromServer === false) {
         fetchDataFromServer();
       }
@@ -231,29 +181,17 @@ export const EditVersion = () => {
     changedData?: any | undefined,
     hideLoading?: boolean
   ) => {
-    const versionToSave = changedData || version;
-    await upsertWorkflowVersion({
+    await save(
+      changedData,
+      version,
+      upsertWorkflowVersion,
       dispatch,
-      workflowVersion: {
-        versionId,
-        workflowId: workflow.id,
-        version: versionToSave?.version,
-        status: versionToSave?.status,
-        versionData: versionToSave?.data,
-        recommended: versionToSave?.recommended,
-      },
-      onSuccess: () => {
-        setLastSaved(Date.now());
-      },
-      onError: (error) => {
-        Modal.error({
-          title: 'Error',
-          content: error.message,
-        });
-      },
+      versionId,
+      workflow,
+      setLastSaved,
       mode,
-      hideLoading,
-    });
+      hideLoading
+    );
   };
   const onChange = (changedData: any) => {
     if (fitScreen === 1) {
@@ -274,67 +212,15 @@ export const EditVersion = () => {
   };
   // TODO: delete elements in cosmetic.layouts
   const onDeleteNode = (id: any) => {
-    if (id === version?.data.start) {
-      // TODO: how about start node of a sub workflow?
-      Modal.error({
-        title: 'Error',
-        content: 'Cannot delete start node',
-      });
-    } else {
-      const newData = structuredClone(version?.data);
-      const index = newData.checkpoints.findIndex((v: any) => v.id === id);
-      if (index !== -1) {
-        newData.checkpoints?.forEach((_node: any, cindex: number) => {
-          if (_node.children?.includes(id)) {
-            const newChkpData =
-              getVoteMachine(_node.vote_machine_type)?.deleteChildNode(
-                _node.data,
-                _node.children,
-                id
-              ) || _node.data;
-            newData.checkpoints[cindex].data = newChkpData;
-            if (_node.children) {
-              _node.children.splice(_node.children.indexOf(id));
-            }
-          }
-        });
-        newData.checkpoints.splice(index, 1);
-      } else {
-        if (newData.subWorkflows) {
-          newData.subWorkflows.map((subWorkflow: any) => {
-            const sIdx = subWorkflow.checkpoints.findIndex(
-              (v: any) => v.id === id
-            );
-            if (sIdx !== -1) {
-              subWorkflow.checkpoints.forEach((_node: any, cindex: number) => {
-                if (_node.children?.includes(id)) {
-                  const newChkpData =
-                    getVoteMachine(_node.vote_machine_type)?.deleteChildNode(
-                      _node.data,
-                      _node.children,
-                      id
-                    ) || _node.data;
-                  subWorkflow.checkpoints[cindex].data = newChkpData;
-                  if (_node.children) {
-                    _node.children.splice(_node.children.indexOf(id));
-                  }
-                }
-              });
-              subWorkflow.checkpoints.splice(sIdx, 1);
-            }
-          });
-        }
-      }
-      setVersion({
-        ...version,
-        data: newData,
-      });
-      if (selectedNodeId) {
-        setDataHasChanged(true);
-      }
-      setSelectedNodeId('');
-      setDataHasChanged(true);
-    }
+    deleteNode(
+      id,
+      version,
+      getVoteMachine,
+      setVersion,
+      selectedNodeId,
+      setDataHasChanged,
+      setSelectedNodeId
+    );
   };
   const onChangeLayout = (changedData: IWorkflowVersionLayout) => {
     if (selectedLayoutId !== '') {
@@ -362,67 +248,13 @@ export const EditVersion = () => {
     setSelectedEdgeId(edge.id);
   };
   const onNodeChanged = (changedNodes: any) => {
-    const newData = structuredClone(version?.data);
-    if (newData.subWorkflows) {
-      newData.subWorkflows.map((subWorkflow: any) => {
-        subWorkflow.checkpoints.forEach((v: any, index: number) => {
-          const changedNode = changedNodes.find((cN: any) => cN.id === v.id);
-          if (changedNode && changedNode.position) {
-            subWorkflow.checkpoints[index].position = changedNode.position;
-            if (selectedLayoutId) {
-              const layout = newData.cosmetic.layouts.find(
-                (l: any) => l.id === selectedLayoutId
-              );
-              if (!layout.nodes) {
-                layout.nodes = [];
-              }
-              const nodes = layout.nodes;
-              const index = nodes.findIndex(
-                (n: any) => n.id === changedNode.id
-              );
-              if (index === -1) {
-                nodes.push({
-                  id: changedNode.id,
-                  position: changedNode.position,
-                });
-              } else {
-                nodes[index].position = changedNode.position;
-              }
-            }
-          }
-        });
-      });
-    }
-    newData?.checkpoints?.forEach((v: any, index: number) => {
-      const changedNode = changedNodes.find((cN: any) => cN.id === v.id);
-      // TODO: position data should come from cosmetic
-      if (changedNode && changedNode.position) {
-        newData.checkpoints[index].position = changedNode.position;
-        if (selectedLayoutId) {
-          const layout = newData.cosmetic.layouts.find(
-            (l: any) => l.id === selectedLayoutId
-          );
-          if (!layout.nodes) {
-            layout.nodes = [];
-          }
-          const nodes = layout.nodes;
-          const index = nodes.findIndex((n: any) => n.id === changedNode.id);
-          if (index === -1) {
-            nodes.push({
-              id: changedNode.id,
-              position: changedNode.position,
-            });
-          } else {
-            nodes[index].position = changedNode.position;
-          }
-        }
-      }
-    });
-    setVersion({
-      ...version,
-      data: newData,
-    });
-    setDataHasChanged(true);
+    changeNode(
+      version,
+      changedNodes,
+      selectedLayoutId,
+      setVersion,
+      setDataHasChanged
+    );
   };
   const onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {
     const cosmetic = changeCosmetic(version?.data.cosmetic, changed);
@@ -447,40 +279,19 @@ export const EditVersion = () => {
   const [gridX, setGridX] = useState(0); // initialize gridX with 0
   const [gridY, setGridY] = useState(0); // initialize gridY with 0
   const onAddNewNode = () => {
-    const newData = structuredClone(version?.data);
-    const newId = `node-${new Date().getTime()}`;
-    const nodeSpacing = 130;
-
-    let newPos = {
-      x: centerPos.x + gridX * nodeSpacing,
-      y: centerPos.y + gridY * nodeSpacing,
-    };
-
-    newData.checkpoints.push({
-      title: `Checkpoint ` + version?.data?.checkpoints?.length,
-      id: newId,
-      position: newPos,
-      isEnd: true,
-    });
-
-    if (gridX < 5) {
-      setGridX(gridX + 1);
-    } else {
-      setGridX(0);
-      setGridY(gridY + 1);
-    }
-
-    setVersion({
-      ...version,
-      data: newData,
-    });
-
-    setSelectedNodeId(newId);
-    if (selectedNodeId) {
-      setDataHasChanged(true);
-    }
+    newNode(
+      version,
+      setVersion,
+      setDataHasChanged,
+      centerPos,
+      gridX,
+      gridY,
+      setGridX,
+      setGridY,
+      setSelectedNodeId,
+      selectedNodeId
+    );
   };
-
   const onViewPortChange = (viewport: any) => {
     setCenterPos({
       x: (-viewport.x + 600) / viewport.zoom,
@@ -528,8 +339,7 @@ export const EditVersion = () => {
     version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
       ?.markers || [];
   const [showColorLegend, setShowColorLegend] = useState(true);
-  const [showAddNewSubWorkflowModal, setShowAddNewSubWorkflowModal] =
-    useState(false);
+  useState(false);
   const allCheckPoints = version?.data?.checkpoints
     ? [...version.data.checkpoints]
     : [];
@@ -550,56 +360,6 @@ export const EditVersion = () => {
                 Console log verion
               </Button>
             </Debug>
-            <NewSubWorkflowModal
-              isShown={showAddNewSubWorkflowModal}
-              data={version?.data}
-              onCancel={() => setShowAddNewSubWorkflowModal(false)}
-              onOK={({
-                refIdString,
-                startId,
-              }: {
-                refIdString: string;
-                startId: string;
-              }) => {
-                const existed =
-                  version?.data?.subWorkflows?.filter(
-                    (w: any) => w.refId === refIdString
-                  ) || [];
-                setShowAddNewSubWorkflowModal(false);
-                if (existed.length > 0) {
-                  Modal.error({
-                    title: 'Error',
-                    content: 'Sub-workflow already existed',
-                  });
-                  return;
-                } else {
-                  const newData = { ...version.data };
-                  const subWorkflows = newData.subWorkflows
-                    ? [...newData.subWorkflows]
-                    : [];
-                  const checkpoints = [...newData.checkpoints];
-                  let chkp = undefined;
-                  for (var i = 0; i < checkpoints.length; i++) {
-                    chkp = structuredClone(checkpoints[i]);
-                    if (chkp.id === startId) {
-                      checkpoints.splice(i, 1);
-                      break;
-                    }
-                  }
-                  subWorkflows.push({
-                    refId: refIdString,
-                    start: startId,
-                    checkpoints: [chkp],
-                  });
-                  newData.subWorkflows = [...subWorkflows];
-                  newData.checkpoints = [...checkpoints];
-                  setVersion({
-                    ...version,
-                    data: newData,
-                  });
-                }
-              }}
-            />
             <Header
               session={session}
               workflow={workflow}
@@ -620,51 +380,16 @@ export const EditVersion = () => {
                     <Skeleton className='p-16' />
                   </div>
                 ) : workflow ? (
-                  <div>
-                    <NotFound404
-                      title='Permission denied'
-                      message={
-                        <div className='w-full text-center'>
-                          <p>
-                            Sorry, you don not have permission to access to this
-                            workflow.
-                          </p>
-                          <p>
-                            Ask the owner to publish this workflow or add you as
-                            a workspace editor.
-                          </p>
-                        </div>
-                      }
-                    />
-                  </div>
+                  <PermissionDeniedToView />
                 ) : (
                   <NotFound404 />
                 )
               ) : viewMode === GraphViewMode.VIEW_ONLY ? (
-                <NotFound404
-                  title='Permission denied'
-                  message={
-                    <div className='w-full text-center'>
-                      <p>
-                        Sorry, you don not have permission to{' '}
-                        <span className='text-violet-500'>EDIT</span> to this
-                        workflow.
-                      </p>
-                      <div>Click here to open the view mode</div>
-                    </div>
-                  }
-                  cta={
-                    <Button
-                      type='primary'
-                      onClick={() =>
-                        navigate(
-                          `/public/${orgIdString}/${workflowIdString}/${versionIdString}`
-                        )
-                      }
-                    >
-                      Open in View
-                    </Button>
-                  }
+                <PermissionDeniedEdit
+                  navigate={navigate}
+                  orgIdString={orgIdString}
+                  workflowIdString={workflowIdString}
+                  versionIdString={versionIdString}
                 />
               ) : (
                 <div className='w-full h-full'>
@@ -685,167 +410,25 @@ export const EditVersion = () => {
                     }}
                     navPanel={
                       <Space direction='vertical' size='middle'>
-                        <div
-                          className='text-gray-400 font-bold flex items-center gap-2'
-                          style={{ marginBottom: '0px' }}
-                        >
-                          <div>Color legend</div>
-                          <div
-                            className='hover:text-violet-500 cursor-pointer'
-                            onClick={() => setShowColorLegend(!showColorLegend)}
-                          >
-                            {showColorLegend ? (
-                              <EyeOutlined />
-                            ) : (
-                              <EyeInvisibleOutlined />
-                            )}
-                          </div>
-                        </div>
-                        {showColorLegend &&
-                          markers.map((marker: any) => {
-                            return (
-                              <div
-                                className='flex gap-2 items-center'
-                                key={marker.color}
-                              >
-                                <div
-                                  className='w-[16px] h-[16px]'
-                                  style={{ backgroundColor: marker.color }}
-                                ></div>
-                                <Typography.Paragraph
-                                  editable={{
-                                    onChange: (val) => {
-                                      markers[markers.indexOf(marker)].title =
-                                        val;
-                                      const selectedLayout =
-                                        version?.data?.cosmetic?.layouts.find(
-                                          (l: any) => l.id === selectedLayoutId
-                                        );
-                                      selectedLayout.markers = markers;
-                                      const cosmetic = changeCosmetic(
-                                        version?.data.cosmetic,
-                                        {
-                                          layouts: [selectedLayout],
-                                        }
-                                      );
-                                      setVersion({
-                                        ...version,
-                                        data: { ...version.data, cosmetic },
-                                      });
-                                      setDataHasChanged(true);
-                                    },
-                                  }}
-                                  style={{ marginBottom: '0px' }}
-                                >
-                                  {marker.title}
-                                </Typography.Paragraph>
-
-                                <CloseCircleOutlined
-                                  className='hover:text-red-500'
-                                  onClick={() => {
-                                    markers.splice(markers.indexOf(marker), 1);
-                                    const selectedLayout =
-                                      version?.data?.cosmetic?.layouts.find(
-                                        (l: any) => l.id === selectedLayoutId
-                                      );
-                                    selectedLayout.markers = markers;
-                                    const cosmetic = changeCosmetic(
-                                      version?.data.cosmetic,
-                                      {
-                                        layouts: [selectedLayout],
-                                      }
-                                    );
-                                    setVersion({
-                                      ...version,
-                                      data: { ...version.data, cosmetic },
-                                    });
-                                    setDataHasChanged(true);
-                                  }}
-                                />
-                              </div>
-                            );
-                          })}
-                        <Space direction='vertical' size='small'>
-                          <div className='flex gap-2 flex-row items-center'>
-                            <div>List of subworkflows</div>
-                            <Button
-                              icon={<PlusOutlined />}
-                              onClick={() => {
-                                setShowAddNewSubWorkflowModal(true);
-                              }}
-                            />
-                          </div>
-                          {version?.data?.subWorkflows?.map((s: any) => {
-                            return (
-                              <div
-                                className='flex gap-2 flex-row items-center'
-                                key={s.refId}
-                              >
-                                <Button
-                                  icon={
-                                    <DeleteOutlined
-                                      onClick={() => {
-                                        const newData = structuredClone(
-                                          version?.data
-                                        );
-
-                                        const index =
-                                          newData.subWorkflows.findIndex(
-                                            (v: any) => v.refId === s.refId
-                                          );
-                                        const subWorkflowStartNode =
-                                          newData.subWorkflows.find(
-                                            (v: any) => v.refId === s.refId
-                                          ).start;
-                                        if (index !== -1) {
-                                          newData.subWorkflows.splice(index, 1);
-                                          const fk = newData.checkpoints.find(
-                                            (ckp: any) =>
-                                              ckp.vote_machine_type ===
-                                                'forkNode' &&
-                                              ckp.data?.start?.includes(s.refId)
-                                          );
-                                          if (fk) {
-                                            fk.data.start.splice(
-                                              fk.data.start.indexOf(s.refId),
-                                              1
-                                            );
-                                            const idxStart =
-                                              fk.children?.indexOf(
-                                                subWorkflowStartNode
-                                              );
-                                            if (idxStart !== -1) {
-                                              fk.children?.splice(idxStart, 1);
-                                            }
-                                            const endIdx = fk.data.end?.indexOf(
-                                              s.refId
-                                            );
-                                            if (endIdx !== -1) {
-                                              fk.data.end.splice(endIdx, 1);
-                                            }
-                                          }
-                                          setVersion({
-                                            ...version,
-                                            data: newData,
-                                          });
-                                        }
-                                      }}
-                                    />
-                                  }
-                                  danger
-                                />
-                                <div>{s.refId}</div>
-                                <div>
-                                  {
-                                    allCheckPoints.find(
-                                      (ckp: any) => ckp.id === s.start
-                                    )?.title
-                                  }
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </Space>
+                        <ColorLegend
+                          showColorLegend={showColorLegend}
+                          setShowColorLegend={setShowColorLegend}
+                          markers={markers}
+                          version={version}
+                          selectedLayoutId={selectedLayoutId}
+                          changeCosmetic={changeCosmetic}
+                          setVersion={setVersion}
+                          setDataHasChanged={setDataHasChanged}
+                        />
+                        <WorkflowList
+                          version={version}
+                          setVersion={setVersion}
+                          allCheckPoints={allCheckPoints}
+                        />
+                        <VariableList
+                          version={version}
+                          setVersion={setVersion}
+                        />
                       </Space>
                     }
                     viewMode={viewMode}
@@ -887,36 +470,3 @@ export const EditVersion = () => {
     </>
   );
 };
-
-{
-  /* <Space
-  direction="horizontal"
-  size="middle"
-  className="flex items-center border-2 bg-white p-2 rounded-md"
->
-  <Space direction="horizontal" size="small">
-    
-  </Space>
-  <BranchesOutlined />
-  <Space direction="horizontal" size="small">
-    <div className="font-bold">{version?.version}</div>
-    <span
-      onClick={() => setShowInfoPanel(true)}
-      className="cursor-pointer"
-    >
-      <EditIcon />
-    </span>
-  </Space>
-  <Button
-    type="link"
-    className="flex items-center text-violet-500"
-    icon={<SaveOutlined />}
-    disabled={!dataHasChanged}
-    onClick={() => {
-      handleSave('data');
-    }}
-  >
-    Save
-  </Button>
-</Space> */
-}
