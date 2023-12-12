@@ -105,11 +105,11 @@ const handleMovingToNextCheckpoint = async (
       .insert({
         checkpoint_id:
           next_checkpoint_id + next_checkpoint[0].vote_machine_type ===
-          'ForkNode'
+          'forkNode'
             ? '-start'
             : null,
         initData:
-          next_checkpoint[0].vote_machine_type === 'ForkNode'
+          next_checkpoint[0].vote_machine_type === 'forkNode'
             ? { joinNode: next_checkpoint_id + '-end' }
             : tallyResult,
         startToVote: startToVote,
@@ -172,7 +172,7 @@ const handleEndNode = async (details) => {
     // check if current checkpoint is ForkNode
     if (
       misison_parent_data.current_vote_data[0].checkpoint[0]
-        .vote_machine_type === 'ForkNode'
+        .vote_machine_type === 'forkNode'
     ) {
       // Update current_vote_data of ForkNode
       let result = misison_parent_data.current_vote_data[0].result;

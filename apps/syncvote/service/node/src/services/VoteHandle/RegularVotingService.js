@@ -54,12 +54,15 @@ async function handleSubmission(props) {
               status: 'OK',
               message: 'Stopped this mission',
             });
-          } else if (!details.vote_machine_type === 'ForkNode') {
+
+          } else if (!details.vote_machine_type === 'forkNode') {
+
             await handleForkNode(details);
             resolve({
               status: 'OK',
               message: 'Seperate this mission',
             });
+            
           } else {
             let { firstTimeToVote, voteMachineController } =
               await checkIfFirstTimeOfVoting(details);
