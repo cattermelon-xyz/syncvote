@@ -17,11 +17,13 @@ import {
 
 const VoteMachine: IVoteMachine = {
   ConfigPanel: (props: IVoteMachineConfigProps) => {
-    const joinNodes: any[] = [];
-    const connectedJoinNodes: any[] = [];
     const currentNode = props.allNodes?.find(
       (a) => a.id === props.currentNodeId
     );
+    const children = currentNode?.children ? [...currentNode?.children] : [];
+    const joinNodes: any[] = [];
+    const connectedJoinNodes: any[] = [];
+
     const joinedNode = currentNode?.data?.joinNode
       ? props.allNodes?.find((v) => v.id === currentNode?.data?.joinNode)
       : undefined;
@@ -64,7 +66,7 @@ const VoteMachine: IVoteMachine = {
     const endSubWorkflowIds = currentNode?.data?.end
       ? currentNode?.data?.end
       : [];
-    const children = currentNode?.children ? [...currentNode?.children] : [];
+
     return (
       <CollapsiblePanel title='Parallel Sub-Workflow'>
         {joinedNode ? (
@@ -208,7 +210,7 @@ const VoteMachine: IVoteMachine = {
     return 'forkNode';
   },
   getLabel: () => {
-    return <span></span>;
+    return <span>trigger</span>;
   },
   getIcon: () => {
     return <VerticalLeftOutlined />;
