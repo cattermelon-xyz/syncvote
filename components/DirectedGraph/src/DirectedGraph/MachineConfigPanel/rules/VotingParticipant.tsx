@@ -27,7 +27,13 @@ const VotingPartipation = () => {
     onChange,
     viewMode,
   } = useContext(GraphPanelContext);
-  const selectedNode = allData.checkpoints?.find(
+  const allCheckPoints = allData.checkpoints ? [...allData.checkpoints] : [];
+  allData.subWorkflows?.map((sw: any) => {
+    sw.checkpoints?.map((chk: any) => {
+      allCheckPoints.push({ ...chk, subWorkflowId: sw.refId });
+    });
+  });
+  const selectedNode = allCheckPoints?.find(
     (chk: any) => chk.id === selectedNodeId
   );
   const participation = selectedNode?.participation || {};
