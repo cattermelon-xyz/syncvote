@@ -70,3 +70,11 @@ export const displayDuration = (duration: moment.Duration) => {
   const drt = years + months + days + hours + minutes + seconds;
   return drt ? drt : '0 seconds';
 };
+
+export const shortenString = (str: string, maxLength: number = 30) => {
+  if (!str || str.length <= maxLength) {
+    return str;
+  }
+  console.log(str);
+  return str.substring(0, maxLength) + '...';
+};

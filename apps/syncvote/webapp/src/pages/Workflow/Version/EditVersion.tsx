@@ -1,21 +1,9 @@
 import {
-  BranchesOutlined,
-  CloseCircleOutlined,
-  DownloadOutlined,
-  EyeInvisibleOutlined,
-  EyeOutlined,
-  SaveOutlined,
-} from '@ant-design/icons';
-import EditIcon from '@assets/icons/svg-icons/EditIcon';
-import {
   DirectedGraph,
   IDoc,
-  defaultLayout,
-  emptyCosmetic,
   emptyStage,
   getVoteMachine,
 } from 'directed-graph';
-import { Icon } from 'icon';
 import {
   canUserEditWorkflowVersion,
   queryWeb2Integration,
@@ -25,8 +13,8 @@ import {
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { shouldUseCachedData } from '@utils/helpers';
 import { extractIdFromIdString } from 'utils';
-import { Button, Drawer, Modal, Skeleton, Space, Typography } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { Button, Modal, Skeleton, Space } from 'antd';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -40,55 +28,26 @@ import NotFound404 from '@pages/NotFound404';
 import Debug from '@components/Debug/Debug';
 import { CreateProposalModal } from '@fragments/CreateProposalModal';
 import autoSaveWorkerString from './worker.js?raw';
+import WorkflowList from './fragment/WorkflowList';
+import ColorLegend from './fragment/ColorLegend';
+import PermissionDeniedToView from './fragment/PermissionDeniedToView';
+import PermissionDeniedEdit from './fragment/PermissionDeniedEdit';
 const workerBlob = new Blob([autoSaveWorkerString], {
   type: 'text/javascript',
 });
 const workerURL = URL.createObjectURL(workerBlob);
 const autoSaveWorker = new Worker(workerURL, { type: 'classic' });
+const env = import.meta.env.VITE_ENV;
 
-const extractVersion = ({
-  workflows,
-  workflowId,
-  versionId,
-}: {
-  workflows: any;
-  workflowId: number;
-  versionId: number;
-}) => {
-  const wf = workflows?.find((workflow: any) => workflow.id === workflowId);
-  let extractedVersion: any = {};
-  if (wf) {
-    extractedVersion = structuredClone(
-      wf.workflow_version.find((wv: any) => wv.id === versionId)
-    );
-    // console.log('extractedVersion', extractedVersion);
-    if (!extractedVersion) return {};
-  } else {
-    return {};
-  }
-  const cosmetic = extractedVersion?.data?.cosmetic;
-  if (typeof extractedVersion?.data === 'string') {
-    extractedVersion.data = emptyStage;
-  }
-  if (!cosmetic) {
-    extractedVersion.data.cosmetic = emptyCosmetic;
-  } else if (cosmetic.layouts.length === 0) {
-    extractedVersion.data.cosmetic.layouts = [defaultLayout];
-    extractedVersion.data.cosmetic.defaultLayout = {
-      horizontal: 'default',
-      vertical: 'default',
-    };
-  } else if (
-    !extractedVersion.data.cosmetic.defaultLayout ||
-    extractedVersion.data.cosmetic.defaultLayout?.horizontal === ''
-  ) {
-    extractedVersion.data.cosmetic.defaultLayout = {
-      horizontal: cosmetic.layouts[0].id,
-      vertical: cosmetic.layouts[0].id,
-    };
-  }
-  return extractedVersion;
-};
+import {
+  changeNode,
+  deleteNode,
+  extractVersion,
+  extractWorkflowFromList,
+  newNode,
+  save,
+} from './funcs';
+import VariableList from './fragment/VariableList';
 
 export const EditVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -101,14 +60,15 @@ export const EditVersion = () => {
   const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
   const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
-  const extractedVersion = extractVersion({
-    workflows,
-    workflowId,
-    versionId,
-  });
   const [openCreateProposalModal, setOpenCreateProposalModal] = useState(false);
   const { web2Integrations } = useSelector((state: any) => state.integration);
-  const [version, setVersion] = useState<any>(extractedVersion);
+  const [version, setVersion] = useState<any>(
+    extractVersion({
+      workflows,
+      workflowId,
+      versionId,
+    })
+  );
   const [web2IntegrationsState, setWeb2IntegrationsState] =
     useState(web2Integrations);
   const [workflow, setWorkflow] = useState<any>(
@@ -117,34 +77,23 @@ export const EditVersion = () => {
   const [selectedNodeId, setSelectedNodeId] = useState('');
   const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [selectedLayoutId, setSelectedLayoutId] = useState(
-    extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal
+    version?.data?.cosmetic?.defaultLayout?.horizontal
   );
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
   const [fitScreen, setFitScreen] = useState(0); // 0: never fit, 1: should fit, 2: fitted
-  const extractWorkflowFromList = (wfList: any) => {
-    let extractedVersion = extractVersion({
-      workflows: wfList,
-      workflowId,
-      versionId,
-    });
-    setVersion(extractedVersion);
-    setSelectedLayoutId(
-      extractedVersion?.data?.cosmetic?.defaultLayout?.horizontal || 'default'
-    );
-    setDataHasChanged(false);
-    setWorkflow(wfList.find((w: any) => w.id === workflowId));
-    return extractedVersion.data ? true : false;
-  };
-  autoSaveWorker.onmessage = (e) => {
-    if (dataHasChanged) {
-      handleSave('data', undefined, true);
-      autoSaveWorker.postMessage(null);
-      setDataHasChanged(false);
-    }
-  };
+
+  if (env === 'production') {
+    autoSaveWorker.onmessage = (e) => {
+      if (dataHasChanged) {
+        handleSave('data', undefined, true);
+        autoSaveWorker.postMessage(null);
+        setDataHasChanged(false);
+      }
+    };
+  }
   useEffect(() => {
     if (dataHasChanged) {
       autoSaveWorker.postMessage(null);
@@ -164,7 +113,15 @@ export const EditVersion = () => {
       orgId,
       dispatch,
       onLoad: (wfList: any) => {
-        extractWorkflowFromList(wfList);
+        extractWorkflowFromList(
+          wfList,
+          workflowId,
+          versionId,
+          setVersion,
+          setSelectedLayoutId,
+          setDataHasChanged,
+          setWorkflow
+        );
         setIsLoadingData(false);
       },
       onError: (error: any) => {
@@ -183,7 +140,15 @@ export const EditVersion = () => {
     if (!shouldUseCachedData(lastFetch)) {
       fetchDataFromServer();
     } else {
-      const isDataInRedux = extractWorkflowFromList(workflows);
+      const isDataInRedux = extractWorkflowFromList(
+        workflows,
+        workflowId,
+        versionId,
+        setVersion,
+        setSelectedLayoutId,
+        setDataHasChanged,
+        setWorkflow
+      );
       if (!isDataInRedux && isDataFetchedFromServer === false) {
         fetchDataFromServer();
       }
@@ -199,44 +164,34 @@ export const EditVersion = () => {
     });
     setDataHasChanged(false);
   }, [workflows, web2Integrations, lastFetch]);
-  useEffect(() => {
-    const handleTabClose = (event: any) => {
-      event.preventDefault();
-      return (event.returnValue = 'Are you sure you want to exit?');
-    };
-    window.addEventListener('beforeunload', handleTabClose);
-    return () => {
-      window.removeEventListener('beforeunload', handleTabClose);
-    };
-  }, [workflows]);
+  if (env === 'production') {
+    useEffect(() => {
+      const handleTabClose = (event: any) => {
+        event.preventDefault();
+        return (event.returnValue = 'Are you sure you want to exit?');
+      };
+      window.addEventListener('beforeunload', handleTabClose);
+      return () => {
+        window.removeEventListener('beforeunload', handleTabClose);
+      };
+    }, [workflows]);
+  }
   const handleSave = async (
     mode: 'data' | 'info' | undefined,
     changedData?: any | undefined,
     hideLoading?: boolean
   ) => {
-    const versionToSave = changedData || version;
-    await upsertWorkflowVersion({
+    await save(
+      changedData,
+      version,
+      upsertWorkflowVersion,
       dispatch,
-      workflowVersion: {
-        versionId,
-        workflowId: workflow.id,
-        version: versionToSave?.version,
-        status: versionToSave?.status,
-        versionData: versionToSave?.data,
-        recommended: versionToSave?.recommended,
-      },
-      onSuccess: () => {
-        setLastSaved(Date.now());
-      },
-      onError: (error) => {
-        Modal.error({
-          title: 'Error',
-          content: error.message,
-        });
-      },
+      versionId,
+      workflow,
+      setLastSaved,
       mode,
-      hideLoading,
-    });
+      hideLoading
+    );
   };
   const onChange = (changedData: any) => {
     if (fitScreen === 1) {
@@ -255,40 +210,17 @@ export const EditVersion = () => {
       setDataHasChanged(true);
     }
   };
+  // TODO: delete elements in cosmetic.layouts
   const onDeleteNode = (id: any) => {
-    if (id === version?.data.start) {
-      Modal.error({
-        title: 'Error',
-        content: 'Cannot delete start node',
-      });
-    } else {
-      const newData = structuredClone(version?.data);
-      const index = newData.checkpoints.findIndex((v: any) => v.id === id);
-      newData.checkpoints?.forEach((_node: any, cindex: number) => {
-        if (_node.children?.includes(id)) {
-          const newChkpData =
-            getVoteMachine(_node.vote_machine_type)?.deleteChildNode(
-              _node.data,
-              _node.children,
-              id
-            ) || _node.data;
-          newData.checkpoints[cindex].data = newChkpData;
-          if (_node.children) {
-            _node.children.splice(_node.children.indexOf(id));
-          }
-        }
-      });
-      newData.checkpoints.splice(index, 1);
-      setVersion({
-        ...version,
-        data: newData,
-      });
-      if (selectedNodeId) {
-        setDataHasChanged(true);
-      }
-      setSelectedNodeId('');
-      setDataHasChanged(true);
-    }
+    deleteNode(
+      id,
+      version,
+      getVoteMachine,
+      setVersion,
+      selectedNodeId,
+      setDataHasChanged,
+      setSelectedNodeId
+    );
   };
   const onChangeLayout = (changedData: IWorkflowVersionLayout) => {
     if (selectedLayoutId !== '') {
@@ -316,37 +248,13 @@ export const EditVersion = () => {
     setSelectedEdgeId(edge.id);
   };
   const onNodeChanged = (changedNodes: any) => {
-    const newData = structuredClone(version?.data);
-    newData?.checkpoints?.forEach((v: any, index: number) => {
-      const changedNode = changedNodes.find((cN: any) => cN.id === v.id);
-      // TODO: position data should come from cosmetic
-      if (changedNode && changedNode.position) {
-        newData.checkpoints[index].position = changedNode.position;
-        if (selectedLayoutId) {
-          const layout = newData.cosmetic.layouts.find(
-            (l: any) => l.id === selectedLayoutId
-          );
-          if (!layout.nodes) {
-            layout.nodes = [];
-          }
-          const nodes = layout.nodes;
-          const index = nodes.findIndex((n: any) => n.id === changedNode.id);
-          if (index === -1) {
-            nodes.push({
-              id: changedNode.id,
-              position: changedNode.position,
-            });
-          } else {
-            nodes[index].position = changedNode.position;
-          }
-        }
-      }
-    });
-    setVersion({
-      ...version,
-      data: newData,
-    });
-    setDataHasChanged(true);
+    changeNode(
+      version,
+      changedNodes,
+      selectedLayoutId,
+      setVersion,
+      setDataHasChanged
+    );
   };
   const onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {
     const cosmetic = changeCosmetic(version?.data.cosmetic, changed);
@@ -356,6 +264,7 @@ export const EditVersion = () => {
     });
     setDataHasChanged(true);
   };
+  // TODO: this function is deprecated, delete it
   const onResetPosition = () => {
     const newData = structuredClone(version?.data);
     newData.checkpoints.forEach((v: any, index: number) => {
@@ -370,40 +279,19 @@ export const EditVersion = () => {
   const [gridX, setGridX] = useState(0); // initialize gridX with 0
   const [gridY, setGridY] = useState(0); // initialize gridY with 0
   const onAddNewNode = () => {
-    const newData = structuredClone(version?.data);
-    const newId = `node-${new Date().getTime()}`;
-    const nodeSpacing = 130;
-
-    let newPos = {
-      x: centerPos.x + gridX * nodeSpacing,
-      y: centerPos.y + gridY * nodeSpacing,
-    };
-
-    newData.checkpoints.push({
-      title: `Checkpoint ` + version?.data?.checkpoints?.length,
-      id: newId,
-      position: newPos,
-      isEnd: true,
-    });
-
-    if (gridX < 5) {
-      setGridX(gridX + 1);
-    } else {
-      setGridX(0);
-      setGridY(gridY + 1);
-    }
-
-    setVersion({
-      ...version,
-      data: newData,
-    });
-
-    setSelectedNodeId(newId);
-    if (selectedNodeId) {
-      setDataHasChanged(true);
-    }
+    newNode(
+      version,
+      setVersion,
+      setDataHasChanged,
+      centerPos,
+      gridX,
+      gridY,
+      setGridX,
+      setGridY,
+      setSelectedNodeId,
+      selectedNodeId
+    );
   };
-
   const onViewPortChange = (viewport: any) => {
     setCenterPos({
       x: (-viewport.x + 600) / viewport.zoom,
@@ -451,21 +339,26 @@ export const EditVersion = () => {
     version?.data?.cosmetic?.layouts.find((l: any) => l.id === selectedLayoutId)
       ?.markers || [];
   const [showColorLegend, setShowColorLegend] = useState(true);
+  useState(false);
+  const allCheckPoints = version?.data?.checkpoints
+    ? [...version.data.checkpoints]
+    : [];
+  version?.data?.subWorkflows?.map((w: any) =>
+    allCheckPoints.push(...(w.checkpoints || []))
+  );
   return (
     <>
       <AuthContext.Consumer>
         {({ session }) => (
           <div className='w-full bg-slate-100 h-screen'>
             <Debug>
-              <div>
-                {dataHasChanged ? 'data has changed' : 'data has not changed'}
-              </div>
-              {/* <div>
-                {viewMode}-{GraphViewMode.VIEW_ONLY}
-              </div> */}
-              <div className='block'>
-                {version ? 'version is TRUE' : 'version is FALSE'}
-              </div>
+              <Button
+                onClick={() => {
+                  console.log(version?.data);
+                }}
+              >
+                Console log verion
+              </Button>
             </Debug>
             <Header
               session={session}
@@ -487,51 +380,16 @@ export const EditVersion = () => {
                     <Skeleton className='p-16' />
                   </div>
                 ) : workflow ? (
-                  <div>
-                    <NotFound404
-                      title='Permission denied'
-                      message={
-                        <div className='w-full text-center'>
-                          <p>
-                            Sorry, you don not have permission to access to this
-                            workflow.
-                          </p>
-                          <p>
-                            Ask the owner to publish this workflow or add you as
-                            a workspace editor.
-                          </p>
-                        </div>
-                      }
-                    />
-                  </div>
+                  <PermissionDeniedToView />
                 ) : (
                   <NotFound404 />
                 )
               ) : viewMode === GraphViewMode.VIEW_ONLY ? (
-                <NotFound404
-                  title='Permission denied'
-                  message={
-                    <div className='w-full text-center'>
-                      <p>
-                        Sorry, you don not have permission to{' '}
-                        <span className='text-violet-500'>EDIT</span> to this
-                        workflow.
-                      </p>
-                      <div>Click here to open the view mode</div>
-                    </div>
-                  }
-                  cta={
-                    <Button
-                      type='primary'
-                      onClick={() =>
-                        navigate(
-                          `/public/${orgIdString}/${workflowIdString}/${versionIdString}`
-                        )
-                      }
-                    >
-                      Open in View
-                    </Button>
-                  }
+                <PermissionDeniedEdit
+                  navigate={navigate}
+                  orgIdString={orgIdString}
+                  workflowIdString={workflowIdString}
+                  versionIdString={versionIdString}
                 />
               ) : (
                 <div className='w-full h-full'>
@@ -551,87 +409,26 @@ export const EditVersion = () => {
                       setOpenCreateProposalModal(true);
                     }}
                     navPanel={
-                      <Space direction='vertical'>
-                        <div
-                          className='text-gray-400 font-bold flex items-center gap-2'
-                          style={{ marginBottom: '0px' }}
-                        >
-                          <div>Color legend</div>
-                          <div
-                            className='hover:text-violet-500 cursor-pointer'
-                            onClick={() => setShowColorLegend(!showColorLegend)}
-                          >
-                            {showColorLegend ? (
-                              <EyeOutlined />
-                            ) : (
-                              <EyeInvisibleOutlined />
-                            )}
-                          </div>
-                        </div>
-                        {showColorLegend &&
-                          markers.map((marker: any) => {
-                            return (
-                              <div
-                                className='flex gap-2 items-center'
-                                key={marker.color}
-                              >
-                                <div
-                                  className='w-[16px] h-[16px]'
-                                  style={{ backgroundColor: marker.color }}
-                                ></div>
-                                <Typography.Paragraph
-                                  editable={{
-                                    onChange: (val) => {
-                                      markers[markers.indexOf(marker)].title =
-                                        val;
-                                      const selectedLayout =
-                                        version?.data?.cosmetic?.layouts.find(
-                                          (l: any) => l.id === selectedLayoutId
-                                        );
-                                      selectedLayout.markers = markers;
-                                      const cosmetic = changeCosmetic(
-                                        version?.data.cosmetic,
-                                        {
-                                          layouts: [selectedLayout],
-                                        }
-                                      );
-                                      setVersion({
-                                        ...version,
-                                        data: { ...version.data, cosmetic },
-                                      });
-                                      setDataHasChanged(true);
-                                    },
-                                  }}
-                                  style={{ marginBottom: '0px' }}
-                                >
-                                  {marker.title}
-                                </Typography.Paragraph>
-
-                                <CloseCircleOutlined
-                                  className='hover:text-red-500'
-                                  onClick={() => {
-                                    markers.splice(markers.indexOf(marker), 1);
-                                    const selectedLayout =
-                                      version?.data?.cosmetic?.layouts.find(
-                                        (l: any) => l.id === selectedLayoutId
-                                      );
-                                    selectedLayout.markers = markers;
-                                    const cosmetic = changeCosmetic(
-                                      version?.data.cosmetic,
-                                      {
-                                        layouts: [selectedLayout],
-                                      }
-                                    );
-                                    setVersion({
-                                      ...version,
-                                      data: { ...version.data, cosmetic },
-                                    });
-                                    setDataHasChanged(true);
-                                  }}
-                                />
-                              </div>
-                            );
-                          })}
+                      <Space direction='vertical' size='middle'>
+                        <ColorLegend
+                          showColorLegend={showColorLegend}
+                          setShowColorLegend={setShowColorLegend}
+                          markers={markers}
+                          version={version}
+                          selectedLayoutId={selectedLayoutId}
+                          changeCosmetic={changeCosmetic}
+                          setVersion={setVersion}
+                          setDataHasChanged={setDataHasChanged}
+                        />
+                        <WorkflowList
+                          version={version}
+                          setVersion={setVersion}
+                          allCheckPoints={allCheckPoints}
+                        />
+                        <VariableList
+                          version={version}
+                          setVersion={setVersion}
+                        />
                       </Space>
                     }
                     viewMode={viewMode}
@@ -673,36 +470,3 @@ export const EditVersion = () => {
     </>
   );
 };
-
-{
-  /* <Space
-  direction="horizontal"
-  size="middle"
-  className="flex items-center border-2 bg-white p-2 rounded-md"
->
-  <Space direction="horizontal" size="small">
-    
-  </Space>
-  <BranchesOutlined />
-  <Space direction="horizontal" size="small">
-    <div className="font-bold">{version?.version}</div>
-    <span
-      onClick={() => setShowInfoPanel(true)}
-      className="cursor-pointer"
-    >
-      <EditIcon />
-    </span>
-  </Space>
-  <Button
-    type="link"
-    className="flex items-center text-violet-500"
-    icon={<SaveOutlined />}
-    disabled={!dataHasChanged}
-    onClick={() => {
-      handleSave('data');
-    }}
-  >
-    Save
-  </Button>
-</Space> */
-}

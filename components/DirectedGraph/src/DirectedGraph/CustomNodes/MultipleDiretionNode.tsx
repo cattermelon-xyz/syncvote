@@ -2,13 +2,16 @@ import {
   SettingOutlined,
   TwitterOutlined,
   CaretRightOutlined,
+  VerticalLeftOutlined,
+  VerticalRightOutlined,
+  FlagOutlined,
 } from '@ant-design/icons';
 import { memo, useContext } from 'react';
 import { Handle, Position } from 'reactflow';
 
 import parse from 'html-react-parser';
 import moment from 'moment';
-import { displayDelayDuration } from '../utils';
+import { displayDelayDuration, shortenString } from '../utils';
 import { GraphContext } from '../context';
 
 // TODO: how to register getIcon in 1 place?
@@ -43,139 +46,146 @@ const Node = memo(
       ? 'border-2 border-violet-500 border-dashed'
       : 'border border-slate-700 border-solid';
     const style = data.style;
-
-    const { openCreateProposalModal } =
-      useContext(GraphContext);
-      
+    const { openCreateProposalModal } = useContext(GraphContext);
+    const type = data.raw?.vote_machine_type;
     const env = import.meta.env.VITE_ENV;
-
+    const { subWorkflowId, isStart } = data;
     return (
       <>
-        <Handle
-          id={`t-${Position.Top}`}
-          type='target'
-          position={Position.Top}
-          style={{ background: '#aca' }}
-          isConnectable={isConnectable}
-        />
-        <Handle
-          id={`t-${Position.Left}`}
-          type='target'
-          position={Position.Left}
-          style={{ background: '#aca' }}
-          isConnectable={isConnectable}
-        />
-        <Handle
-          id={`t-${Position.Bottom}`}
-          type='target'
-          position={Position.Bottom}
-          style={{ background: '#aca' }}
-          isConnectable={isConnectable}
-        />
-        <Handle
-          id={`t-${Position.Right}`}
-          type='target'
-          position={Position.Right}
-          style={{ background: '#aca' }}
-          isConnectable={isConnectable}
-        />
-        <Handle
-          id={`s-${Position.Top}`}
-          type='source'
-          position={Position.Top}
-          style={{ background: '#ccc' }}
-          isConnectable={isConnectable}
-        />
-        <Handle
-          id={`s-${Position.Left}`}
-          type='source'
-          position={Position.Left}
-          style={{ background: '#ccc' }}
-          isConnectable={isConnectable}
-        />
-        <Handle
-          id={`s-${Position.Bottom}`}
-          type='source'
-          position={Position.Bottom}
-          style={{ background: '#ccc' }}
-          isConnectable={isConnectable}
-        />
-        <Handle
-          id={`s-${Position.Right}`}
-          type='source'
-          position={Position.Right}
-          style={{ background: '#ccc' }}
-          isConnectable={isConnectable}
-        />
-        <div
-          className={`rounded-md text-base ${selected} ${
-            data.isEnd ? 'bg-zinc-700 text-white' : ''
-          }`}
-        >
-          {duration > 0 ? (
-            <div className='absolute -top-8 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
-              {displayDelayDuration(moment.duration(duration))}
-            </div>
-          ) : null}
-          {id === 'root' ? (
-            <>
-              {env !== 'production' ? (
-                <div
-                  className='absolute -left-9 bg-violet-100 py-1 px-2 rounded-md text-blue-500'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (openCreateProposalModal) {
-                      openCreateProposalModal();
-                    }
-                  }}
-                >
+        <>
+          <Handle
+            id={`t-${Position.Top}`}
+            type='target'
+            position={Position.Top}
+            style={{ background: '#aca' }}
+            isConnectable={isConnectable}
+          />
+          <Handle
+            id={`t-${Position.Left}`}
+            type='target'
+            position={Position.Left}
+            style={{ background: '#aca' }}
+            isConnectable={isConnectable}
+          />
+          <Handle
+            id={`t-${Position.Bottom}`}
+            type='target'
+            position={Position.Bottom}
+            style={{ background: '#aca' }}
+            isConnectable={isConnectable}
+          />
+          <Handle
+            id={`t-${Position.Right}`}
+            type='target'
+            position={Position.Right}
+            style={{ background: '#aca' }}
+            isConnectable={isConnectable}
+          />
+          <Handle
+            id={`s-${Position.Top}`}
+            type='source'
+            position={Position.Top}
+            style={{ background: '#ccc' }}
+            isConnectable={isConnectable}
+          />
+          <Handle
+            id={`s-${Position.Left}`}
+            type='source'
+            position={Position.Left}
+            style={{ background: '#ccc' }}
+            isConnectable={isConnectable}
+          />
+          <Handle
+            id={`s-${Position.Bottom}`}
+            type='source'
+            position={Position.Bottom}
+            style={{ background: '#ccc' }}
+            isConnectable={isConnectable}
+          />
+          <Handle
+            id={`s-${Position.Right}`}
+            type='source'
+            position={Position.Right}
+            style={{ background: '#ccc' }}
+            isConnectable={isConnectable}
+          />
+        </>
+        <>
+          {(env !== 'production' && isStart === true && (
+            <div
+              className='absolute -top-8'
+              onClick={(e) => {
+                if (subWorkflowId === '') {
+                  e.stopPropagation();
+                  if (openCreateProposalModal) {
+                    openCreateProposalModal();
+                  }
+                }
+              }}
+            >
+              {subWorkflowId === '' ? (
+                <div className='bg-violet-100 py-1 px-2 rounded-md text-blue-500'>
                   <CaretRightOutlined />
                 </div>
-              ) : null}
-            </>
-          ) : null}
-          <div className='hover:opacity-50'>
-            <div
-              className={`p-2 font-bold`}
-              style={style.title ? style.title : {}}
-            >
-              {data.label
-                ? typeof data.label === 'string'
-                  ? parse(
-                      data.label.length > 30
-                        ? data.label.substr(0, 30) + '...'
-                        : data.label
-                    )
-                  : data.label
-                : 'untitled'}
+              ) : (
+                <div className='flex flex-row gap-2 items-center'>
+                  <div className='bg-violet-100 py-1 px-2 rounded-md'>
+                    <FlagOutlined />
+                  </div>
+                  <div>{subWorkflowId}</div>
+                </div>
+              )}
             </div>
-            {data.abstract ? (
-              <div style={style.content ? style.content : {}} className='py-2'>
-                {data.abstract}
+          )) ||
+            (env !== 'production' &&
+              isStart !== true &&
+              subWorkflowId !== '' && (
+                <div className='absolute -top-5'>{subWorkflowId}</div>
+              ))}
+        </>
+        {((type === 'forkNode' || type === 'joinNode') && (
+          <div>{data.abstract}</div>
+        )) ||
+          (data.isEnd === true && (
+            <div className='items-center flex flex-col'>
+              <div
+                className={`rounded-full text-base w-4 h-4 ${selected} bg-zinc-700 text-white items-center justify-center flex`}
+              >
+                <div
+                  className={`rounded-full text-base w-3 h-3 ${selected} bg-zinc-100 text-white`}
+                ></div>
               </div>
-            ) : null}
-
-            {/* {data.triggers && data.triggers.length > 0 ? (
-            <div className="text-xs flex justify-center gap-0.5 p-2">
-              {data.triggers.map((trigger: any) => {
-                const icon = getIcon(trigger.provider, trigger.id);
-                if (trigger.triggerAt === 'this') {
-                  return icon;
-                }
-                return null;
-              })}
+              <div>{data.label}</div>
             </div>
-          ) : null}
-          {description ? (
-            <div
-              className="text-xs justify-left gap-0.5 py-2 px-3 bg-white rounded-b-md"
-              style={style.content ? style.content : {}}
-            >
-              {parse(description)}
+          )) || (
+            <div className={`rounded-md text-base ${selected}`}>
+              {duration > 0 ? (
+                <div className='absolute -top-8 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
+                  {displayDelayDuration(moment.duration(duration))}
+                </div>
+              ) : null}
+              <div className='hover:opacity-50'>
+                <div
+                  className={`p-2 font-bold`}
+                  style={style.title ? style.title : {}}
+                >
+                  {data.label
+                    ? typeof data.label === 'string'
+                      ? parse(shortenString(data.label, 30))
+                      : data.label
+                    : 'untitled'}
+                </div>
+                {data.abstract ? (
+                  <div
+                    style={style.content ? style.content : {}}
+                    className='py-2'
+                  >
+                    {data.abstract}
+                  </div>
+                ) : null}
+              </div>
             </div>
-          ) : null} */}
-          </div>
-        </div>
+          )}
       </>
     );
   }

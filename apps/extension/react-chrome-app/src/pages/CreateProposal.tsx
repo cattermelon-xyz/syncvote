@@ -5,20 +5,39 @@ import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
 import { createProposalDemo } from '@data/org';
 import { resetLastProposalId } from '../utils';
+import { createMission } from '@axios/createMission';
 
 interface Props {
   setPage: any;
   setCurrentProposalId: any;
+  currentOrgData: any;
+  user: any;
 }
 
-const CreateProposal: React.FC<Props> = ({ setPage, setCurrentProposalId }) => {
+const CreateProposal: React.FC<Props> = ({
+  setPage,
+  setCurrentProposalId,
+  currentOrgData,
+  user,
+}) => {
   const [inputValue, setInputValue] = useState('');
-  const [selectValue, setSelectValue] = useState();
-  const isButtonDisabled = !inputValue || !selectValue;
+  const [currentWorkflowData, setCurrentWorkflowData] = useState<any>();
+  const isButtonDisabled = !inputValue || !currentWorkflowData;
+  const [workflowsOption, setWorkflowsOption] = useState<any>();
 
   const handleCreateProposal = async () => {
-    createProposalDemo({
+    const missionData = {
+      creator_id: user.id,
+      status: 'PUBLIC',
       title: inputValue,
+      data: currentWorkflowData?.versions[0]?.data,
+      icon_url: currentWorkflowData?.icon_url,
+      start: currentWorkflowData?.versions[0]?.data?.start,
+      workflow_version_id: currentWorkflowData?.versions[0]?.id,
+    };
+
+    createMission({
+      missionData,
       onSuccess: (data) => {
         console.log('create proposal success', data);
         setCurrentProposalId(data?.id);
@@ -32,6 +51,43 @@ const CreateProposal: React.FC<Props> = ({ setPage, setCurrentProposalId }) => {
   useEffect(() => {
     resetLastProposalId();
   });
+
+  useEffect(() => {
+    if (currentOrgData) {
+      const sortedData = currentOrgData?.workflows.sort((a: any, b: any) => {
+        const titleA = a.title.toUpperCase();
+        const titleB = b.title.toUpperCase();
+        if (titleA < titleB) {
+          return -1;
+        }
+        if (titleA > titleB) {
+          return 1;
+        }
+        return 0;
+      });
+
+      const filteredData = sortedData?.map((workflowData: any) => {
+        return {
+          value: workflowData?.id,
+          label: workflowData?.title,
+        };
+      });
+
+      setWorkflowsOption(filteredData);
+    }
+  }, [currentOrgData]);
+
+  const handleChangeWorkflow = (value: string) => {
+    console.log(`selected ${value}`);
+    const selectedDataWorkflow = currentOrgData?.workflows?.filter(
+      (dataOrg: any) => dataOrg?.id === value
+    );
+    setCurrentWorkflowData(selectedDataWorkflow[0]);
+  };
+
+  useEffect(() => {
+    console.log('currentWorkflowData', currentWorkflowData);
+  }, [currentWorkflowData]);
 
   return (
     <div>
@@ -56,26 +112,11 @@ const CreateProposal: React.FC<Props> = ({ setPage, setCurrentProposalId }) => {
           />
           <Select
             className='h-[49px] w-full'
-            showSearch
             style={{ width: 236 }}
             placeholder='Select proposal process'
-            optionFilterProp='children'
-            filterOption={(input, option) =>
-              (option?.label ?? '').includes(input)
-            }
-            filterSort={(optionA, optionB) =>
-              (optionA?.label ?? '')
-                .toLowerCase()
-                .localeCompare((optionB?.label ?? '').toLowerCase())
-            }
-            value={selectValue}
-            onChange={setSelectValue}
-            options={[
-              {
-                value: '1',
-                label: 'Idle DAO governance process',
-              },
-            ]}
+            onChange={handleChangeWorkflow}
+            options={workflowsOption}
+            dropdownStyle={{ maxHeight: '120px', overflow: 'auto' }}
           />
         </div>
 
@@ -89,7 +130,7 @@ const CreateProposal: React.FC<Props> = ({ setPage, setCurrentProposalId }) => {
             setPage(PAGE_ROUTER.DONE_CREATE_PROPOSAL);
           }}
         >
-          Comfirm
+          Confirm
         </Button>
       </div>
     </div>

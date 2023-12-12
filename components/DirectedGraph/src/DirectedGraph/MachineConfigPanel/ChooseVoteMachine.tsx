@@ -1,5 +1,10 @@
 import { Popconfirm, Space } from 'antd';
-import { StopOutlined, WarningOutlined } from '@ant-design/icons';
+import {
+  StopOutlined,
+  WarningOutlined,
+  VerticalLeftOutlined,
+  VerticalRightOutlined,
+} from '@ant-design/icons';
 import { getAllVoteMachines } from '../voteMachine';
 
 const warningText = 'Change this would destroy all the current node setting!';
