@@ -17,7 +17,7 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
     : [];
   versionData.subWorkflows?.map((sw: any) => {
     sw.checkpoints?.map((chk: any) => {
-      allCheckPoints.push(chk);
+      allCheckPoints.push({ ...chk, subWorkflowId: sw.refId });
     });
   });
   const selectedNode = allCheckPoints?.find(

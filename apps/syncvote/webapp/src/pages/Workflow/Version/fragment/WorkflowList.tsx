@@ -1,5 +1,6 @@
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Input, Modal, Select, Space } from 'antd';
+import { CollapsiblePanel } from 'directed-graph';
 import { useState } from 'react';
 
 const NewSubWorkflowModal = ({
@@ -112,74 +113,80 @@ const WorkflowList = ({
   const [showAddNewSubWorkflowModal, setShowAddNewSubWorkflowModal] =
     useState(false);
   return (
-    <Space direction='vertical' size='small'>
-      <NewSubWorkflowModal
-        isShown={showAddNewSubWorkflowModal}
-        version={version}
-        setVersion={setVersion}
-        setShowAddNewSubWorkflowModal={setShowAddNewSubWorkflowModal}
-      />
-      <div className='flex gap-2 flex-row items-center'>
-        <div>List of subworkflows</div>
-        <Button
-          icon={<PlusOutlined />}
-          onClick={() => {
-            setShowAddNewSubWorkflowModal(true);
-          }}
+    <CollapsiblePanel title='Workflow List' className='p-0 w-full'>
+      <Space direction='vertical' size='small'>
+        <NewSubWorkflowModal
+          isShown={showAddNewSubWorkflowModal}
+          version={version}
+          setVersion={setVersion}
+          setShowAddNewSubWorkflowModal={setShowAddNewSubWorkflowModal}
         />
-      </div>
-      {version?.data?.subWorkflows?.map((s: any) => {
-        return (
-          <div className='flex gap-2 flex-row items-center' key={s.refId}>
-            <Button
-              icon={
-                <DeleteOutlined
-                  onClick={() => {
-                    const newData = structuredClone(version?.data);
+        <div className='flex gap-2 flex-row items-center'>
+          <Button
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setShowAddNewSubWorkflowModal(true);
+            }}
+          >
+            Add new sub-workflow
+          </Button>
+        </div>
+        {version?.data?.subWorkflows?.map((s: any) => {
+          return (
+            <div className='flex gap-2 flex-row items-center' key={s.refId}>
+              <Button
+                icon={
+                  <DeleteOutlined
+                    onClick={() => {
+                      const newData = structuredClone(version?.data);
 
-                    const index = newData.subWorkflows.findIndex(
-                      (v: any) => v.refId === s.refId
-                    );
-                    const subWorkflowStartNode = newData.subWorkflows.find(
-                      (v: any) => v.refId === s.refId
-                    ).start;
-                    if (index !== -1) {
-                      newData.subWorkflows.splice(index, 1);
-                      const fk = newData.checkpoints.find(
-                        (ckp: any) =>
-                          ckp.vote_machine_type === 'forkNode' &&
-                          ckp.data?.start?.includes(s.refId)
+                      const index = newData.subWorkflows.findIndex(
+                        (v: any) => v.refId === s.refId
                       );
-                      if (fk) {
-                        fk.data.start.splice(fk.data.start.indexOf(s.refId), 1);
-                        const idxStart =
-                          fk.children?.indexOf(subWorkflowStartNode);
-                        if (idxStart !== -1) {
-                          fk.children?.splice(idxStart, 1);
+                      const subWorkflowStartNode = newData.subWorkflows.find(
+                        (v: any) => v.refId === s.refId
+                      ).start;
+                      if (index !== -1) {
+                        newData.subWorkflows.splice(index, 1);
+                        const fk = newData.checkpoints.find(
+                          (ckp: any) =>
+                            ckp.vote_machine_type === 'forkNode' &&
+                            ckp.data?.start?.includes(s.refId)
+                        );
+                        if (fk) {
+                          fk.data.start.splice(
+                            fk.data.start.indexOf(s.refId),
+                            1
+                          );
+                          const idxStart =
+                            fk.children?.indexOf(subWorkflowStartNode);
+                          if (idxStart !== -1) {
+                            fk.children?.splice(idxStart, 1);
+                          }
+                          const endIdx = fk.data.end?.indexOf(s.refId);
+                          if (endIdx !== -1) {
+                            fk.data.end.splice(endIdx, 1);
+                          }
                         }
-                        const endIdx = fk.data.end?.indexOf(s.refId);
-                        if (endIdx !== -1) {
-                          fk.data.end.splice(endIdx, 1);
-                        }
+                        setVersion({
+                          ...version,
+                          data: newData,
+                        });
                       }
-                      setVersion({
-                        ...version,
-                        data: newData,
-                      });
-                    }
-                  }}
-                />
-              }
-              danger
-            />
-            <div>{s.refId}</div>
-            <div>
-              {allCheckPoints.find((ckp: any) => ckp.id === s.start)?.title}
+                    }}
+                  />
+                }
+                danger
+              />
+              <div>{s.refId}</div>
+              <div>
+                {allCheckPoints.find((ckp: any) => ckp.id === s.start)?.title}
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </Space>
+          );
+        })}
+      </Space>
+    </CollapsiblePanel>
   );
 };
 
