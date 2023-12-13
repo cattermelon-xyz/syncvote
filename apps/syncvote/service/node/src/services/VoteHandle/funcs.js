@@ -2,11 +2,10 @@ const {
   VoteMachineController,
 } = require('../../models/votemachines/VotingController');
 const { supabase } = require('../../configs/supabaseClient');
-
+const axios = require('axios');
 const moment = require('moment');
 var CronJob = require('cron').CronJob;
 const { createArweave, convertToCron } = require('../../functions');
-const PostService = require('../PostService');
 
 const checkIfFirstTimeOfVoting = async (details) => {
   let voteMachineController = new VoteMachineController(details);
@@ -88,31 +87,226 @@ const handleMovingToNextCheckpoint = async (
       }
     }
 
-    // Init next checkpontId
+    // Next checkpontId
     const next_checkpoint_id = `${details.mission_id}-${
       details.children[tallyResult.index]
     }`;
-
-    // get data of next checkpoint
-    const { data: next_checkpoint } = await supabase
-      .from('checkpoint')
-      .select('*')
-      .eq('id', next_checkpoint_id);
 
     // create current vote data for next checkpoint
     const { data: new_current_vote_data } = await supabase
       .from('current_vote_data')
       .insert({
         checkpoint_id: next_checkpoint_id,
-        initData: tallyResult,
         startToVote: startToVote,
+        initData: tallyResult,
       })
       .select('*');
 
-    // create a job for create post
-    const cronSyntax = convertToCron(moment(startToVote));
+    // Update next current vote data for mission
+    const { error } = await supabase
+      .from('mission')
+      .update({
+        current_vote_data_id: new_current_vote_data[0].id,
+      })
+      .eq('id', details.mission_id);
+
+    let { data: next_details } = await supabase
+      .from('mission_vote_details')
+      .select(`*`)
+      .eq('mission_id', details.mission_id);
+
+    const startNextCheckpoint = async (details) => {
+      if (details.vote_machine_type === 'forkNode') {
+        await startForkNode(details);
+      } else if (!details.vote_machine_type && details.isEnd) {
+        await startEndNode(details);
+      } else {
+        await start(details);
+      }
+    };
+
+    if (startToVote.unix() === timeDefault.unix()) {
+      await startNextCheckpoint(next_details[0]);
+    } else {
+      const cronSyntax = convertToCron(moment(startToVote));
+      const job = new CronJob(cronSyntax, async function () {
+        await startNextCheckpoint(next_details[0]);
+      });
+      job.start();
+      console.log(`Start a job to start for ${next_checkpoint_id} `);
+    }
+
+    if (error) {
+      console.log(error);
+    }
+
+    return { next_checkpoint_id };
+  } catch (error) {
+    console.log('Handle moving to next checkpoint error', error);
+    return {};
+  }
+};
+
+const startEndNode = async (details) => {
+  try {
+    console.log('Start EndNode: ', details.id);
+    // update mission
+    await supabase
+      .from('mission')
+      .update({ status: 'STOPPED' })
+      .eq('id', details.mission_id);
+
+    // update current_vote_data
+    await supabase
+      .from('current_vote_data')
+      .update({ endedAt: moment().format() })
+      .eq('id', details.cvd_id);
+
+    // check if this misison have parent
+    if (details.m_parent) {
+      // get data of current_vote_data of m_parent
+      const { data } = await supabase
+        .from('mission')
+        .select('*, current_vote_data(*, checkpoint(*))')
+        .eq('id', details.m_parent);
+
+      const misison_parent_data = data[0];
+
+      // check if current checkpoint is ForkNode
+      if (
+        misison_parent_data.current_vote_data.checkpoint.vote_machine_type ===
+        'forkNode'
+      ) {
+        // Update current_vote_data of ForkNode
+        let result = misison_parent_data.current_vote_data.result;
+        if (result && result.condition.length > 0) {
+          // Append to result mission Id
+          result.condition.push(details.mission_id);
+        } else {
+          result = { condition: [details.mission_id] };
+        }
+
+        await supabase
+          .from('current_vote_data')
+          .update({
+            result: result,
+          })
+          .eq('id', misison_parent_data.current_vote_data.id);
+
+        // Check if parent misson satisfy the conditions to go to JoinNode
+        if (
+          deepEqual(
+            result.condition,
+            misison_parent_data.current_vote_data.initData.end
+          )
+        ) {
+          // Update current_vote_data for ForkNode
+          await supabase
+            .from('current_vote_data')
+
+            .update({ tallyResult: result, endedAt: moment().format() })
+            .eq('id', misison_parent_data.current_vote_data.id);
+
+          // Create current_vote_data for JointNode
+          const { data: new_current_vote_data } = await supabase
+            .from('current_vote_data')
+            .insert({
+              checkpoint_id:
+                misison_parent_data.current_vote_data.initData.joinNode,
+              startToVote: moment().format(),
+            })
+            .select('*');
+
+          // Update current_vote_data for mission
+          await supabase
+            .from('mission')
+            .update({ current_vote_data_id: new_current_vote_data[0].id })
+            .eq('id', details.mission_id);
+        }
+      } else {
+        console.log(
+          `Children checkpoint is running but mission parent don't run in ForkNode`
+        );
+      }
+    }
+  } catch (error) {
+    console.log('StartEndNodeError', error);
+  }
+};
+
+const startForkNode = async (details) => {
+  try {
+    console.log('Start ForkNode: ', details.id);
+    const subMissions = details?.m_data?.subWorkflows;
+    const end = details?.data?.end;
+    const start = details?.data?.start;
+    const startMissionId = [];
+    const endMissionId = [];
+
+    for (let subMissionData of subMissions) {
+      if (start.includes(subMissionData.refId)) {
+        const { checkpoints, ...newObject } = subMissionData;
+
+        await axios
+          .post(`${process.env.BACKEND_API}/mission/create`, {
+            data: { checkpoints: checkpoints },
+            ...newObject,
+            status: 'PUBLIC',
+            creator_id: details.creator_id,
+            parent: details.mission_id,
+          })
+          .then(async (response) => {
+            if (response.data.status !== 'ERR') {
+              startMissionId.push(response.data.data[0].id);
+              if (end.includes(subMissionData.refId)) {
+                endMissionId.push(response.data.data[0].id);
+              }
+            }
+          });
+      }
+    }
+
+    // update current_vote_data of ForkNode
+    await supabase
+      .from('current_vote_data')
+      .update({
+        initData: {
+          joinNode: details.mission_id + '-' + details.data.joinNode,
+          start: startMissionId,
+          end: endMissionId,
+        },
+      })
+      .eq('id', details.cvd_id);
+  } catch (error) {
+    console.log('StartForkNodeError: ', error);
+  }
+};
+
+const start = async (details) => {
+  try {
+    console.log(`Start ${details.vote_machine_type} Node: `, details.id);
+    const voteMachineController = new VoteMachineController(details);
+    // 1. Get the data was created by voteMachine
+    const { result } = voteMachineController.initDataForCVD();
+
+    // 2. Update result current_vote_data for checkpoint
+    await supabase
+      .from('current_vote_data')
+      .update({
+        result: result,
+      })
+      .eq('id', details.cvd_id);
+
+    // 3. Update the result of mission_vote_details
+    details.result = result;
+
+    // create a job to stop this checkpoint
+    const stopTime = moment(details.startToVote).add(
+      details.duration,
+      'seconds'
+    );
+    const cronSyntax = convertToCron(stopTime);
     const job = new CronJob(cronSyntax, async function () {
-      // vote to start checkpoint
       await fetch(`${process.env.BACKEND_API}/vote/create`, {
         method: 'POST',
         headers: {
@@ -127,51 +321,42 @@ const handleMovingToNextCheckpoint = async (
       });
     });
     job.start();
-    console.log(`Start a job to post and start for ${next_checkpoint_id} `);
-
-    // Update next current vote data for mission
-    await supabase
-      .from('mission')
-      .update({
-        current_vote_data_id: new_current_vote_data[0].id,
-      })
-      .eq('id', details.mission_id);
-
-    return { next_checkpoint_id };
   } catch (error) {
-    console.log('Handle moving to next checkpoint error', error);
-    return {};
+    console.log('StartRegularNodeError: ', error);
   }
 };
+
+function deepEqual(obj1, obj2) {
+  if (obj1 === obj2) return true;
+
+  if (
+    obj1 === null ||
+    obj2 === null ||
+    typeof obj1 !== 'object' ||
+    typeof obj2 !== 'object'
+  ) {
+    return false;
+  }
+
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  if (keys1.length !== keys2.length) return false;
+
+  for (let key of keys1) {
+    if (!keys2.includes(key)) return false;
+
+    if (!deepEqual(obj1[key], obj2[key])) return false;
+  }
+
+  return true;
+}
 
 module.exports = {
   checkIfFirstTimeOfVoting,
   handleMovingToNextCheckpoint,
+  startEndNode,
+  startForkNode,
+  deepEqual,
+  start,
 };
-      // // post when have topic
-      // if (details.topic_id !== null) {
-      //   const { data: web2KeyData, error: errorWeb2KeyData } = await supabase
-      //     .from('web2_key')
-      //     .select('*')
-      //     .eq('org_id', details.org_id);
-
-      //   if (web2KeyData.length > 0) {
-      //     const filteredDiscourse = web2KeyData.filter(
-      //       (integration) => integration.provider === 'discourse'
-      //     );
-
-      //     if (filteredDiscourse.length === 1) {
-      //       const discourseConfig = filteredDiscourse[0];
-
-      //       const postData = {
-      //         topic_id: details.topic_id,
-      //         raw: `<p>Checkpoint ${next_checkpoint[0].title} has been started</p>
-      //                       <p>Checkpoint description: ${next_checkpoint[0].desc} </p>`,
-      //         org_id: details.org_id,
-      //         discourseConfig,
-      //       };
-
-      //       PostService.createPost(postData);
-      //     }
-      //   }
-      // }

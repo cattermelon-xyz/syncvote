@@ -19,7 +19,6 @@ async function createArweave(metadata) {
       data: metadataRequest,
     });
     await arweave.transactions.sign(metadataTransaction, wallet);
-    console.log('https://arweave.net/' + metadataTransaction.id);
 
     await fetch('https://arweave.net/tx', {
       method: 'POST',
@@ -55,10 +54,9 @@ function extractCurrentCheckpointId(inputStr) {
   return parts.join('-');
 }
 
-
 module.exports = {
   convertToCron,
   isArraySubset,
   createArweave,
-  extractCurrentCheckpointId
+  extractCurrentCheckpointId,
 };

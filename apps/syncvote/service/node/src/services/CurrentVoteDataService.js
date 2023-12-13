@@ -5,7 +5,6 @@ async function insertCurrentVoteData(props) {
     .from('current_vote_data')
     .insert(props)
     .select('*');
-  console.log(error);
   if (!error) {
     return { ...newCurrentVoteData[0] };
   } else {

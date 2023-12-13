@@ -58,7 +58,7 @@ const addMission = async () => {
         }
       }
     } else {
-      console.log(error);
+      console.log('Error test 1:', error);
     }
   } catch (error) {
     console.log(error);
