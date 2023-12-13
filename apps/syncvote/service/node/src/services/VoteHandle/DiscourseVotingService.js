@@ -52,7 +52,7 @@ async function handleVoteDiscourse(props) {
           if (fallback) {
             console.log('FallbackError: ', f_error);
             const tallyResult = {
-              index: details.children.indexOf(details.data.fallback) || 0,
+              index: details.children.indexOf(details.props.fallback) || 0,
             };
             const timeDefault = moment(details.startToVote).add(
               details.duration,
@@ -125,7 +125,7 @@ async function handleVoteDiscourse(props) {
             } else {
               // find next checkpoint
               tallyResult = {
-                index: details.children.indexOf(details.data.next) || 0,
+                index: details.children.indexOf(details.props.next) || 0,
                 submission: {
                   firstPostId: data?.firstPostId,
                   linkDiscourse: data?.linkDiscourse,
