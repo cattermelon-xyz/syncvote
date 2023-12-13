@@ -2,11 +2,24 @@ const { supabase } = require('../configs/supabaseClient');
 const axios = require('axios');
 
 const createTopic = async (props) => {
-  const { discourseConfig } = props;
   try {
     if (!props.title || !props.raw || !props.org_id) {
       throw new Error('Title, content, and org_id are all required!');
     }
+
+    const { data, error } = await supabase
+      .from('web2_key')
+      .select('*')
+      .eq('org_id', props.org_id);
+
+    if (error || data.length === 0) {
+      throw new Error(error || 'No Discourse configuration found.');
+    }
+
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === 'discourse'
+    );
+    const discourseConfig = filteredDiscourse[0];
 
     console.log('discourseConfig', discourseConfig);
     console.log(`http://${discourseConfig.id_string}/posts`);
@@ -29,7 +42,17 @@ const createTopic = async (props) => {
       }
     );
 
-    return { data: response.data };
+    const firstPostId = response?.data?.id;
+    const topicId = response?.data?.topic_id;
+    const linkDiscourse = `https://${discourseConfig.id_string}/t/welcome-to-syncvote/${topicId}`;
+
+    const dataAfterCreate = {
+      firstPostId,
+      topicId,
+      linkDiscourse
+    }
+
+    return { data: dataAfterCreate };
   } catch (e) {
     console.error('Error creating topic:', e);
     return { error: e };

@@ -1,5 +1,5 @@
 import { Space, Switch, Button, Alert, Input, Popover, Select } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ICheckPoint, IVoteMachineConfigProps } from 'directed-graph';
 import {
   DelayUnit,
@@ -11,8 +11,10 @@ import {
 import NewOptionDrawer from './NewOptionDrawer';
 import { PlusOutlined } from '@ant-design/icons';
 import '../styles.scss';
-import { Snapshot as Interface } from '../interface';
+import { Discourse as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
+import { GraphContext } from 'directed-graph';
+import { useContext } from 'react';
 
 /**
  *
@@ -36,11 +38,8 @@ export default (props: IVoteMachineConfigProps) => {
       max: 0,
       token: '', // spl token
       options: [],
-      space: '',
-      type: {
-        label: 'Single Choice',
-        value: 'single-choice',
-      },
+      action: '',
+      variables: [],
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -49,7 +48,24 @@ export default (props: IVoteMachineConfigProps) => {
     optionsDescription,
   } = props;
 
-  const { max, token, options } = data;
+  const { max, token, options, action, variables } = data;
+  const { data: graphData } = useContext(GraphContext);
+  const variablesMission = graphData?.variables;
+  const [variablesOption, setVariablesOption] =
+    useState<{ label: string; value: string }[]>();
+
+  useEffect(() => {
+    if (variablesMission) {
+      const optionsData = variablesMission?.map((variables: string) => {
+        return {
+          label: variables,
+          value: variables,
+        };
+      });
+      setVariablesOption(optionsData);
+    }
+  }, [variablesMission]);
+
   const delays = props.delays || Array(options?.length).fill(0);
   const delayUnits =
     props.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
@@ -261,12 +277,10 @@ export default (props: IVoteMachineConfigProps) => {
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-sm text-slate-600 flex items-center gap-2'>
                 Action
-                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
-                  <MdHelpOutline />
-                </Popover>
               </div>
               <Select
-                value={data?.type?.label}
+                value={action}
+                placeholder='Please select action'
                 className='w-full'
                 options={selectOptions}
                 onChange={(value, option) => {
@@ -274,6 +288,25 @@ export default (props: IVoteMachineConfigProps) => {
                     data: {
                       ...data,
                       action: value,
+                    },
+                  });
+                }}
+              />
+            </Space>
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='text-sm text-slate-600 flex items-center gap-2'>
+                Variables
+              </div>
+              <Select
+                value={variables[0]}
+                placeholder='Please select variables'
+                className='w-full'
+                options={variablesOption}
+                onChange={(value, option) => {
+                  onChange({
+                    data: {
+                      ...data,
+                      variables: [value],
                     },
                   });
                 }}
