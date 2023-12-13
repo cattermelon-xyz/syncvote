@@ -3,6 +3,7 @@ const { Veto } = require('./Veto');
 const { UpVote } = require('./Upvote');
 const { SingleVote } = require('./SingleVote');
 const { DocInput } = require('./DocInput');
+const { Discourse } = require('./Discourse');
 
 class VoteMachineController {
   constructor(props) {
@@ -12,6 +13,7 @@ class VoteMachineController {
       UpVote: new UpVote(props),
       SingleChoiceRaceToMax: new SingleVote(props),
       DocInput: new DocInput(props),
+      Discourse: new Discourse(props),
     };
     this.vote_machine_type = props.vote_machine_type;
     this.id = props.id;

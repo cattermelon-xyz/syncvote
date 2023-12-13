@@ -237,9 +237,9 @@ const startEndNode = async (details) => {
 const startForkNode = async (details) => {
   try {
     console.log('Start ForkNode: ', details.id);
-    const subMissions = details?.m_data?.subWorkflows;
-    const end = details?.data?.end;
-    const start = details?.data?.start;
+    const subMissions = details?.data?.subWorkflows;
+    const end = details?.props?.end;
+    const start = details?.props?.start;
     const startMissionId = [];
     const endMissionId = [];
 
@@ -271,7 +271,7 @@ const startForkNode = async (details) => {
       .from('current_vote_data')
       .update({
         initData: {
-          joinNode: details.mission_id + '-' + details.data.joinNode,
+          joinNode: details.mission_id + '-' + details.props.joinNode,
           start: startMissionId,
           end: endMissionId,
         },

@@ -1,8 +1,8 @@
 import { ICheckPoint } from 'directed-graph';
 // import { IData } from './interface';
-import { Snapshot as Interface } from './interface';
+import { Discourse as Interface } from './interface';
 
-export namespace Snapshot {
+export namespace Discourse {
   export const getName = () => {
     return 'Discourse';
   };
@@ -38,6 +38,8 @@ export namespace Snapshot {
       options: [],
       max: 0,
       token: '',
+      action: '',
+      variables: [],
     };
     return data;
   };
@@ -57,6 +59,10 @@ export namespace Snapshot {
     if (!checkpoint?.data.action) {
       isValid = false;
       message.push('Missing action of vote in discourse');
+    }
+    if (!checkpoint?.data.variables) {
+      isValid = false;
+      message.push('Missing variables to save topic id discourse');
     }
     return {
       isValid,

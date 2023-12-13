@@ -170,7 +170,7 @@ export interface IWorkflowVersionData {
   docs?: IDoc[]; // docs of all workflows
   cosmetic?: IWorkflowVersionCosmetic; // cosmetic & positions of all checkpoints
   subWorkflows?: ISubWorkflow[];
-  variables?: string;
+  variables?: string[];
 }
 
 export interface IGraph {

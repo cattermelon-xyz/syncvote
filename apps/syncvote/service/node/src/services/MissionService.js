@@ -48,6 +48,7 @@ async function insertMission(props) {
             if (
               !checkpoint.isEnd &&
               checkpoint?.vote_machine_type !== 'Snapshot' &&
+              checkpoint?.vote_machine_type !== 'Discourse' &&
               checkpoint?.vote_machine_type !== 'forkNode' &&
               checkpoint?.vote_machine_type !== 'joinNode'
             ) {
@@ -92,7 +93,7 @@ async function insertMission(props) {
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
               includedAbstain: checkpoint?.includedAbstain,
-              data: checkpoint?.data,
+              props: checkpoint?.data,
             };
 
             const error = await insertCheckpoint(checkpointData);
