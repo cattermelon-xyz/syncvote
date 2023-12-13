@@ -158,33 +158,35 @@ const Node = memo(
               <div>{data.label}</div>
             </div>
           )) || (
-            <div className={`rounded-md text-base ${selected}`}>
+            <>
+              <div className={`rounded-md text-base ${selected}`}>
+                <div className='hover:opacity-50'>
+                  <div
+                    className={`p-2 font-bold`}
+                    style={style.title ? style.title : {}}
+                  >
+                    {data.label
+                      ? typeof data.label === 'string'
+                        ? parse(shortenString(data.label, 30))
+                        : data.label
+                      : 'untitled'}
+                  </div>
+                  {data.abstract ? (
+                    <div
+                      style={style.content ? style.content : {}}
+                      className='py-2'
+                    >
+                      {data.abstract}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
               {duration > 0 ? (
-                <div className='absolute -top-8 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
+                <div className='mt-2 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
                   {displayDelayDuration(moment.duration(duration))}
                 </div>
               ) : null}
-              <div className='hover:opacity-50'>
-                <div
-                  className={`p-2 font-bold`}
-                  style={style.title ? style.title : {}}
-                >
-                  {data.label
-                    ? typeof data.label === 'string'
-                      ? parse(shortenString(data.label, 30))
-                      : data.label
-                    : 'untitled'}
-                </div>
-                {data.abstract ? (
-                  <div
-                    style={style.content ? style.content : {}}
-                    className='py-2'
-                  >
-                    {data.abstract}
-                  </div>
-                ) : null}
-              </div>
-            </div>
+            </>
           )}
       </>
     );

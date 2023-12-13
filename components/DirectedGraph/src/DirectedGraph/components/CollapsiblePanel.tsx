@@ -19,7 +19,9 @@ const CollapsiblePanel = ({
 }: CollapsiblePanelProps) => {
   const [open, setOpen] = useState(collapsable);
   return (
-    <div className={`py-4 px-4 bg-white rounded-lg w-full ${className}`}>
+    <div
+      className={`${className ? className : 'p-4 bg-white rounded-lg w-full'}`}
+    >
       <div className='w-full flex items-center justify-between'>
         <div className='font-bold text-lg select-none'>{title}</div>
         <div

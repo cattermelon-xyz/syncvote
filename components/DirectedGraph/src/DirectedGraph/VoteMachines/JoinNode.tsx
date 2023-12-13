@@ -1,14 +1,48 @@
+import { Select, Space } from 'antd';
 import {
+  CollapsiblePanel,
   ICheckPoint,
   IVoteMachine,
+  IVoteMachineConfigProps,
   IWorkflowVersionData,
   shortenString,
 } from '../../..';
 import { VerticalRightOutlined } from '@ant-design/icons';
 
 const VoteMachine: IVoteMachine = {
-  ConfigPanel: () => {
-    return <></>;
+  ConfigPanel: (props: IVoteMachineConfigProps) => {
+    const currentNode = props.allNodes?.find(
+      (a) => a.id === props.currentNodeId
+    );
+    const children = currentNode?.children ? [...currentNode?.children] : [];
+    const checkpoints: any[] = [];
+    props.allNodes?.forEach((child) => {
+      if (
+        ['joinNode', 'forkNode'].indexOf(child.vote_machine_type) === -1 &&
+        children.indexOf(child.id) === -1 &&
+        child.subWorkflowId === currentNode?.subWorkflowId
+      ) {
+        checkpoints.push({ value: child.id, label: child.title });
+      }
+    });
+    return (
+      <CollapsiblePanel title='Parallel Sub-Workflow'>
+        <div className='w-full justify-between flex items-center'>
+          <div className='w-1/4'>Connect to</div>
+          <Select
+            value={children[0]}
+            className='w-full'
+            options={checkpoints}
+            onChange={(value) => {
+              props.onChange({
+                ...currentNode,
+                children: [value],
+              });
+            }}
+          />
+        </div>
+      </CollapsiblePanel>
+    );
   },
   getName: () => {
     return 'Join Node';
@@ -17,7 +51,7 @@ const VoteMachine: IVoteMachine = {
     return 'joinNode';
   },
   getLabel: () => {
-    return <div>Join Node</div>;
+    return <span>trigger</span>;
   },
   getIcon: () => {
     return <VerticalRightOutlined />;

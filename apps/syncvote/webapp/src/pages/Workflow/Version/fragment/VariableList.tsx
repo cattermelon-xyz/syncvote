@@ -1,5 +1,6 @@
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Button, Input, Modal, Space } from 'antd';
+import { CollapsiblePanel } from 'directed-graph';
 import { useState } from 'react';
 
 const VariableDialog = ({
@@ -57,42 +58,45 @@ const VariableList = ({
   const variables = version.data?.variables ? [...version.data?.variables] : [];
   const [showDialog, setShowDialog] = useState(false);
   return (
-    <Space direction='vertical' size='middle' className='w-full'>
+    <CollapsiblePanel title='Variables' className='w-full'>
       <VariableDialog
         open={showDialog}
         setShowDialog={setShowDialog}
         setVersion={setVersion}
         version={version}
       />
-      <div className='w-full flex items-center justify-between'>
-        <div>List of variables</div>
-        <Button icon={<PlusOutlined />} onClick={() => setShowDialog(true)} />
-      </div>
-      <Space direction='vertical' size='small'>
-        {variables.map((v: any, idx: number) => {
-          const newVariables = [...variables];
-          return (
-            <div key={v} className='flex flex-row items-center gap-2'>
-              <Button
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  newVariables.splice(idx, 1);
-                  setVersion({
-                    ...version,
-                    data: {
-                      ...version.data,
-                      variables: newVariables,
-                    },
-                  });
-                }}
-                danger
-              />
-              <div>{v}</div>
-            </div>
-          );
-        })}
+      <Space className='w-full' size='middle' direction='vertical'>
+        <div className='w-full flex items-center justify-between'>
+          <Button icon={<PlusOutlined />} onClick={() => setShowDialog(true)}>
+            New Variable
+          </Button>
+        </div>
+        <Space direction='vertical' size='small'>
+          {variables.map((v: any, idx: number) => {
+            const newVariables = [...variables];
+            return (
+              <div key={v} className='flex flex-row items-center gap-2'>
+                <Button
+                  icon={<DeleteOutlined />}
+                  onClick={() => {
+                    newVariables.splice(idx, 1);
+                    setVersion({
+                      ...version,
+                      data: {
+                        ...version.data,
+                        variables: newVariables,
+                      },
+                    });
+                  }}
+                  danger
+                />
+                <div>{v}</div>
+              </div>
+            );
+          })}
+        </Space>
       </Space>
-    </Space>
+    </CollapsiblePanel>
   );
 };
 

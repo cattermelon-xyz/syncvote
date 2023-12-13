@@ -147,7 +147,6 @@ export const changeNode = (
   setDataHasChanged: any
 ) => {
   const newData = structuredClone(version?.data);
-  console.log('version: ', version);
   if (newData.subWorkflows) {
     newData.subWorkflows.map((subWorkflow: any) => {
       subWorkflow.checkpoints.forEach((v: any, index: number) => {
