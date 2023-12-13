@@ -42,19 +42,32 @@ async function handleVoteDiscourse(props) {
             });
             return;
           }
+          const details = mission_vote_details[0];
 
-          const voteMachineController = new VoteMachineController(
-            mission_vote_details[0]
-          );
+          const voteMachineController = new VoteMachineController(details);
 
           // 3️⃣ check if fallback
           const { fallback, error: f_error } = voteMachineController.fallBack();
 
           if (fallback) {
-            console.log('Move this mission to fallback checkpoint');
+            console.log('FallbackError: ', f_error);
+            const tallyResult = {
+              index: details.children.indexOf(details.data.fallback) || 0,
+            };
+            const timeDefault = moment(details.startToVote).add(
+              details.duration,
+              'seconds'
+            );
+
+            let { next_checkpoint_id } = await handleMovingToNextCheckpoint(
+              details,
+              tallyResult,
+              timeDefault
+            );
+
             resolve({
-              status: 'FALLBACK',
-              message: f_error,
+              status: 'OK',
+              message: `FALLBACK: Move this checkpoint to ${next_checkpoint_id}`,
             });
             return;
           }
@@ -82,7 +95,7 @@ async function handleVoteDiscourse(props) {
               identify,
               option,
               voting_power: 1,
-              current_vote_data_id: mission_vote_details[0].cvd_id,
+              current_vote_data_id: details.cvd_id,
             })
             .select('*');
 
@@ -95,6 +108,8 @@ async function handleVoteDiscourse(props) {
           }
 
           // 6️⃣ change the result
+          let tallyResult = {};
+          let msg = '';
           if (submission.action === DISCOURSE_ACTION.CREATE_TOPIC) {
             //create Topic
             const { data, error: error_create_topic } = await createTopic(
@@ -108,8 +123,9 @@ async function handleVoteDiscourse(props) {
               });
               return;
             } else {
-              const tallyResult = {
-                index: option[0],
+              // find next checkpoint
+              tallyResult = {
+                index: details.children.indexOf(details.data.next) || 0,
                 submission: {
                   firstPostId: data?.firstPostId,
                   linkDiscourse: data?.linkDiscourse,
@@ -121,12 +137,11 @@ async function handleVoteDiscourse(props) {
                 .from('current_vote_data')
                 .update({
                   who: [identify],
-                  result: [],
                   tallyResult: tallyResult,
                   endedAt: moment().format(),
                 })
                 .select('*')
-                .eq('id', mission_vote_details[0].cvd_id);
+                .eq('id', details.cvd_id);
 
               if (cvd_err) {
                 resolve({
@@ -136,46 +151,17 @@ async function handleVoteDiscourse(props) {
                 return;
               }
             }
-            let startToVote = moment().format();
-            const index = tallyResult.index;
-            // check if delays
-            if (mission_vote_details[0].delays) {
-              if (mission_vote_details[0].delays[index]) {
-                let delayUnits = `${mission_vote_details[0].delayUnits[index]}s`;
-
-                startToVote = moment().add(
-                  mission_vote_details[0].delays[index],
-                  delayUnits
-                );
-              }
-            }
-            // check if next checkpoint is end checkpoint
-            const next_checkpoint_id = `${mission_id}-${
-              mission_vote_details[0].children[tallyResult.index]
-            }`;
-            console.log(next_checkpoint_id);
-
-            // create current vote data for next checkpoint
-            const { data: new_current_vote_data } = await supabase
-              .from('current_vote_data')
-              .insert({
-                checkpoint_id: next_checkpoint_id,
-                initData: tallyResult,
-                startToVote: startToVote,
-              })
-              .select('*');
-
-            await supabase
-              .from('mission')
-              .update({
-                current_vote_data_id: new_current_vote_data[0].id,
-              })
-              .eq('id', mission_id);
-            resolve({
-              status: 'OK',
-              message: 'Create topic successfully => Move to next checkpoint',
-            });
+            msg = 'Create topic successfully => Move to next checkpoint';
           }
+          let timeDefault = moment();
+
+          // Moving to next checkpoint
+          await handleMovingToNextCheckpoint(details, tallyResult, timeDefault);
+
+          resolve({
+            status: 'OK',
+            message: msg,
+          });
         } catch (error) {
           console.log(error);
         }
