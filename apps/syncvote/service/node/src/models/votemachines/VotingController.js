@@ -14,8 +14,9 @@ class VoteMachineController {
       DocInput: new DocInput(props),
     };
     this.vote_machine_type = props.vote_machine_type;
+    this.id = props.id;
   }
-  
+
   initDataForCVD() {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].initDataForCVD();
@@ -28,6 +29,7 @@ class VoteMachineController {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].fallBack();
     } else {
+      console.log('Debug fallBack', this.vote_machine_type, this.id);
       throw new Error(`Invalid data`);
     }
   }

@@ -5,10 +5,10 @@ const { SingleVote } = require('../models/votemachines/SingleVote');
 const { DocInput } = require('../models/votemachines/DocInput');
 const { Veto } = require('../models/votemachines/Veto');
 const { UpVote } = require('../models/votemachines/Upvote');
-var CronJob = require('cron').CronJob;
 
 const moment = require('moment');
-const { createArweave, convertToCron } = require('../functions');
+const { createArweave } = require('../functions');
+const { start } = require('./VoteHandle/funcs');
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: new SingleVote({}),
@@ -20,6 +20,13 @@ const VoteMachineValidate = {
 async function insertMission(props) {
   return new Promise(async (resolve, reject) => {
     try {
+      if (props) {
+        if (props.refId && props.parent) {
+          console.log('Create Mission: ', props.refId);
+        } else {
+          console.log('Create Mission');
+        }
+      }
       const { arweave_id, error: arweave_err } = await createArweave(props);
 
       if (arweave_err) {
@@ -37,7 +44,7 @@ async function insertMission(props) {
 
       if (!error) {
         if (newMission[0].status === 'PUBLIC') {
-          newMission[0].data.checkpoints.map(async (checkpoint) => {
+          for (const checkpoint of newMission[0].data.checkpoints) {
             if (
               !checkpoint.isEnd &&
               checkpoint?.vote_machine_type !== 'Snapshot' &&
@@ -89,6 +96,7 @@ async function insertMission(props) {
             };
 
             const error = await insertCheckpoint(checkpointData);
+
             if (error) {
               resolve({
                 status: 'ERR',
@@ -104,30 +112,6 @@ async function insertMission(props) {
                 startToVote: moment().format(),
               });
 
-              // create a job to close this current vote data in expected time close
-              const expectEndedAt = moment().add(
-                checkpointData.duration,
-                'seconds'
-              );
-
-              const cronSyntax = convertToCron(expectEndedAt);
-              const job = new CronJob(cronSyntax, async function () {
-                await fetch(`${process.env.BACKEND_API}/vote/create`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    identify: `cronjob-${checkpointData.id}`,
-                    option: ['fake option'],
-                    voting_power: 9999,
-                    mission_id: newMission[0].id,
-                  }),
-                });
-              });
-              job.start();
-              console.log(`create job to stop at ${expectEndedAt}`);
-
               const { u_error } = await supabase
                 .from('mission')
                 .update({
@@ -135,6 +119,13 @@ async function insertMission(props) {
                 })
                 .eq('id', newMission[0].id)
                 .select('*');
+
+              let { data: details } = await supabase
+                .from('mission_vote_details')
+                .select(`*`)
+                .eq('mission_id', newMission[0].id);
+
+              await start(details[0]);
 
               if (u_error) {
                 resolve({
@@ -144,7 +135,7 @@ async function insertMission(props) {
                 return;
               }
             }
-          });
+          }
         }
         resolve({
           status: 'OK',
@@ -156,6 +147,7 @@ async function insertMission(props) {
           status: 'ERR',
           message: error,
         });
+        console.log('MissionCreateError: ', error);
       }
     } catch (e) {
       reject(e);

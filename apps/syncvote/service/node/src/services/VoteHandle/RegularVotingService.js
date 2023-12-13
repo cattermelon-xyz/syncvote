@@ -1,13 +1,9 @@
 const { supabase } = require('../../configs/supabaseClient');
 const moment = require('moment');
-var CronJob = require('cron').CronJob;
-const { convertToCron } = require('../../functions');
+const { handleMovingToNextCheckpoint } = require('./funcs');
 const {
-  checkIfFirstTimeOfVoting,
-  handleMovingToNextCheckpoint,
-  handleEndNode,
-  handleForkNode,
-} = require('./funcs');
+  VoteMachineController,
+} = require('../../models/votemachines/VotingController');
 
 async function handleSubmission(props) {
   return new Promise(async (resolve, reject) => {
@@ -48,32 +44,28 @@ async function handleSubmission(props) {
           }
 
           // check if this is ended checkpoint
-          if (!details.vote_machine_type) {
-            await handleEndNode(details);
+          if (!details.vote_machine_type && isEnd) {
             resolve({
-              status: 'OK',
-              message: 'Stopped this mission',
+              status: 'ERR',
+              message: 'Cannot vote in End Node',
             });
-
-          } else if (!details.vote_machine_type === 'forkNode') {
-
-            await handleForkNode(details);
+            return;
+          } else if (details.vote_machine_type === 'forkNode') {
             resolve({
-              status: 'OK',
-              message: 'Seperate this mission',
+              status: 'ERR',
+              message: 'Cannot vote in forkNode',
             });
-            
+            return;
           } else {
-            let { firstTimeToVote, voteMachineController } =
-              await checkIfFirstTimeOfVoting(details);
+            const voteMachineController = new VoteMachineController(details);
 
             // 4️⃣ check if fallback
             const { fallback, error: f_error } =
               voteMachineController.fallBack();
 
             if (fallback) {
+              console.log('FallbackError: ', f_error);
               const tallyResult = { index: 0 };
-
               const timeDefault = moment(details.startToVote).add(
                 details.duration,
                 'seconds'
@@ -90,31 +82,6 @@ async function handleSubmission(props) {
                 message: `FALLBACK: Move this checkpoint to ${next_checkpoint_id}`,
               });
               return;
-            }
-
-            if (firstTimeToVote) {
-              // create a job to stop this checkpoint
-              const stopTime = moment(details.startToVote).add(
-                details.duration,
-                'seconds'
-              );
-
-              const cronSyntax = convertToCron(stopTime);
-              const job = new CronJob(cronSyntax, async function () {
-                await fetch(`${process.env.BACKEND_API}/vote/create`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    identify: `cronjob-${checkpointData.id}`,
-                    option: ['fake option'],
-                    voting_power: 9999,
-                    mission_id: details.id,
-                  }),
-                });
-              });
-              job.start();
             }
 
             // 5️⃣ check if recorded
@@ -206,6 +173,7 @@ async function handleSubmission(props) {
             });
           }
         } catch (error) {
+          console.log('HandleVotingError: ', error);
           resolve({
             status: 'ERR',
             message: error,
