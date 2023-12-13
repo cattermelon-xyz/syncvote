@@ -14,6 +14,8 @@ export namespace Discourse {
     body?: string;
     discussion?: string;
     plugins?: string;
+    next?: string;
+    fallback?: string;
   }
 
   export interface IOption {
