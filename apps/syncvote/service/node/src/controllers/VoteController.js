@@ -43,7 +43,7 @@ const submitDoc = async (req, res) => {
 const submitDiscourse = async (req, res) => {
   try {
     const { identify, option, submission, mission_id } = req.body;
-    if (!identify || !submission || !mission_id || !option) {
+    if (!identify || !submission || !mission_id) {
       return res.status(200).json({
         status: 'ERR',
         message: 'The input is required',

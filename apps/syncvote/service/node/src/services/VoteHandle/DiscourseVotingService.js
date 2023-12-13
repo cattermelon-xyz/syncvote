@@ -7,6 +7,7 @@ var CronJob = require('cron').CronJob;
 const { createArweave } = require('../../functions');
 const { DISCOURSE_ACTION } = require('../../configs/constants');
 const { createTopic } = require('../TopicService');
+const { handleMovingToNextCheckpoint } = require('./funcs');
 
 async function handleVoteDiscourse(props) {
   return new Promise(async (resolve, reject) => {
@@ -46,31 +47,31 @@ async function handleVoteDiscourse(props) {
 
           const voteMachineController = new VoteMachineController(details);
 
-          // 3️⃣ check if fallback
-          const { fallback, error: f_error } = voteMachineController.fallBack();
+          // // 3️⃣ check if fallback
+          // const { fallback, error: f_error } = voteMachineController.fallBack();
 
-          if (fallback) {
-            console.log('FallbackError: ', f_error);
-            const tallyResult = {
-              index: details.children.indexOf(details.props.fallback) || 0,
-            };
-            const timeDefault = moment(details.startToVote).add(
-              details.duration,
-              'seconds'
-            );
+          // if (fallback) {
+          //   console.log('FallbackError: ', f_error);
+          //   const tallyResult = {
+          //     index: details.children.indexOf(details.props.fallback) || 0,
+          //   };
+          //   const timeDefault = moment(details.startToVote).add(
+          //     details.duration,
+          //     'seconds'
+          //   );
 
-            let { next_checkpoint_id } = await handleMovingToNextCheckpoint(
-              details,
-              tallyResult,
-              timeDefault
-            );
+          //   let { next_checkpoint_id } = await handleMovingToNextCheckpoint(
+          //     details,
+          //     tallyResult,
+          //     timeDefault
+          //   );
 
-            resolve({
-              status: 'OK',
-              message: `FALLBACK: Move this checkpoint to ${next_checkpoint_id}`,
-            });
-            return;
-          }
+          //   resolve({
+          //     status: 'OK',
+          //     message: `FALLBACK: Move this checkpoint to ${next_checkpoint_id}`,
+          //   });
+          //   return;
+          // }
 
           // 4️⃣ check if recorded
           const { notRecorded, error: r_error } =
@@ -112,9 +113,10 @@ async function handleVoteDiscourse(props) {
           let msg = '';
           if (submission.action === DISCOURSE_ACTION.CREATE_TOPIC) {
             //create Topic
-            const { data, error: error_create_topic } = await createTopic(
-              submission
-            );
+            const { data, error: error_create_topic } = await createTopic({
+              ...submission,
+              org_id: details?.org_id,
+            });
 
             if (error_create_topic) {
               resolve({
@@ -129,7 +131,7 @@ async function handleVoteDiscourse(props) {
                 submission: {
                   firstPostId: data?.firstPostId,
                   linkDiscourse: data?.linkDiscourse,
-                  [submission.variables]: data?.topicId,
+                  [submission.variable]: data?.topicId,
                 },
               };
 

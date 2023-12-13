@@ -32,7 +32,7 @@ const createTopic = async (props) => {
 
     // Make API call to Discourse
     const response = await axios.post(
-      `http://${discourseConfig.id_string}/posts`,
+      `https://${discourseConfig.id_string}/posts`,
       discourseData,
       {
         headers: {
@@ -49,8 +49,8 @@ const createTopic = async (props) => {
     const dataAfterCreate = {
       firstPostId,
       topicId,
-      linkDiscourse
-    }
+      linkDiscourse,
+    };
 
     return { data: dataAfterCreate };
   } catch (e) {

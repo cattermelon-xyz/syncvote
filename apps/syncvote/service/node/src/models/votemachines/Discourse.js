@@ -34,11 +34,7 @@ class Discourse extends VotingMachine {
         };
       }
 
-      if (!voteData.submission.org_id) {
-        return { notRecorded: true, error: 'Missing org_id to query API key' };
-      }
-
-      if (!voteData.submission.variables) {
+      if (!voteData.submission.variable) {
         return {
           notRecorded: true,
           error: 'Missing variable to store topic_id',
