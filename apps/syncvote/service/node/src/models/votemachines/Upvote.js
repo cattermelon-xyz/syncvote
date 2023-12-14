@@ -15,10 +15,12 @@ class UpVote extends VotingMachine {
       isValid = false;
       message.push('Missing options');
     }
+
     if (!checkpoint?.quorum) {
       isValid = false;
       message.push('Missing quorum');
     }
+
     if (!checkpoint?.data.pass || !checkpoint?.data.fallback) {
       isValid = false;
       message.push('Missing pass or fallback option');

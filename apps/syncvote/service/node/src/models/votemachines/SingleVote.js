@@ -17,10 +17,17 @@ class SingleVote extends VotingMachine {
       isValid = false;
       message.push('Missing options');
     }
+
     if (!checkpoint?.data.max) {
       isValid = false;
       message.push('Missing number of vote need to win');
     }
+
+    if (!checkpoint?.quorum) {
+      isValid = false;
+      message.push('Missing quorum');
+    }
+
     return {
       isValid,
       message,

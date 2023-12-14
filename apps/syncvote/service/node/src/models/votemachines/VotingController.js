@@ -14,6 +14,7 @@ class VoteMachineController {
       SingleChoiceRaceToMax: new SingleVote(props),
       DocInput: new DocInput(props),
       Discourse: new Discourse(props),
+      Snapshot: new Snapshot(props),
     };
     this.vote_machine_type = props.vote_machine_type;
     this.id = props.id;
