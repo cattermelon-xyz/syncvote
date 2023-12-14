@@ -9,17 +9,19 @@ import {
   DoneCreateProposal,
   Voting,
 } from '@pages';
-import { queryDemo } from '@data/org';
+import { queryAMissionDetail } from '@data/mission';
 import { queryMission } from '@data/mission';
+import { extractCurrentCheckpointId } from './utils';
 
 function App() {
   const [user, setUser] = useState<any>();
   const [page, setPage] = useState<string>(PAGE_ROUTER.HOME_PAGE);
-  const [dataDemo, setDataDemo] = useState<any>();
   const [currentProposalId, setCurrentProposalId] = useState<number>();
   const [currentProposalData, setCurrentProposalData] = useState<any>();
   const [currentOrgData, setCurrentOrgData] = useState<any>();
   const [dataMissions, setDataMissions] = useState<any>();
+  const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
+  const [listVersionDocs, setListVersionDocs] = useState<any[]>();
 
   useEffect(() => {
     getCurrentUser().then((resp) => {
@@ -37,32 +39,66 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      queryDemo({
-        onSuccess: (data) => {
-          data.sort(
-            (a: any, b: any) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime()
+    console.log('inUseEffect ** currentProposalId', currentProposalId);
+    if (currentProposalId && currentProposalId !== -1) {
+      queryAMissionDetail({
+        missionId: currentProposalId,
+        onSuccess: (data: any) => {
+          console.log('data query', data);
+          setCurrentProposalData(data);
+          const currentCheckpointId = extractCurrentCheckpointId(data.id);
+          const checkpointData = data?.data?.checkpoints.filter(
+            (checkpoint: any) => checkpoint.id === currentCheckpointId
           );
-          setDataDemo(data);
+          const listVersionDocs = data?.progress.flatMap((progress: any) => {
+            return progress?.tallyResult?.submission || [];
+          });
+          setListVersionDocs(listVersionDocs);
+          console.log('missiondata', data);
+          console.log('checkpointData', checkpointData[0]);
+          let checkpointDataAfterHandle = checkpointData[0];
+
+          if (!checkpointData[0].isEnd) {
+            const startToVote = new Date(data.startToVote);
+            // convert second to millisecond of duration
+            const duration = checkpointData[0].duration * 1000;
+            const endTovote = new Date(
+              startToVote.getTime() + duration
+            ).toISOString();
+            checkpointDataAfterHandle.endToVote = endTovote;
+          }
+
+          switch (checkpointData[0]?.vote_machine_type) {
+            case 'SingleChoiceRaceToMax':
+              if (checkpointData[0]?.includedAbstain === true) {
+                checkpointDataAfterHandle.data.options.push('Abstain');
+              }
+              break;
+            case 'UpVote':
+              checkpointDataAfterHandle.data.options = [];
+              checkpointDataAfterHandle.data.options.push('Upvote');
+              if (checkpointData[0]?.includedAbstain === true) {
+                checkpointDataAfterHandle.data.options.push('Abstain');
+              }
+              break;
+            case 'Veto':
+              checkpointDataAfterHandle.data.options = [];
+              checkpointDataAfterHandle.data.options.push('Upvote');
+              if (checkpointData[0]?.includedAbstain === true) {
+                checkpointDataAfterHandle.data.options.push('Abstain');
+              }
+              break;
+            default:
+              break;
+          }
+          setCurrentCheckpointData(checkpointDataAfterHandle);
         },
         onError: (error) => {
           console.log('error', error);
         },
       });
     }
-  }, [user, page]);
-
-  useEffect(() => {
-    console.log('inUseEffect ** currentProposalId', currentProposalId);
-    if (currentProposalId && currentProposalId !== -1 && dataDemo) {
-      const data = dataDemo.filter(
-        (data: any) => data.id === currentProposalId
-      );
-      setCurrentProposalData(data[0]);
-    }
-  }, [currentProposalId, dataDemo]);
+  }, [currentProposalId]);
 
   useEffect(() => {
     if (currentOrgData) {
@@ -81,19 +117,12 @@ function App() {
     }
   }, [currentOrgData, user]);
 
-  useEffect(() => {
-    console.log('dataDemo', dataDemo);
-    console.log('user', user);
-    console.log('currentProposalId', currentProposalId);
-    console.log('currentOrgData', currentOrgData);
-    console.log('dataMissions', dataMissions);
-  }, [
-    dataDemo,
-    currentProposalData,
-    currentProposalId,
-    currentOrgData,
-    dataMissions,
-  ]);
+  // useEffect(() => {
+  //   console.log('user', user);
+  //   console.log('currentProposalId', currentProposalId);
+  //   console.log('currentOrgData', currentOrgData);
+  //   console.log('dataMissions', dataMissions);
+  // }, [currentProposalData, currentProposalId, currentOrgData, dataMissions]);
 
   return (
     <div className='w-[260px] h-[380px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
@@ -103,6 +132,7 @@ function App() {
         <Voting
           setPage={setPage}
           currentProposalData={currentProposalData}
+          currentCheckpointData={currentCheckpointData}
           setCurrentProposalId={setCurrentProposalId}
           setCurrentProposalData={setCurrentProposalData}
         />

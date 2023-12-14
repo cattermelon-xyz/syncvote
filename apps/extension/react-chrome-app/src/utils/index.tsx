@@ -16,3 +16,12 @@ export const saveLastProposalId = async (id: number) => {
     payload: id,
   });
 };
+
+export const extractCurrentCheckpointId = (inputStr: string) => {
+  const parts = inputStr.split('-');
+  if (parts.length <= 1) {
+    return null;
+  }
+  parts.shift();
+  return parts.join('-');
+};
