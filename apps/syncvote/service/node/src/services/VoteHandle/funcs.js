@@ -118,13 +118,14 @@ const handleMovingToNextCheckpoint = async (
     const startNextCheckpoint = async (details) => {
       if (!details?.vote_machine_type && details?.isEnd) {
         await startEndNode(details);
-      } else if (details.vote_machine_type && !details?.isEnd) {
+      } else if (details?.vote_machine_type && !details?.isEnd) {
         if (details?.vote_machine_type === 'forkNode') {
           await startForkNode(details);
         } else {
           await start(details);
         }
       } else {
+        console.log('Debug', details);
         console.log('Something went wrong');
       }
     };
