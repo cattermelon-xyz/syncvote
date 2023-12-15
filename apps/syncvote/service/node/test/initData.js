@@ -2,6 +2,7 @@ const { supabase } = require('../src/configs/supabaseClient');
 const { insertCheckpoint } = require('../src/services/CheckpointService');
 const moment = require('moment');
 const { insertMission } = require('../src/services/MissionService');
+
 const missionData = {
   id: 9999,
   title: 'Test something',

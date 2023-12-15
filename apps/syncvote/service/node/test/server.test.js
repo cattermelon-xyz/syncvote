@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const axios = require('axios');
 const moment = require('moment');
 const { addMission, deleteMission, missionData } = require('./initData');
-const { response } = require('express');
 dotenv.config();
 
 describe('Testing voting function', function () {
@@ -16,7 +15,19 @@ describe('Testing voting function', function () {
     voting_power: 1,
     mission_id: missionData.id,
   };
+describe('Testing voting function', function () {
+  this.timeout(50000);
+  const voteData = {
+    id: 9999,
+    identify: `chaukhac4@gmail.com`,
+    option: [0],
+    voting_power: 1,
+    mission_id: missionData.id,
+  };
 
+  beforeEach(async function () {
+    await addMission();
+  });
   beforeEach(async function () {
     await addMission();
   });
@@ -62,7 +73,7 @@ describe('Testing voting function', function () {
   });
 
   it('3. Vote in the 3st leg', async function () {
-    this.timeout(10000);
+    this.timeout(15000);
 
     const { data } = await supabase
       .from('current_vote_data')
@@ -98,7 +109,7 @@ describe('Testing voting function', function () {
   });
 
   it('4. Vote in the 4th leg', async function () {
-    this.timeout(10000);
+    this.timeout(15000);
 
     const { data } = await supabase
       .from('current_vote_data')
