@@ -15,7 +15,19 @@ describe('Testing voting function', function () {
     voting_power: 1,
     mission_id: missionData.id,
   };
+describe('Testing voting function', function () {
+  this.timeout(50000);
+  const voteData = {
+    id: 9999,
+    identify: `chaukhac4@gmail.com`,
+    option: [0],
+    voting_power: 1,
+    mission_id: missionData.id,
+  };
 
+  beforeEach(async function () {
+    await addMission();
+  });
   beforeEach(async function () {
     await addMission();
   });
