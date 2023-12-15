@@ -117,7 +117,6 @@ const handleMovingToNextCheckpoint = async (
 
     const startNextCheckpoint = async (details) => {
       if (!details?.vote_machine_type && details?.isEnd) {
-      if (!details?.vote_machine_type && details?.isEnd) {
         await startEndNode(details);
       } else if (details?.vote_machine_type && !details?.isEnd) {
         if (details?.vote_machine_type === 'forkNode') {
