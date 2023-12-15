@@ -299,6 +299,7 @@ const MissionVotingDetail = () => {
           default:
             break;
         }
+        
         setCurrentCheckpointData(checkpointDataAfterHandle);
       },
       onError: (error) => {
