@@ -116,12 +116,17 @@ const handleMovingToNextCheckpoint = async (
       .eq('mission_id', details.mission_id);
 
     const startNextCheckpoint = async (details) => {
-      if (details.vote_machine_type === 'forkNode') {
-        await startForkNode(details);
-      } else if (!details.vote_machine_type && details.isEnd) {
+      if (!details?.vote_machine_type && details?.isEnd) {
         await startEndNode(details);
+      } else if (details?.vote_machine_type && !details?.isEnd) {
+        if (details?.vote_machine_type === 'forkNode') {
+          await startForkNode(details);
+        } else {
+          await start(details);
+        }
       } else {
-        await start(details);
+        console.log('Debug', details);
+        console.log('Something went wrong');
       }
     };
 
