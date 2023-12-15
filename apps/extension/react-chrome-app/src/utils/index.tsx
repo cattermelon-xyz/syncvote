@@ -16,3 +16,20 @@ export const saveLastProposalId = async (id: number) => {
     payload: id,
   });
 };
+
+export const extractCurrentCheckpointId = (inputStr: string) => {
+  const parts = inputStr.split('-');
+  if (parts.length <= 1) {
+    return null;
+  }
+  parts.shift();
+  return parts.join('-');
+};
+
+export const createIdString = (title: String, id: String) => {
+  let result = '';
+  result = title.toLocaleLowerCase().replace(/([^\w ]|_)/g, '');
+  result = result.split(' ').join('-');
+  return `${result}-${id}`;
+};
+

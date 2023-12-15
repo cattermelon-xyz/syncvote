@@ -44,3 +44,52 @@ export const queryMission = async ({
     onError(error);
   }
 };
+
+export const queryAMissionDetail = async ({
+  missionId,
+  onSuccess,
+  onError = (error) => {
+    console.error(error); // eslint-disable-line
+  },
+}: {
+  missionId: number;
+  onSuccess: (data: any) => void;
+  onError?: (data: any) => void;
+}) => {
+  const { data, error } = await supabase
+    .from('mission_vote_details')
+    .select('*')
+    .eq('mission_id', missionId);
+  if (!error) {
+    const { data: dataVoteRecords, error: errorVoteRecord } = await supabase
+      .from('vote_record')
+      .select('*')
+      .eq('current_vote_data_id', data[0].cvd_id);
+
+    const { data: dataProgress, error: errorProgress } = await supabase
+      .from('progress_mission_view')
+      .select('*')
+      .eq('mission_id', data[0].mission_id);
+
+    if (!errorVoteRecord && !errorProgress) {
+      const voteRecords = dataVoteRecords.map((voteRecord) => {
+        return {
+          identify: voteRecord.identify,
+          option: voteRecord.option,
+        };
+      });
+      const progress = dataProgress.sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+      const dataMissionAfterHandle = data[0];
+      dataMissionAfterHandle.vote_record = voteRecords;
+      dataMissionAfterHandle.progress = progress;
+      onSuccess(dataMissionAfterHandle);
+    } else {
+      onError(errorVoteRecord);
+    }
+  } else {
+    onError(error);
+  }
+};

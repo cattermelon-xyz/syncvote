@@ -252,6 +252,7 @@ const MissionVotingDetail = () => {
     queryAMissionDetail({
       missionId,
       onSuccess: (data: any) => {
+        console.log('data query', data);
         setMissionData(data);
         const currentCheckpointId = extractCurrentCheckpointId(data.id);
         const checkpointData = data?.data?.checkpoints.filter(
@@ -298,6 +299,7 @@ const MissionVotingDetail = () => {
           default:
             break;
         }
+        
         setCurrentCheckpointData(checkpointDataAfterHandle);
       },
       onError: (error) => {

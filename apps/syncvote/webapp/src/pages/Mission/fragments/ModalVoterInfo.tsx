@@ -3,6 +3,7 @@ import { Modal, Form, Input } from 'antd';
 import { vote } from '@axios/vote';
 import { useDispatch } from 'react-redux';
 import { insertDocInput } from '@dal/data';
+import { VM_TYPE } from '@utils/constants/votemachine';
 
 interface Props {
   open: boolean;
@@ -60,7 +61,7 @@ const ModalVoterInfo: React.FC<Props> = ({
       };
 
       if (
-        currentCheckpointData.vote_machine_type === 'DocInput' &&
+        currentCheckpointData.vote_machine_type === VM_TYPE.DOC_INPUT &&
         submission
       ) {
         const arweaveIds: any[] = [];
@@ -80,6 +81,11 @@ const ModalVoterInfo: React.FC<Props> = ({
           },
           []
         );
+      } else if (
+        currentCheckpointData.vote_machine_type === VM_TYPE.DISCOURSE &&
+        submission
+      ) {
+        voteData.submission = submission;
       } else {
         voteData.voting_power = values.votepower;
       }
@@ -126,8 +132,10 @@ const ModalVoterInfo: React.FC<Props> = ({
         },
         dispatch,
         typeVote:
-          currentCheckpointData.vote_machine_type === 'DocInput'
-            ? 'DocInput'
+          currentCheckpointData.vote_machine_type === VM_TYPE.DOC_INPUT
+            ? VM_TYPE.DOC_INPUT
+            : currentCheckpointData.vote_machine_type === VM_TYPE.DISCOURSE
+            ? VM_TYPE.DISCOURSE
             : undefined,
       });
 

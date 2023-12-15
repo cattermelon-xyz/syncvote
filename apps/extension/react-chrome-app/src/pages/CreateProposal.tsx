@@ -26,6 +26,7 @@ const CreateProposal: React.FC<Props> = ({
   const [workflowsOption, setWorkflowsOption] = useState<any>();
 
   const handleCreateProposal = async () => {
+
     const missionData = {
       creator_id: user.id,
       status: 'PUBLIC',
