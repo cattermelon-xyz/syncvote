@@ -77,6 +77,13 @@ const VoteSection: React.FC<Props> = ({
           currentCheckpointData={currentCheckpointData}
           client={client}
         />
+      ) : voteMachine &&
+        currentCheckpointData?.vote_machine_type === VM_TYPE.DISCOURSE ? (
+        <voteMachine.VoteUIWeb
+          currentCheckpointData={currentCheckpointData}
+          setSubmission={setSubmission}
+          setOpenModalVoterInfo={setOpenModalVoterInfo}
+        />
       ) : (
         <></>
       )}

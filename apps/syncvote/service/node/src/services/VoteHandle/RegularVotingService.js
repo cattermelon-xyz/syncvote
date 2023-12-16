@@ -44,7 +44,7 @@ async function handleSubmission(props) {
           }
 
           // check if this is ended checkpoint
-          if (!details.vote_machine_type && isEnd) {
+          if (!details?.vote_machine_type && details?.isEnd) {
             resolve({
               status: 'ERR',
               message: 'Cannot vote in End Node',

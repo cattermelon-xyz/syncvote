@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+import { VM_TYPE } from '@utils/constants/votemachine';
 
 export const vote = async ({
   data,
@@ -19,10 +20,11 @@ export const vote = async ({
   dispatch(startLoading({}));
 
   const apiUrl =
-    typeVote === 'DocInput'
+    typeVote === VM_TYPE.DOC_INPUT
       ? `${import.meta.env.VITE_SERVER_URL}/vote/submit-doc`
+      : typeVote === VM_TYPE.DISCOURSE
+      ? `${import.meta.env.VITE_SERVER_URL}/vote/create-topic`
       : `${import.meta.env.VITE_SERVER_URL}/vote/create`;
-
   axios
     .post(apiUrl, data)
     .then((response) => {
