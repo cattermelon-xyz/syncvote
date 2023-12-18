@@ -67,7 +67,7 @@ async function insertMission(props) {
                 return;
               }
             }
-
+            
             const checkpointData = {
               id: `${newMission[0].id}-${checkpoint.id}`,
               vote_machine_type: checkpoint.vote_machine_type,
