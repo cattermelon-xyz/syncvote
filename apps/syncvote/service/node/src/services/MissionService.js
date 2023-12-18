@@ -54,7 +54,7 @@ async function insertMission(props) {
               checkpoint?.vote_machine_type !== 'joinNode'
             ) {
               const { duration, participation, title } = checkpoint;
-              const { isValid } =
+              const { isValid, message } =
                 VoteMachineValidate[checkpoint.vote_machine_type].validate(
                   checkpoint
                 );
@@ -62,12 +62,13 @@ async function insertMission(props) {
               if (!duration || !participation || !title || !isValid) {
                 resolve({
                   status: 'ERR',
-                  message: 'Checkpoint of this proposal is missing attributes',
+                  message:
+                    `${checkpoint?.vote_machine_type}: ` + String(message),
                 });
                 return;
               }
             }
-            
+
             const checkpointData = {
               id: `${newMission[0].id}-${checkpoint.id}`,
               vote_machine_type: checkpoint.vote_machine_type,

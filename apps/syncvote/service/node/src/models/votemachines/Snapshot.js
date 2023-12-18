@@ -15,14 +15,22 @@ class Snapshot extends VotingMachine {
       message.push('Missing options');
     }
 
-    if (!checkpoint?.props.fallback || !checkpoint?.props.next) {
+    if (!checkpoint?.data?.fallback || !checkpoint?.data?.next) {
       isValid = false;
-      message.push('Missiong fallback and next checkpoint');
+      message.push('Missing fallback and next checkpoint');
     }
 
-    if (!checkpoint?.props.space || !checkpoint?.props.type) {
+    if (!checkpoint?.data?.space || !checkpoint?.data?.type) {
       isValid = false;
       message.push('Missing attributes of snapshot');
+    }
+
+    if (
+      checkpoint?.data?.action !== SNAPSHOT_ACTION.CREATE_PROPOSAL &&
+      checkpoint?.data?.action !== SNAPSHOT_ACTION.SYNC_PROPOSAL
+    ) {
+      isValid = false;
+      message.push('Wrong of missing action');
     }
 
     return {
@@ -37,7 +45,7 @@ class Snapshot extends VotingMachine {
     if (notRecorded) {
       return { notRecorded, error };
     }
-
+    console.log('Debug 1', voteData);
     // check if dont have action
     if (!voteData.submission) {
       return {
@@ -45,7 +53,7 @@ class Snapshot extends VotingMachine {
         error: 'Snapshot: Missing submission',
       };
     } else {
-      if (!voteData.proposalId) {
+      if (!voteData.submission.proposalId) {
         return {
           notRecorded: true,
           error: 'Snapshot: Missing proposalId',
@@ -68,13 +76,14 @@ class Snapshot extends VotingMachine {
   }
 
   shouldTally() {
-    if (this.submission.action === SNAPSHOT_ACTION.CREATE_PROPOSAL) {
+    if (this.data.action === SNAPSHOT_ACTION.CREATE_PROPOSAL) {
       return {
         shouldTally: true,
         tallyResult: this.tallyResult,
       };
-    } else if (voteData.submission.action === SNAPSHOT_ACTION.SYNC_PROPOSAL) {
+    } else if (this.data.action === SNAPSHOT_ACTION.SYNC_PROPOSAL) {
     }
+    return {};
   }
 }
 

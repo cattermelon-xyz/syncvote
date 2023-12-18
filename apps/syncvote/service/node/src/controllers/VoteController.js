@@ -4,8 +4,8 @@ const DiscourseVotingService = require('../services/VoteHandle/DiscourseVotingSe
 
 const voting = async (req, res) => {
   try {
-    const { mission_id } = req.body;
-    if (!mission_id) {
+    const { mission_id, identify } = req.body;
+    if (!mission_id || !identify) {
       return res.status(200).json({
         status: 'ERR',
         message: 'The input is required',

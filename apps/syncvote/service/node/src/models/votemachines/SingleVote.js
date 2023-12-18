@@ -46,14 +46,12 @@ class SingleVote extends VotingMachine {
     options.map((_, index) => {
       result[index] = {
         count: 0,
-        voting_power: 0,
       };
     });
 
     if (this.includedAbstain) {
       result['-1'] = {
         count: 0,
-        voting_power: 0,
       };
     }
 
@@ -87,6 +85,9 @@ class SingleVote extends VotingMachine {
       return { notRecorded, error };
     }
 
+    if (!voteData.option) {
+    }
+
     // check if user's choice is wrong
     for (const option of voteData.option) {
       if (option > this.options.length - 1) {
@@ -117,7 +118,6 @@ class SingleVote extends VotingMachine {
 
     if (this.participation.type === 'identity') {
       this.result[voteData.option[0]].count += 1;
-      this.result[voteData.option[0]].voting_power += 1;
     } else {
       // Dont have vote by token
     }
