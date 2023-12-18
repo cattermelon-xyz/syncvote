@@ -9,12 +9,14 @@ const { UpVote } = require('../models/votemachines/Upvote');
 const moment = require('moment');
 const { createArweave } = require('../functions');
 const { start } = require('./VoteHandle/funcs');
+const { Snapshot } = require('../models/votemachines/Snapshot');
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: new SingleVote({}),
   DocInput: new DocInput({}),
   Veto: new Veto({}),
   UpVote: new UpVote({}),
+  Snapshot: new Snapshot({}),
 };
 
 async function insertMission(props) {
@@ -47,32 +49,21 @@ async function insertMission(props) {
           for (const checkpoint of newMission[0].data.checkpoints) {
             if (
               !checkpoint.isEnd &&
-              checkpoint?.vote_machine_type !== 'Snapshot' &&
               checkpoint?.vote_machine_type !== 'Discourse' &&
               checkpoint?.vote_machine_type !== 'forkNode' &&
               checkpoint?.vote_machine_type !== 'joinNode'
             ) {
-              const { duration, participation, title, quorum } = checkpoint;
-              const { isValid } =
+              const { duration, participation, title } = checkpoint;
+              const { isValid, message } =
                 VoteMachineValidate[checkpoint.vote_machine_type].validate(
                   checkpoint
                 );
 
-              if (duration && participation && title && isValid) {
-                if (checkpoint.vote_machine_type !== 'DocInput') {
-                  if (!quorum) {
-                    resolve({
-                      status: 'ERR',
-                      message:
-                        'Checkpoint of this proposal is missing attributes',
-                    });
-                    return;
-                  }
-                }
-              } else {
+              if (!duration || !participation || !title || !isValid) {
                 resolve({
                   status: 'ERR',
-                  message: 'Checkpoint of this proposal is missing attributes',
+                  message:
+                    `${checkpoint?.vote_machine_type}: ` + String(message),
                 });
                 return;
               }

@@ -5,4 +5,9 @@ const DISCOURSE_ACTION = {
   MOVE_TOPIC: 'move-topic', //Move Topic
 };
 
-module.exports = { DISCOURSE_ACTION };
+const SNAPSHOT_ACTION = {
+  CREATE_PROPOSAL: 'create-proposal', //Create topic
+  SYNC_PROPOSAL: 'sync-proposal', //Create post into topic
+};
+
+module.exports = { DISCOURSE_ACTION, SNAPSHOT_ACTION };

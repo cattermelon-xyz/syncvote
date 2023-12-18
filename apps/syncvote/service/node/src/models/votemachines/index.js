@@ -13,6 +13,8 @@ class VotingMachine {
       endedAt,
       tallyResult,
       participation,
+      children,
+      props: data,
     } = props;
     this.duration = duration;
     this.cvd_created_at = cvd_created_at;
@@ -24,6 +26,12 @@ class VotingMachine {
     this.endedAt = endedAt;
     this.tallyResult = tallyResult;
     this.participation = JSON.parse(participation || `{}`);
+    this.children = children;
+    this.data = data;
+  }
+
+  initDataForCVD() {
+    return {};
   }
 
   fallBack() {
@@ -42,6 +50,13 @@ class VotingMachine {
   }
 
   recordVote(voteData) {
+    if (!voteData.identify) {
+      return {
+        notRecorded: true,
+        error: `VoteData missing identity`,
+      };
+    }
+
     if (this.endedAt) {
       return {
         notRecorded: true,

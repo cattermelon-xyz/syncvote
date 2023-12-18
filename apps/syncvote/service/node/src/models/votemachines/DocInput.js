@@ -4,20 +4,7 @@ class DocInput extends VotingMachine {
   constructor(props) {
     super(props);
   }
-
-  validate(checkpoint) {
-    let isValid = true;
-    const message = [];
-    if (!checkpoint?.children || checkpoint.children.length === 0) {
-      isValid = false;
-      message.push('Missing options');
-    }
-    return {
-      isValid,
-      message,
-    };
-  }
-
+  
   validate(checkpoint) {
     let isValid = true;
     const message = [];

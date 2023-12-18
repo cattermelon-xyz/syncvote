@@ -58,9 +58,12 @@ const missionData = {
           options: ['OK'],
           space: 'hectagon.eth',
           type: {
-            label: 'Basic',
-            value: 'basic',
+            label: 'Single Choice',
+            value: 'single-choice',
           },
+          next: 'node-1702876588029',
+          fallback: 'node-1702876588029',
+          action: 'create-proposal',
         },
         vote_machine_type: 'Snapshot',
         participation: {

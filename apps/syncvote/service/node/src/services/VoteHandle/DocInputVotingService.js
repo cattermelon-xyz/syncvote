@@ -79,7 +79,6 @@ async function handleSubbmission(props) {
             .insert({
               identify,
               option,
-              voting_power: 1,
               current_vote_data_id: mission_vote_details[0].cvd_id,
             })
             .select('*');

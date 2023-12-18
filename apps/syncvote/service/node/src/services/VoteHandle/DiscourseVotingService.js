@@ -95,7 +95,6 @@ async function handleVoteDiscourse(props) {
             .insert({
               identify,
               option,
-              voting_power: 1,
               current_vote_data_id: details.cvd_id,
             })
             .select('*');

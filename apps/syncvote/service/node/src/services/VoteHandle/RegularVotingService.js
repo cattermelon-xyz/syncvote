@@ -8,7 +8,7 @@ const {
 async function handleSubmission(props) {
   return new Promise(async (resolve, reject) => {
     try {
-      const { identify, option, voting_power, mission_id } = props;
+      const { identify, mission_id } = props;
 
       let { data: mission_vote_details, error: mvd_error } = await supabase
         .from('mission_vote_details')
@@ -65,7 +65,12 @@ async function handleSubmission(props) {
 
             if (fallback) {
               console.log('FallbackError: ', f_error);
-              const tallyResult = { index: 0 };
+              const tallyResult = {
+                index: details?.props?.fallback
+                  ? details.children.indexOf(details?.props?.fallback)
+                  : 0,
+              };
+
               const timeDefault = moment(details.startToVote).add(
                 details.duration,
                 'seconds'
@@ -86,11 +91,7 @@ async function handleSubmission(props) {
 
             // 5️⃣ check if recorded
             const { notRecorded, error: r_error } =
-              voteMachineController.recordVote({
-                identify,
-                option,
-                voting_power,
-              });
+              voteMachineController.recordVote(props);
 
             if (notRecorded) {
               resolve({
@@ -105,8 +106,7 @@ async function handleSubmission(props) {
               .from('vote_record')
               .insert({
                 identify,
-                option,
-                voting_power,
+                option: [props.option] || [props.submission],
                 current_vote_data_id: details.cvd_id,
               })
               .select('*');
@@ -114,7 +114,7 @@ async function handleSubmission(props) {
             if (nv_error) {
               resolve({
                 status: 'ERR',
-                message: nv_error,
+                message: 'VoteRecordError: ' + String(nv_error),
               });
               return;
             }

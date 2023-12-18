@@ -91,7 +91,7 @@ const handleMovingToNextCheckpoint = async (
     const next_checkpoint_id = `${details.mission_id}-${
       details.children[tallyResult.index]
     }`;
-
+    console.log(next_checkpoint_id);
     // create current vote data for next checkpoint
     const { data: new_current_vote_data } = await supabase
       .from('current_vote_data')
@@ -126,7 +126,6 @@ const handleMovingToNextCheckpoint = async (
         }
       } else {
         console.log('Debug', details);
-        console.log('Something went wrong');
       }
     };
 
@@ -241,16 +240,17 @@ const startEndNode = async (details) => {
 
 const startForkNode = async (details) => {
   try {
+    console.log(details);
     console.log('Start ForkNode: ', details.id);
-    const subMissions = details?.data?.subWorkflows;
+    const subWorkflows = details?.data?.subWorkflows;
     const end = details?.props?.end;
     const start = details?.props?.start;
     const startMissionId = [];
     const endMissionId = [];
 
-    for (let subMissionData of subMissions) {
-      if (start.includes(subMissionData.refId)) {
-        const { checkpoints, ...newObject } = subMissionData;
+    for (let subWorkflowData of subWorkflows) {
+      if (start.includes(subWorkflowData.refId)) {
+        const { checkpoints, ...newObject } = subWorkflowData;
 
         await axios
           .post(`${process.env.BACKEND_API}/mission/create`, {
@@ -263,7 +263,7 @@ const startForkNode = async (details) => {
           .then(async (response) => {
             if (response.data.status !== 'ERR') {
               startMissionId.push(response.data.data[0].id);
-              if (end.includes(subMissionData.refId)) {
+              if (end.includes(subWorkflowData.refId)) {
                 endMissionId.push(response.data.data[0].id);
               }
             }
@@ -320,7 +320,6 @@ const start = async (details) => {
         body: JSON.stringify({
           identify: `cronjob-${checkpointData.id}`,
           option: ['fake option'],
-          voting_power: 9999,
           mission_id: details.id,
         }),
       });

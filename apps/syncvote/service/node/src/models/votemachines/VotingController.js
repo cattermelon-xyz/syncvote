@@ -4,6 +4,7 @@ const { UpVote } = require('./Upvote');
 const { SingleVote } = require('./SingleVote');
 const { DocInput } = require('./DocInput');
 const { Discourse } = require('./Discourse');
+const { Snapshot } = require('./Snapshot');
 
 class VoteMachineController {
   constructor(props) {
@@ -14,6 +15,7 @@ class VoteMachineController {
       SingleChoiceRaceToMax: new SingleVote(props),
       DocInput: new DocInput(props),
       Discourse: new Discourse(props),
+      Snapshot: new Snapshot(props),
     };
     this.vote_machine_type = props.vote_machine_type;
     this.id = props.id;
@@ -23,6 +25,7 @@ class VoteMachineController {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].initDataForCVD();
     } else {
+      console.log('Debug initDataForCVD', this.vote_machine_type, this.id);
       throw new Error(`Invalid data`);
     }
   }
