@@ -33,7 +33,6 @@ export default (props: IVoteMachineConfigProps) => {
     votingPowerProvider = '',
     whitelist = [], //eslint-disable-line
     data = {
-      max: 0,
       token: '', // spl token
       options: [],
       space: '',
@@ -41,21 +40,52 @@ export default (props: IVoteMachineConfigProps) => {
         label: 'Single Choice',
         value: 'single-choice',
       },
+      next: '',
+      fallback: '',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
     allNodes = [], //eslint-disable-line
-    includedAbstain,
     optionsDescription,
   } = props;
 
-  const { max, token, options } = data;
+  const { fallback, next, max, token, options } = data;
   const delays = props.delays || Array(options?.length).fill(0);
   const delayUnits =
     props.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
   const delayNotes = props.delayNotes || Array(options?.length).fill('');
   const posibleOptions: ICheckPoint[] = [];
   const [showAddOptionDrawer, setShowNewOptionDrawer] = useState(false);
+  // fallback and next
+  const fallbackNode = allNodes.find((n) => n.id === fallback);
+  const nextNode = allNodes.find((n) => n.id === next);
+  const posibleNodes = [
+    ...allNodes.filter(
+      (n) => [fallback, next, currentNodeId].indexOf(n.id) === -1
+    ),
+  ];
+  const changeDelayHandler = (val: any, childIdx: number) => {
+    const { delay, delayUnit, delayNote } = val;
+    delays[childIdx] = delay;
+    delayUnits[childIdx] = delayUnit;
+    delayNotes[childIdx] = delayNote;
+    onChange({
+      delays: structuredClone(delays),
+      delayUnits: structuredClone(delayUnits),
+      delayNotes: structuredClone(delayNotes),
+    });
+  };
+  const replaceHandler = (val: any, childIdx: number) => {
+    const { id } = val;
+    const newChildren = [...children];
+    if (childIdx === -1) {
+      newChildren.push(id);
+    } else {
+      newChildren[childIdx] = id;
+    }
+    return newChildren;
+  };
+  // fallback and next
   allNodes.forEach((child) => {
     if (child.id !== currentNodeId && !children.includes(child.id)) {
       posibleOptions.push(child);
@@ -155,26 +185,26 @@ export default (props: IVoteMachineConfigProps) => {
       label: 'Single Choice',
       value: 'single-choice',
     },
-    {
-      label: 'Approval',
-      value: 'approval',
-    },
-    {
-      label: 'Quadratic',
-      value: 'quadratic',
-    },
-    {
-      label: 'Ranked Choice',
-      value: 'ranked-choice',
-    },
-    {
-      label: 'Weighted',
-      value: 'weighted',
-    },
-    {
-      label: 'Basic',
-      value: 'basic',
-    },
+    // {
+    //   label: 'Approval',
+    //   value: 'approval',
+    // },
+    // {
+    //   label: 'Quadratic',
+    //   value: 'quadratic',
+    // },
+    // {
+    //   label: 'Ranked Choice',
+    //   value: 'ranked-choice',
+    // },
+    // {
+    //   label: 'Weighted',
+    //   value: 'weighted',
+    // },
+    // {
+    //   label: 'Basic',
+    //   value: 'basic',
+    // },
   ];
 
   return (
@@ -186,7 +216,7 @@ export default (props: IVoteMachineConfigProps) => {
         {getMaxText()}
       </div>
     </Space> */}
-        <CollapsiblePanel title='Options & navigation'>
+        {/* <CollapsiblePanel title='Options & navigation'>
           <>
             <Space
               direction='horizontal'
@@ -269,7 +299,77 @@ export default (props: IVoteMachineConfigProps) => {
               }}
             />
           </>
+        </CollapsiblePanel> */}
+
+        <CollapsiblePanel title='Navigation'>
+          <Alert
+            type='success'
+            message={
+              <>
+                <p>
+                  There are only 2 options "Pass" or "Fail" for user to
+                  choose.
+                </p>
+                {/* <p>Note that "Abstain" choices are included in "Quorum"</p> */}
+              </>
+            }
+          />
+          <Space direction='vertical' size='middle' className='w-full mt-4'>
+            <NavConfigPanel
+              title='Pass'
+              currentNode={nextNode}
+              possibleNodes={posibleNodes}
+              index={children.indexOf(next || '')}
+              navLabel='Total votes pass Quorum and Vetos fail Threshold'
+              delay={nextNode ? delays[children.indexOf(next || '')] : 0}
+              delayUnit={
+                nextNode ? delayUnits[children.indexOf(next || '')] : 0
+              }
+              delayNote={
+                nextNode ? delayNotes[children.indexOf(next || '')] : 0
+              }
+              changeDelayHandler={changeDelayHandler}
+              replaceHandler={(val: any, idx: number) => {
+                onChange({
+                  children: replaceHandler(val, idx),
+                  data: { ...data, next: val.id },
+                });
+              }}
+            />
+            <NavConfigPanel
+              title='Fail'
+              currentNode={fallbackNode}
+              possibleNodes={posibleNodes}
+              index={children.indexOf(fallback || '')}
+              navLabel='Total votes fail Quorum and/or Vetos pass Threshold'
+              delay={
+                fallbackNode ? delays[children.indexOf(fallback || '')] : 0
+              }
+              delayUnit={
+                fallbackNode ? delayUnits[children.indexOf(fallback || '')] : 0
+              }
+              delayNote={
+                fallbackNode ? delayNotes[children.indexOf(fallback || '')] : 0
+              }
+              changeDelayHandler={changeDelayHandler}
+              replaceHandler={(val: any, idx: number) => {
+                onChange({
+                  children: replaceHandler(val, idx),
+                  data: { ...data, fallback: val.id },
+                });
+              }}
+            />
+            <SideNote
+              value={optionsDescription}
+              setValue={(val: string) => {
+                onChange({
+                  optionsDescription: val,
+                });
+              }}
+            />
+          </Space>
         </CollapsiblePanel>
+
         <CollapsiblePanel title='Snapshot Info'>
           <Space direction='vertical' size='small' className='w-full'>
             <Space direction='vertical' size='small' className='w-full'>
