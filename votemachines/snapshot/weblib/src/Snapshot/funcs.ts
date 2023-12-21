@@ -7,6 +7,7 @@ export namespace Snapshot {
     return 'Snapshot';
   };
 
+  
   export const getProgramAddress = () => {
     return 'Snapshot';
   };

@@ -9,7 +9,7 @@ import {
   SideNote,
 } from 'directed-graph';
 import NewOptionDrawer from './NewOptionDrawer';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import '../styles.scss';
 import { Snapshot as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
@@ -30,11 +30,10 @@ export default (props: IVoteMachineConfigProps) => {
   // optionsDescription: '',
   const {
     currentNodeId = '',
-    votingPowerProvider = '',
-    whitelist = [], //eslint-disable-line
     data = {
       token: '', // spl token
       options: [],
+      snapShotOption: [],
       space: '',
       type: {
         label: 'Single Choice',
@@ -42,6 +41,7 @@ export default (props: IVoteMachineConfigProps) => {
       },
       next: '',
       fallback: '',
+      action: 'create-proposal',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -49,14 +49,17 @@ export default (props: IVoteMachineConfigProps) => {
     optionsDescription,
   } = props;
 
-  const { fallback, next, max, token, options } = data;
-  const delays = props.delays || Array(options?.length).fill(0);
-  const delayUnits =
-    props.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
-  const delayNotes = props.delayNotes || Array(options?.length).fill('');
+  const { fallback, next, action, snapShotOption } = data;
+  const delays = props.delays || Array(2).fill(0);
+  const delayUnits = props.delayUnits || Array(2).fill(0);
+  const delayNotes = props.delayNotes || Array(2).fill('');
+
   const posibleOptions: ICheckPoint[] = [];
-  const [showAddOptionDrawer, setShowNewOptionDrawer] = useState(false);
-  // fallback and next
+  const actions = [
+    { label: 'Create Proposal', value: 'create-proposal' },
+    { label: 'Vote Proposal', value: 'sync-proposal' },
+  ];
+
   const fallbackNode = allNodes.find((n) => n.id === fallback);
   const nextNode = allNodes.find((n) => n.id === next);
   const posibleNodes = [
@@ -91,95 +94,7 @@ export default (props: IVoteMachineConfigProps) => {
       posibleOptions.push(child);
     }
   });
-  const [newOption, setNewOption] = useState<Interface.IOption>({
-    id: '',
-    title: '',
-    delay: 0,
-    delayUnit: DelayUnit.MINUTE,
-    delayNote: '',
-  });
-  const addNewOptionHandler = (newOptionData: any) => {
-    if (newOptionData.id && newOptionData.title) {
-      const opts = options ? [...options] : [];
-      const chds = children ? [...children] : [];
-      onChange({
-        data: {
-          options: [...opts, newOptionData.title],
-        },
-        children: [...chds, newOptionData.id],
-        delays: [...delays, newOptionData.delay],
-        delayUnits: [...delayUnits, newOptionData.delayUnit],
-        delayNotes: [...delayNotes, newOptionData.delayNote],
-      });
-    }
-  };
-  const deleteOptionHandler = (index: number) => {
-    onChange({
-      data: {
-        options: [...options.slice(0, index), ...options.slice(index + 1)],
-      },
-      children: [...children.slice(0, index), ...children.slice(index + 1)],
-      delays: [...delays.slice(0, index), ...delays.slice(index + 1)],
-      delayUnits: [
-        ...delayUnits.slice(0, index),
-        ...delayUnits.slice(index + 1),
-      ],
-      delayNotes: [
-        ...delayNotes.slice(0, index),
-        ...delayNotes.slice(index + 1),
-      ],
-    });
-  };
-  const changeOptionDelay = (value: any, index: number) => {
-    const newDelays = [...delays];
-    const newDelayUnits = [...delayUnits];
-    const newDelayNotes = [...delayNotes];
-    newDelays[index] = value.delay;
-    newDelayUnits[index] = value.delayUnit;
-    newDelayNotes[index] = value.delayNote;
-    onChange({
-      delays: structuredClone(newDelays),
-      delayUnits: structuredClone(newDelayUnits),
-      delayNotes: structuredClone(newDelayNotes),
-    });
-  };
-  const changeOptionLabel = (value: string, index: number) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    onChange({ data: { ...data, options: structuredClone(newOptions) } });
-  };
-  const changeAbstainHandler = (value: boolean) => {
-    onChange({
-      includedAbstain: value,
-    });
-  };
-  const replaceOption = (
-    newOptionData: { id: string; title: string },
-    index: number
-  ) => {
-    if (newOptionData.id && newOptionData.title) {
-      const newOptions = options
-        ? [
-            ...options.slice(0, index),
-            newOptionData.title,
-            ...options.slice(index + 1),
-          ]
-        : [];
-      const newChildren = children
-        ? [
-            ...children.slice(0, index),
-            newOptionData.id,
-            ...children.slice(index + 1),
-          ]
-        : [];
-      onChange({
-        data: {
-          options: structuredClone(newOptions),
-        },
-        children: structuredClone(newChildren),
-      });
-    }
-  };
+
   const selectOptions = [
     {
       label: 'Single Choice',
@@ -207,99 +122,42 @@ export default (props: IVoteMachineConfigProps) => {
     // },
   ];
 
+  const addNewOptionHandler = (newOptionData: any) => {
+    if (newOptionData) {
+      const opts = snapShotOption ? [...snapShotOption] : [];
+      onChange({
+        data: {
+          ...data,
+          snapShotOption: [...opts, newOptionData],
+        },
+      });
+
+      setInputValue('');
+    }
+  };
+
+  const [inputValue, setInputValue] = useState('');
+
   return (
     <>
       <Space direction='vertical' size='large' className='w-full single-choice'>
-        {/* <Space direction="vertical" size="small" className="w-full">
-      <div className="bg-slate-100 p-2 w-full">
-        <span className="mr-0.5">Everyone choose ONE option until one option reach</span>
-        {getMaxText()}
-      </div>
-    </Space> */}
-        {/* <CollapsiblePanel title='Options & navigation'>
-          <>
-            <Space
-              direction='horizontal'
-              size='small'
-              className='w-full flex items-center justify-between bg-zinc-100 px-4 py-2 rounded-lg'
-            >
-              <span>Enable abstain options</span>
-              <Space direction='horizontal' size='small'>
-                Yes
-                <Switch
-                  checked={includedAbstain}
-                  onChange={changeAbstainHandler}
-                />
-              </Space>
-            </Space>
-            <hr className='my-2' />
-            <Alert
-              type='success'
-              message='Set up logic for your workflow'
-              description='If option X wins then workflow will navigage to Y checkpoint'
-              closable
-            />
-            <Space direction='vertical' size='small' className='w-full'>
-              {options?.map((option: string, index: number) => {
-                const currentNode = allNodes.find(
-                  (node) => node.id === children[index]
-                );
-                return (
-                  <NavConfigPanel
-                    title={`Option ${index + 1}`}
-                    key={option}
-                    index={index}
-                    navLabel={option}
-                    currentNode={currentNode as INavPanelNode}
-                    changeDelayHandler={changeOptionDelay}
-                    changeLabelHandler={changeOptionLabel}
-                    deleteHandler={deleteOptionHandler}
-                    possibleNodes={posibleOptions as INavPanelNode[]}
-                    replaceHandler={replaceOption}
-                    delay={delays[index] || 0}
-                    delayUnit={delayUnits[index] || 0}
-                    delayNote={delayNotes[index] || ''}
-                  />
-                );
-              })}
-              {includedAbstain ? (
-                <Space
-                  direction='vertical'
-                  className='w-full flex justify-between'
-                >
-                  <span className='text-gray-400'>
-                    Option {options?.length + 1}
-                  </span>
-                  <Input className='w-full' value='Abstain' disabled />
-                </Space>
-              ) : null}
-            </Space>
-            <Button
-              type='link'
-              icon={<PlusOutlined />}
-              className='w-full flex items-center justify-start pl-0 my-2'
-              onClick={() => setShowNewOptionDrawer(true)}
-            >
-              Add a new option & navigation
-            </Button>
-            <NewOptionDrawer
-              showAddOptionDrawer={showAddOptionDrawer}
-              setShowNewOptionDrawer={setShowNewOptionDrawer}
-              newOption={newOption}
-              setNewOption={setNewOption}
-              posibleOptions={posibleOptions}
-              addNewOptionHandler={addNewOptionHandler}
-            />
-            <SideNote
-              value={optionsDescription}
-              setValue={(val: string) => {
+        <CollapsiblePanel title='Action Type'>
+          <Space direction='vertical' size='small' className='w-full'>
+            <Select
+              value={action}
+              className='w-full'
+              options={actions}
+              onChange={(value, option) => {
                 onChange({
-                  optionsDescription: val,
+                  data: {
+                    ...data,
+                    action: value,
+                  },
                 });
               }}
             />
-          </>
-        </CollapsiblePanel> */}
+          </Space>
+        </CollapsiblePanel>
 
         <CollapsiblePanel title='Navigation'>
           <Alert
@@ -307,8 +165,7 @@ export default (props: IVoteMachineConfigProps) => {
             message={
               <>
                 <p>
-                  There are only 2 options "Pass" or "Fail" for user to
-                  choose.
+                  There are only 2 options "Pass" or "Fail" for user to choose.
                 </p>
                 {/* <p>Note that "Abstain" choices are included in "Quorum"</p> */}
               </>
@@ -413,6 +270,60 @@ export default (props: IVoteMachineConfigProps) => {
                   });
                 }}
               />
+            </Space>
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='text-sm text-slate-600 flex items-center gap-2'>
+                Options
+                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
+                  <MdHelpOutline />
+                </Popover>
+              </div>
+              <Input
+                value={inputValue}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                }}
+                suffix={
+                  <Button
+                    type='link'
+                    icon={<PlusOutlined />}
+                    className='w-full flex items-center justify-start pl-0'
+                    onClick={() => {
+                      addNewOptionHandler(inputValue);
+                    }}
+                  >
+                    Add a new option
+                  </Button>
+                }
+              />
+              <Space direction='vertical' size='small' className='w-full'>
+                {snapShotOption &&
+                  snapShotOption.map((option: string, index: number) => {
+                    return (
+                      <div
+                        key={index}
+                        className='flex items-center justify-between w-full'
+                      >
+                        <div className=''>{option}</div>
+                        <Button
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() => {
+                            console.log(index);
+                            const opts = [...snapShotOption];
+                            opts.splice(index, 1);
+                            onChange({
+                              data: {
+                                ...data,
+                                snapShotOption: opts,
+                              },
+                            });
+                          }}
+                        ></Button>
+                      </div>
+                    );
+                  })}
+              </Space>
             </Space>
           </Space>
         </CollapsiblePanel>
