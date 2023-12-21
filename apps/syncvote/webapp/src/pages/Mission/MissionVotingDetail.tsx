@@ -299,7 +299,7 @@ const MissionVotingDetail = () => {
           default:
             break;
         }
-        
+
         setCurrentCheckpointData(checkpointDataAfterHandle);
       },
       onError: (error) => {
@@ -416,7 +416,7 @@ const MissionVotingDetail = () => {
                 </Card>
 
                 {/* =============================== METAMASK SECTION =============================== */}
-                {connected && account ? (
+                {/* {connected && account ? (
                   <>
                     <Dropdown menu={{ items }} placement='bottom'>
                       <Button
@@ -453,7 +453,7 @@ const MissionVotingDetail = () => {
                       Connect wallet
                     </Button>
                   </>
-                )}
+                )} */}
 
                 {/* =============================== METAMASK SECTION =============================== */}
               </Space>

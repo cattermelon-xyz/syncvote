@@ -39,6 +39,7 @@ export namespace Snapshot {
     body?: string;
     discussion?: string;
     plugins?: string;
+    snapShotOption: string[];
   }
 
   export interface IOption {

@@ -16,6 +16,8 @@ function isExternalProvider(provider: any): provider is ExternalProvider {
 }
 
 const VoteUIWeb = (props: Props): JSX.Element => {
+  console.log('Testing');
+
   const { proposalData, currentCheckpointData, onSelectedOption, client } =
     props;
 
