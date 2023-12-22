@@ -2,7 +2,7 @@ const { VotingMachine } = require('.');
 const { DISCOURSE_ACTION } = require('../../configs/constants');
 const { supabase } = require('../../configs/supabaseClient');
 const { createPost } = require('../../services/PostService');
-const { createTopic } = require('../../services/TopicService');
+const { createTopic, moveTopic } = require('../../services/TopicService');
 
 class Discourse extends VotingMachine {
   constructor(props) {
@@ -153,6 +153,55 @@ class Discourse extends VotingMachine {
           },
         };
       }
+    } else if (this.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
+      if (!voteData.submission.variable) {
+        return {
+          notRecorded: true,
+          error: 'Missing variable to get value of topic_id',
+        };
+      }
+
+      if (!voteData.submission.categoryId) {
+        return {
+          notRecorded: true,
+          error: 'Missing categoryId to move topic',
+        };
+      }
+
+      const { data: variables, error } = await supabase
+        .from('variables')
+        .select('*')
+        .eq('name', voteData.submission.variable)
+        .eq('mission_id', this.mission_id);
+
+      if (error) {
+        return {
+          notRecorded: true,
+          error: 'Cannot get value of topicId',
+        };
+      } else {
+        const { data, error: error_update_topic } = await moveTopic({
+          topic_id: variables[0].value,
+          org_id: this.org_id,
+          category_id: voteData.submission.categoryId,
+        });
+
+        if (error_update_topic) {
+          console.log('MoveTopicError');
+          return {
+            notRecorded: true,
+            error: 'Error when move topic',
+          };
+        }
+
+        this.tallyResult = {
+          index: this.children.indexOf(this.data.next) || 0,
+          submission: {
+            [voteData.submission.variable]: data?.topicId,
+          },
+        };
+      }
+    } else if (this.data.action === DISCOURSE_ACTION.UPDATE_TOPIC) {
     }
 
     this.who = [voteData.identify];
@@ -165,6 +214,8 @@ class Discourse extends VotingMachine {
     if (this.data.action === DISCOURSE_ACTION.CREATE_TOPIC) {
       return { shouldTally: true, tallyResult: this.tallyResult };
     } else if (this.data.action === DISCOURSE_ACTION.CREATE_POST) {
+      return { shouldTally: true, tallyResult: this.tallyResult };
+    } else if (this.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
       return { shouldTally: true, tallyResult: this.tallyResult };
     }
 

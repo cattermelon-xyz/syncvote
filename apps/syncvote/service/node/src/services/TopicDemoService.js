@@ -108,7 +108,7 @@ const getPost = async (reqBody) => {
   } catch (error) {}
 };
 
-const updateCategory = async (reqBody) => {
+const moveTopic = async (reqBody) => {
   try {
     const { data, error } = await supabase
       .from('demo_missions')
@@ -186,7 +186,7 @@ const updatePost = async (reqBody) => {
 module.exports = {
   createTopic,
   getPosts,
-  updateCategory,
+  moveTopic,
   updatePost,
   getPost,
 };
