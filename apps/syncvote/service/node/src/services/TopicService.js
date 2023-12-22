@@ -21,9 +21,6 @@ const createTopic = async (props) => {
     );
     const discourseConfig = filteredDiscourse[0];
 
-    console.log('discourseConfig', discourseConfig);
-    console.log(`http://${discourseConfig.id_string}/posts`);
-
     const discourseData = {
       title: props.title,
       raw: props.raw,
@@ -54,7 +51,7 @@ const createTopic = async (props) => {
 
     return { data: dataAfterCreate };
   } catch (e) {
-    console.error('Error creating topic:', e);
+    console.error('Error creating topic:', e.data);
     return { error: e };
   }
 };

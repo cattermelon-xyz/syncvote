@@ -15,9 +15,11 @@ class VotingMachine {
       participation,
       children,
       props: data,
+      mission_id,
     } = props;
     this.duration = duration;
     this.cvd_created_at = cvd_created_at;
+    this.mission_id = mission_id;
     this.who = who;
     this.delays = delays;
     this.delayUnits = delayUnits;

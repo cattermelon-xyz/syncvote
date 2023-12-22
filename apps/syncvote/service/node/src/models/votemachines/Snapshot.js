@@ -30,7 +30,7 @@ class Snapshot extends VotingMachine {
       checkpoint?.data?.action !== SNAPSHOT_ACTION.SYNC_PROPOSAL
     ) {
       isValid = false;
-      message.push('Wrong of missing action');
+      message.push('Wrong or missing action');
     }
 
     return {
@@ -45,7 +45,7 @@ class Snapshot extends VotingMachine {
     if (notRecorded) {
       return { notRecorded, error };
     }
-    console.log('Debug 1', voteData);
+
     // check if dont have action
     if (!voteData.submission) {
       return {

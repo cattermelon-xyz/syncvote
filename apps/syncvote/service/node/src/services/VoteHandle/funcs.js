@@ -91,7 +91,7 @@ const handleMovingToNextCheckpoint = async (
     const next_checkpoint_id = `${details.mission_id}-${
       details.children[tallyResult.index]
     }`;
-    console.log(next_checkpoint_id);
+    
     // create current vote data for next checkpoint
     const { data: new_current_vote_data } = await supabase
       .from('current_vote_data')
