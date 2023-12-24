@@ -81,6 +81,7 @@ const updateTopic = async (props) => {
         'Api-Username': discourseConfig.username,
       },
     });
+    console.log(response);
     return { data: response.data };
   } catch (e) {
     return { error: e };

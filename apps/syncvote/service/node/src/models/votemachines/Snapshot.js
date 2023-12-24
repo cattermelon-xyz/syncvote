@@ -1,5 +1,5 @@
 const { VotingMachine } = require('.');
-const { SNAPSHOT_ACTION } = require('../../configs/constants');
+const { SNAPSHOT_ACTION, isValidAction } = require('../../configs/constants');
 const { ApolloClient, InMemoryCache, gql } = require('@apollo/client');
 
 class Snapshot extends VotingMachine {
@@ -25,10 +25,7 @@ class Snapshot extends VotingMachine {
       message.push('Missing attributes of snapshot');
     }
 
-    if (
-      checkpoint?.data?.action !== SNAPSHOT_ACTION.CREATE_PROPOSAL &&
-      checkpoint?.data?.action !== SNAPSHOT_ACTION.SYNC_PROPOSAL
-    ) {
+    if (isValidAction(SNAPSHOT_ACTION, checkpoint?.data?.action)) {
       isValid = false;
       message.push('Wrong or missing action');
     }

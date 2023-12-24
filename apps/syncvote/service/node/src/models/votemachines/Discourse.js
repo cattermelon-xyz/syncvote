@@ -1,5 +1,5 @@
 const { VotingMachine } = require('.');
-const { DISCOURSE_ACTION } = require('../../configs/constants');
+const { DISCOURSE_ACTION, isValidAction } = require('../../configs/constants');
 const { supabase } = require('../../configs/supabaseClient');
 const { createPost, updateTopic } = require('../../services/PostService');
 const { createTopic, moveTopic } = require('../../services/TopicService');
@@ -30,14 +30,17 @@ class Discourse extends VotingMachine {
       message.push('Missing variable to store data');
     }
 
-    if (
-      checkpoint?.data?.action !== DISCOURSE_ACTION.CREATE_TOPIC &&
-      checkpoint?.data?.action !== DISCOURSE_ACTION.CREATE_POST &&
-      checkpoint?.data?.action !== DISCOURSE_ACTION.UPDATE_TOPIC &&
-      checkpoint?.data?.action !== DISCOURSE_ACTION.MOVE_TOPIC
-    ) {
+    if (!isValidAction(DISCOURSE_ACTION, checkpoint?.data?.action)) {
       isValid = false;
       message.push('Wrong or missing action');
+    }
+
+    // check if move topic missing categoryId
+    if (checkpoint?.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
+      if (!checkpoint?.data?.categoryId) {
+        isValid = false;
+        message.push('Missing categoryId in move topic checkpoint');
+      }
     }
 
     return {
@@ -155,13 +158,6 @@ class Discourse extends VotingMachine {
         };
       }
     } else if (this.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
-      if (!voteData.submission.categoryId) {
-        return {
-          notRecorded: true,
-          error: 'Missing categoryId to move topic',
-        };
-      }
-
       const { data: variables, error } = await supabase
         .from('variables')
         .select('*')
@@ -177,7 +173,7 @@ class Discourse extends VotingMachine {
         const { data, error: error_move_topic } = await moveTopic({
           topic_id: variables[0].value,
           org_id: this.org_id,
-          category_id: voteData.submission.categoryId,
+          category_id: this.data.categoryId,
         });
 
         if (error_move_topic) {
@@ -265,13 +261,7 @@ class Discourse extends VotingMachine {
   }
 
   shouldTally() {
-    if (this.data.action === DISCOURSE_ACTION.CREATE_TOPIC) {
-      return { shouldTally: true, tallyResult: this.tallyResult };
-    } else if (this.data.action === DISCOURSE_ACTION.CREATE_POST) {
-      return { shouldTally: true, tallyResult: this.tallyResult };
-    } else if (this.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
-      return { shouldTally: true, tallyResult: this.tallyResult };
-    } else if (this.data.action === DISCOURSE_ACTION.UPDATE_TOPIC) {
+    if (isValidAction(DISCOURSE_ACTION, this.data.action)) {
       return { shouldTally: true, tallyResult: this.tallyResult };
     }
 

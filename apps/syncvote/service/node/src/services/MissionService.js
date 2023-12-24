@@ -31,6 +31,7 @@ async function insertMission(props) {
           console.log('Create Mission');
         }
       }
+
       const { arweave_id, error: arweave_err } = await createArweave(props);
 
       if (arweave_err) {
