@@ -1,7 +1,7 @@
 const { VotingMachine } = require('.');
 const { DISCOURSE_ACTION } = require('../../configs/constants');
 const { supabase } = require('../../configs/supabaseClient');
-const { createPost } = require('../../services/PostService');
+const { createPost, updateTopic } = require('../../services/PostService');
 const { createTopic, moveTopic } = require('../../services/TopicService');
 
 class Discourse extends VotingMachine {
@@ -23,6 +23,11 @@ class Discourse extends VotingMachine {
     if (!checkpoint?.data?.fallback || !checkpoint?.data?.next) {
       isValid = false;
       message.push('Missing fallback and next checkpoint');
+    }
+
+    if (!checkpoint?.data?.variables) {
+      isValid = false;
+      message.push('Missing variable to store data');
     }
 
     if (
@@ -69,13 +74,6 @@ class Discourse extends VotingMachine {
         };
       }
 
-      if (!voteData.submission.variable) {
-        return {
-          notRecorded: true,
-          error: 'Missing variable to store topic_id',
-        };
-      }
-
       const { data, error: error_create_topic } = await createTopic({
         ...voteData.submission,
         org_id: this.org_id,
@@ -94,15 +92,25 @@ class Discourse extends VotingMachine {
         submission: {
           firstPostId: data?.firstPostId,
           linkDiscourse: data?.linkDiscourse,
-          [voteData.submission.variable]: data?.topicId,
+          [this.data.variables[0]]: data?.topicId,
         },
       };
 
       // update variables
+      const { data: variables } = await supabase
+        .from('variables')
+        .insert({
+          name: this.data.variables[0],
+          value: data?.topicId,
+          mission_id: this.mission_id,
+        })
+        .select('*');
+
       await supabase.from('variables').insert({
-        name: voteData.submission.variable,
-        value: data?.topicId,
+        name: 'firstPostId',
+        value: data?.firstPostId,
         mission_id: this.mission_id,
+        parent: variables[0].id,
       });
     } else if (this.data.action === DISCOURSE_ACTION.CREATE_POST) {
       if (!voteData.submission.raw) {
@@ -112,17 +120,10 @@ class Discourse extends VotingMachine {
         };
       }
 
-      if (!voteData.submission.variable) {
-        return {
-          notRecorded: true,
-          error: 'Missing variable to take topic_id',
-        };
-      }
-
       const { data: variables, error } = await supabase
         .from('variables')
         .select('*')
-        .eq('name', voteData.submission.variable)
+        .eq('name', this.data.variables[0])
         .eq('mission_id', this.mission_id);
 
       if (error) {
@@ -149,18 +150,11 @@ class Discourse extends VotingMachine {
           index: this.children.indexOf(this.data.next) || 0,
           submission: {
             linkDiscourse: data?.linkDiscourse,
-            [voteData.submission.variable]: data?.topicId,
+            [this.data.variables[0]]: data?.topicId,
           },
         };
       }
     } else if (this.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
-      if (!voteData.submission.variable) {
-        return {
-          notRecorded: true,
-          error: 'Missing variable to get value of topic_id',
-        };
-      }
-
       if (!voteData.submission.categoryId) {
         return {
           notRecorded: true,
@@ -171,7 +165,7 @@ class Discourse extends VotingMachine {
       const { data: variables, error } = await supabase
         .from('variables')
         .select('*')
-        .eq('name', voteData.submission.variable)
+        .eq('name', this.data.variables[0])
         .eq('mission_id', this.mission_id);
 
       if (error) {
@@ -180,13 +174,13 @@ class Discourse extends VotingMachine {
           error: 'Cannot get value of topicId',
         };
       } else {
-        const { data, error: error_update_topic } = await moveTopic({
+        const { data, error: error_move_topic } = await moveTopic({
           topic_id: variables[0].value,
           org_id: this.org_id,
           category_id: voteData.submission.categoryId,
         });
 
-        if (error_update_topic) {
+        if (error_move_topic) {
           console.log('MoveTopicError');
           return {
             notRecorded: true,
@@ -197,11 +191,71 @@ class Discourse extends VotingMachine {
         this.tallyResult = {
           index: this.children.indexOf(this.data.next) || 0,
           submission: {
-            [voteData.submission.variable]: data?.topicId,
+            [this.data.variables[0]]: data?.topicId,
           },
         };
       }
     } else if (this.data.action === DISCOURSE_ACTION.UPDATE_TOPIC) {
+      if (!voteData.submission.raw) {
+        return {
+          notRecorded: true,
+          error: 'Missing raw to update topic',
+        };
+      }
+
+      if (!voteData.submission.edit_reason) {
+        return {
+          notRecorded: true,
+          error: 'Missing edit_reason to update topic',
+        };
+      }
+      const { data: variables, error } = await supabase
+        .from('variables')
+        .select('*')
+        .eq('name', this.data.variables[0])
+        .eq('mission_id', this.mission_id);
+
+      if (error) {
+        return {
+          notRecorded: true,
+          error: 'Cannot get value of topicId',
+        };
+      } else {
+        const { data: firstPostId, error } = await supabase
+          .from('variables')
+          .select('*')
+          .eq('name', 'firstPostId')
+          .eq('parent', variables[0].id);
+
+        if (error) {
+          return {
+            notRecorded: true,
+            error: 'Cannot get value of firstTopicId',
+          };
+        }
+
+        const { data, error: error_update_topic } = await updateTopic({
+          raw: voteData.submission.raw,
+          org_id: this.org_id,
+          edit_reason: voteData.submission.edit_reason,
+          firstPostId: firstPostId[0].id,
+        });
+
+        if (error_update_topic) {
+          console.log('UpdateTopicError');
+          return {
+            notRecorded: true,
+            error: 'Error when update topic',
+          };
+        }
+
+        this.tallyResult = {
+          index: this.children.indexOf(this.data.next) || 0,
+          submission: {
+            [this.data.variables[0]]: data?.topicId,
+          },
+        };
+      }
     }
 
     this.who = [voteData.identify];
@@ -216,6 +270,8 @@ class Discourse extends VotingMachine {
     } else if (this.data.action === DISCOURSE_ACTION.CREATE_POST) {
       return { shouldTally: true, tallyResult: this.tallyResult };
     } else if (this.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
+      return { shouldTally: true, tallyResult: this.tallyResult };
+    } else if (this.data.action === DISCOURSE_ACTION.UPDATE_TOPIC) {
       return { shouldTally: true, tallyResult: this.tallyResult };
     }
 

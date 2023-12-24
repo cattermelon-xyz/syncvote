@@ -167,8 +167,7 @@ const updatePost = async (reqBody) => {
     const url = `https://discourse.syncvote.shop/posts/${postId}.json`;
 
     const payload = {
-      raw: reqBody.raw,
-      edit_reason: 'Finalize the proposal',
+      post: { raw: reqBody.raw, edit_reason: 'Finalize the proposal' },
     };
     const response = await axios.put(url, payload, {
       headers: {

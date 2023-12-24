@@ -45,6 +45,49 @@ const createPost = async (props) => {
   }
 };
 
+const updateTopic = async (props) => {
+  try {
+    if (
+      !props.raw ||
+      !props.org_id ||
+      !props.edit_reason ||
+      !props.firstPostId
+    ) {
+      throw new Error('Topic id, content, and OrgId are all required!');
+    }
+    const { data, error } = await supabase
+      .from('web2_key')
+      .select('*')
+      .eq('org_id', props.org_id);
+
+    if (error || data.length === 0) {
+      throw new Error(error || 'No Discourse configuration found.');
+    }
+
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === 'discourse'
+    );
+    const discourseConfig = filteredDiscourse[0];
+
+    const url = `https://discourse.syncvote.shop/posts/${props.firstPostId}.json`;
+
+    const payload = {
+      raw: props.raw,
+      edit_reason: props.edit_reason,
+    };
+    const response = await axios.put(url, payload, {
+      headers: {
+        'Api-Key': discourseConfig.access_token,
+        'Api-Username': discourseConfig.username,
+      },
+    });
+    return { data: response.data };
+  } catch (e) {
+    return { error: e };
+  }
+};
+
 module.exports = {
   createPost,
+  updateTopic,
 };
