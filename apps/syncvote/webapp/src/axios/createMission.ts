@@ -28,7 +28,7 @@ export const createMission = async ({
   dispatch(startLoading({}));
   // check if all checkpoint of this mission is valid
   const data = missionData.data;
-  let isValidate = false;
+  let isValidate = true;
   data.checkpoints.forEach((checkpoint: ICheckPoint, index: number) => {
     if (
       !checkpoint?.isEnd &&
@@ -70,6 +70,7 @@ export const createMission = async ({
         dispatch(finishLoading({}));
       });
   } else {
+    console.log('Here');
     onError('Checkpoint of this proposal is missing attributes');
     dispatch(finishLoading({}));
   }

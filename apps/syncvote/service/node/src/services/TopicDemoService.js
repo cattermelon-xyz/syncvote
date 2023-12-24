@@ -108,7 +108,7 @@ const getPost = async (reqBody) => {
   } catch (error) {}
 };
 
-const updateCategory = async (reqBody) => {
+const moveTopic = async (reqBody) => {
   try {
     const { data, error } = await supabase
       .from('demo_missions')
@@ -167,8 +167,7 @@ const updatePost = async (reqBody) => {
     const url = `https://discourse.syncvote.shop/posts/${postId}.json`;
 
     const payload = {
-      raw: reqBody.raw,
-      edit_reason: 'Finalize the proposal',
+      post: { raw: reqBody.raw, edit_reason: 'Finalize the proposal' },
     };
     const response = await axios.put(url, payload, {
       headers: {
@@ -186,7 +185,7 @@ const updatePost = async (reqBody) => {
 module.exports = {
   createTopic,
   getPosts,
-  updateCategory,
+  moveTopic,
   updatePost,
   getPost,
 };

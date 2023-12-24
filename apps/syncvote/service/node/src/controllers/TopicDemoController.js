@@ -14,7 +14,7 @@ const createTopic = async (req, res) => {
 
 const updateDescAndMoveCategory = async (req, res) => {
   try {
-    const response = await TopicService.updateCategory(req.body);
+    const response = await TopicService.moveTopic(req.body);
     await TopicService.updatePost({
       raw: req.body.raw,
       mission_id: req.body.mission_id,
@@ -58,9 +58,9 @@ const getPosts = async (req, res) => {
   }
 };
 
-const updateCategory = async (req, res) => {
+const moveTopic = async (req, res) => {
   try {
-    const response = await TopicService.updateCategory(req.body);
+    const response = await TopicService.moveTopic(req.body);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
@@ -73,6 +73,6 @@ module.exports = {
   createTopic,
   getPosts,
   getPost,
-  updateCategory,
+  moveTopic,
   updateDescAndMoveCategory,
 };

@@ -91,7 +91,7 @@ async function handleSubmission(props) {
 
             // 5️⃣ check if recorded
             const { notRecorded, error: r_error } =
-              voteMachineController.recordVote(props);
+              await voteMachineController.recordVote(props);
 
             if (notRecorded) {
               resolve({

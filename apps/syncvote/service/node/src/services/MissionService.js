@@ -10,6 +10,7 @@ const moment = require('moment');
 const { createArweave } = require('../functions');
 const { start } = require('./VoteHandle/funcs');
 const { Snapshot } = require('../models/votemachines/Snapshot');
+const { Discourse } = require('../models/votemachines/Discourse');
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: new SingleVote({}),
@@ -17,6 +18,7 @@ const VoteMachineValidate = {
   Veto: new Veto({}),
   UpVote: new UpVote({}),
   Snapshot: new Snapshot({}),
+  Discourse: new Discourse({}),
 };
 
 async function insertMission(props) {
@@ -29,6 +31,7 @@ async function insertMission(props) {
           console.log('Create Mission');
         }
       }
+
       const { arweave_id, error: arweave_err } = await createArweave(props);
 
       if (arweave_err) {
@@ -49,7 +52,6 @@ async function insertMission(props) {
           for (const checkpoint of newMission[0].data.checkpoints) {
             if (
               !checkpoint.isEnd &&
-              checkpoint?.vote_machine_type !== 'Discourse' &&
               checkpoint?.vote_machine_type !== 'forkNode' &&
               checkpoint?.vote_machine_type !== 'joinNode'
             ) {
@@ -112,13 +114,6 @@ async function insertMission(props) {
                 .eq('id', newMission[0].id)
                 .select('*');
 
-              let { data: details } = await supabase
-                .from('mission_vote_details')
-                .select(`*`)
-                .eq('mission_id', newMission[0].id);
-
-              await start(details[0]);
-
               if (u_error) {
                 resolve({
                   status: 'ERR',
@@ -126,6 +121,13 @@ async function insertMission(props) {
                 });
                 return;
               }
+
+              let { data: details, error } = await supabase
+                .from('mission_vote_details')
+                .select(`*`)
+                .eq('mission_id', newMission[0].id);
+
+              await start(details[0]);
             }
           }
         }

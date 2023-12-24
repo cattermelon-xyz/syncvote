@@ -59,6 +59,7 @@ export default (props: IVoteMachineConfigProps) => {
       variables: [],
       next: '',
       fallback: '',
+      categoryId: '',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -66,7 +67,7 @@ export default (props: IVoteMachineConfigProps) => {
     optionsDescription,
   } = props;
 
-  const { max, token, options, action, variables, next, fallback } = data;
+  const { options, action, variables, next, fallback, categoryId } = data;
 
   const fallbackNode = allNodes.find((n) => n.id === fallback);
   const nextNode = allNodes.find((n) => n.id === next);
@@ -239,6 +240,24 @@ export default (props: IVoteMachineConfigProps) => {
                 }}
               />
             </Space>
+            {action && action === 'move-topic' && (
+              <>
+                <Space direction='vertical' size='small' className='w-full'>
+                  <div className='text-sm text-slate-600 flex items-center gap-2'>
+                    Category ID
+                  </div>
+                  <Input
+                    value={categoryId ? categoryId : ''}
+                    placeholder='Please fill in category ID'
+                    onChange={(e) => {
+                      onChange({
+                        data: { ...data, categoryId: e.target.value },
+                      });
+                    }}
+                  />
+                </Space>
+              </>
+            )}
           </Space>
         </CollapsiblePanel>
       </Space>

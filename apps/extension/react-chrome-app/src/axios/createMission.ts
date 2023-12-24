@@ -66,6 +66,7 @@ export const createMission = async ({
         onError(error);
       });
   } else {
+    console.log('Here');
     onError('Checkpoint of this proposal is missing attributes');
   }
 };

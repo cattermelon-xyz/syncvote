@@ -25,36 +25,10 @@ import VoteUIWeb from './VoteUIWeb';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
-  const data = source.data || {};
-  const { triggers } = source;
-  const filteredTriggers = triggers?.filter(
-    (trg: any) => trg.triggerAt === target.id
-  );
-  const children = source.children || [];
-  const idx = children.indexOf(target.id);
-  return data.options ? (
-    <div>
-      <div>{data.options[idx]}</div>
-      <div>
-        {filteredTriggers?.map((trg: any) =>
-          trg.provider === 'twitter' ? (
-            <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
-          ) : (
-            <span key={trg.id || Math.random()}>{trg.provider}</span>
-          )
-        )}
-      </div>
-    </div>
+  return source?.data.next === target?.id ? (
+    <span>Pass</span>
   ) : (
-    <div>
-      {filteredTriggers?.map((trg: any) =>
-        trg.provider === 'twitter' ? (
-          <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
-        ) : (
-          <span key={trg.id || Math.random()}>{trg.provider}</span>
-        )
-      )}
-    </div>
+    <span>Fail</span>
   );
 };
 // label: label.length > 20 ? `${label.substring(0, 20)}...` : label,

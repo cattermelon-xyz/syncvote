@@ -10,4 +10,8 @@ const SNAPSHOT_ACTION = {
   SYNC_PROPOSAL: 'sync-proposal', //Create post into topic
 };
 
-module.exports = { DISCOURSE_ACTION, SNAPSHOT_ACTION };
+function isValidAction(type_action, action) {
+  return Object.values(type_action).includes(action);
+}
+
+module.exports = { DISCOURSE_ACTION, SNAPSHOT_ACTION, isValidAction };

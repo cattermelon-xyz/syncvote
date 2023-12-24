@@ -5,13 +5,11 @@ async function insertCurrentVoteData(props) {
     .from('current_vote_data')
     .insert(props)
     .select('*');
+
   if (!error) {
     return { ...newCurrentVoteData[0] };
   } else {
-    return {
-      status: 'ERR',
-      message: error,
-    };
+    console.log('InsertCurrentVoteDataError: ', error);
   }
 }
 
