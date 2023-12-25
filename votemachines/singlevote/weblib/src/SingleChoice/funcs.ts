@@ -58,6 +58,11 @@ export namespace SingleChoice {
       isValid = false;
       message.push('Missing number of vote need to win');
     }
+
+    if (!checkpoint?.quorum) {
+      isValid = false;
+      message.push('Missing number of quorum');
+    }
     return {
       isValid,
       message,

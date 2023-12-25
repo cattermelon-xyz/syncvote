@@ -72,6 +72,12 @@ export namespace UpVote {
       isValid = false;
       message.push('Missing number of vote need to win');
     }
+
+    if (!checkpoint?.quorum) {
+      isValid = false;
+      message.push('Missing number of quorum');
+    }
+
     if (!checkpoint?.data.pass || !checkpoint?.data.fallback) {
       isValid = false;
       message.push('Missing pass or fallback option');

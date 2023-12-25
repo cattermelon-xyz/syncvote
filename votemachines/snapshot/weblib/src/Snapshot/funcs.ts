@@ -7,7 +7,6 @@ export namespace Snapshot {
     return 'Snapshot';
   };
 
-  
   export const getProgramAddress = () => {
     return 'Snapshot';
   };
@@ -37,8 +36,11 @@ export namespace Snapshot {
   export const getInitialData = () => {
     const data: Interface.IData = {
       options: [],
-      max: 0,
-      token: '',
+      snapShotOption: [],
+      space: '',
+      action: 'create-proposal',
+      type: 'single-choice',
+      proposalId: '',
     };
     return data;
   };
@@ -63,6 +65,23 @@ export namespace Snapshot {
     if (!checkpoint?.data.space) {
       isValid = false;
       message.push('Missing space of snapshot');
+    }
+
+    if (!checkpoint?.data.fallback || !checkpoint.data.next) {
+      isValid = false;
+      message.push('Missing fallback or next checkpoint');
+    }
+
+    if (!checkpoint?.data.action) {
+      isValid = false;
+      message.push('Missing action for snapshot checkpoint');
+    }
+
+    if (checkpoint?.data.action === 'create-proposal') {
+      if (!checkpoint.data.proposalId) {
+        isValid = false;
+        message.push('Missiong variable to store proposalId');
+      }
     }
     return {
       isValid,

@@ -5,14 +5,25 @@ import { ICheckPoint } from 'directed-graph';
 import { DocInput } from 'doc-input/src/DocInput/funcs';
 import { Veto } from 'veto/src/Veto/funcs';
 import { UpVote } from 'upvote/src/UpVote/funcs';
+import { Discourse } from 'discourse/src/Discourse/funcs';
+import { Snapshot } from 'snapshot/src/Snapshot/funcs';
+import { validate } from '@snapshot-labs/snapshot.js/dist/utils';
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: SingleChoice.validate,
   DocInput: DocInput.validate,
   Veto: Veto.validate,
   UpVote: UpVote.validate,
+  Discourse: Discourse.validate,
+  Snapshot: Snapshot.validate,
 };
-type VoteMachineType = 'SingleChoiceRaceToMax' | 'DocInput' | 'Veto' | 'UpVote';
+type VoteMachineType =
+  | 'SingleChoiceRaceToMax'
+  | 'DocInput'
+  | 'Veto'
+  | 'UpVote'
+  | 'Discourse'
+  | 'Snapshot';
 
 export const createMission = async ({
   missionData,
@@ -32,22 +43,17 @@ export const createMission = async ({
   data.checkpoints.forEach((checkpoint: ICheckPoint, index: number) => {
     if (
       !checkpoint?.isEnd &&
-      checkpoint.vote_machine_type !== 'Snapshot' &&
-      checkpoint.vote_machine_type !== 'Discourse'
+      checkpoint.vote_machine_type !== 'forkNode' &&
+      checkpoint.vote_machine_type !== 'joinNode'
     ) {
-      const { duration, participation, title, quorum } = checkpoint;
+      const { duration, participation, title } = checkpoint;
       if (checkpoint.vote_machine_type) {
         const { isValid, message } = VoteMachineValidate[
           checkpoint.vote_machine_type as VoteMachineType
         ]({ checkpoint: checkpoint });
-        if (duration && participation && title && isValid) {
-          if (checkpoint.vote_machine_type !== 'DocInput') {
-            if (quorum) {
-              isValidate = true;
-            }
-          } else {
-            isValidate = true;
-          }
+        if (!duration || !participation || !title || !isValid) {
+          isValidate = false;
+          console.log(`${checkpoint.vote_machine_type}: `, message);
         }
       }
     }
