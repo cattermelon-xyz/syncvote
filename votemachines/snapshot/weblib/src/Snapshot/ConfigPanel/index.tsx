@@ -1,6 +1,10 @@
 import { Space, Switch, Button, Alert, Input, Popover, Select } from 'antd';
-import { useState } from 'react';
-import { ICheckPoint, IVoteMachineConfigProps } from 'directed-graph';
+import { useContext, useEffect, useState } from 'react';
+import {
+  GraphContext,
+  ICheckPoint,
+  IVoteMachineConfigProps,
+} from 'directed-graph';
 import {
   DelayUnit,
   NavConfigPanel,
@@ -31,17 +35,14 @@ export default (props: IVoteMachineConfigProps) => {
   const {
     currentNodeId = '',
     data = {
-      token: '', // spl token
       options: [],
       snapShotOption: [],
       space: '',
-      type: {
-        label: 'Single Choice',
-        value: 'single-choice',
-      },
+      type: 'single-choice',
       next: '',
       fallback: '',
       action: 'create-proposal',
+      proposalId: '',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -49,7 +50,7 @@ export default (props: IVoteMachineConfigProps) => {
     optionsDescription,
   } = props;
 
-  const { fallback, next, action, snapShotOption } = data;
+  const { fallback, next, action, snapShotOption, proposalId } = data;
   const delays = props.delays || Array(2).fill(0);
   const delayUnits = props.delayUnits || Array(2).fill(0);
   const delayNotes = props.delayNotes || Array(2).fill('');
@@ -137,6 +138,22 @@ export default (props: IVoteMachineConfigProps) => {
   };
 
   const [inputValue, setInputValue] = useState('');
+  const { data: graphData } = useContext(GraphContext);
+  const variablesMission = graphData?.variables;
+  const [variablesOption, setVariablesOption] =
+    useState<{ label: string; value: string }[]>();
+
+  useEffect(() => {
+    if (variablesMission) {
+      const optionsData = variablesMission?.map((variables: string) => {
+        return {
+          label: variables,
+          value: variables,
+        };
+      });
+      setVariablesOption(optionsData);
+    }
+  }, [variablesMission]);
 
   return (
     <>
@@ -258,14 +275,36 @@ export default (props: IVoteMachineConfigProps) => {
                 </Popover>
               </div>
               <Select
-                value={data?.type?.label}
+                value={data?.type}
                 className='w-full'
                 options={selectOptions}
                 onChange={(value, option) => {
                   onChange({
                     data: {
                       ...data,
-                      type: option,
+                      type: value,
+                    },
+                  });
+                }}
+              />
+            </Space>
+
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='text-sm text-slate-600 flex items-center gap-2'>
+                Proposal ID
+                <Popover content='Choose variable to store proposal Id of Snapshot'>
+                  <MdHelpOutline />
+                </Popover>
+              </div>
+              <Select
+                value={data?.proposalId}
+                className='w-full'
+                options={variablesOption}
+                onChange={(value, option) => {
+                  onChange({
+                    data: {
+                      ...data,
+                      proposalId: value,
                     },
                   });
                 }}

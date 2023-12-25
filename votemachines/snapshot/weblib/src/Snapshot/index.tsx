@@ -154,7 +154,7 @@ const abstract = ({
 // };
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
-  const snapshotType = source?.data.action.value;
+  const snapshotType = source?.data?.action;
   return (
     <>
       {snapshotType === 'create-proposal' ? (
