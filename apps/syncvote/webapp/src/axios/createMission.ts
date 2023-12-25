@@ -7,7 +7,6 @@ import { Veto } from 'veto/src/Veto/funcs';
 import { UpVote } from 'upvote/src/UpVote/funcs';
 import { Discourse } from 'discourse/src/Discourse/funcs';
 import { Snapshot } from 'snapshot/src/Snapshot/funcs';
-import { validate } from '@snapshot-labs/snapshot.js/dist/utils';
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: SingleChoice.validate,
