@@ -29,8 +29,8 @@ export namespace Snapshot {
   export interface IData {
     //eslint-disable-line
     options: string[];
-    max: number;
-    token: string;
+    // max: number;
+    // token: string;
     space?: string;
     type?: ProposalType;
     start?: number;

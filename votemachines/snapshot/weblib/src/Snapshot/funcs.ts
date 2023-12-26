@@ -7,7 +7,6 @@ export namespace Snapshot {
     return 'Snapshot';
   };
 
-  
   export const getProgramAddress = () => {
     return 'Snapshot';
   };
@@ -37,8 +36,7 @@ export namespace Snapshot {
   export const getInitialData = () => {
     const data: Interface.IData = {
       options: [],
-      max: 0,
-      token: '',
+      snapShotOption: [],
     };
     return data;
   };

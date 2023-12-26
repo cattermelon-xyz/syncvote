@@ -73,9 +73,19 @@ export interface IVoteMachineGetLabelProps {
   target: any;
 }
 
+// if checkPointData is ended -> show result
+// else show options for choices
+export interface IVoteUIWebProps {
+  onSubmit: (data: any) => void; // submit the choice & its data
+  missionData: any; // data of the mission
+  checkpointData: any; // data of current checkpoint
+}
+
 export interface IVoteMachine {
   ConfigPanel: (props: IVoteMachineConfigProps) => JSX.Element;
-  VoteUIWeb?: (props: any) => JSX.Element;
+  VoteUIWeb?: (props: IVoteUIWebProps) => JSX.Element;
+  RenderChoices?: (props: any) => JSX.Element;
+  RenderTallyResult?: (props: any) => JSX.Element;
   getName: () => string;
   getProgramAddress: () => string;
   getType: () => string;
