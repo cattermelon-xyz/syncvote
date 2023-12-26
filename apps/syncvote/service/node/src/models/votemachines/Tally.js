@@ -62,6 +62,15 @@ class Tally extends VotingMachine {
       index: this.children.indexOf(this.data.next),
     };
 
+    await supabase
+      .from('variables')
+      .insert({
+        name: this.data.proposalId,
+        value: voteData.submission.proposalId,
+        mission_id: this.mission_id,
+      })
+      .select('*');
+
     return {};
   }
 
