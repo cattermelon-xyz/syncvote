@@ -72,8 +72,7 @@ const updateTopic = async (props) => {
     const url = `https://discourse.syncvote.shop/posts/${props.firstPostId}.json`;
 
     const payload = {
-      raw: props.raw,
-      edit_reason: props.edit_reason,
+      post: { raw: props.raw, edit_reason: props.edit_reason },
     };
     const response = await axios.put(url, payload, {
       headers: {

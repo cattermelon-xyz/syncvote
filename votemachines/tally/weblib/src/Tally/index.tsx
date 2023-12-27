@@ -1,5 +1,5 @@
-import { Snapshot as Interface } from './interface';
-import { Snapshot as Funcs } from './funcs';
+import { Tally as Interface } from './interface';
+import { Tally as Funcs } from './funcs';
 import ConfigPanel from './ConfigPanel/index';
 import { HiOutlineBolt } from 'react-icons/hi2';
 import {
@@ -116,62 +116,24 @@ const abstract = ({
   ) : null;
 };
 
-// const getLabel = (props: IVoteMachineGetLabelProps) => {
-//   const { source, target } = props;
-//   console.log('GetLabel', source, target);
-
-//   const data = source.data || {};
-//   const { triggers } = source;
-//   const filteredTriggers = triggers?.filter(
-//     (trg: any) => trg.triggerAt === target.id
-//   );
-//   const children = source.children || [];
-//   const idx = children.indexOf(target.id);
-//   return data.options ? (
-//     <div>
-//       <div>{data.options[idx]}</div>
-//       <div>
-//         {filteredTriggers?.map((trg: any) =>
-//           trg.provider === 'twitter' ? (
-//             <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
-//           ) : (
-//             <span key={trg.id || Math.random()}>{trg.provider}</span>
-//           )
-//         )}
-//       </div>
-//     </div>
-//   ) : (
-//     <div>
-//       {filteredTriggers?.map((trg: any) =>
-//         trg.provider === 'twitter' ? (
-//           <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
-//         ) : (
-//           <span key={trg.id || Math.random()}>{trg.provider}</span>
-//         )
-//       )}
-//     </div>
-//   );
-// };
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
-  const snapshotType = source?.data?.action;
-  return (
-    <>
-      {snapshotType === 'create-proposal' ? (
-        <>
-          {source?.data.next === target?.id ? (
-            <span>Pass</span>
-          ) : (
-            <span>Fail</span>
-          )}
-        </>
-      ) : null}
-    </>
+
+  return source?.data.next === target?.id ? (
+    <span>Pass</span>
+  ) : (
+    <span>Fail</span>
   );
 };
 
 const getIcon = () => {
-  return <HiOutlineBolt />;
+  return (
+    <img
+      src='https://cdn-images-1.medium.com/max/184/1*yDU1ckzLBOBhtRSjPQWULw@2x.png'
+      alt=''
+      className='w-4 h-4'
+    />
+  );
 };
 
 const VoteMachine: IVoteMachine = {

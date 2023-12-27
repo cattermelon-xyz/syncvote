@@ -15,7 +15,7 @@ import {
 import NewOptionDrawer from './NewOptionDrawer';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import '../styles.scss';
-import { Snapshot as Interface } from '../interface';
+import { Tally as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
 
 /**
@@ -36,12 +36,10 @@ export default (props: IVoteMachineConfigProps) => {
     currentNodeId = '',
     data = {
       options: [],
-      snapShotOption: [],
-      space: '',
-      type: 'single-choice',
+      governor: '',
+      token: '',
       next: '',
       fallback: '',
-      action: 'create-proposal',
       proposalId: '',
     },
     onChange = (data: ICheckPoint) => {},
@@ -50,16 +48,12 @@ export default (props: IVoteMachineConfigProps) => {
     optionsDescription,
   } = props;
 
-  const { fallback, next, action, snapShotOption, proposalId } = data;
+  const { fallback, next } = data;
   const delays = props.delays || Array(2).fill(0);
   const delayUnits = props.delayUnits || Array(2).fill(0);
   const delayNotes = props.delayNotes || Array(2).fill('');
 
   const posibleOptions: ICheckPoint[] = [];
-  const actions = [
-    { label: 'Create Proposal', value: 'create-proposal' },
-    { label: 'Vote Proposal', value: 'sync-proposal' },
-  ];
 
   const fallbackNode = allNodes.find((n) => n.id === fallback);
   const nextNode = allNodes.find((n) => n.id === next);
@@ -96,48 +90,6 @@ export default (props: IVoteMachineConfigProps) => {
     }
   });
 
-  const selectOptions = [
-    {
-      label: 'Single Choice',
-      value: 'single-choice',
-    },
-    // {
-    //   label: 'Approval',
-    //   value: 'approval',
-    // },
-    // {
-    //   label: 'Quadratic',
-    //   value: 'quadratic',
-    // },
-    // {
-    //   label: 'Ranked Choice',
-    //   value: 'ranked-choice',
-    // },
-    // {
-    //   label: 'Weighted',
-    //   value: 'weighted',
-    // },
-    // {
-    //   label: 'Basic',
-    //   value: 'basic',
-    // },
-  ];
-
-  const addNewOptionHandler = (newOptionData: any) => {
-    if (newOptionData) {
-      const opts = snapShotOption ? [...snapShotOption] : [];
-      onChange({
-        data: {
-          ...data,
-          snapShotOption: [...opts, newOptionData],
-        },
-      });
-
-      setInputValue('');
-    }
-  };
-
-  const [inputValue, setInputValue] = useState('');
   const { data: graphData } = useContext(GraphContext);
   const variablesMission = graphData?.variables;
   const [variablesOption, setVariablesOption] =
@@ -158,24 +110,6 @@ export default (props: IVoteMachineConfigProps) => {
   return (
     <>
       <Space direction='vertical' size='large' className='w-full single-choice'>
-        <CollapsiblePanel title='Action Type'>
-          <Space direction='vertical' size='small' className='w-full'>
-            <Select
-              value={action}
-              className='w-full'
-              options={actions}
-              onChange={(value, option) => {
-                onChange({
-                  data: {
-                    ...data,
-                    action: value,
-                  },
-                });
-              }}
-            />
-          </Space>
-        </CollapsiblePanel>
-
         <CollapsiblePanel title='Navigation'>
           <Alert
             type='success'
@@ -244,45 +178,46 @@ export default (props: IVoteMachineConfigProps) => {
           </Space>
         </CollapsiblePanel>
 
-        <CollapsiblePanel title='Snapshot Info'>
+        <CollapsiblePanel title='Tally Info'>
           <Space direction='vertical' size='small' className='w-full'>
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Space
+                Governor contract
                 <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
                   <MdHelpOutline />
                 </Popover>
               </div>
               <Input
                 className='w-full'
-                placeholder='hectagon.eth'
-                value={data.space}
+                placeholder='Address of the deployed contract'
+                value={data?.governor}
                 onChange={(e: any) => {
                   onChange({
                     data: {
                       ...data,
-                      space: e.target.value,
+                      governor: e.target.value,
                     },
                   });
                 }}
               />
             </Space>
+
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Votemachine type
+                Token address
                 <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
                   <MdHelpOutline />
                 </Popover>
               </div>
-              <Select
-                value={data?.type}
+              <Input
                 className='w-full'
-                options={selectOptions}
-                onChange={(value, option) => {
+                placeholder='Address of the deployed contract'
+                value={data?.token}
+                onChange={(e: any) => {
                   onChange({
                     data: {
                       ...data,
-                      type: value,
+                      token: e.target.value,
                     },
                   });
                 }}
@@ -309,60 +244,6 @@ export default (props: IVoteMachineConfigProps) => {
                   });
                 }}
               />
-            </Space>
-            <Space direction='vertical' size='small' className='w-full'>
-              <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Options
-                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
-                  <MdHelpOutline />
-                </Popover>
-              </div>
-              <Input
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                }}
-                suffix={
-                  <Button
-                    type='link'
-                    icon={<PlusOutlined />}
-                    className='w-full flex items-center justify-start pl-0'
-                    onClick={() => {
-                      addNewOptionHandler(inputValue);
-                    }}
-                  >
-                    Add a new option
-                  </Button>
-                }
-              />
-              <Space direction='vertical' size='small' className='w-full'>
-                {snapShotOption &&
-                  snapShotOption.map((option: string, index: number) => {
-                    return (
-                      <div
-                        key={index}
-                        className='flex items-center justify-between w-full'
-                      >
-                        <div className=''>{option}</div>
-                        <Button
-                          danger
-                          icon={<DeleteOutlined />}
-                          onClick={() => {
-                            console.log(index);
-                            const opts = [...snapShotOption];
-                            opts.splice(index, 1);
-                            onChange({
-                              data: {
-                                ...data,
-                                snapShotOption: opts,
-                              },
-                            });
-                          }}
-                        ></Button>
-                      </div>
-                    );
-                  })}
-              </Space>
             </Space>
           </Space>
         </CollapsiblePanel>

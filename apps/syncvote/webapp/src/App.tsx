@@ -11,6 +11,7 @@ import { UpVote } from 'upvote';
 import { DocInput } from 'doc-input';
 import { Snapshot } from 'snapshot';
 import { Discourse } from 'discourse';
+import { Tally } from 'tally-xyz';
 import { AuthContext } from '@layout/context/AuthContext';
 
 function App({ layout }: { layout: any }) {
@@ -27,6 +28,7 @@ function App({ layout }: { layout: any }) {
     registerVoteMachine(DocInput);
     registerVoteMachine(Snapshot);
     registerVoteMachine(Discourse);
+    registerVoteMachine(Tally);
   }, [session]);
 
   const Layout: any = layout;

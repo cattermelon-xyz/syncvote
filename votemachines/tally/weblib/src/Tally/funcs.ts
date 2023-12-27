@@ -1,14 +1,14 @@
 import { ICheckPoint } from 'directed-graph';
 // import { IData } from './interface';
-import { Snapshot as Interface } from './interface';
+import { Tally as Interface } from './interface';
 
-export namespace Snapshot {
+export namespace Tally {
   export const getName = () => {
-    return 'Snapshot';
+    return 'Tally';
   };
 
   export const getProgramAddress = () => {
-    return 'Snapshot';
+    return 'Tally';
   };
 
   /**
@@ -16,7 +16,7 @@ export namespace Snapshot {
    * @returns Type of the voting machine
    */
   export const getType = () => {
-    return 'Snapshot';
+    return 'Tally';
   };
 
   export const deleteChildNode = (
@@ -36,11 +36,6 @@ export namespace Snapshot {
   export const getInitialData = () => {
     const data: Interface.IData = {
       options: [],
-      snapShotOption: [],
-      space: '',
-      action: 'create-proposal',
-      type: 'single-choice',
-      proposalId: '',
     };
     return data;
   };
@@ -56,32 +51,20 @@ export namespace Snapshot {
       isValid = false;
       message.push('Missing options');
     }
-    // if (!checkpoint?.data || !checkpoint.data.max) {
-    if (!checkpoint?.data.type) {
-      isValid = false;
-      message.push('Missing type of vote in snapshot');
-    }
-
-    if (!checkpoint?.data.space) {
-      isValid = false;
-      message.push('Missing space of snapshot');
-    }
 
     if (!checkpoint?.data.fallback || !checkpoint.data.next) {
       isValid = false;
       message.push('Missing fallback or next checkpoint');
     }
 
-    if (!checkpoint?.data.action) {
+    if (!checkpoint?.data.governor) {
       isValid = false;
-      message.push('Missing action for snapshot checkpoint');
+      message.push('Missing governor contract');
     }
 
-    if (checkpoint?.data.action === 'create-proposal') {
-      if (!checkpoint.data.proposalId) {
-        isValid = false;
-        message.push('Missiong variable to store proposalId');
-      }
+    if (!checkpoint?.data.token) {
+      isValid = false;
+      message.push('Missing token contract');
     }
     return {
       isValid,
