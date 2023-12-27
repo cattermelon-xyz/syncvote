@@ -82,6 +82,11 @@ export namespace Snapshot {
         isValid = false;
         message.push('Missiong variable to store proposalId');
       }
+
+      if (!checkpoint.data.snapShotOption) {
+        isValid = false;
+        message.push('Missiong option for snapshot proposal');
+      }
     }
     return {
       isValid,

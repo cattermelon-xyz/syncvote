@@ -7,6 +7,7 @@ import { Veto } from 'veto/src/Veto/funcs';
 import { UpVote } from 'upvote/src/UpVote/funcs';
 import { Discourse } from 'discourse/src/Discourse/funcs';
 import { Snapshot } from 'snapshot/src/Snapshot/funcs';
+import { Tally } from 'tally-xyz/src/Tally/funcs';
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: SingleChoice.validate,
@@ -15,6 +16,7 @@ const VoteMachineValidate = {
   UpVote: UpVote.validate,
   Discourse: Discourse.validate,
   Snapshot: Snapshot.validate,
+  Tally: Tally.validate,
 };
 type VoteMachineType =
   | 'SingleChoiceRaceToMax'
@@ -22,7 +24,8 @@ type VoteMachineType =
   | 'Veto'
   | 'UpVote'
   | 'Discourse'
-  | 'Snapshot';
+  | 'Snapshot'
+  | 'Tally';
 
 export const createMission = async ({
   missionData,
@@ -52,6 +55,8 @@ export const createMission = async ({
         ]({ checkpoint: checkpoint });
         if (!duration || !participation || !title || !isValid) {
           isValidate = false;
+          console.log(duration, participation, title, isValid);
+
           console.log(`${checkpoint.vote_machine_type}: `, message);
         }
       }

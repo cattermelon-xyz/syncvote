@@ -30,7 +30,7 @@ class Snapshot extends VotingMachine {
       message.push('Missing variable proposalId');
     }
 
-    if (isValidAction(SNAPSHOT_ACTION, checkpoint?.data?.action)) {
+    if (!isValidAction(SNAPSHOT_ACTION, checkpoint?.data?.action)) {
       isValid = false;
       message.push('Wrong or missing action');
     }
