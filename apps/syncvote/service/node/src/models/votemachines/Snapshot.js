@@ -25,6 +25,11 @@ class Snapshot extends VotingMachine {
       message.push('Missing attributes of snapshot');
     }
 
+    if (!checkpoint?.data?.proposalId) {
+      isValid = false;
+      message.push('Missing variable proposalId');
+    }
+
     if (isValidAction(SNAPSHOT_ACTION, checkpoint?.data?.action)) {
       isValid = false;
       message.push('Wrong or missing action');
@@ -65,6 +70,15 @@ class Snapshot extends VotingMachine {
         ...voteData.submission,
         index: this.children.indexOf(this.data.next),
       };
+
+      await supabase
+        .from('variables')
+        .insert({
+          name: this.data.proposalId,
+          value: voteData.submission.proposalId,
+          mission_id: this.mission_id,
+        })
+        .select('*');
     } else if (this.data.action === SNAPSHOT_ACTION.SYNC_PROPOSAL) {
       const { data } = await getSnapshotData('proposalId');
     }
