@@ -1,36 +1,26 @@
 import { Button, Input, Select, Space } from 'antd';
+import { IVoteUIWebProps } from 'directed-graph';
 import { useEffect, useState } from 'react';
 import { TextEditor } from 'rich-text-editor';
 
-interface Props {
-  currentCheckpointData: any;
-  setSubmission: any;
-  setOpenModalVoterInfo: any;
-}
-
-const VoteUIWeb = (props: Props): JSX.Element => {
-  const {
-    currentCheckpointData,
-    setSubmission,
-    setOpenModalVoterInfo,
-  } = props;
+const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
+  const { checkpointData, missionData, onSubmit } = props;
 
   const [title, setTitle] = useState<any>();
   const [missionDesc, setMissionDesc] = useState<any>();
 
   useEffect(() => {
-    console.log('currentCheckpointData', currentCheckpointData);
-  }, [currentCheckpointData]);
+    console.log('currentCheckpointData', checkpointData);
+  }, [checkpointData]);
 
   const handleConfirm = () => {
     const submissionData = {
-      action: currentCheckpointData?.data?.action,
-      variable: currentCheckpointData?.data?.variables[0],
+      action: checkpointData?.data?.action,
+      variable: checkpointData?.data?.variables[0],
       title,
       raw: missionDesc,
     };
-    setSubmission(submissionData);
-    setOpenModalVoterInfo(true);
+    onSubmit(submissionData);
   };
 
   return (

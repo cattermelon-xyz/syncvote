@@ -1,54 +1,42 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { Card, Button, Radio } from 'antd';
+import { IVoteUIWebProps } from 'directed-graph';
 
-interface Props {
-  currentCheckpointData: any;
-  setOpenModalVoterInfo: any;
-  onSelectedOption: any;
-}
+// onSubmit: (data: any) => void; // submit the choice & its data
+//   missionData: any; // data of the mission
+//   checkpointData: any; // data of current checkpoint
 
-const VoteUIWeb = (props: Props): JSX.Element => {
-  const { currentCheckpointData, setOpenModalVoterInfo, onSelectedOption } =
-    props;
-
-  const [selectedOption, setSelectedOption] = useState<number>();
-
-  useEffect(() => {
-    if (selectedOption) {
-      onSelectedOption(selectedOption);
-    }
-  }, [selectedOption]);
-
+const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
+  const { onSubmit, missionData, checkpointData } = props;
+  const [selectedOption, setSelectedOption] = useState<any>(null);
   return (
     <div>
       <Card className='p-4'>
         <div className='flex flex-col gap-6'>
           <p className='text-xl font-medium'>Vote</p>
           <>
-            {currentCheckpointData.data.options.map(
-              (option: any, index: any) => (
-                <Card className='w-full' key={index}>
-                  {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                  <Radio
-                    checked={
-                      selectedOption === (option === 'Abstain' ? -1 : index + 1)
-                    }
-                    onChange={() =>
-                      setSelectedOption(option === 'Abstain' ? -1 : index + 1)
-                    }
-                  >
-                    {`${index + 1}. ${option}`}
-                  </Radio>
-                </Card>
-              )
-            )}
+            {checkpointData.data.options.map((option: any, index: any) => (
+              <Card className='w-full' key={index}>
+                {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
+                <Radio
+                  checked={
+                    selectedOption === (option === 'Abstain' ? -1 : index + 1)
+                  }
+                  onChange={() =>
+                    setSelectedOption(option === 'Abstain' ? -1 : index + 1)
+                  }
+                >
+                  {`${index + 1}. ${option}`}
+                </Radio>
+              </Card>
+            ))}
           </>
           <Button
             type='primary'
             className='w-full'
             onClick={async () => {
-              setOpenModalVoterInfo(true);
+              onSubmit(selectedOption);
             }}
             disabled={
               selectedOption

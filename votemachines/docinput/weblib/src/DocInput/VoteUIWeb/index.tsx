@@ -6,102 +6,68 @@ import { getTimeRemainingToEnd } from '../funcs';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { TextEditor } from 'rich-text-editor';
 import ShowDescription from './ShowDescription';
+import { IVoteUIWebProps } from 'directed-graph';
 
-interface Props {
-  onSelectedOption: any;
-  currentCheckpointData: any;
-  dataOfAllDocs: any;
-  listVersionDocs: any;
-  missionData: any;
-  setSubmission: any;
-  setOpenModalVoterInfo: any;
-}
+// How to find all historical version of a doc?
 
-const VoteUIWeb = (props: Props): JSX.Element => {
-  const {
-    onSelectedOption,
-    currentCheckpointData,
-    dataOfAllDocs,
-    listVersionDocs,
-    missionData,
-    setSubmission,
-    setOpenModalVoterInfo,
-  } = props;
-
-  const [selectedOption, setSelectedOption] = useState<number>();
-  const [optionDocs, setOptionDocs] = useState<any>([]);
+const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
+  const { onSubmit, missionData, checkpointData } = props;
+  console.log('missionData: ', missionData);
+  console.log('checkpointData: ', checkpointData);
+  const dataOfAllDocs = missionData?.data?.docs || [];
+  // TODO: later acquire this through PDA-style design
+  const listVersionDocs: any[] = [];
+  const [selectedOption, setSelectedOption] = useState<any>(null);
   const [expandedDocIds, setExpandedDocIds] = useState<string[]>([]);
   const [expandVoteForDocInput, setExpandVoteForDocInput] = useState<boolean>();
   const [editorValues, setEditorValues] = useState<{ [key: string]: string }>(
     {}
   );
+  const optionDocs: any[] = [];
+  if (checkpointData && dataOfAllDocs && listVersionDocs && missionData) {
+    const checkpointDocs = checkpointData.data.docs;
+    const missionDocs: IDoc[] = missionData.data.docs;
 
-  useEffect(() => {
-    if (selectedOption) {
-      onSelectedOption(selectedOption);
-    }
-    if (
-      currentCheckpointData &&
-      dataOfAllDocs &&
-      listVersionDocs &&
-      missionData
-    ) {
-      const checkpointDocs = currentCheckpointData.data.docs;
-      const missionDocs: IDoc[] = missionData.data.docs;
-
-      const filteredDocs = missionDocs
-        .filter((missionDoc) =>
-          checkpointDocs.some(
-            (checkpointDoc: any) => checkpointDoc.id === missionDoc.id
-          )
+    const filteredDocs = missionDocs
+      .filter((missionDoc) =>
+        checkpointDocs.some(
+          (checkpointDoc: any) => checkpointDoc.id === missionDoc.id
         )
-        .map((filteredDoc) => {
-          const correspondingCheckpointDoc = checkpointDocs.find(
-            (checkpointDoc: any) => checkpointDoc.id === filteredDoc.id
-          );
+      )
+      .map((filteredDoc) => {
+        const correspondingCheckpointDoc = checkpointDocs.find(
+          (checkpointDoc: any) => checkpointDoc.id === filteredDoc.id
+        );
 
-          // Check if the doc exists in listVersionDocs
-          const versionDocEntry = listVersionDocs.find(
-            (entry: any) => entry[correspondingCheckpointDoc.id]
-          );
+        // Check if the doc exists in listVersionDocs
+        const versionDocEntry = listVersionDocs.find(
+          (entry: any) => entry[correspondingCheckpointDoc.id]
+        );
 
-          // If exists, get the content from dataOfAllDocs with the latest created_at
-          if (versionDocEntry) {
-            const latestDocVersion = dataOfAllDocs
-              .filter(
-                (doc: any) => doc.doc_input_id === correspondingCheckpointDoc.id
-              )
-              .sort(
-                (a: any, b: any) =>
-                  new Date(b.created_at).getTime() -
-                  new Date(a.created_at).getTime()
-              )[0];
+        // If exists, get the content from dataOfAllDocs with the latest created_at
+        if (versionDocEntry) {
+          const latestDocVersion = dataOfAllDocs
+            .filter(
+              (doc: any) => doc.doc_input_id === correspondingCheckpointDoc.id
+            )
+            .sort(
+              (a: any, b: any) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+            )[0];
 
-            if (latestDocVersion) {
-              filteredDoc.template = latestDocVersion.content;
-            }
+          if (latestDocVersion) {
+            filteredDoc.template = latestDocVersion.content;
           }
+        }
 
-          return {
-            ...filteredDoc,
-            action: correspondingCheckpointDoc?.action,
-          };
-        });
-      setOptionDocs(filteredDocs);
-    }
-  }, [
-    selectedOption,
-    dataOfAllDocs,
-    currentCheckpointData,
-    listVersionDocs,
-    missionData,
-    editorValues,
-  ]);
-
-  useEffect(() => {
-    console.log('optionDocs', optionDocs);
-    console.log('listVersionDocs', listVersionDocs);
-  }, [optionDocs, editorValues, listVersionDocs]);
+        return {
+          ...filteredDoc,
+          action: correspondingCheckpointDoc?.action,
+        };
+      });
+    optionDocs.push(...filteredDocs);
+  }
 
   const handleConfirm = () => {
     const finalValues = Object.keys(editorValues).reduce((acc: any, docId) => {
@@ -113,9 +79,7 @@ const VoteUIWeb = (props: Props): JSX.Element => {
       }
       return acc;
     }, {});
-
-    setSubmission(finalValues);
-    setOpenModalVoterInfo(true);
+    console.log('confirm: ', finalValues);
   };
 
   return (
@@ -188,20 +152,16 @@ const VoteUIWeb = (props: Props): JSX.Element => {
                         </div>
                       </>
                     ) : (
-                      <div>
-                        <TextEditor
-                          value={
-                            editorValues[optionDoc.id] || optionDoc.template
-                          }
-                          id={`text-editor-${optionDoc.id}`}
-                          setValue={(newValue: any) => {
-                            setEditorValues((prevValues) => ({
-                              ...prevValues,
-                              [optionDoc.id]: newValue,
-                            }));
-                          }}
-                        />
-                      </div>
+                      <TextEditor
+                        value={editorValues[optionDoc.id] || optionDoc.template}
+                        id={`text-editor-${optionDoc.id}`}
+                        setValue={(newValue: any) => {
+                          setEditorValues((prevValues) => ({
+                            ...prevValues,
+                            [optionDoc.id]: newValue,
+                          }));
+                        }}
+                      />
                     ))}
                 </div>
               </div>
@@ -229,31 +189,28 @@ const VoteUIWeb = (props: Props): JSX.Element => {
             )}
           </div>
           {expandVoteForDocInput &&
-            currentCheckpointData.data.options.map(
-              (option: any, index: any) => (
-                <Card className='w-full' key={index}>
-                  {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                  <Radio
-                    checked={
-                      selectedOption === (option === 'Abstain' ? -1 : index + 1)
-                    }
-                    onChange={() =>
-                      setSelectedOption(option === 'Abstain' ? -1 : index + 1)
-                    }
-                  >
-                    {`${index + 1}. ${option}`}
-                  </Radio>
-                </Card>
-              )
-            )}
+            checkpointData.data.options.map((option: any, index: any) => (
+              <Card className='w-full' key={index}>
+                {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
+                <Radio
+                  checked={
+                    selectedOption === (option === 'Abstain' ? -1 : index + 1)
+                  }
+                  onChange={() =>
+                    setSelectedOption(option === 'Abstain' ? -1 : index + 1)
+                  }
+                >
+                  {`${index + 1}. ${option}`}
+                </Radio>
+              </Card>
+            ))}
           <Button
             type='primary'
             className='w-full'
             onClick={handleConfirm}
             disabled={
               selectedOption &&
-              getTimeRemainingToEnd(currentCheckpointData.endToVote) !=
-                'expired'
+              getTimeRemainingToEnd(checkpointData.endToVote) != 'expired'
                 ? false
                 : true
             }
