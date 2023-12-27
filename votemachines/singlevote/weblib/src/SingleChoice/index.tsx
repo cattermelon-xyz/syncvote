@@ -22,6 +22,8 @@ import { SingleChoice as Funcs } from './funcs';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
 import VoteUIWeb from './VoteUIWeb';
+import { Card } from 'antd';
+import { Icon } from 'icon';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
@@ -224,9 +226,52 @@ const abstract = ({
   ) : null;
 };
 
+const RenderChoices = ({
+  missionData,
+  currentCheckpointData,
+}: {
+  missionData: any;
+  currentCheckpointData: any;
+}) => {
+  return (
+    <Card className='p-4'>
+      <div className='flex flex-col gap-4'>
+        <p className='text-xl font-medium'>Votes</p>
+        <div className='flex'>
+          <p className='w-8/12'>Identity</p>
+          <p className='w-4/12 text-right'>Vote</p>
+        </div>
+        {missionData.vote_record &&
+          missionData.vote_record.map((record: any, recordIndex: number) => {
+            return (
+              <div className='flex mb-4' key={recordIndex}>
+                <div className='w-8/12 flex items-center gap-2'>
+                  <Icon iconUrl='' presetIcon='' size='medium' />
+                  <p>{record.identify}</p>
+                </div>
+                {record.option.map((option: any, optionIndex: number) => {
+                  const voteOption =
+                    option === '-1'
+                      ? 'Abstain'
+                      : currentCheckpointData.data.options[parseInt(option)];
+                  return (
+                    <p key={optionIndex} className='w-4/12 text-right'>
+                      {voteOption}
+                    </p>
+                  );
+                })}
+              </div>
+            );
+          })}
+      </div>
+    </Card>
+  );
+};
+
 const VoteMachine: IVoteMachine = {
   ConfigPanel: ConfigPanel,
   VoteUIWeb: VoteUIWeb,
+  RenderChoices: RenderChoices,
   getProgramAddress: Funcs.getProgramAddress,
   getName: Funcs.getName,
   deleteChildNode: Funcs.deleteChildNode,

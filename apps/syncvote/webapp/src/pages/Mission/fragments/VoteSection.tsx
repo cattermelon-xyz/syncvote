@@ -12,27 +12,14 @@ import Client from '@snapshot-labs/snapshot.js/dist/sign';
 
 interface Props {
   currentCheckpointData: any;
-  onSelectedOption: any;
-  setOpenModalVoterInfo: any;
-  missionData: any;
-  setSubmission: any;
-  submission: any;
-  dataOfAllDocs: any;
-  listVersionDocs: any;
   proposalData?: any;
-  client?: Client;
+  onSubmit?: (data: any) => void;
 }
 
 const VoteSection: React.FC<Props> = ({
   currentCheckpointData,
-  onSelectedOption,
-  setOpenModalVoterInfo,
-  missionData,
-  setSubmission,
-  dataOfAllDocs,
-  listVersionDocs,
   proposalData,
-  client,
+  onSubmit,
 }) => {
   const [voteMachine, setVoteMachine] = useState<any>(null);
 
@@ -54,36 +41,34 @@ const VoteSection: React.FC<Props> = ({
       {voteMachine &&
       currentCheckpointData?.vote_machine_type === VM_TYPE.DOC_INPUT ? (
         <voteMachine.VoteUIWeb
-          onSelectedOption={onSelectedOption}
-          currentCheckpointData={currentCheckpointData}
-          dataOfAllDocs={dataOfAllDocs}
-          listVersionDocs={listVersionDocs}
-          missionData={missionData}
-          setSubmission={setSubmission}
-          setOpenModalVoterInfo={setOpenModalVoterInfo}
+          missionData={proposalData}
+          checkpointData={currentCheckpointData}
+          onSubmit={onSubmit}
         />
       ) : voteMachine &&
         currentCheckpointData?.vote_machine_type === VM_TYPE.SINGLE_VOTE ? (
         <voteMachine.VoteUIWeb
-          onSelectedOption={onSelectedOption}
-          currentCheckpointData={currentCheckpointData}
-          setOpenModalVoterInfo={setOpenModalVoterInfo}
+          missionData={proposalData}
+          checkpointData={currentCheckpointData}
+          onSubmit={onSubmit}
         />
       ) : voteMachine &&
         currentCheckpointData?.vote_machine_type === VM_TYPE.SNAPSHOT ? (
-        <voteMachine.VoteUIWeb
-          proposalData={proposalData}
-          onSelectedOption={onSelectedOption}
-          currentCheckpointData={currentCheckpointData}
-          client={client}
-        />
+        // <voteMachine.VoteUIWeb
+        //   proposalData={proposalData}
+        //   onSelectedOption={onSelectedOption}
+        //   currentCheckpointData={currentCheckpointData}
+        //   client={client}
+        // />
+        <div>Not supported</div>
       ) : voteMachine &&
         currentCheckpointData?.vote_machine_type === VM_TYPE.DISCOURSE ? (
-        <voteMachine.VoteUIWeb
-          currentCheckpointData={currentCheckpointData}
-          setSubmission={setSubmission}
-          setOpenModalVoterInfo={setOpenModalVoterInfo}
-        />
+        // <voteMachine.VoteUIWeb
+        //   currentCheckpointData={currentCheckpointData}
+        //   setSubmission={setSubmission}
+        //   setOpenModalVoterInfo={setOpenModalVoterInfo}
+        // />
+        <div>Not supported</div>
       ) : (
         <></>
       )}
