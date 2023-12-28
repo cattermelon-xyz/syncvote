@@ -9,22 +9,15 @@ export const vote = async ({
     console.error(e);
   },
   dispatch,
-  typeVote,
 }: {
   data: any;
   onSuccess: (data: any) => void;
   onError?: (error: any) => void;
   dispatch: any;
-  typeVote?: any;
 }) => {
   dispatch(startLoading({}));
 
-  const apiUrl =
-    typeVote === VM_TYPE.DOC_INPUT
-      ? `${import.meta.env.VITE_SERVER_URL}/vote/submit-doc`
-      : typeVote === VM_TYPE.DISCOURSE
-      ? `${import.meta.env.VITE_SERVER_URL}/vote/create-topic`
-      : `${import.meta.env.VITE_SERVER_URL}/vote/create`;
+  const apiUrl = `${import.meta.env.VITE_SERVER_URL}/vote/create`;
   axios
     .post(apiUrl, data)
     .then((response) => {
