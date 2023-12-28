@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Space, MenuProps } from 'antd';
+import { Space, MenuProps, Button, Card, Tag } from 'antd';
 import { useParams } from 'react-router-dom';
 import { queryAMissionDetail } from '@dal/data';
-import { extractIdFromIdString, supabase } from 'utils';
+import { extractIdFromIdString, supabase, useGetDataHook } from 'utils';
 import { Modal } from 'antd';
 import { useDispatch } from 'react-redux';
 import ModalListParticipants from './fragments/ModalListParticipants';
-import ModalVoterInfo from './fragments/ModalVoterInfo';
 import { extractCurrentCheckpointId } from '@utils/helpers';
 import { queryDocInput } from '@dal/data';
+import { config } from '@dal/config';
 // =============================== METAMASK SECTION ===============================
 import { useSDK } from '@metamask/sdk-react';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
@@ -18,6 +18,11 @@ import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import MissionProgressSummary from './fragments/MissionProgressSummary';
 import MissionSummary from './fragments/MissionSummary';
 import { getVoteMachine } from 'directed-graph';
+import { vote } from '@axios/vote';
+import { log } from 'console';
+import Metamask from '@assets/icons/svg-icons/Metamask';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { L } from '@utils/locales/L';
 export function isExternalProvider(
   provider: any
 ): provider is ExternalProvider {
@@ -47,24 +52,45 @@ const getCheckpointData = (data: any) => {
   };
 };
 
+const login = async (dispatch: any) => {
+  dispatch(startLoading({}));
+  const currentURL = window.location.href;
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+      redirectTo: currentURL,
+    },
+  });
+  dispatch(finishLoading({}));
+  if (error) {
+    Modal.error({
+      title: L('error'),
+      content: error.message || '',
+    });
+  }
+};
+
 const MissionVotingDetail = () => {
   const { missionIdString } = useParams();
   const missionId = extractIdFromIdString(missionIdString);
   const [missionData, setMissionData] = useState<any>();
   const [openModalListParticipants, setOpenModalListParticipants] =
     useState<boolean>(false);
-  const [openModalVoterInfo, setOpenModalVoterInfo] = useState<boolean>(false);
   const [selectedOption, onSelectedOption] = useState<number>(-1);
   const { currentCheckpointData, listVersionDocs } = missionData
     ? getCheckpointData(missionData)
     : { currentCheckpointData: undefined, listVersionDocs: [] };
   const [submission, setSubmission] = useState<any>();
   const dispatch = useDispatch();
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
 
   // =============================== METAMASK SECTION ===============================
-  const [proposalId, setProposalId] = useState(null);
-  const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-  const [proposal, setProposal] = useState<any>(null);
   const [account, setAccount] = useState<any>();
   const { sdk, connected, connecting, provider, chainId } = useSDK();
 
@@ -85,161 +111,6 @@ const MissionVotingDetail = () => {
     sdk?.terminate();
     setAccount('');
   };
-
-  const client = new snapshot.Client712(hub);
-
-  const createProposal = async () => {
-    let web3;
-    if (isExternalProvider(window.ethereum)) {
-      web3 = new Web3Provider(window.ethereum);
-    }
-    let choices: string[] = currentCheckpointData.data.options;
-    if (currentCheckpointData.includedAbstain) {
-      choices.push('Abstain');
-    }
-
-    if (web3) {
-      const accounts = await web3.listAccounts();
-      const receipt = await client.proposal(web3, accounts[0], {
-        space: currentCheckpointData?.data?.space,
-        type: currentCheckpointData?.data?.type?.value,
-        title: 'Testing Syncvote MVP',
-        body: `***Hello DAO members,***
-        How's everyone doing?
-        If you're reading this proposal, it means that our team has successfully generated a Snapshot proposal through Syncvote. This marks a step in our ongoing efforts to enhance DAOs' autonomy through integrations on Syncvote.
-        DAOs which have already created governance workflows on Syncvote can now adopt this new automation feature. When it comes to the Snapshot (off-chain voting) stage of the governance process, proposal author only needs to:
-        - Open our plugin
-        - Click on one button
-        - Draft the proposal
-        - And the proposal will be automatically generated on Snapshot.
-        In the near future, we will broaden our integrations with widely-used DAO apps and tools such as Discourse, Tally, Realms… ***It will bring Syncvote one step closer to becoming a top-of-mind unified app to enforce DAO governance process.***
-        To gain a better understanding of the context, please refer to this proposal: **[HIP14 - Proposal to utilize treasury for developing Syncvote](https://snapshot.org/#/hectagon.eth/proposal/0xadde5daee982803db92ba838ba3fefe5bc6b935baf44aef9643f010be5bbc7f3).**
-        Thanks for reading.`,
-        choices: choices,
-        start: moment().unix(),
-        end: moment().unix() + currentCheckpointData?.duration,
-        snapshot: 13620822,
-        plugins: JSON.stringify({}),
-        app: 'my-app',
-        discussion: '',
-      });
-
-      if (receipt) {
-        const { data } = await supabase
-          .from('current_vote_data')
-          .update({ initData: receipt })
-          .eq('checkpoint_id', `${missionId}-${currentCheckpointData.id}`)
-          .select('initData');
-
-        if (data) {
-          setProposalId(data[0].initData.id);
-          getDataSnapshot(data[0]?.initData.id);
-        }
-      }
-    }
-  };
-
-  const checkProposalId = async () => {
-    if (
-      currentCheckpointData &&
-      currentCheckpointData?.vote_machine_type === 'Snapshot'
-    ) {
-      const { data } = await supabase
-        .from('current_vote_data')
-        .select('initData')
-        .eq('checkpoint_id', `${missionId}-${currentCheckpointData.id}`);
-
-      if (data && data[0]?.initData?.id) {
-        setProposalId(data[0]?.initData.id);
-
-        getDataSnapshot(data[0]?.initData.id);
-      }
-    }
-  };
-
-  const getDataSnapshot = async (proposalId: string) => {
-    const clientApollo = new ApolloClient({
-      uri: 'https://hub.snapshot.org/graphql',
-      cache: new InMemoryCache(),
-    });
-
-    clientApollo
-      .query({
-        query: gql`
-          query {
-            proposal(id: "${proposalId}") {
-              id
-              title
-              body
-              choices
-              start
-              end
-              snapshot
-              state
-              author
-              created
-              scores
-              scores_by_strategy
-              scores_total
-              scores_updated
-              plugins
-              network
-              strategies {
-                name
-                network
-                params
-              }
-              space {
-                id
-                name
-              }
-            }
-          }
-        `,
-      })
-      .then((result) => {
-        console.log(result);
-        setProposal(result.data.proposal);
-      });
-  };
-
-  const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: (
-        <>
-          {!proposalId ? (
-            <a onClick={createProposal} className='rounded-xl w-full'>
-              Create Snapshot Proposal
-            </a>
-          ) : (
-            <a className='rounded-xl w-full'>Sync proposal</a>
-          )}
-        </>
-      ),
-      disabled: proposalId ? true : false,
-    },
-    {
-      key: '2',
-      label: (
-        <>
-          <a className='rounded-xl w-full'>Change wallet</a>
-        </>
-      ),
-      disabled: true,
-    },
-    {
-      key: '3',
-      label: (
-        <>
-          <a onClick={disconnect} className='rounded-xl w-full'>
-            Disconnect
-          </a>
-        </>
-      ),
-    },
-  ];
-
   // =============================== METAMASK SECTION ===============================
 
   const fetchData = () => {
@@ -266,14 +137,63 @@ const MissionVotingDetail = () => {
   // TODO: change to PDA-style design to query all docs version
 
   const onSubmit = (submitted: any) => {
-    console.log('submitted data: ', submitted);
+    const { option, submission } = submitted;
+    const participants = currentCheckpointData?.participation?.data || [];
+    let permittedIdentity = participants.find(
+      (participant: any) =>
+        participant.toLowerCase() === user?.email?.toLowerCase() ||
+        participant.toLowerCase() === account?.toLowerCase()
+    );
+    let permitted =
+      participants.length === 0
+        ? true
+        : permittedIdentity !== undefined
+        ? true
+        : false;
+    if (permitted) {
+      vote({
+        data: {
+          identify: permittedIdentity,
+          option: option,
+          mission_id: missionId,
+          submission: submission,
+        },
+        onSuccess: (res: any) => {
+          if (['FALLBACK', 'ERR'].indexOf(res.data.status) !== -1) {
+            console.log('error: ', res);
+            Modal.error({
+              title: 'Error',
+              content: res.data.message.toString(),
+            });
+          } else {
+            Modal.success({
+              title: 'Success',
+              content: 'Voting successfully',
+              onOk: () => {
+                window.location.reload();
+              },
+            });
+          }
+        },
+        onError: (err) => {
+          console.log('err: ', err);
+          Modal.error({
+            title: 'Error',
+            content: 'Voting error',
+          });
+        },
+        dispatch,
+      });
+    } else {
+      Modal.error({
+        title: "You don't have permission to vote",
+        content: 'Please sign in with your registered email or wallet address',
+      });
+    }
   };
-  console.log(
-    'current votemachine: ',
-    currentCheckpointData?.vote_machine_type
-  );
   const voteMachine = getVoteMachine(currentCheckpointData?.vote_machine_type);
-  const shouldRenderVoteSection = !(
+  // if forkNode or joinNode, what should we do?
+  const isVoteable = !(
     currentCheckpointData?.isEnd ||
     currentCheckpointData?.vote_machine_type === 'forkNode' ||
     currentCheckpointData?.vote_machine_type === 'joinNode'
@@ -282,15 +202,71 @@ const MissionVotingDetail = () => {
     <>
       {missionData && currentCheckpointData && (
         <div className='lg:w-[1024px] md:w-[640px] sm:w-[400px] flex gap-4'>
-          <div className='w-2/3'>
+          <Space direction='vertical' className='w-2/3' size='small'>
             <MissionSummary
               currentCheckpointData={currentCheckpointData}
               missionData={missionData}
               listVersionDocs={listVersionDocs}
               dataOfAllDocs={[]}
             />
+            {isVoteable && (
+              <Card className='flex flex-col mb-10 gap-6'>
+                <Space direction='vertical'>
+                  {user?.email ? (
+                    <div>
+                      <span>
+                        You are voting with email <Tag>{user.email}</Tag>
+                        <Button
+                          type='text'
+                          onClick={async () => {
+                            dispatch(startLoading({}));
+                            await supabase.auth.signOut();
+                            window.location.reload();
+                            dispatch(finishLoading({}));
+                          }}
+                        >
+                          Sign out
+                        </Button>
+                      </span>
+                    </div>
+                  ) : (
+                    <div>
+                      <Button
+                        onClick={() => {
+                          login(dispatch);
+                        }}
+                      >
+                        Login
+                      </Button>{' '}
+                      with email
+                    </div>
+                  )}
+                  {account ? (
+                    <div>
+                      <span>You are voting with wallet </span>
+                      <Tag>{account}</Tag>{' '}
+                      <Button type='text' onClick={disconnect}>
+                        Sign out
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className='flex gap-2 items-center'>
+                      Or
+                      <Button
+                        icon={<Metamask />}
+                        className='flex items-center'
+                        onClick={connect}
+                      >
+                        Login
+                      </Button>
+                      with MetaMask
+                    </div>
+                  )}
+                </Space>
+              </Card>
+            )}
             <Space direction='vertical' size={16} className='w-full'>
-              {shouldRenderVoteSection && voteMachine?.VoteUIWeb && (
+              {isVoteable && voteMachine?.VoteUIWeb && (
                 <voteMachine.VoteUIWeb
                   missionData={missionData}
                   checkpointData={currentCheckpointData}
@@ -310,11 +286,10 @@ const MissionVotingDetail = () => {
                   </>
                 )}
             </Space>
-          </div>
+          </Space>
           <div className='flex-1 flex flex-col gap-4'>
             <MissionProgressSummary
               missionData={missionData}
-              proposal={proposal}
               currentCheckpointData={currentCheckpointData}
               setOpenModalListParticipants={setOpenModalListParticipants}
             />
@@ -325,16 +300,6 @@ const MissionVotingDetail = () => {
         open={openModalListParticipants}
         onClose={() => setOpenModalListParticipants(false)}
         listParticipants={currentCheckpointData?.participation?.data || []}
-      />
-
-      <ModalVoterInfo
-        option={selectedOption === -1 ? [-1] : [selectedOption - 1]}
-        open={openModalVoterInfo}
-        onClose={() => setOpenModalVoterInfo(false)}
-        missionId={missionId}
-        listParticipants={currentCheckpointData?.participation?.data || []}
-        submission={submission}
-        currentCheckpointData={currentCheckpointData}
       />
     </>
   );

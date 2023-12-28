@@ -180,6 +180,46 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
             )}
           </>
         </CollapsiblePanel>
+        {!selectedNode?.isEnd && type !== 'forkNode' && type !== 'joinNode' ? (
+          <>
+            <CollapsiblePanel title='Fallback Option'>
+              <Space
+                direction='horizontal'
+                size='middle'
+                className='w-full justify-between'
+              >
+                <div>
+                  Option to fallback when duration is passed or vote result
+                  cannot be decided
+                </div>
+                <Select
+                  options={(selectedNode?.children || []).map((id: any) => {
+                    return {
+                      value: id,
+                      label: allCheckPoints.find((chk: any) => chk.id === id)
+                        ?.title,
+                    };
+                  })}
+                  value={
+                    selectedNode?.children ? selectedNode?.children[0] : ''
+                  }
+                  onChange={(selectedValue: string) => {
+                    let children = selectedNode?.children || [];
+                    const idx = children.indexOf(selectedValue);
+                    children = [
+                      children[idx],
+                      ...children.slice(0, idx),
+                      ...children.slice(idx + 1),
+                    ];
+                    onChange({
+                      children,
+                    });
+                  }}
+                />
+              </Space>
+            </CollapsiblePanel>
+          </>
+        ) : null}
         {vmConfigPanel}
         {!selectedNode?.isEnd && type !== 'forkNode' && type !== 'joinNode' ? (
           <VotingDuration />

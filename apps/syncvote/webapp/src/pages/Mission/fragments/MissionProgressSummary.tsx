@@ -9,12 +9,10 @@ import {
 
 const MissionProgressSummary = ({
   missionData,
-  proposal,
   currentCheckpointData,
   setOpenModalListParticipants,
 }: {
   missionData: any;
-  proposal: any;
   currentCheckpointData: any;
   setOpenModalListParticipants: any;
 }) => {
@@ -32,7 +30,7 @@ const MissionProgressSummary = ({
     <>
       {missionData?.progress && <MissionProgress missionData={missionData} />}
 
-      {missionData.result || proposal ? (
+      {missionData.result ? (
         <Card className=''>
           <p className='mb-6 text-base font-semibold'>Voting results</p>
 
@@ -44,36 +42,27 @@ const MissionProgressSummary = ({
             let totalVotingPower = 0;
             let percentage = 0;
 
-            if (!proposal) {
-              totalVotingPower = Object.values(missionData.result).reduce(
-                (acc: number, voteData: any) => acc + voteData.voting_power,
-                0
-              );
+            totalVotingPower = Object.values(missionData.result).reduce(
+              (acc: number, voteData: any) => acc + voteData.voting_power,
+              0
+            );
 
-              if (currentCheckpointData.quorum >= totalVotingPower) {
-                percentage =
-                  (missionData.result[index]?.voting_power /
-                    currentCheckpointData.quorum) *
-                  100;
-              } else {
-                percentage =
-                  (missionData.result[index]?.voting_power / totalVotingPower) *
-                  100;
-              }
-              percentage = parseFloat(percentage.toFixed(2));
+            if (currentCheckpointData.quorum >= totalVotingPower) {
+              percentage =
+                (missionData.result[index]?.voting_power /
+                  currentCheckpointData.quorum) *
+                100;
             } else {
-              totalVotingPower = proposal?.scores_total;
-              percentage = parseFloat(
-                (proposal?.scores[index] / totalVotingPower).toFixed(2)
-              );
+              percentage =
+                (missionData.result[index]?.voting_power / totalVotingPower) *
+                100;
             }
+            percentage = parseFloat(percentage.toFixed(2));
 
             return (
               <div key={index} className='flex flex-col gap-2'>
                 <p className='text-base font-semibold'>{option}</p>
-                <p className='text-base'>
-                  {proposal ? 0 : missionData.result[option]} votes
-                </p>
+                <p className='text-base'>{missionData.result[option]} votes</p>
                 <Progress percent={percentage} size='small' />
               </div>
             );
@@ -93,9 +82,7 @@ const MissionProgressSummary = ({
         </Card>
       ) : null}
 
-      {currentCheckpointData.isEnd ||
-      (currentCheckpointData.vote_machine_type === 'Snapshot' &&
-        !proposal) ? null : (
+      {currentCheckpointData.isEnd ? null : (
         <>
           <Card className=''>
             <p className='mb-4 text-base font-semibold'>Rules & conditions</p>
@@ -103,26 +90,18 @@ const MissionProgressSummary = ({
               <div className='flex justify-between'>
                 <p className='text-base '>Start time</p>
                 <p className='text-base font-semibold'>
-                  {proposal
-                    ? getTimeElapsedSinceStart(
-                        moment(proposal.created).format()
-                      )
-                    : getTimeElapsedSinceStart(missionData.startToVote)}
+                  {getTimeElapsedSinceStart(missionData.startToVote)}
                 </p>
               </div>
               <p className='text-right'>
-                {proposal
-                  ? formatDate(moment(proposal.created).format())
-                  : formatDate(missionData.startToVote)}
+                {formatDate(missionData.startToVote)}
               </p>
             </div>
             <div className='flex flex-col gap-2'>
               <div className='flex justify-between'>
                 <p className='text-base '>Remaining duration</p>
                 <p className='text-base font-semibold'>
-                  {proposal
-                    ? getTimeRemainingToEnd(moment(proposal.end).format())
-                    : getTimeRemainingToEnd(currentCheckpointData.endToVote)}
+                  {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
                 </p>
               </div>
 
@@ -135,45 +114,41 @@ const MissionProgressSummary = ({
               )}
             </div>
 
-            {proposal ? null : (
-              <>
-                <hr className='w-full my-4' />
-                <div className='flex justify-between'>
-                  <p className='text-base '>Who can vote</p>
-                  <p
-                    className='text-base font-semibold text-[#6200EE] cursor-pointer'
-                    onClick={() => setOpenModalListParticipants(true)}
-                  >
-                    View details
-                  </p>
-                </div>
-                <hr className='w-full my-4' />
-                {currentCheckpointData?.data?.threshold ? (
-                  <div>
-                    <div className='flex justify-between'>
-                      <p className='text-base '>Threshold counted by</p>
-                      <p className='text-base font-semibold'>
-                        Total votes made
-                      </p>
-                    </div>
-                    <div className='flex justify-between'>
-                      <p className='text-base '>Threshold</p>
-                      <p className='text-base font-semibold'>
-                        {currentCheckpointData?.data?.threshold}
-                      </p>
-                    </div>
+            <>
+              <hr className='w-full my-4' />
+              <div className='flex justify-between'>
+                <p className='text-base '>Who can vote</p>
+                <p
+                  className='text-base font-semibold text-[#6200EE] cursor-pointer'
+                  onClick={() => setOpenModalListParticipants(true)}
+                >
+                  View details
+                </p>
+              </div>
+              <hr className='w-full my-4' />
+              {currentCheckpointData?.data?.threshold ? (
+                <div>
+                  <div className='flex justify-between'>
+                    <p className='text-base '>Threshold counted by</p>
+                    <p className='text-base font-semibold'>Total votes made</p>
                   </div>
-                ) : (
-                  <></>
-                )}
-                <div className='flex justify-between'>
-                  <p className='text-base '>Quorum</p>
-                  <p className='text-base font-semibold'>
-                    {currentCheckpointData.quorum} votes
-                  </p>
+                  <div className='flex justify-between'>
+                    <p className='text-base '>Threshold</p>
+                    <p className='text-base font-semibold'>
+                      {currentCheckpointData?.data?.threshold}
+                    </p>
+                  </div>
                 </div>
-              </>
-            )}
+              ) : (
+                <></>
+              )}
+              <div className='flex justify-between'>
+                <p className='text-base '>Quorum</p>
+                <p className='text-base font-semibold'>
+                  {currentCheckpointData.quorum} votes
+                </p>
+              </div>
+            </>
           </Card>
         </>
       )}
