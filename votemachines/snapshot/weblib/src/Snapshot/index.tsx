@@ -15,6 +15,7 @@ import { Space } from 'antd';
 import { SolutionOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
+import VoteUIWeb from './VoteUIWeb';
 
 const explain = ({
   checkpoint,
@@ -178,6 +179,7 @@ const VoteMachine: IVoteMachine = {
   ConfigPanel: ConfigPanel,
   getProgramAddress: Funcs.getProgramAddress,
   getName: Funcs.getName,
+  VoteUIWeb: VoteUIWeb,
   deleteChildNode: Funcs.deleteChildNode,
   getLabel,
   getType: Funcs.getType,

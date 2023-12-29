@@ -1,6 +1,7 @@
 const { VotingMachine } = require('.');
 const { SNAPSHOT_ACTION, isValidAction } = require('../../configs/constants');
 const { ApolloClient, InMemoryCache, gql } = require('@apollo/client');
+const { supabase } = require('../../configs/supabaseClient');
 
 class Snapshot extends VotingMachine {
   constructor(props) {
@@ -30,7 +31,7 @@ class Snapshot extends VotingMachine {
       message.push('Missing variable proposalId');
     }
 
-    if (isValidAction(SNAPSHOT_ACTION, checkpoint?.data?.action)) {
+    if (!isValidAction(SNAPSHOT_ACTION, checkpoint?.data?.action)) {
       isValid = false;
       message.push('Wrong or missing action');
     }
