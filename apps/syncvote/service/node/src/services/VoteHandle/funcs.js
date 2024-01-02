@@ -225,7 +225,7 @@ const startEndNode = async (details) => {
           await supabase
             .from('mission')
             .update({ current_vote_data_id: new_current_vote_data[0].id })
-            .eq('id', details.mission_id);
+            .eq('id', details.m_parent);
         }
       } else {
         console.log(

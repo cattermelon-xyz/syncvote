@@ -37,6 +37,7 @@ export class MissionFunctionClass {
       const { data, error } = await supabase
         .from('mission_view')
         .select('*')
+        .neq('title', '')
         .in('org_id', orgIds);
 
       // TODO: check if data is correct
@@ -114,6 +115,7 @@ export const queryAMissionDetail = async ({
     .from('mission_vote_details')
     .select('*')
     .eq('mission_id', missionId);
+  console.log('from dal/mission.ts: ', data, missionId);
   if (!error) {
     const { data: dataVoteRecords, error: errorVoteRecord } = await supabase
       .from('vote_record')
@@ -168,6 +170,7 @@ export const queryMission = async ({
   const { data, error } = await supabase
     .from('mission_view')
     .select('*')
+    .neq('title', '')
     .in('org_id', orgIds);
 
   if (data) {
