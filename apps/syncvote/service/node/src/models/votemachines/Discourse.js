@@ -89,32 +89,26 @@ class Discourse extends VotingMachine {
           error: 'Error when create topic',
         };
       }
+      const dataToStore = data?.topicId + ',' + data?.firstPostId;
 
       this.tallyResult = {
         index: this.children.indexOf(this.data.next) || 0,
         submission: {
           firstPostId: data?.firstPostId,
           linkDiscourse: data?.linkDiscourse,
-          [this.data.variables[0]]: data?.topicId,
+          [this.data.variables[0]]: dataToStore,
         },
       };
-
+      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
       // update variables
       const { data: variables } = await supabase
         .from('variables')
         .insert({
           name: this.data.variables[0],
-          value: data?.topicId,
-          mission_id: this.mission_id,
+          value: dataToStore,
+          mission_id: root_mission_id,
         })
         .select('*');
-
-      await supabase.from('variables').insert({
-        name: 'firstPostId',
-        value: data?.firstPostId,
-        mission_id: this.mission_id,
-        parent: variables[0].id,
-      });
     } else if (this.data.action === DISCOURSE_ACTION.CREATE_POST) {
       if (!voteData.submission.raw) {
         return {
@@ -122,27 +116,28 @@ class Discourse extends VotingMachine {
           error: 'Missing description of proposal to create post',
         };
       }
-
+      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
       const { data: variables, error } = await supabase
         .from('variables')
         .select('*')
         .eq('name', this.data.variables[0])
-        .eq('mission_id', this.mission_id);
-
+        .eq('mission_id', root_mission_id);
+      variables;
       if (error) {
         return {
           notRecorded: true,
           error: 'Cannot get value of topicId',
         };
       } else {
+        const topicId = variables[0]?.value?.split(',')[0];
         const { data, error: error_create_post } = await createPost({
           raw: voteData.submission.raw,
           org_id: this.org_id,
-          topic_id: Number(variables[0].value),
+          topic_id: Number(topicId),
         });
 
         if (error_create_post) {
-          console.log('CreatePostError');
+          console.log('CreatePostError ', error_create_post);
           return {
             notRecorded: true,
             error: 'Error when create post',
@@ -153,16 +148,16 @@ class Discourse extends VotingMachine {
           index: this.children.indexOf(this.data.next) || 0,
           submission: {
             linkDiscourse: data?.linkDiscourse,
-            [this.data.variables[0]]: data?.topicId,
           },
         };
       }
     } else if (this.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
+      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
       const { data: variables, error } = await supabase
         .from('variables')
         .select('*')
         .eq('name', this.data.variables[0])
-        .eq('mission_id', this.mission_id);
+        .eq('mission_id', root_mission_id);
 
       if (error) {
         return {
@@ -170,12 +165,15 @@ class Discourse extends VotingMachine {
           error: 'Cannot get value of topicId',
         };
       } else {
+        console.log('root_mission_id', this.m_parent);
+        console.log(this.data.variables[0], variables);
+        const topicId = variables[0]?.value?.split(',')[0];
+        console.log(topicId, this.org_id, this.data.categoryId);
         const { data, error: error_move_topic } = await moveTopic({
-          topic_id: variables[0].value,
+          topic_id: Number(topicId),
           org_id: this.org_id,
           category_id: this.data.categoryId,
         });
-
         if (error_move_topic) {
           console.log('MoveTopicError');
           return {
@@ -183,7 +181,6 @@ class Discourse extends VotingMachine {
             error: 'Error when move topic',
           };
         }
-
         this.tallyResult = {
           index: this.children.indexOf(this.data.next) || 0,
           submission: {
@@ -198,18 +195,12 @@ class Discourse extends VotingMachine {
           error: 'Missing raw to update topic',
         };
       }
-
-      if (!voteData.submission.edit_reason) {
-        return {
-          notRecorded: true,
-          error: 'Missing edit_reason to update topic',
-        };
-      }
+      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
       const { data: variables, error } = await supabase
         .from('variables')
         .select('*')
         .eq('name', this.data.variables[0])
-        .eq('mission_id', this.mission_id);
+        .eq('mission_id', root_mission_id);
 
       if (error) {
         return {
@@ -217,12 +208,7 @@ class Discourse extends VotingMachine {
           error: 'Cannot get value of topicId',
         };
       } else {
-        const { data: firstPostId, error } = await supabase
-          .from('variables')
-          .select('*')
-          .eq('name', 'firstPostId')
-          .eq('parent', variables[0].id);
-
+        const postId = variables[0]?.value?.split(',')[1];
         if (error) {
           return {
             notRecorded: true,
@@ -233,12 +219,12 @@ class Discourse extends VotingMachine {
         const { data, error: error_update_topic } = await updateTopic({
           raw: voteData.submission.raw,
           org_id: this.org_id,
-          edit_reason: voteData.submission.edit_reason,
-          firstPostId: firstPostId[0].id,
+          edit_reason: voteData.submission.edit_reason || 'Not specified',
+          firstPostId: Number(postId),
         });
 
         if (error_update_topic) {
-          console.log('UpdateTopicError');
+          console.log('UpdateTopicError ', error_update_topic);
           return {
             notRecorded: true,
             error: 'Error when update topic',
@@ -248,7 +234,7 @@ class Discourse extends VotingMachine {
         this.tallyResult = {
           index: this.children.indexOf(this.data.next) || 0,
           submission: {
-            [this.data.variables[0]]: data?.topicId,
+            [this.data.variables[0]]: Number(postId),
           },
         };
       }

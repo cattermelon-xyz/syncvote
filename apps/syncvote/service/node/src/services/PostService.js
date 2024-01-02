@@ -19,7 +19,9 @@ const createPost = async (props) => {
       (integration) => integration.provider === 'discourse'
     );
     const discourseConfig = filteredDiscourse[0];
-
+    discourseConfig.id_string = discourseConfig.id_string.includes('https')
+      ? discourseConfig.id_string
+      : 'https://' + discourseConfig.id_string;
     const payload = {
       raw: props.raw,
       topic_id: props.topic_id,
@@ -27,7 +29,7 @@ const createPost = async (props) => {
 
     // Make API call to Discourse
     const response = await axios.post(
-      `https://${discourseConfig.id_string}/posts`,
+      `${discourseConfig.id_string}/posts`,
       payload,
       {
         headers: {
@@ -36,7 +38,7 @@ const createPost = async (props) => {
         },
       }
     );
-    const linkDiscourse = `https://${discourseConfig.id_string}/t/welcome-to-syncvote/${props.topic_id}`;
+    const linkDiscourse = `${discourseConfig.id_string}/t/${props.topic_id}`;
 
     return { data: { ...response.data, linkDiscourse: linkDiscourse } };
   } catch (e) {
@@ -63,13 +65,14 @@ const updateTopic = async (props) => {
     if (error || data.length === 0) {
       throw new Error(error || 'No Discourse configuration found.');
     }
-
     const filteredDiscourse = data.filter(
       (integration) => integration.provider === 'discourse'
     );
     const discourseConfig = filteredDiscourse[0];
-
-    const url = `https://discourse.syncvote.shop/posts/${props.firstPostId}.json`;
+    discourseConfig.id_string = discourseConfig.id_string.includes('https')
+      ? discourseConfig.id_string
+      : 'https://' + discourseConfig.id_string;
+    const url = discourseConfig.id_string + `/posts/${props.firstPostId}.json`;
 
     const payload = {
       post: { raw: props.raw, edit_reason: props.edit_reason },
@@ -80,7 +83,6 @@ const updateTopic = async (props) => {
         'Api-Username': discourseConfig.username,
       },
     });
-    console.log(response);
     return { data: response.data };
   } catch (e) {
     return { error: e };

@@ -91,7 +91,7 @@ const handleMovingToNextCheckpoint = async (
     const next_checkpoint_id = `${details.mission_id}-${
       details.children[tallyResult.index]
     }`;
-    
+
     // create current vote data for next checkpoint
     const { data: new_current_vote_data } = await supabase
       .from('current_vote_data')
@@ -240,8 +240,6 @@ const startEndNode = async (details) => {
 
 const startForkNode = async (details) => {
   try {
-    console.log(details);
-    console.log('Start ForkNode: ', details.id);
     const subWorkflows = details?.data?.subWorkflows;
     const end = details?.props?.end;
     const start = details?.props?.start;
@@ -259,6 +257,7 @@ const startForkNode = async (details) => {
             status: 'PUBLIC',
             creator_id: details.creator_id,
             parent: details.mission_id,
+            workflow_version_id: details.workflow_version_id,
           })
           .then(async (response) => {
             if (response.data.status !== 'ERR') {

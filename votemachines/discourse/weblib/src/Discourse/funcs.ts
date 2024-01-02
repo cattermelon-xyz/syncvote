@@ -36,8 +36,6 @@ export namespace Discourse {
   export const getInitialData = () => {
     const data: Interface.IData = {
       options: [],
-      max: 0,
-      token: '',
       action: '',
       variables: [],
     };
