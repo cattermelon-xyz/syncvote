@@ -205,14 +205,36 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
                   }
                   onChange={(selectedValue: string) => {
                     let children = selectedNode?.children || [];
+                    let delays = selectedNode?.delays || [];
+                    let delayUnits = selectedNode?.delayUnits || [];
+                    let delayNotes = selectedNode?.delayNotes || [];
                     const idx = children.indexOf(selectedValue);
                     children = [
                       children[idx],
                       ...children.slice(0, idx),
                       ...children.slice(idx + 1),
                     ];
+                    delays = [
+                      delays[idx],
+                      ...delays.slice(0, idx),
+                      ...delays.slice(idx + 1),
+                    ];
+                    delayUnits = [
+                      delayUnits[idx],
+                      ...delayUnits.slice(0, idx),
+                      ...delayUnits.slice(idx + 1),
+                    ];
+                    delayNotes = [
+                      delayNotes[idx],
+                      ...delayNotes.slice(0, idx),
+                      ...delayNotes.slice(idx + 1),
+                    ];
+                    // TODO: what if children index is dependent upon the vote machine?
                     onChange({
                       children,
+                      delays,
+                      delayUnits,
+                      delayNotes,
                     });
                   }}
                 />

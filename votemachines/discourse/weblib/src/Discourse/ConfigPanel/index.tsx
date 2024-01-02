@@ -8,13 +8,12 @@ import {
   CollapsiblePanel,
   SideNote,
 } from 'directed-graph';
-import NewOptionDrawer from './NewOptionDrawer';
-import { PlusOutlined } from '@ant-design/icons';
 import '../styles.scss';
 import { Discourse as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
 import { GraphContext } from 'directed-graph';
 import { useContext } from 'react';
+const SelectOptions = Interface.SelectOptions;
 
 /**
  *
@@ -23,24 +22,6 @@ import { useContext } from 'react';
  * @returns ConfigPanel:JSX.Element
  */
 
-const selectOptions = [
-  {
-    label: 'Create topic',
-    value: 'create-topic',
-  },
-  {
-    label: 'Create post into topic',
-    value: 'create-post',
-  },
-  {
-    label: 'Update first post of topic',
-    value: 'update-topic',
-  },
-  {
-    label: 'Move Topic',
-    value: 'move-topic',
-  },
-];
 export default (props: IVoteMachineConfigProps) => {
   // delayUnits: [], // 1 byte (8) to decide the unit (minute, hour, day, week, month, year)
   // delays: [], // 2 bytes (65,536) for the actual value
@@ -210,7 +191,7 @@ export default (props: IVoteMachineConfigProps) => {
                 value={action ? action : null}
                 placeholder='Please select action'
                 className='w-full'
-                options={selectOptions}
+                options={SelectOptions}
                 onChange={(value, option) => {
                   onChange({
                     data: {

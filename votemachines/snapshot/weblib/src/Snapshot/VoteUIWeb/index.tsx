@@ -1,14 +1,13 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { useSDK } from '@metamask/sdk-react';
-
-import { Card, Button, Radio, Input } from 'antd';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { IVoteUIWebProps } from 'directed-graph';
 import snapshot from '@snapshot-labs/snapshot.js';
 import moment from 'moment';
 import { TextEditor } from 'rich-text-editor';
 import html2md from 'html-to-md';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { Button, Card, Input } from 'antd';
 
 export type Receipt = {
   id: string;

@@ -43,14 +43,18 @@ async function insertMission(props) {
         });
         return;
       }
-
+      console.log('arweave_id: ', arweave_id);
       const { data: newMission, error } = await supabase
         .from('mission')
         .insert({ ...props, arweave_id: arweave_id })
         .select('*');
-
+      console.log('newMission: ', newMission[0].data.checkpoints);
       if (!error) {
         if (newMission[0].status === 'PUBLIC') {
+          console.log(
+            'loop to create checkpoints ',
+            newMission[0].data.checkpoints.length
+          );
           for (const checkpoint of newMission[0].data.checkpoints) {
             if (
               !checkpoint.isEnd &&
@@ -72,7 +76,6 @@ async function insertMission(props) {
                 return;
               }
             }
-
             const checkpointData = {
               id: `${newMission[0].id}-${checkpoint.id}`,
               vote_machine_type: checkpoint.vote_machine_type,
@@ -100,7 +103,7 @@ async function insertMission(props) {
               });
               return;
             }
-
+            console.log('insert checkpont: ', checkpoint.id);
             if (checkpoint.id === newMission[0].start) {
               // create current_vote_data
               const current_vote_data = await insertCurrentVoteData({

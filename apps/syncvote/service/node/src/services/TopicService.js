@@ -1,6 +1,6 @@
 const { supabase } = require('../configs/supabaseClient');
 const axios = require('axios');
-
+// TODO: wrong place! should place inside votemachine
 const createTopic = async (props) => {
   try {
     if (!props.title || !props.raw || !props.org_id) {
@@ -29,7 +29,9 @@ const createTopic = async (props) => {
 
     // Make API call to Discourse
     const response = await axios.post(
-      `https://${discourseConfig.id_string}/posts`,
+      discourseConfig.id_string.includes('http')
+        ? `${discourseConfig.id_string}/posts`
+        : `https://${discourseConfig.id_string}/posts`,
       discourseData,
       {
         headers: {
@@ -113,8 +115,11 @@ const moveTopic = async (props) => {
       (integration) => integration.provider === 'discourse'
     );
     const discourseConfig = filteredDiscourse[0];
+    discourseConfig.id_string = discourseConfig.id_string.includes('https')
+      ? discourseConfig.id_string
+      : 'https://' + discourseConfig.id_string;
 
-    const url = `https://${discourseConfig.id_string}/t/-/${props.topic_id}.json`;
+    const url = `${discourseConfig.id_string}/t/-/${props.topic_id}.json`;
 
     const payload = {
       category_id: props.category_id,

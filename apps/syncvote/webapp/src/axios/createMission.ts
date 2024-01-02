@@ -32,17 +32,25 @@ export const createMission = async ({
   onSuccess,
   onError,
   dispatch,
+  author,
 }: {
   missionData: any;
   onSuccess: (data: any) => void;
   onError: (error: any) => void;
   dispatch: any;
+  author: string;
 }) => {
   dispatch(startLoading({}));
   // check if all checkpoint of this mission is valid
   const data = missionData.data;
   let isValidate = true;
-  data.checkpoints.forEach((checkpoint: ICheckPoint, index: number) => {
+  const allCheckPoints = data.checkpoints ? [...data.checkpoints] : [];
+  data.subWorkflows?.map((sw: any) => {
+    sw.checkpoints?.map((chk: any) => {
+      allCheckPoints.push({ ...chk, subWorkflowId: sw.refId });
+    });
+  });
+  allCheckPoints.forEach((checkpoint: ICheckPoint, index: number) => {
     if (
       !checkpoint?.isEnd &&
       checkpoint.vote_machine_type !== 'forkNode' &&
@@ -57,6 +65,15 @@ export const createMission = async ({
           isValidate = false;
           console.log(`${checkpoint.vote_machine_type}: `, message);
         }
+      }
+      if (checkpoint.participation?.type === 'identity') {
+        const list = <string[]>participation?.data || [];
+        checkpoint.participation.data = list.map(function (id: string) {
+          if (id === 'proposer' || id === 'author') {
+            return author;
+          }
+          return id || '';
+        });
       }
     }
   });
