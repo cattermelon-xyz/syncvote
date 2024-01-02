@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
 
 export function useWindowSize() {
   // Initialize state with undefined width/height so server and client renders match
