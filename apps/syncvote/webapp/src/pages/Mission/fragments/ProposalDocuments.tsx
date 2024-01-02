@@ -44,8 +44,9 @@ const ProposalDocuments: React.FC<Props> = ({
     dataOfAllDocs: any[]
   ): Record<string, string> => {
     const docIds: Record<string, number[]> = {};
-
+    console.log('listVersionDocs: ', listVersionDocs);
     listVersionDocs.forEach((doc: any) => {
+      console.log('doc: ', doc);
       const [docInput, id] = Object.entries(doc)[0];
       docIds[docInput] = [...(docIds[docInput] || []), Number(id)];
     });

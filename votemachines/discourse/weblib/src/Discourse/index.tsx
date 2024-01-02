@@ -22,6 +22,8 @@ import { Discourse as Funcs } from './funcs';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
 import VoteUIWeb from './VoteUIWeb';
+import { Tag } from 'antd';
+const SelectOptions = Interface.SelectOptions;
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
@@ -47,79 +49,33 @@ const explain = ({
   if (!checkpoint) {
     return <></>;
   }
-  const noOfOptions = checkpoint.children ? checkpoint.children.length : 0;
-  const voteMachineType = checkpoint.data?.type?.label;
-  const space = checkpoint.data?.space;
-  const optionsDescription = checkpoint.optionsDescription;
-  const renderOption = ({
-    data,
-    index,
-  }: {
-    data: Interface.IData;
-    index: number;
-  }) => {
-    const { options } = data;
-    const { delays, delayUnits, delayNotes } = checkpoint;
-    const option = options[index];
-    const delay = delays ? delays[index] : 0;
-    const delayUnit = delayUnits ? delayUnits[index] : DelayUnit.MINUTE;
-    const delayNote = delayNotes ? delayNotes[index] : '';
-    return option ? (
-      <>
-        <div>
-          <span className='text-violet-500'>{option}</span>{' '}
-          {delay ? (
-            <span>
-              - Timelock:{' '}
-              <span className='text-violet-500'>
-                {displayDuration(moment.duration(delay, delayUnit))}
-              </span>
-            </span>
-          ) : null}
-        </div>
-        <div className='py-1'>
-          <SideNote value={delayNote} />
-        </div>
-      </>
-    ) : null;
-  };
-  const p1 = (
+  const action = data.action;
+  const actionLabel =
+    SelectOptions.find((item: any) => item.value === data.action)?.label ||
+    'Empty';
+  const variable = data.variables[0];
+  return (
     <>
-      <div className='text-zinc-400'>Voting format</div>
-      <ul className='list-disc ml-4'>
-        <li>
-          Space:
-          <span className='text-violet-500'>
-            <a href={`https://snapshot.org/#/${space}`}>{space}</a>
-          </span>
-        </li>
-
-        <li>
-          Voting method:
-          <span className='text-violet-500'> Snapshot - {voteMachineType}</span>
-        </li>
-
-        <li>
-          Voting options:{' '}
-          <ul className='flex flex-col gap-1'>
-            {noOfOptions ? (
-              <>
-                {data.options.map((option: string, index: number) => {
-                  return <li key={index}>{renderOption({ data, index })}</li>;
-                })}
-                {checkpoint.includedAbstain ? (
-                  <li className='text-violet-500'>Abstain</li>
-                ) : null}
-              </>
-            ) : null}
-          </ul>
-        </li>
-
-        <SideNote value={optionsDescription} />
-      </ul>
+      <div className='flex items-center justify-between mb-2'>
+        <div>Action Type</div>
+        <div>{actionLabel}</div>
+      </div>
+      <div className='flex items-center justify-between mb-2'>
+        <div>
+          {action === 'create-topic'
+            ? 'Write data to Variable'
+            : 'Read data from Variable'}
+        </div>
+        <Tag>{variable}</Tag>
+      </div>
+      {action === 'move-topic' ? (
+        <div className='flex items-center justify-between mb-2'>
+          <div>Move to category Id</div>
+          <div>{data?.categoryId || 'Missing'}</div>
+        </div>
+      ) : null}
     </>
   );
-  return p1;
 };
 const abstract = ({
   checkpoint,
@@ -128,29 +84,28 @@ const abstract = ({
   checkpoint: ICheckPoint | undefined;
   data: any;
 }) => {
-  const { votingLocation, quorum } = checkpoint || {};
-  const threshold = data.max;
-  const token = data.token;
-
-  return threshold || isRTE(votingLocation) || quorum ? (
-    <>
-      <div className='flex text-ellipsis items-center px-2'>
-        <VerticalAlignTopOutlined className='mr-2' />
-        {/* {`Threshold ${threshold} ${token}`} */}
-        <div className='flex gap-1'>
-          <span>Space</span>
-          {/* <NumberWithPercentageInput value={threshold} />
-          {token ? <TokenInput address={token} /> : 'votes'} */}
-        </div>
+  const action = data?.action;
+  const actionLabel =
+    SelectOptions.find((item: any) => item.value === data.action)?.label ||
+    'Empty';
+  const variable = data?.variables[0];
+  const text = variable ? (
+    action === 'create-topic' ? (
+      <div>
+        Store in <Tag>{variable}</Tag>
       </div>
-      {isRTE(votingLocation) ? (
-        <div className='flex text-ellipsis items-center px-2'>
-          <LuMapPin className='mr-2' />
-          {parse(votingLocation || '')}
-        </div>
-      ) : null}
-    </>
+    ) : (
+      <div>
+        Read from <Tag>{variable}</Tag>
+      </div>
+    )
   ) : null;
+  return (
+    <div className='px-4'>
+      {actionLabel}
+      {text}
+    </div>
+  );
 };
 
 const VoteMachine: IVoteMachine = {

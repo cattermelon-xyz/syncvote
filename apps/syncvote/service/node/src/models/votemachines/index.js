@@ -16,6 +16,7 @@ class VotingMachine {
       children,
       props: data,
       mission_id,
+      m_parent,
     } = props;
     this.duration = duration;
     this.cvd_created_at = cvd_created_at;
@@ -30,6 +31,7 @@ class VotingMachine {
     this.participation = JSON.parse(participation || `{}`);
     this.children = children;
     this.data = data;
+    this.m_parent = m_parent;
   }
 
   initDataForCVD() {

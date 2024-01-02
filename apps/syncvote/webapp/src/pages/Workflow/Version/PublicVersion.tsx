@@ -45,6 +45,7 @@ import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import './public-version.scss';
 import { config } from '@dal/config';
 import LogoSyncVoteShort from '@assets/icons/svg-icons/LogoSyncVoteShort';
+import { CreateProposalModal } from '@fragments/CreateProposalModal';
 
 export const PublicVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -182,10 +183,22 @@ export const PublicVersion = () => {
   };
 
   const isDesktop = window.innerWidth > 700;
+  const [openCreateProposalModal, setOpenCreateProposalModal] = useState(false);
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
   return (
     <>
       {contextHolder}
       <Layout>
+        <CreateProposalModal
+          open={openCreateProposalModal}
+          onCancel={() => {
+            setOpenCreateProposalModal(false);
+          }}
+          workflow={workflow}
+          workflowVersion={version}
+        />
         {version?.status === 'PUBLISHED' ||
         version?.status === 'PUBLIC_COMMUNITY' ||
         (version?.status === 'DRAFT' &&
@@ -392,6 +405,16 @@ export const PublicVersion = () => {
                   selectedLayoutId={
                     version?.data?.cosmetic?.defaultLayout?.horizontal
                   }
+                  openCreateProposalModal={() => {
+                    if (user.email) {
+                      setOpenCreateProposalModal(true);
+                    } else {
+                      Modal.error({
+                        title: 'Login required',
+                        content: 'Please login to create proposal',
+                      });
+                    }
+                  }}
                   onConfigEdgePanelClose={() => setSelectedEdgeId('')}
                   setExportImage={setDownloadImageStatus}
                   shouldExportImage={downloadImageStatus}

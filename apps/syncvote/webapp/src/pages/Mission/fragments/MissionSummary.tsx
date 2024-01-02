@@ -20,13 +20,15 @@ const MissionSummary = ({
   listVersionDocs: any;
   dataOfAllDocs: any;
 }) => {
+  const isForkNode = currentCheckpointData.vote_machine_type === 'forkNode';
+  const isEnd = currentCheckpointData.isEnd;
+  const isExpired =
+    getTimeRemainingToEnd(currentCheckpointData.endToVote) === 'expired';
   return (
     <>
       <div className='flex flex-col mb-10 gap-6'>
         <div className='flex gap-4'>
-          {!currentCheckpointData.isEnd &&
-          getTimeRemainingToEnd(currentCheckpointData.endToVote) !=
-            'expired' ? (
+          {isForkNode || (!isExpired && !isEnd) ? (
             <Tag bordered={false} color='green' className='text-base '>
               Active
             </Tag>

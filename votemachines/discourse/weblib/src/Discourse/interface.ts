@@ -4,16 +4,15 @@ export namespace Discourse {
   export interface IData {
     //eslint-disable-line
     options: string[];
-    max: number;
-    token: string;
     action: string;
     variables: string[];
-    start?: number;
-    end?: number;
-    title?: string;
-    body?: string;
-    discussion?: string;
-    plugins?: string;
+    categoryId?: number;
+    // start?: number;
+    // end?: number;
+    // title?: string;
+    // body?: string;
+    // discussion?: string;
+    // plugins?: string;
     next?: string;
     fallback?: string;
   }
@@ -25,4 +24,23 @@ export namespace Discourse {
     delayUnit: DelayUnit;
     delayNote: string;
   }
+
+  export const SelectOptions = [
+    {
+      label: 'Create topic',
+      value: 'create-topic',
+    },
+    {
+      label: 'Create post into topic',
+      value: 'create-post',
+    },
+    {
+      label: 'Update first post of topic',
+      value: 'update-topic',
+    },
+    {
+      label: 'Move Topic',
+      value: 'move-topic',
+    },
+  ];
 }
