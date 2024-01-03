@@ -8,6 +8,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import moment from 'moment';
 import { TextEditor } from 'rich-text-editor';
 import html2md from 'html-to-md';
+import { BorderOutlined } from '@ant-design/icons';
 
 export type Receipt = {
   id: string;
@@ -42,7 +43,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const [web3, setWeb3] = useState<Web3Provider>();
   const [title, setTitle] = useState('');
   const [description, setDiscription] = useState('');
-
+  const options = checkpointData?.data?.snapShotOption || [];
   return (
     <div>
       <Card className='p-4'>
@@ -65,6 +66,21 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 <div className='text-base mb-1'>Description</div>
                 <TextEditor value={description} setValue={setDiscription} />
               </div>
+              {options.length > 0 ? (
+                <div>
+                  <div className='font-bold'>
+                    Voter can choose among these options:
+                  </div>
+                  {options.map((option: any, index: number) => {
+                    return (
+                      <div key={index}>
+                        <BorderOutlined className='mr-2' />
+                        {option}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
               <Button
                 type='primary'
                 className='w-full'
@@ -89,7 +105,6 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     });
 
                     if (isReceipt(receipt)) {
-
                       onSubmit({
                         submission: {
                           proposalId: receipt.id,
