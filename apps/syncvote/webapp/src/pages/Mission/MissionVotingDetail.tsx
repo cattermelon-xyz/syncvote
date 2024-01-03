@@ -316,6 +316,14 @@ const MissionVotingDetail = () => {
         const checkpointData = data?.data?.checkpoints.filter(
           (checkpoint: any) => checkpoint.id === currentCheckpointId
         );
+        console.log(
+          'checkpointData: ',
+          checkpointData,
+          '; ',
+          currentCheckpointId,
+          data?.data?.checkpoints,
+          data
+        );
         if (checkpointData[0].vote_machine_type === 'forkNode') {
           subMissionIds = data.initData?.start || [];
           for (var i = 0; i < subMissionIds.length; i++) {
