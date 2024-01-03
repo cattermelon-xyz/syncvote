@@ -88,9 +88,7 @@ const handleMovingToNextCheckpoint = async (
     }
 
     // Next checkpontId
-    const next_checkpoint_id = `${details.mission_id}-${
-      details.children[tallyResult.index]
-    }`;
+    const next_checkpoint_id = `${details.mission_id}-${details.children[index]}`;
 
     // create current vote data for next checkpoint
     const { data: new_current_vote_data } = await supabase
@@ -226,6 +224,11 @@ const startEndNode = async (details) => {
             .from('mission')
             .update({ current_vote_data_id: new_current_vote_data[0].id })
             .eq('id', details.m_parent);
+
+          const tallyResult = { index: 0 };
+          const timeDefault = moment();
+          // go to next checkpoint
+          await handleMovingToNextCheckpoint(details, tallyResult, timeDefault);
         }
       } else {
         console.log(
