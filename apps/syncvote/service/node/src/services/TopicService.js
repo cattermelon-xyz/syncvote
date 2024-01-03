@@ -29,7 +29,7 @@ const createTopic = async (props) => {
 
     // Make API call to Discourse
     const response = await axios.post(
-      discourseConfig.id_string.includes('http')
+      discourseConfig.id_string.includes('https')
         ? `${discourseConfig.id_string}/posts`
         : `https://${discourseConfig.id_string}/posts`,
       discourseData,
@@ -43,7 +43,7 @@ const createTopic = async (props) => {
 
     const firstPostId = response?.data?.id;
     const topicId = response?.data?.topic_id;
-    const linkDiscourse = `https://${discourseConfig.id_string}/t/welcome-to-syncvote/${topicId}`;
+    const linkDiscourse = `${discourseConfig.id_string}/t/${topicId}`;
 
     const dataAfterCreate = {
       firstPostId,

@@ -38,7 +38,7 @@ const createPost = async (props) => {
         },
       }
     );
-    const linkDiscourse = `${discourseConfig.id_string}/t/${props.topic_id}`;
+    const linkDiscourse = `${discourseConfig.id_string}/p/${response.data.id}`;
 
     return { data: { ...response.data, linkDiscourse: linkDiscourse } };
   } catch (e) {

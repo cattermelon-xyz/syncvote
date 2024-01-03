@@ -70,14 +70,16 @@ class Snapshot extends VotingMachine {
       this.tallyResult = {
         ...voteData.submission,
         index: this.children.indexOf(this.data.next),
+        linkSnapshot: `https://snapshot.org/#/${this.data.space}/proposal/${voteData.submission.proposalId}`,
       };
+      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
 
       await supabase
         .from('variables')
         .insert({
           name: this.data.proposalId,
           value: voteData.submission.proposalId,
-          mission_id: this.mission_id,
+          mission_id: root_mission_id,
         })
         .select('*');
     } else if (this.data.action === SNAPSHOT_ACTION.SYNC_PROPOSAL) {
