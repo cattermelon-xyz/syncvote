@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { startLoading, finishLoading } from '@redux/reducers/ui.reducer';
+// TODO: fix this, syncvote should not depend on any votemachine
 import { SingleChoice } from 'single-vote/src/SingleChoice/funcs';
 import { ICheckPoint } from 'directed-graph';
 import { DocInput } from 'doc-input/src/DocInput/funcs';
@@ -8,6 +9,7 @@ import { UpVote } from 'upvote/src/UpVote/funcs';
 import { Discourse } from 'discourse/src/Discourse/funcs';
 import { Snapshot } from 'snapshot/src/Snapshot/funcs';
 
+// TODO: fix this, syncvote should not depend on any votemachine
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: SingleChoice.validate,
   DocInput: DocInput.validate,
@@ -39,7 +41,8 @@ export const createMission = async ({
 }) => {
   dispatch(startLoading({}));
   // check if all checkpoint of this mission is valid
-  const data = missionData.data;
+  const newMissionData = structuredClone(missionData);
+  const data = newMissionData.data;
   let isValidate = true;
   const allCheckPoints = data.checkpoints ? [...data.checkpoints] : [];
   data.subWorkflows?.map((sw: any) => {
@@ -76,7 +79,7 @@ export const createMission = async ({
   });
   if (isValidate) {
     axios
-      .post(`${import.meta.env.VITE_SERVER_URL}/mission/create`, missionData)
+      .post(`${import.meta.env.VITE_SERVER_URL}/mission/create`, newMissionData)
       .then((response) => {
         console.log('Respone', response.data);
         if (response.data.status === 'ERR') {

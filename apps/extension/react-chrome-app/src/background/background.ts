@@ -17,6 +17,21 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
 
+    case 'openUrl': {
+      const url = request.payload.url;
+
+      chrome.tabs.create({ url: url, active: true }, (tab) => {
+        sendResponse(request.action + ' executed');
+      });
+      break;
+    }
+
+    case 'vote': {
+      // get choice as params
+      // post it and refresh the page
+      break;
+    }
+
     case 'handlePostDiscourse': {
       const url = request.payload.url;
 

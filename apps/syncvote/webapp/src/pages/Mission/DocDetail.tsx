@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { extractIdFromIdString } from 'utils';
 import parse from 'html-react-parser';
 import { FileTextOutlined } from '@ant-design/icons';
+import { CollapsiblePanel } from 'directed-graph';
 
 const DocDetail = () => {
   const { orgIdString, workflowIdString, versionIdString, docId } = useParams();
@@ -47,19 +48,9 @@ const DocDetail = () => {
       </Space>
       <div className='text-lg font-bold'>{doc?.title}</div>
       <div>{parse(doc.description || '')}</div>
-      <Collapse
-        items={[
-          {
-            label: (
-              <div>
-                <FileTextOutlined /> Template content
-              </div>
-            ),
-            key: '1',
-            children: <div>{parse(doc.template || '')}</div>,
-          },
-        ]}
-      />
+      <CollapsiblePanel title='Template content'>
+        <div>{parse(doc.template || '')}</div>
+      </CollapsiblePanel>
     </Space>
   );
 };

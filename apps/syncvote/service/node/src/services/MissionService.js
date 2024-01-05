@@ -89,6 +89,7 @@ async function insertMission(props) {
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
               includedAbstain: checkpoint?.includedAbstain,
+              desc: checkpoint?.description,
               props: checkpoint?.data,
             };
 

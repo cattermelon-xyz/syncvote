@@ -5,6 +5,8 @@ import {
   VerticalLeftOutlined,
   VerticalRightOutlined,
   FlagOutlined,
+  TeamOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { memo, useContext } from 'react';
 import { Handle, Position } from 'reactflow';
@@ -48,6 +50,19 @@ const Node = memo(
     const style = data.style;
     const { openCreateProposalModal } = useContext(GraphContext);
     const type = data.raw?.vote_machine_type;
+    const participation = data.raw?.participation || {};
+    let partipationIcon =
+      participation?.type === 'identity' ? (
+        <TeamOutlined title='Admin(s) make the decision' />
+      ) : null;
+    partipationIcon =
+      participation?.type === 'identity' &&
+      (participation?.data[0] === 'author' ||
+        participation?.data[0] === 'proposer') ? (
+        <UserOutlined title='Only author make the decision' />
+      ) : (
+        partipationIcon
+      );
     const env = import.meta.env.VITE_ENV;
     const { subWorkflowId, isStart } = data;
     return (
@@ -171,6 +186,7 @@ const Node = memo(
                         : data.label
                       : 'untitled'}
                   </div>
+
                   {data.abstract ? (
                     <div
                       style={style.content ? style.content : {}}
@@ -184,6 +200,9 @@ const Node = memo(
               {duration > 0 ? (
                 <div className='mt-2 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
                   {displayDelayDuration(moment.duration(duration))}
+                  {partipationIcon ? (
+                    <div className='px-1'>{partipationIcon}</div>
+                  ) : null}
                 </div>
               ) : null}
             </>
