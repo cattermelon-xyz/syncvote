@@ -84,6 +84,18 @@ const HomePage: React.FC<Props> = ({
         </div>
       ),
     },
+    {
+      key: '2',
+      label: 'Mentions',
+      children: <></>,
+      disabled: true,
+    },
+    {
+      key: '3',
+      label: 'Followings',
+      children: <></>,
+      disabled: true,
+    },
   ];
 
   const onChangeTabs = (key: string) => {
