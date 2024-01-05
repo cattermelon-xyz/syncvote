@@ -7,8 +7,6 @@ import AppRoutes from '@routing';
 import { ConfigProvider } from 'antd';
 import { MetaMaskProvider } from '@metamask/sdk-react';
 
-console.log(window.location.host);
-
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
     {/* <React.StrictMode> */}
