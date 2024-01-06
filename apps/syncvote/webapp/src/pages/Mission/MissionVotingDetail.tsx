@@ -326,6 +326,7 @@ const MissionVotingDetail = () => {
         );
         if (checkpointData[0].vote_machine_type === 'forkNode') {
           subMissionIds = data.initData?.start || [];
+          
           for (var i = 0; i < subMissionIds.length; i++) {
             await queryAMissionDetail({
               missionId: subMissionIds[i],

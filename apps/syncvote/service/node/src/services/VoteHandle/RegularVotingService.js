@@ -33,7 +33,6 @@ async function handleSubmission(props) {
           }
 
           const details = mission_vote_details[0];
-          console.log('details: ', details);
           // 2️⃣ check mission is stopped
           if (details.status === 'STOPPED') {
             resolve({
