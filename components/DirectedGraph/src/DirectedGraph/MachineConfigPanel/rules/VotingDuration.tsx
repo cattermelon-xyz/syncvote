@@ -57,7 +57,9 @@ const VotingDuration = () => {
             className='text-center'
             onChange={(e) => {
               dateChange(
-                parseInt(e.target.value, 10) * 86400 + hours * 3600 + mins * 60
+                parseInt(e.target.value || '0', 10) * 86400 +
+                  hours * 3600 +
+                  mins * 60
               );
             }}
             disabled={locked.duration}
@@ -69,7 +71,9 @@ const VotingDuration = () => {
             className='text-center'
             onChange={(e) => {
               dateChange(
-                days * 86400 + parseInt(e.target.value, 10) * 3600 + mins * 60
+                days * 86400 +
+                  parseInt(e.target.value || '0', 10) * 3600 +
+                  mins * 60
               );
             }}
             disabled={locked.duration}
@@ -81,7 +85,9 @@ const VotingDuration = () => {
             className='text-center'
             onChange={(e) => {
               dateChange(
-                days * 86400 + hours * 3600 + parseInt(e.target.value, 10) * 60
+                days * 86400 +
+                  hours * 3600 +
+                  parseInt(e.target.value || '0', 10) * 60
               );
             }}
             disabled={locked.duration}

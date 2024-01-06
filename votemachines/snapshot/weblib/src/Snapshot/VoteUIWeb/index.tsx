@@ -105,7 +105,9 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                       body: html2md(description),
                       choices: checkpointData?.data?.snapShotOption,
                       start: moment().unix(),
-                      end: moment().unix() + checkpointData?.duration,
+                      end:
+                        moment().unix() +
+                        checkpointData?.data?.snapshotDuration,
                       snapshot: 13620822,
                       plugins: JSON.stringify({}),
                       app: 'my-app',
