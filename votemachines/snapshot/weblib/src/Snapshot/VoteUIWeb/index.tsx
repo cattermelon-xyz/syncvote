@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { Card, Button, Radio, Input } from 'antd';
+import { Card, Button, Radio, Input, Tag } from 'antd';
 import Client from '@snapshot-labs/snapshot.js/dist/sign';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { IVoteUIWebProps } from 'directed-graph';
@@ -44,6 +44,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const [title, setTitle] = useState('');
   const [description, setDiscription] = useState('');
   const options = checkpointData?.data?.snapShotOption || [];
+  const space = checkpointData?.data?.space || '';
   return (
     <div>
       <Card className='p-4'>
@@ -68,6 +69,13 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               </div>
               {options.length > 0 ? (
                 <div>
+                  <div>
+                    A proposal will be held in{' '}
+                    <a href={`https://snapshot.org/#/${space}`} target='_blank'>
+                      <Tag>{space}</Tag>
+                    </a>{' '}
+                    space
+                  </div>
                   <div className='font-bold'>
                     Voter can choose among these options:
                   </div>

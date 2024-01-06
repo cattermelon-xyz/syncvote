@@ -1,6 +1,7 @@
-export const trimTitle = (title: string) => {
+export const trimTitle = (title: string, len?: number) => {
+  const maxLen = len || 30;
   if (!title) return '';
-  return title.length > 30 ? title.slice(0, 30) + '...' : title;
+  return title.length > maxLen ? title.slice(0, maxLen) + '...' : title;
 };
 
 export const resetLastProposalId = async () => {
@@ -32,4 +33,3 @@ export const createIdString = (title: String, id: String) => {
   result = result.split(' ').join('-');
   return `${result}-${id}`;
 };
-

@@ -12,13 +12,11 @@ interface Props {
 const HistoryItem = ({ item }: { item: any }) => {
   const { endedAt, tallyResult, options, checkpoint_title, arweave_id } = item;
   // TODO: this is a hack, should use votemachine function instead
-  console.log(tallyResult?.index);
   const selectedOption = tallyResult?.index
     ? options[parseInt(tallyResult?.index)]
     : null;
   const linkDiscourse = tallyResult?.submission?.linkDiscourse || null;
   const linkSnapshot = tallyResult?.linkSnapshot || null;
-  console.log(item);
   return (
     <div>
       <div>

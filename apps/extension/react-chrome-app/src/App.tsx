@@ -44,7 +44,6 @@ function App() {
       queryAMissionDetail({
         missionId: currentProposalId,
         onSuccess: (data: any) => {
-          console.log('data query', data);
           setCurrentProposalData(data);
           const currentCheckpointId = extractCurrentCheckpointId(data.id);
           const checkpointData = data?.data?.checkpoints.filter(
@@ -68,29 +67,6 @@ function App() {
             checkpointDataAfterHandle.endToVote = endTovote;
           }
 
-          switch (checkpointData[0]?.vote_machine_type) {
-            case 'SingleChoiceRaceToMax':
-              if (checkpointData[0]?.includedAbstain === true) {
-                checkpointDataAfterHandle.data.options.push('Abstain');
-              }
-              break;
-            case 'UpVote':
-              checkpointDataAfterHandle.data.options = [];
-              checkpointDataAfterHandle.data.options.push('Upvote');
-              if (checkpointData[0]?.includedAbstain === true) {
-                checkpointDataAfterHandle.data.options.push('Abstain');
-              }
-              break;
-            case 'Veto':
-              checkpointDataAfterHandle.data.options = [];
-              checkpointDataAfterHandle.data.options.push('Upvote');
-              if (checkpointData[0]?.includedAbstain === true) {
-                checkpointDataAfterHandle.data.options.push('Abstain');
-              }
-              break;
-            default:
-              break;
-          }
           setCurrentCheckpointData(checkpointDataAfterHandle);
         },
         onError: (error) => {
@@ -106,8 +82,12 @@ function App() {
         orgId: currentOrgData?.id,
         onSuccess: (data) => {
           const filteredMissions = data.filter(
-            (missionData: any) => missionData?.creator_id === user?.id
+            (missionData: any) =>
+              missionData?.creator_id === user?.id && missionData.title
           );
+          filteredMissions.sort((a: any, b: any) => {
+            return b.id - a.id;
+          });
           setDataMissions(filteredMissions);
         },
         onError: (error) => {
@@ -116,13 +96,6 @@ function App() {
       });
     }
   }, [currentOrgData, user]);
-
-  // useEffect(() => {
-  //   console.log('user', user);
-  //   console.log('currentProposalId', currentProposalId);
-  //   console.log('currentOrgData', currentOrgData);
-  //   console.log('dataMissions', dataMissions);
-  // }, [currentProposalData, currentProposalId, currentOrgData, dataMissions]);
 
   return (
     <div className='w-[260px] h-[380px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
@@ -135,6 +108,7 @@ function App() {
           currentCheckpointData={currentCheckpointData}
           setCurrentProposalId={setCurrentProposalId}
           setCurrentProposalData={setCurrentProposalData}
+          user={user}
         />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
         <HomePage

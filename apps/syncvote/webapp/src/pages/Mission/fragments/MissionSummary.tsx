@@ -8,6 +8,8 @@ import { Button, Card, Space, Tag, message } from 'antd';
 import { Icon } from 'icon';
 import ShowDescription from './ShowDescription';
 import ProposalDocuments from './ProposalDocuments';
+import { shortenString } from 'directed-graph';
+import moment from 'moment';
 
 const MissionSummary = ({
   currentCheckpointData,
@@ -24,16 +26,17 @@ const MissionSummary = ({
   const isEnd = currentCheckpointData.isEnd;
   const isExpired =
     getTimeRemainingToEnd(currentCheckpointData.endToVote) === 'expired';
+  const { created_at, workflow_icon_url } = missionData;
   return (
     <>
       <div className='flex flex-col mb-10 gap-6'>
         <div className='flex gap-4'>
           {isForkNode || (!isExpired && !isEnd) ? (
-            <Tag bordered={false} color='green' className='text-base '>
+            <Tag color='green' className='text-base'>
               Active
             </Tag>
           ) : (
-            <Tag bordered={false} color='default' className='text-base'>
+            <Tag color='default' className='text-base'>
               Closed
             </Tag>
           )}
@@ -55,7 +58,12 @@ const MissionSummary = ({
           </Button>
         </div>
         <div className='flex items-center'>
-          <Icon presetIcon='' iconUrl='' size='large' />
+          <Icon
+            presetIcon=''
+            iconUrl={workflow_icon_url}
+            size='large'
+            className='border border-solid border-gray-500 rounded-full'
+          />
           <div className='flex flex-col ml-2'>
             <p className='font-semibold text-xl	'>{missionData.m_title}</p>
             <p>{missionData.workflow_title}</p>
@@ -64,11 +72,21 @@ const MissionSummary = ({
       </div>
       <Space direction='vertical' size='middle' className='w-full'>
         <Space direction='horizontal'>
-          <Card className='w-[271px]'>
+          <Card>
             <Space direction='horizontal' size={'small'}>
               <p>Author</p>
-              <Icon iconUrl='' presetIcon='' size='medium' />
-              <p className='w-[168px] truncate ...'>{missionData.author}</p>
+              <Icon
+                iconUrl={missionData.author_icon_url}
+                presetIcon=''
+                size='medium'
+              />
+              <p>{shortenString(missionData.author_email, 30)}</p>
+            </Space>
+          </Card>
+          <Card>
+            <Space direction='horizontal' size={'small'}>
+              <p>Created On</p>
+              <p>{moment(created_at).format('MMM Do, YYYY')}</p>
             </Space>
           </Card>
         </Space>
@@ -77,12 +95,16 @@ const MissionSummary = ({
           titleDescription={'Proposal content'}
           description={missionData?.m_desc}
         />
-        <ShowDescription
-          titleDescription={'Checkpoint description'}
-          description={currentCheckpointData?.description}
-          bgColor='bg-[#F6F6F6]'
-        />
-        {missionData?.progress && (
+        {currentCheckpointData?.description ? (
+          <ShowDescription
+            titleDescription={'Voting Guideline'}
+            description={currentCheckpointData?.description}
+          />
+        ) : (
+          <></>
+        )}
+
+        {missionData?.progress && dataOfAllDocs.length > 0 && (
           <ProposalDocuments
             titleDescription={'Proposal documents'}
             missionData={missionData}
