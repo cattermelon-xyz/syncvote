@@ -12,7 +12,8 @@ interface Props {
   setCurrentProposalId: any;
   setCurrentOrgData: any;
   user: any;
-  dataMissions: any;
+  myMissions: any;
+  followingMissions: any;
 }
 
 const HomePage: React.FC<Props> = ({
@@ -20,7 +21,8 @@ const HomePage: React.FC<Props> = ({
   setCurrentProposalId,
   setCurrentOrgData,
   user,
-  dataMissions,
+  myMissions,
+  followingMissions,
 }) => {
   const [orgsOption, setOrgsOption] = useState<any>();
   const [dataOrgs, setDataOrgs] = useState<any>();
@@ -69,8 +71,8 @@ const HomePage: React.FC<Props> = ({
       label: 'For you',
       children: (
         <div className='flex flex-col gap-2'>
-          {dataMissions && dataMissions.length > 0 ? (
-            dataMissions.map((proposal: any, index: any) => (
+          {myMissions && myMissions.length > 0 ? (
+            myMissions.map((proposal: any, index: any) => (
               <MissionCard
                 key={index}
                 proposal={proposal}
@@ -86,13 +88,27 @@ const HomePage: React.FC<Props> = ({
     },
     {
       key: '2',
-      label: 'Mentions',
-      children: <></>,
-      disabled: true,
+      label: 'Followings',
+      children: (
+        <div className='flex flex-col gap-2'>
+          {followingMissions && followingMissions.length > 0 ? (
+            followingMissions.map((proposal: any, index: any) => (
+              <MissionCard
+                key={index}
+                proposal={proposal}
+                setPage={setPage}
+                setCurrentProposalId={setCurrentProposalId}
+              />
+            ))
+          ) : (
+            <Empty />
+          )}
+        </div>
+      ),
     },
     {
       key: '3',
-      label: 'Followings',
+      label: 'Mentions',
       children: <></>,
       disabled: true,
     },

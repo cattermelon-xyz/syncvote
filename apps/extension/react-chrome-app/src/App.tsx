@@ -19,9 +19,11 @@ function App() {
   const [currentProposalId, setCurrentProposalId] = useState<number>();
   const [currentProposalData, setCurrentProposalData] = useState<any>();
   const [currentOrgData, setCurrentOrgData] = useState<any>();
-  const [dataMissions, setDataMissions] = useState<any>();
+  const [myMissions, setMyMissions] = useState<any>();
+  const [followingMissions, setFollowingMissions] = useState<any[]>();
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
   const [listVersionDocs, setListVersionDocs] = useState<any[]>();
+  const [lastRequest, setLastRequest] = useState<any>(0);
 
   useEffect(() => {
     getCurrentUser().then((resp) => {
@@ -74,21 +76,30 @@ function App() {
         },
       });
     }
-  }, [currentProposalId]);
+  }, [currentProposalId, lastRequest]);
 
   useEffect(() => {
     if (currentOrgData) {
       queryMission({
         orgId: currentOrgData?.id,
         onSuccess: (data) => {
-          const filteredMissions = data.filter(
+          const tmpMyMissions = data.filter(
             (missionData: any) =>
               missionData?.creator_id === user?.id && missionData.title
           );
-          filteredMissions.sort((a: any, b: any) => {
+          const tmpFollowingMissions = data.filter(
+            (missionData: any) =>
+              missionData?.creator_id !== user?.id && missionData.title
+          );
+          tmpMyMissions.sort((a: any, b: any) => {
             return b.id - a.id;
           });
-          setDataMissions(filteredMissions);
+          tmpFollowingMissions.sort((a: any, b: any) => {
+            return b.id - a.id;
+          });
+          console.log('tmpFollowingMissions', tmpFollowingMissions);
+          setMyMissions(tmpMyMissions);
+          setFollowingMissions(tmpFollowingMissions);
         },
         onError: (error) => {
           console.log('error', error);
@@ -109,6 +120,9 @@ function App() {
           setCurrentProposalId={setCurrentProposalId}
           setCurrentProposalData={setCurrentProposalData}
           user={user}
+          reload={() => {
+            setLastRequest(new Date().getTime());
+          }}
         />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
         <HomePage
@@ -116,7 +130,8 @@ function App() {
           setPage={setPage}
           setCurrentOrgData={setCurrentOrgData}
           setCurrentProposalId={setCurrentProposalId}
-          dataMissions={dataMissions}
+          myMissions={myMissions}
+          followingMissions={followingMissions}
         />
       ) : currentOrgData && page === PAGE_ROUTER.CREATE_PROPOSAL ? (
         <CreateProposal

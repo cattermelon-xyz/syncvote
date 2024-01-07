@@ -1,19 +1,7 @@
 import React, { useEffect, useState } from 'react';
-
-import { Button, Card, Tag, Input } from 'antd';
-import {
-  CloseCircleOutlined,
-  DownOutlined,
-  LeftOutlined,
-  UpOutlined,
-} from '@ant-design/icons';
-import Discourse from '@assets/icons/Discourse';
+import { LeftOutlined } from '@ant-design/icons';
 import { PAGE_ROUTER } from '@constants/common';
-import DoneIcon from '@assets/icons/DoneIcon';
-import { updateProposalDemo } from '@data/org';
-import Success from '@assets/icons/Success';
-import axios from 'axios';
-import { trimTitle, createIdString } from '../utils';
+import { trimTitle } from '../utils';
 import HistoryItem from '@components/HistoryItem';
 import VoteUI from '@components/VoteUI';
 
@@ -24,9 +12,8 @@ interface Props {
   setCurrentProposalId: any;
   setCurrentProposalData: any;
   user: any;
+  reload: any;
 }
-
-const frontEndUrl = 'http://localhost:3001';
 
 const Voting: React.FC<Props> = ({
   setPage,
@@ -35,6 +22,7 @@ const Voting: React.FC<Props> = ({
   setCurrentProposalId,
   setCurrentProposalData,
   user,
+  reload,
 }) => {
   useEffect(() => {
     console.log('currentProposalData', currentProposalData);
@@ -64,6 +52,7 @@ const Voting: React.FC<Props> = ({
             currentProposalData={currentProposalData}
             checkpointData={currentCheckpointData}
             user={user}
+            reload={reload}
           />
         </div>
       </div>
