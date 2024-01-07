@@ -51,12 +51,15 @@ const Node = memo(
     const { openCreateProposalModal } = useContext(GraphContext);
     const type = data.raw?.vote_machine_type;
     const participation = data.raw?.participation || {};
+    console.log(participation);
+
     let partipationIcon =
       participation?.type === 'identity' ? (
         <TeamOutlined title='Admin(s) make the decision' />
       ) : null;
     partipationIcon =
       participation?.type === 'identity' &&
+      participation?.data &&
       (participation?.data[0] === 'author' ||
         participation?.data[0] === 'proposer') ? (
         <UserOutlined title='Only author make the decision' />
