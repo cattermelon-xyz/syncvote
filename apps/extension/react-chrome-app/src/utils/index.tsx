@@ -1,3 +1,6 @@
+import axios from 'axios';
+const serverUrl = process.env.BACKEND_URL as string;
+
 export const trimTitle = (title: string, len?: number) => {
   const maxLen = len || 30;
   if (!title) return '';
@@ -32,4 +35,18 @@ export const createIdString = (title: String, id: String) => {
   result = title.toLocaleLowerCase().replace(/([^\w ]|_)/g, '');
   result = result.split(' ').join('-');
   return `${result}-${id}`;
+};
+
+export const vote = async (data: any) => {
+  const apiUrl = `${serverUrl}/vote/create`;
+  try {
+    const response = await axios.post(apiUrl, data);
+    if (response.status === 200) {
+      return { data: response.data, error: null };
+    } else {
+      return { data: null, error: response };
+    }
+  } catch (error) {
+    return { data: null, error: error };
+  }
 };

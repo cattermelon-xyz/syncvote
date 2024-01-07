@@ -5,7 +5,7 @@ import { DocInput } from 'doc-input/src/DocInput/funcs';
 import { Veto } from 'veto/src/Veto/funcs';
 import { UpVote } from 'upvote/src/UpVote/funcs';
 
-const serverUrl = process.env.SERVER_URL as string;
+const serverUrl = process.env.BACKEND_URL as string;
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: SingleChoice.validate,

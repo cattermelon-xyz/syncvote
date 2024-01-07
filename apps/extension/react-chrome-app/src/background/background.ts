@@ -26,12 +26,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
 
-    case 'vote': {
-      // get choice as params
-      // post it and refresh the page
-      break;
-    }
-
     case 'handlePostDiscourse': {
       const url = request.payload.url;
 

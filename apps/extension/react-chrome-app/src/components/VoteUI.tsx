@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import moment from 'moment';
 import parse from 'html-react-parser';
-import renderVoteButton from './renderVoteButton';
+import VoteButton from './VoteButton';
 
 const isInteractable = ({
   checkpointId,
@@ -41,10 +41,12 @@ const VoteUI = ({
   currentProposalData,
   checkpointData,
   user,
+  reload,
 }: {
   currentProposalData: any;
   checkpointData: any;
   user: any;
+  reload: any;
 }) => {
   console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
@@ -95,7 +97,12 @@ const VoteUI = ({
           )}
           {isAuthorOnly && (
             <div>
-              {renderVoteButton({ currentProposalData, checkpointData })}
+              <VoteButton
+                currentProposalData={currentProposalData}
+                checkpointData={checkpointData}
+                reload={reload}
+                user={user}
+              />
             </div>
           )}
           {isForkNode && (
