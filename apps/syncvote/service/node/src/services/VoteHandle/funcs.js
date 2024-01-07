@@ -197,7 +197,7 @@ const startEndNode = async (details) => {
 
         // Check if parent misson satisfy the conditions to go to JoinNode
         if (
-          deepEqual(
+          arraysEqual(
             result.condition,
             misison_parent_data.current_vote_data.initData.end
           )
@@ -225,10 +225,20 @@ const startEndNode = async (details) => {
             .update({ current_vote_data_id: new_current_vote_data[0].id })
             .eq('id', details.m_parent);
 
+          // Get new details
+          const { data: new_details } = await supabase
+            .from('mission_vote_details')
+            .select('*')
+            .eq('mission_id', details.mission_id);
+
           const tallyResult = { index: 0 };
           const timeDefault = moment();
           // go to next checkpoint
-          await handleMovingToNextCheckpoint(details, tallyResult, timeDefault);
+          await handleMovingToNextCheckpoint(
+            new_details[0],
+            tallyResult,
+            timeDefault
+          );
         }
       } else {
         console.log(
@@ -356,6 +366,14 @@ function deepEqual(obj1, obj2) {
   }
 
   return true;
+}
+
+function arraysEqual(arr1, arr2) {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  return arr1.every((element) => arr2.includes(element));
 }
 
 module.exports = {
