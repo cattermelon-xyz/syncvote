@@ -44,7 +44,7 @@ const VoteButton = ({
             const data = {
               option: [selectedOption],
               mission_id: proposalId,
-              identity: user.email,
+              identify: user.email,
             };
             console.log('data to vote: ', data);
             return (
@@ -53,7 +53,7 @@ const VoteButton = ({
                 block
                 className='flex items-center gap-1'
                 onClick={async () => {
-                  vote(data);
+                  await vote(data);
                   reload();
                 }}
               >
@@ -89,7 +89,7 @@ const VoteButton = ({
               const data = {
                 submission: {},
                 mission_id: proposalId,
-                identity: user.email,
+                identify: user.email,
               };
               await vote(data);
               reload();
@@ -119,7 +119,7 @@ const VoteButton = ({
           className='flex items-center gap-1'
           onClick={() => openMissionPage(orgId, proposalId)}
         >
-          {action}
+          {label}
         </Button>
       );
       break;
