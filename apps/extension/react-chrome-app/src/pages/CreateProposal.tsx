@@ -3,7 +3,6 @@ import { LeftOutlined } from '@ant-design/icons';
 import Input from 'antd/es/input/Input';
 import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
-import { createProposalDemo } from '@data/org';
 import { resetLastProposalId } from '../utils';
 import { createMission } from '@axios/createMission';
 
@@ -26,7 +25,6 @@ const CreateProposal: React.FC<Props> = ({
   const [workflowsOption, setWorkflowsOption] = useState<any>();
 
   const handleCreateProposal = async () => {
-
     const missionData = {
       creator_id: user.id,
       status: 'PUBLIC',
@@ -39,13 +37,14 @@ const CreateProposal: React.FC<Props> = ({
 
     createMission({
       missionData,
-      onSuccess: (data) => {
-        console.log('create proposal success', data);
-        setCurrentProposalId(data?.id);
+      onSuccess: (response) => {
+        console.log('create proposal success', response);
+        setCurrentProposalId(response.data[0]?.id);
       },
       onError: (error) => {
         console.log('error', error);
       },
+      author: user?.email,
     });
   };
 
