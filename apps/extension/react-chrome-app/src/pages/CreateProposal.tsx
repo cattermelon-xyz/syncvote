@@ -11,6 +11,7 @@ interface Props {
   setCurrentProposalId: any;
   currentOrgData: any;
   user: any;
+  setLoading: any;
 }
 
 const CreateProposal: React.FC<Props> = ({
@@ -18,6 +19,7 @@ const CreateProposal: React.FC<Props> = ({
   setCurrentProposalId,
   currentOrgData,
   user,
+  setLoading,
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [currentWorkflowData, setCurrentWorkflowData] = useState<any>();
@@ -126,7 +128,9 @@ const CreateProposal: React.FC<Props> = ({
           size='large'
           disabled={isButtonDisabled}
           onClick={async () => {
+            setLoading(true);
             await handleCreateProposal();
+            setLoading(false);
             setPage(PAGE_ROUTER.DONE_CREATE_PROPOSAL);
           }}
         >

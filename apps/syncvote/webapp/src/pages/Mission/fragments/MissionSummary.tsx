@@ -95,14 +95,14 @@ const MissionSummary = ({
           titleDescription={'Proposal content'}
           description={missionData?.m_desc}
         />
-        {currentCheckpointData?.description ? (
+        {/* {currentCheckpointData?.description ? (
           <ShowDescription
             titleDescription={'Voting Guideline'}
             description={currentCheckpointData?.description}
           />
         ) : (
           <></>
-        )}
+        )} */}
 
         {missionData?.progress && dataOfAllDocs.length > 0 && (
           <ProposalDocuments

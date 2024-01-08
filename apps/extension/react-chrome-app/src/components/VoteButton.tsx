@@ -1,26 +1,20 @@
 import { Button } from 'antd';
 import Discourse from '@assets/icons/Discourse';
 import { vote } from '../utils';
-
-const frontEndUrl = process.env.FRONTEND_URL as string;
-
-const openMissionPage = (orgId: string, proposalId: string) => {
-  chrome.runtime.sendMessage({
-    action: 'openUrl',
-    payload: { url: `${frontEndUrl}/${orgId}/${proposalId}` },
-  });
-};
+import { openMissionPage } from '../utils';
 
 const VoteButton = ({
   currentProposalData,
   checkpointData,
   reload,
   user,
+  setLoading,
 }: {
   currentProposalData: any;
   checkpointData: any;
   reload: any;
   user: any;
+  setLoading: any;
 }) => {
   const { vote_machine_type } = checkpointData;
   const action = checkpointData?.data?.action;
@@ -46,14 +40,15 @@ const VoteButton = ({
               mission_id: proposalId,
               identify: user.email,
             };
-            console.log('data to vote: ', data);
             return (
               <Button
                 key={index}
                 block
                 className='flex items-center gap-1'
                 onClick={async () => {
+                  setLoading(true);
                   await vote(data);
+                  setLoading(false);
                   reload();
                 }}
               >

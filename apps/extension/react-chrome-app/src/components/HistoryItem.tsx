@@ -56,11 +56,11 @@ const HistoryItem = ({ item }: { item: any }) => {
         </div>
         {expanded && !isEnd && (
           <>
-            {desc && (
+            {/* {desc && (
               <div className='bg-white p-3 rounded flex justify-between items-center'>
                 {parse(desc || '')}
               </div>
-            )}
+            )} */}
             {selectedOption || linkDiscourse || linkSnapshot ? (
               <div className='bg-white p-3 rounded flex justify-between items-center'>
                 <div className='text-xs'>
