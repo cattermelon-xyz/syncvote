@@ -23,6 +23,7 @@ export interface ICheckPoint {
   optionsDescription?: string;
   durationDescription?: string;
   subWorkflowId?: string;
+  inHappyPath?: boolean;
 }
 
 // TODO: add version

@@ -281,6 +281,15 @@ export const changeVersion = ({
       ].durationDescription = changedCheckPointData.durationDescription;
     }
   }
+  if (changedCheckPointData.hasOwnProperty('inHappyPath')) {
+    if (subWorkflowId === undefined || indexOfSubWorkflow === -1) {
+      newData.checkpoints[index].inHappyPath =
+        changedCheckPointData.inHappyPath;
+    } else {
+      newData.subWorkflows[indexOfSubWorkflow].checkpoints[index].inHappyPath =
+        changedCheckPointData.inHappyPath;
+    }
+  }
   return newData;
 };
 
