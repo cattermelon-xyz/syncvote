@@ -9,7 +9,7 @@ async function handleSubmission(props) {
   return new Promise(async (resolve, reject) => {
     try {
       const { identify, mission_id } = props;
-
+      console.log('Voting at mission: ', mission_id);
       let { data: mission_vote_details, error: mvd_error } = await supabase
         .from('mission_vote_details')
         .select(`*`)
