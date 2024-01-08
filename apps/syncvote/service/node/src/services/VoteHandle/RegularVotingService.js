@@ -5,7 +5,7 @@ const {
   VoteMachineController,
 } = require('../../models/votemachines/VotingController');
 
-async function handleSubmission(x) {
+async function handleSubmission(props) {
   return new Promise(async (resolve, reject) => {
     try {
       const { identify, mission_id } = props;
