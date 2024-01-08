@@ -42,11 +42,13 @@ const VoteUI = ({
   checkpointData,
   user,
   reload,
+  setLoading,
 }: {
   currentProposalData: any;
   checkpointData: any;
   user: any;
   reload: any;
+  setLoading: any;
 }) => {
   console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
@@ -88,13 +90,13 @@ const VoteUI = ({
       </div>
       {expanded && (
         <>
-          {description ? (
+          {/* {description ? (
             <div className='bg-white p-3 rounded flex justify-between items-center'>
               {parse(description || '')}
             </div>
           ) : (
             <></>
-          )}
+          )} */}
           {isAuthorOnly && (
             <div>
               <VoteButton
@@ -102,14 +104,14 @@ const VoteUI = ({
                 checkpointData={checkpointData}
                 reload={reload}
                 user={user}
+                setLoading={setLoading}
               />
             </div>
           )}
           {isForkNode && (
             <div>
               <div className='bg-white p-3 rounded flex justify-between items-center'>
-                If forkNode then show multiple button from subMissions. If
-                endNode then show message
+                TODO:Show multiple buttons
               </div>
             </div>
           )}

@@ -18,7 +18,7 @@ const HistoryItem = ({ item }: { item: any }) => {
   const linkDiscourse = tallyResult?.submission?.linkDiscourse || null;
   const linkSnapshot = tallyResult?.linkSnapshot || null;
   return (
-    <div>
+    <div className={!endedAt ? 'font-bold' : ''}>
       <div>
         {checkpoint_title}{' '}
         <span className='text-xs'>

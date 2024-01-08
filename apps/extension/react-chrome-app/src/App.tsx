@@ -12,6 +12,15 @@ import {
 import { queryAMissionDetail } from '@data/mission';
 import { queryMission } from '@data/mission';
 import { extractCurrentCheckpointId } from './utils';
+import { Spin } from 'antd';
+
+const Loading = () => {
+  return (
+    <div className='w-full h-full flex justify-center items-center'>
+      <Spin />
+    </div>
+  );
+};
 
 function App() {
   const [user, setUser] = useState<any>();
@@ -24,11 +33,14 @@ function App() {
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
   const [listVersionDocs, setListVersionDocs] = useState<any[]>();
   const [lastRequest, setLastRequest] = useState<any>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    setLoading(true);
     getCurrentUser().then((resp) => {
       if (resp) {
         setUser(resp.user);
+        setLoading(false);
       } else {
         console.log('user is not found');
       }
@@ -36,6 +48,7 @@ function App() {
     getLastProposalId().then((resp) => {
       if (resp) {
         setCurrentProposalId(resp.id);
+        setLoading(false);
       }
     });
   }, []);
@@ -70,9 +83,11 @@ function App() {
           }
 
           setCurrentCheckpointData(checkpointDataAfterHandle);
+          setLoading(false);
         },
         onError: (error) => {
           console.log('error', error);
+          setLoading(false);
         },
       });
     }
@@ -100,9 +115,11 @@ function App() {
           console.log('tmpFollowingMissions', tmpFollowingMissions);
           setMyMissions(tmpMyMissions);
           setFollowingMissions(tmpFollowingMissions);
+          setLoading(false);
         },
         onError: (error) => {
           console.log('error', error);
+          setLoading(false);
         },
       });
     }
@@ -110,7 +127,9 @@ function App() {
 
   return (
     <div className='w-[260px] h-[380px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
-      {user === null || user === undefined ? (
+      {loading === true ? (
+        <Loading />
+      ) : user === null || user === undefined ? (
         <Login />
       ) : currentProposalData ? (
         <Voting
@@ -123,6 +142,7 @@ function App() {
           reload={() => {
             setLastRequest(new Date().getTime());
           }}
+          setLoading={setLoading}
         />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
         <HomePage
@@ -132,6 +152,7 @@ function App() {
           setCurrentProposalId={setCurrentProposalId}
           myMissions={myMissions}
           followingMissions={followingMissions}
+          setLoading={setLoading}
         />
       ) : currentOrgData && page === PAGE_ROUTER.CREATE_PROPOSAL ? (
         <CreateProposal
@@ -139,11 +160,12 @@ function App() {
           currentOrgData={currentOrgData}
           setCurrentProposalId={setCurrentProposalId}
           user={user}
+          setLoading={setLoading}
         />
       ) : page === PAGE_ROUTER.DONE_CREATE_PROPOSAL ? (
         <DoneCreateProposal setPage={setPage} />
       ) : (
-        <></>
+        <Loading />
       )}
     </div>
   );

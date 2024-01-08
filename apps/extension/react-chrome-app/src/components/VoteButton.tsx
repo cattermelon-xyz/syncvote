@@ -1,26 +1,20 @@
 import { Button } from 'antd';
 import Discourse from '@assets/icons/Discourse';
 import { vote } from '../utils';
-
-const frontEndUrl = process.env.FRONTEND_URL as string;
-
-const openMissionPage = (orgId: string, proposalId: string) => {
-  chrome.runtime.sendMessage({
-    action: 'openUrl',
-    payload: { url: `${frontEndUrl}/${orgId}/${proposalId}` },
-  });
-};
+import { openMissionPage } from '../utils';
 
 const VoteButton = ({
   currentProposalData,
   checkpointData,
   reload,
   user,
+  setLoading,
 }: {
   currentProposalData: any;
   checkpointData: any;
   reload: any;
   user: any;
+  setLoading: any;
 }) => {
   const { vote_machine_type } = checkpointData;
   const action = checkpointData?.data?.action;
@@ -44,16 +38,17 @@ const VoteButton = ({
             const data = {
               option: [selectedOption],
               mission_id: proposalId,
-              identity: user.email,
+              identify: user.email,
             };
-            console.log('data to vote: ', data);
             return (
               <Button
                 key={index}
                 block
                 className='flex items-center gap-1'
                 onClick={async () => {
-                  vote(data);
+                  setLoading(true);
+                  await vote(data);
+                  setLoading(false);
                   reload();
                 }}
               >
@@ -89,7 +84,7 @@ const VoteButton = ({
               const data = {
                 submission: {},
                 mission_id: proposalId,
-                identity: user.email,
+                identify: user.email,
               };
               await vote(data);
               reload();
@@ -119,7 +114,7 @@ const VoteButton = ({
           className='flex items-center gap-1'
           onClick={() => openMissionPage(orgId, proposalId)}
         >
-          {action}
+          {label}
         </Button>
       );
       break;
