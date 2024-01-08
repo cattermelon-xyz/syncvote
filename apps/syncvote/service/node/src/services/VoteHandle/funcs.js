@@ -7,48 +7,6 @@ const moment = require('moment');
 var CronJob = require('cron').CronJob;
 const { createArweave, convertToCron } = require('../../functions');
 
-const checkIfFirstTimeOfVoting = async (details) => {
-  let voteMachineController = new VoteMachineController(details);
-  let firstTimeToVote = false;
-
-  if (!details.result) {
-    console.log(`It's first time of voting`);
-    // 1. Get the data was created by voteMachine
-    const {
-      initData,
-      error: init_error,
-      result,
-    } = voteMachineController.initDataForCVD();
-
-    // check if cannot init the data for current_vote_data
-    if (!initData) {
-      resolve({
-        status: 'ERR',
-        message: init_error,
-      });
-      return;
-    }
-
-    // 2. Update result current_vote_data for checkpoint
-    await supabase
-      .from('current_vote_data')
-      .update({
-        result: result,
-      })
-      .eq('id', details.cvd_id);
-
-    // 3. Update the result of mission_vote_details
-    details.result = result;
-
-    // 4. Update voteController
-    voteMachineController = new VoteMachineController(details);
-
-    firstTimeToVote = true;
-  }
-
-  return { firstTimeToVote, voteMachineController };
-};
-
 const handleMovingToNextCheckpoint = async (
   details,
   tallyResult,
@@ -205,7 +163,6 @@ const startEndNode = async (details) => {
           // Update current_vote_data for ForkNode
           await supabase
             .from('current_vote_data')
-
             .update({ tallyResult: result, endedAt: moment().format() })
             .eq('id', misison_parent_data.current_vote_data.id);
 
@@ -229,9 +186,8 @@ const startEndNode = async (details) => {
           const { data: new_details } = await supabase
             .from('mission_vote_details')
             .select('*')
-            .eq('mission_id', details.mission_id);
+            .eq('mission_id', details.m_parent);
 
-          console.log(new_details);
           const tallyResult = { index: 0 };
           const timeDefault = moment();
           // go to next checkpoint
@@ -379,7 +335,6 @@ function arraysEqual(arr1, arr2) {
 }
 
 module.exports = {
-  checkIfFirstTimeOfVoting,
   handleMovingToNextCheckpoint,
   startEndNode,
   startForkNode,
