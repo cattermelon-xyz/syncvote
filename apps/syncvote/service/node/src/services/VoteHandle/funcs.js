@@ -231,9 +231,11 @@ const startEndNode = async (details) => {
             .select('*')
             .eq('mission_id', details.mission_id);
 
+          console.log(new_details);
           const tallyResult = { index: 0 };
           const timeDefault = moment();
           // go to next checkpoint
+
           await handleMovingToNextCheckpoint(
             new_details[0],
             tallyResult,
