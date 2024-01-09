@@ -66,6 +66,16 @@ export namespace Tally {
       isValid = false;
       message.push('Missing token contract');
     }
+
+    if (!checkpoint?.data.proposalId) {
+      isValid = false;
+      message.push('Missing variable to store proposal ID');
+    }
+
+    if (!checkpoint?.data.tallyLink) {
+      isValid = false;
+      message.push('Missing link to your Tally DAO');
+    }
     return {
       isValid,
       message,

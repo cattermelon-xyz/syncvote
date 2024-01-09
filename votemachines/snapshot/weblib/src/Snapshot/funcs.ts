@@ -83,6 +83,12 @@ export namespace Snapshot {
         message.push('Missiong variable to store proposalId');
       }
     }
+
+    if (!checkpoint?.data.snapshotDuration) {
+      isValid = false;
+      message.push('Missing duration for Snapshot proposal');
+    }
+
     return {
       isValid,
       message,

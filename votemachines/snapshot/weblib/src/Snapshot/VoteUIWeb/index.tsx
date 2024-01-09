@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
+import { useSDK } from '@metamask/sdk-react';
 import { Card, Button, Radio, Input, Tag } from 'antd';
 import Client from '@snapshot-labs/snapshot.js/dist/sign';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';

@@ -1,4 +1,5 @@
 const { VotingMachine } = require('.');
+const { supabase } = require('../../configs/supabaseClient');
 
 class Tally extends VotingMachine {
   constructor(props) {
@@ -60,6 +61,7 @@ class Tally extends VotingMachine {
     this.tallyResult = {
       ...voteData.submission,
       index: this.children.indexOf(this.data.next),
+      proposalLink: `${this.data.tallyLink}/proposal/${voteData.submission.proposalId}`,
     };
 
     await supabase
