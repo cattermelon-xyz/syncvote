@@ -41,7 +41,7 @@ const getCheckpointData = (data: any) => {
   if (!checkpointData[0].isEnd) {
     const startToVote = new Date(data.startToVote);
     // convert second to millisecond of duration
-    const duration = checkpointData[0].duration || 0 * 1000;
+    const duration = (checkpointData[0].duration || 0) * 1000;
     const endTovote = new Date(startToVote.getTime() + duration).toISOString();
     checkpointDataAfterHandle.endToVote = endTovote;
     checkpointDataAfterHandle.initData = data.initData || {};

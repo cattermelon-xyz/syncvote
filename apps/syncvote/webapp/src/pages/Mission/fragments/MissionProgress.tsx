@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Card, Button, Timeline, Tag } from 'antd';
-import { AuditOutlined, BranchesOutlined } from '@ant-design/icons';
+import {
+  AuditOutlined,
+  BranchesOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons';
 import { createIdString, extractIdFromIdString, useGetDataHook } from 'utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
@@ -49,6 +54,49 @@ const HistoryItem = ({ item }: { item: any }) => {
   );
 };
 
+const buildFutureHappyNode = ({
+  checkpoints,
+  current,
+  existed,
+}: {
+  checkpoints: any;
+  current: any;
+  existed: any;
+}) => {
+  const originCheckpointId = current.checkpoint_id.replace(
+    current.mission_id + '-',
+    ''
+  );
+  const originCheckpoint = (checkpoints || []).find(
+    (item: any) => item.id === originCheckpointId
+  );
+  let happyNodes: any[] = [];
+  const pickNextHappyPathNode = (
+    cp: any,
+    checkpoints: any,
+    happyNodes: any
+  ) => {
+    if (cp.isEnd) return;
+    for (var i = 0; i < cp.children.length; i++) {
+      var child = checkpoints.find((item: any) => item.id === cp.children[i]);
+      if (child.inHappyPath === true) {
+        const found =
+          happyNodes.find((item: any) => item.id === child.id) ||
+          existed.find((id: any) => id === child.id);
+        if (!found) {
+          happyNodes.push(child);
+          pickNextHappyPathNode(child, checkpoints, happyNodes);
+        }
+      }
+    }
+  };
+  if (originCheckpoint && originCheckpoint.inHappyPath === true) {
+    pickNextHappyPathNode(originCheckpoint, checkpoints, happyNodes);
+    return happyNodes;
+  }
+  return [];
+};
+
 const MissionProgress: React.FC<Props> = ({ missionData }) => {
   const { orgIdString } = useParams();
   const navigate = useNavigate();
@@ -62,16 +110,49 @@ const MissionProgress: React.FC<Props> = ({ missionData }) => {
     workflowId
   )}/${versionIdString}`;
   const items: any[] = [];
+  const existed: any[] = [];
+  let lastItem = missionData?.progress?.[missionData?.progress?.length - 1];
+  const checkpoints = missionData?.data?.checkpoints || [];
   missionData?.progress?.forEach((item: any, index: any) => {
+    const originalCheckpoint = checkpoints.find(
+      (cp: any) =>
+        cp.id === item.checkpoint_id.replace(item.mission_id + '-', '')
+    );
     if (!item || item.vote_machine_type === 'joinNode') return;
-    let color =
-      index === missionData?.progress.length - 1 ? 'green' : '#D9D9D9';
+    let dot = undefined;
+    let color = '#D9D9D9';
+    if (originalCheckpoint.inHappyPath) {
+      dot = <CheckCircleOutlined />;
+      color = 'green';
+    }
+    if (index === missionData?.progress.length - 1) {
+      color = 'purple';
+      dot = (
+        <div className='rounded-full bg-violet-500 w-[10px] h-[10px]'></div>
+      );
+    }
+    if (originalCheckpoint.isEnd && !originalCheckpoint.inHappyPath) {
+      color = 'red';
+      dot = <CloseCircleOutlined />;
+    }
     items.push({
       color: color,
       children: <HistoryItem item={item} />,
+      dot: dot,
+    });
+    existed.push(originalCheckpoint?.id);
+  });
+  const futureHappyNodes = buildFutureHappyNode({
+    checkpoints: missionData?.data.checkpoints,
+    current: lastItem,
+    existed,
+  });
+  futureHappyNodes.forEach((item: any, index: any) => {
+    items.push({
+      color: '#D9D9D9',
+      children: <div className='rounded text-slate-300'>{item.title}</div>,
     });
   });
-
   const handleViewLiveWorkflow = () => {
     if (publicUrl) window.open(publicUrl, '_blank');
   };
