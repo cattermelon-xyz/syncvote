@@ -11,10 +11,12 @@ const MissionProgressSummary = ({
   missionData,
   currentCheckpointData,
   setOpenModalListParticipants,
+  setHistoricalCheckpointData,
 }: {
   missionData: any;
   currentCheckpointData: any;
   setOpenModalListParticipants: any;
+  setHistoricalCheckpointData?: any;
 }) => {
   let isReachedQuorum = false;
   if (missionData.result) {
@@ -28,7 +30,12 @@ const MissionProgressSummary = ({
   }
   return (
     <>
-      {missionData?.progress && <MissionProgress missionData={missionData} />}
+      {missionData?.progress && (
+        <MissionProgress
+          missionData={missionData}
+          setHistoricalCheckpointData={setHistoricalCheckpointData}
+        />
+      )}
 
       {missionData.result ? (
         <Card className=''>
