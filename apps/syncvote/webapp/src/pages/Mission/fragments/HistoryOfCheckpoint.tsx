@@ -53,8 +53,11 @@ const HistoryOfCheckpoint: React.FC<Props> = ({ historicalCheckpointData }) => {
             </div>
             <p>Ended at: {formatDate(historicalCheckpointData?.endedAt)}</p>
           </div>
+
           {historicalCheckpointData?.vote_machine_type ===
           VM_TYPE?.DISCOURSE ? (
+            //TODO: Update first post for discourse but name's variable is discourse_topic in historicalCheckpointData?.tallyResult?.submission.
+            // It can be confusing
             <p
               className='text-[#6200EE] hover:cursor-pointer truncate'
               onClick={() => {

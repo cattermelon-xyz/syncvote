@@ -412,7 +412,9 @@ const MissionVotingDetail = () => {
                   </>
                 )}
                 {historicalCheckpointData ? (
-                  <HistoryOfCheckpoint historicalCheckpointData={historicalCheckpointData} />
+                  <HistoryOfCheckpoint
+                    historicalCheckpointData={historicalCheckpointData}
+                  />
                 ) : (
                   renderVoteMachine(missionData, user, account, dispatch)
                 )}
@@ -424,6 +426,7 @@ const MissionVotingDetail = () => {
                 currentCheckpointData={currentCheckpointData}
                 setOpenModalListParticipants={setOpenModalListParticipants}
                 setHistoricalCheckpointData={setHistoricalCheckpointData}
+                historicalCheckpointData={historicalCheckpointData}
               />
             </div>
           </div>
@@ -432,6 +435,7 @@ const MissionVotingDetail = () => {
           open={openModalListParticipants}
           onClose={() => setOpenModalListParticipants(false)}
           listParticipants={currentCheckpointData?.participation?.data || []}
+          historicalCheckpointData={historicalCheckpointData}
         />
       </MetaMaskProvider>
     </>

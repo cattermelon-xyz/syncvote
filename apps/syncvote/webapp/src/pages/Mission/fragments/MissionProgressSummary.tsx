@@ -6,17 +6,20 @@ import {
   getTimeElapsedSinceStart,
   getTimeRemainingToEnd,
 } from '@utils/helpers';
+import { useEffect } from 'react';
 
 const MissionProgressSummary = ({
   missionData,
   currentCheckpointData,
   setOpenModalListParticipants,
   setHistoricalCheckpointData,
+  historicalCheckpointData,
 }: {
   missionData: any;
   currentCheckpointData: any;
   setOpenModalListParticipants: any;
   setHistoricalCheckpointData?: any;
+  historicalCheckpointData?: any;
 }) => {
   let isReachedQuorum = false;
   if (missionData.result) {
@@ -93,7 +96,61 @@ const MissionProgressSummary = ({
         </Card>
       ) : null}
 
-      {currentCheckpointData.isEnd ? null : (
+      {historicalCheckpointData ? (
+        <Card className=''>
+          <p className='mb-4 text-base font-semibold'>Rules & conditions</p>
+          <div className='flex flex-col gap-2'>
+            <div className='flex justify-between'>
+              <p className='text-base '>Start time</p>
+              <p className='text-base font-semibold'>
+                {getTimeElapsedSinceStart(
+                  historicalCheckpointData?.startToVote
+                )}
+              </p>
+            </div>
+            <p className='text-right'>
+              {formatDate(historicalCheckpointData?.startToVote)}
+            </p>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <div className='flex justify-between'>
+              <p className='text-base '>Remaining duration</p>
+              <p className='text-base font-semibold'>
+                {getTimeElapsedSinceStart(historicalCheckpointData?.endedAt)}
+              </p>
+            </div>
+            <p className='text-right'>
+              {formatDate(historicalCheckpointData?.endedAt)}
+            </p>
+          </div>
+          <hr className='w-full my-4' />
+          <>
+            <div className='flex justify-between'>
+              <p className='text-base '>Who can vote</p>
+              <p
+                className='text-base font-semibold text-[#6200EE] cursor-pointer'
+                onClick={() => setOpenModalListParticipants(true)}
+              >
+                View details
+              </p>
+            </div>
+            <hr className='w-full my-4' />
+            <div className='flex justify-between'>
+              <p className='text-base '>Threshold</p>
+              <p className='text-base font-semibold'>
+                {historicalCheckpointData?.threshold}
+              </p>
+            </div>
+
+            <div className='flex justify-between'>
+              <p className='text-base '>Quorum</p>
+              <p className='text-base font-semibold'>
+                {historicalCheckpointData?.quorum} votes
+              </p>
+            </div>
+          </>
+        </Card>
+      ) : currentCheckpointData.isEnd ? null : (
         <>
           <Card className=''>
             <p className='mb-4 text-base font-semibold'>Rules & conditions</p>
@@ -156,7 +213,7 @@ const MissionProgressSummary = ({
               <div className='flex justify-between'>
                 <p className='text-base '>Quorum</p>
                 <p className='text-base font-semibold'>
-                  {currentCheckpointData.quorum} votes
+                  {currentCheckpointData?.quorum} votes
                 </p>
               </div>
             </>
