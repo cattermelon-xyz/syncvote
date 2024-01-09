@@ -1,8 +1,9 @@
-import { Button, Card, Radio } from 'antd';
+import { Card, Radio } from 'antd';
 import React from 'react';
 import { AuditOutlined } from '@ant-design/icons';
 import { getTransformArweaveLink } from '@utils/helpers';
 import { VM_TYPE } from '@utils/constants/votemachine';
+import { formatDate } from '@utils/helpers';
 
 interface Props {
   historicalCheckpointData?: any;
@@ -19,39 +20,53 @@ const HistoryOfCheckpoint: React.FC<Props> = ({ historicalCheckpointData }) => {
     }
   };
 
+  const getDiscourseLink = (submission: any) => {
+    if (submission?.linkDiscourse) {
+      return submission.linkDiscourse;
+    }
+    if (submission?.discourse_topic) {
+      return `https://discourse.syncvote.shop/p/${submission.discourse_topic}`;
+    }
+    return null;
+  };
+
   return (
     <div>
       <Card className='p-4'>
         <div className='flex flex-col gap-6'>
-          <div className='flex justify-between'>
-            <p className='text-xl font-medium'>Result</p>
-            <div
-              className='flex items-center hover:cursor-pointer'
-              onClick={() => {
-                if (transformedArweaveLink)
-                  handleOpenLink(transformedArweaveLink);
-              }}
-            >
-              <p>View proof</p>
-              <AuditOutlined className='ml-1' />
+          <p className='text-xl font-medium truncate'>
+            {historicalCheckpointData?.checkpoint_title}
+          </p>
+          <div className='flex flex-col gap-1'>
+            <div className='flex justify-between'>
+              <p className='text-xl font-medium'>Result</p>
+              <div
+                className='flex items-center hover:cursor-pointer'
+                onClick={() => {
+                  if (transformedArweaveLink)
+                    handleOpenLink(transformedArweaveLink);
+                }}
+              >
+                <p>View proof</p>
+                <AuditOutlined className='ml-1' />
+              </div>
             </div>
+            <p>Ended at: {formatDate(historicalCheckpointData?.endedAt)}</p>
           </div>
           {historicalCheckpointData?.vote_machine_type ===
           VM_TYPE?.DISCOURSE ? (
             <p
               className='text-[#6200EE] hover:cursor-pointer truncate'
               onClick={() => {
-                if (
+                const discourseLink = getDiscourseLink(
                   historicalCheckpointData?.tallyResult?.submission
-                    ?.linkDiscourse
-                )
-                  handleOpenLink(
-                    historicalCheckpointData?.tallyResult?.submission
-                      ?.linkDiscourse
-                  );
+                );
+                if (discourseLink) handleOpenLink(discourseLink);
               }}
             >
-              {historicalCheckpointData?.tallyResult?.submission?.linkDiscourse}
+              {getDiscourseLink(
+                historicalCheckpointData?.tallyResult?.submission
+              )}
             </p>
           ) : historicalCheckpointData?.vote_machine_type ===
             VM_TYPE?.SNAPSHOT ? (
@@ -70,18 +85,28 @@ const HistoryOfCheckpoint: React.FC<Props> = ({ historicalCheckpointData }) => {
             VM_TYPE?.SINGLE_VOTE ? (
             <>
               {historicalCheckpointData?.options.map(
-                (option: any, index: any) => (
-                  <Card className='w-full' key={index}>
-                    {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                    <Radio
-                      checked={
-                        +historicalCheckpointData?.tallyResult?.index === index
-                      }
+                (option: any, index: any) => {
+                  const isChecked =
+                    +historicalCheckpointData?.tallyResult?.index === index;
+                  return (
+                    <Card
+                      className={`w-full ${
+                        isChecked ? 'border-2 border-[#6200EE]' : ''
+                      }`}
+                      key={index}
                     >
-                      {`${index + 1}. ${option}`}
-                    </Radio>
-                  </Card>
-                )
+                      {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
+                      <Radio
+                        checked={
+                          +historicalCheckpointData?.tallyResult?.index ===
+                          index
+                        }
+                      >
+                        {`${index + 1}. ${option}`}
+                      </Radio>
+                    </Card>
+                  );
+                }
               )}
             </>
           ) : (

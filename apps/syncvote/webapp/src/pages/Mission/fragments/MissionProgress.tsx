@@ -20,9 +20,13 @@ interface Props {
 const HistoryItem = ({
   item,
   setHistoricalCheckpointData,
+  isSelected,
+  onSelectItem,
 }: {
   item: any;
   setHistoricalCheckpointData?: any;
+  isSelected?: boolean;
+  onSelectItem?: any;
 }) => {
   const { endedAt, tallyResult, options, checkpoint_title, arweave_id } = item;
   // TODO: this is a hack, should use votemachine function instead
@@ -35,14 +39,13 @@ const HistoryItem = ({
     ? getTransformArweaveLink(arweave_id)
     : null;
 
-  useEffect(() => {
-    console.log('item', item);
-  }, [item]);
-
   return (
     <div
-      className='hover:bg-gray-100 cursor-pointer'
+      className={`p-1 rounded-md ${
+        isSelected ? 'bg-gray-100' : 'hover:bg-gray-100'
+      } cursor-pointer`}
       onClick={() => {
+        onSelectItem(item?.id);
         item.endedAt
           ? setHistoricalCheckpointData(item)
           : setHistoricalCheckpointData(null);
@@ -137,6 +140,10 @@ const MissionProgress: React.FC<Props> = ({
   const workflowId = missionData?.workflow_id?.toString();
   const workflowTitle = missionData?.workflow_title;
   const versionIdString = missionData?.workflow_version_id;
+  const [selectedItemId, setSelectedItemId] = useState<number>();
+  const handleSelectItem = (itemId: number) => {
+    setSelectedItemId(itemId);
+  };
 
   const publicUrl = `/public/${orgIdString}/${createIdString(
     workflowTitle,
@@ -173,7 +180,9 @@ const MissionProgress: React.FC<Props> = ({
       children: (
         <HistoryItem
           item={item}
+          isSelected={selectedItemId === item.id}
           setHistoricalCheckpointData={setHistoricalCheckpointData}
+          onSelectItem={handleSelectItem}
         />
       ),
       dot: dot,
