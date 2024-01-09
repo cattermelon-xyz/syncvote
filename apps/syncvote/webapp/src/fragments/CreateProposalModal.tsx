@@ -219,7 +219,7 @@ export const CreateProposalModal = ({
                 <div>
                   <Input
                     className='w-full'
-                    placeholder={'Governance revision'}
+                    placeholder={'E.g: Proposal to invest new project'}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     style={isWarning ? { borderColor: 'red' } : undefined}
@@ -245,7 +245,7 @@ export const CreateProposalModal = ({
                     </div>
                   </>
                 )}
-                <div className='text-sm text-[#575655] mb-2'>
+                {/* <div className='text-sm text-[#575655] mb-2'>
                   Proposal description
                 </div>
                 <div>
@@ -256,7 +256,7 @@ export const CreateProposalModal = ({
                     }}
                     id='text-editor'
                   />
-                </div>
+                </div> */}
               </Space>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { UploadOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import {
   formatDate,
   getTimeElapsedSinceStart,
@@ -29,7 +29,7 @@ const MissionSummary = ({
   const { created_at, workflow_icon_url } = missionData;
   return (
     <>
-      <div className='flex flex-col mb-10 gap-6'>
+      <div className='flex flex-col mb-4 gap-6'>
         <div className='flex gap-4'>
           {isForkNode || (!isExpired && !isEnd) ? (
             <Tag color='green' className='text-base'>
@@ -72,25 +72,20 @@ const MissionSummary = ({
       </div>
       <Space direction='vertical' size='middle' className='w-full'>
         <Space direction='horizontal'>
-          <Card>
-            <Space direction='horizontal' size={'small'}>
-              <p>Author</p>
-              <Icon
-                iconUrl={missionData.author_icon_url}
-                presetIcon=''
-                size='medium'
-              />
-              <p>{shortenString(missionData.author_email, 30)}</p>
-            </Space>
-          </Card>
-          <Card>
-            <Space direction='horizontal' size={'small'}>
-              <p>Created On</p>
-              <p>{moment(created_at).format('MMM Do, YYYY')}</p>
-            </Space>
-          </Card>
+          <Icon
+            iconUrl={missionData.author_icon_url}
+            presetIcon=''
+            size='medium'
+          />
+          <p>{shortenString(missionData.author_email, 30)}</p>-
+          <p>{moment(created_at).format('MMM Do, YYYY')}</p>
         </Space>
-
+        {!isExpired && !isEnd ? (
+          <div className='flex flex-row gap-1 bg-violet-100 border border-violet-500 border-solid px-2 py-3 rounded-md'>
+            <ClockCircleOutlined className='text-violet-500' />
+            This proposal is in progress
+          </div>
+        ) : null}
         <ShowDescription
           titleDescription={'Proposal content'}
           description={missionData?.m_desc}
