@@ -19,6 +19,7 @@ import { vote } from '@axios/vote';
 import Metamask from '@assets/icons/svg-icons/Metamask';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
+import HistoryOfCheckpoint from './fragments/HistoryOfCheckpoint';
 export function isExternalProvider(
   provider: any
 ): provider is ExternalProvider {
@@ -259,6 +260,8 @@ const MissionVotingDetail = () => {
   const [missionData, setMissionData] = useState<any>();
   const [openModalListParticipants, setOpenModalListParticipants] =
     useState<boolean>(false);
+  const [historicalCheckpointData, setHistoricalCheckpointData] =
+    useState<any>();
   const { currentCheckpointData, listVersionDocs } = missionData
     ? getCheckpointData(missionData)
     : {
@@ -364,6 +367,10 @@ const MissionVotingDetail = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    console.log('historicalCheckpointData', historicalCheckpointData);
+  }, [historicalCheckpointData]);
+
   // TODO: change to PDA-style design to query all docs version
 
   const isForkNode = currentCheckpointData?.vote_machine_type === 'forkNode';
@@ -404,7 +411,13 @@ const MissionVotingDetail = () => {
                     <Tabs defaultActiveKey='0' items={subMissionTabItems} />
                   </>
                 )}
-                {renderVoteMachine(missionData, user, account, dispatch)}
+                {historicalCheckpointData ? (
+                  <HistoryOfCheckpoint
+                    historicalCheckpointData={historicalCheckpointData}
+                  />
+                ) : (
+                  renderVoteMachine(missionData, user, account, dispatch)
+                )}
               </Space>
             </Space>
             <div className='flex-1 flex flex-col gap-4'>
@@ -412,6 +425,8 @@ const MissionVotingDetail = () => {
                 missionData={missionData}
                 currentCheckpointData={currentCheckpointData}
                 setOpenModalListParticipants={setOpenModalListParticipants}
+                setHistoricalCheckpointData={setHistoricalCheckpointData}
+                historicalCheckpointData={historicalCheckpointData}
               />
             </div>
           </div>
@@ -420,6 +435,7 @@ const MissionVotingDetail = () => {
           open={openModalListParticipants}
           onClose={() => setOpenModalListParticipants(false)}
           listParticipants={currentCheckpointData?.participation?.data || []}
+          historicalCheckpointData={historicalCheckpointData}
         />
       </MetaMaskProvider>
     </>

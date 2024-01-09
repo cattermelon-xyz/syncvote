@@ -194,6 +194,11 @@ export const extractCurrentCheckpointId = (inputStr: string) => {
   return parts.join('-');
 };
 
+export const getTransformArweaveLink = (arweaveId: string) => {
+  const id = arweaveId.split('/').pop();
+  return `https://viewblock.io/arweave/tx/${id}`;
+};
+
 /**
  * 13 - 4 = 9; 13: minuend, 4: substrahend, 9: difference
  * @param minuend: number[]

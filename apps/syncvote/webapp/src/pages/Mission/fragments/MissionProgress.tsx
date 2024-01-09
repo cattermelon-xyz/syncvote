@@ -7,14 +7,27 @@ import {
   CloseCircleOutlined,
 } from '@ant-design/icons';
 import { createIdString, extractIdFromIdString, useGetDataHook } from 'utils';
+import { getTransformArweaveLink } from '@utils/helpers';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { shortenString } from 'directed-graph';
+
 interface Props {
   missionData: any;
+  setHistoricalCheckpointData?: any;
 }
 
-const HistoryItem = ({ item }: { item: any }) => {
+const HistoryItem = ({
+  item,
+  setHistoricalCheckpointData,
+  isSelected,
+  onSelectItem,
+}: {
+  item: any;
+  setHistoricalCheckpointData?: any;
+  isSelected?: boolean;
+  onSelectItem?: any;
+}) => {
   const { endedAt, tallyResult, options, checkpoint_title, arweave_id } = item;
   // TODO: this is a hack, should use votemachine function instead
   const selectedOption = tallyResult?.index
@@ -22,34 +35,54 @@ const HistoryItem = ({ item }: { item: any }) => {
     : null;
   const linkDiscourse = tallyResult?.submission?.linkDiscourse || null;
   const linkSnapshot = tallyResult?.linkSnapshot || null;
+  const transformedArweaveLink = arweave_id
+    ? getTransformArweaveLink(arweave_id)
+    : null;
+
   return (
-    <div className={!endedAt ? 'font-bold' : ''}>
-      <div>
-        {checkpoint_title}{' '}
-        <span className='text-xs'>
-          {arweave_id ? (
-            <a href={arweave_id}>
-              {endedAt ? moment(endedAt).fromNow() : null}
-              <AuditOutlined className='ml-1' />
-            </a>
-          ) : null}
-        </span>
-      </div>
-      {endedAt && (
-        <div className='text-xs'>
-          {selectedOption ? <Tag>{selectedOption}</Tag> : null}{' '}
-          {linkDiscourse ? (
-            <a href={linkDiscourse} target='_blank' className='text-green-500'>
-              {shortenString(linkDiscourse, 30)}
-            </a>
-          ) : null}
-          {linkSnapshot ? (
-            <a href={linkSnapshot} target='_blank' className='text-green-500'>
-              {shortenString(linkSnapshot, 30)}
-            </a>
-          ) : null}
+    <div
+      className={`p-1 rounded-md ${
+        isSelected ? 'bg-gray-100' : 'hover:bg-gray-100'
+      } cursor-pointer`}
+      onClick={() => {
+        onSelectItem(item?.id);
+        item.endedAt
+          ? setHistoricalCheckpointData(item)
+          : setHistoricalCheckpointData(null);
+      }}
+    >
+      <div className={!endedAt ? 'font-bold' : ''}>
+        <div>
+          {checkpoint_title}{' '}
+          <span className='text-xs'>
+            {transformedArweaveLink ? (
+              <a href={transformedArweaveLink} target='_blank'>
+                {endedAt ? moment(endedAt).fromNow() : null}
+                <AuditOutlined className='ml-1' />
+              </a>
+            ) : null}
+          </span>
         </div>
-      )}
+        {endedAt && (
+          <div className='text-xs'>
+            {selectedOption ? <Tag>{selectedOption}</Tag> : null}{' '}
+            {linkDiscourse ? (
+              <a
+                href={linkDiscourse}
+                target='_blank'
+                className='text-green-500'
+              >
+                {shortenString(linkDiscourse, 30)}
+              </a>
+            ) : null}
+            {linkSnapshot ? (
+              <a href={linkSnapshot} target='_blank' className='text-green-500'>
+                {shortenString(linkSnapshot, 30)}
+              </a>
+            ) : null}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -97,13 +130,20 @@ const buildFutureHappyNode = ({
   return [];
 };
 
-const MissionProgress: React.FC<Props> = ({ missionData }) => {
+const MissionProgress: React.FC<Props> = ({
+  missionData,
+  setHistoricalCheckpointData,
+}) => {
   const { orgIdString } = useParams();
   const navigate = useNavigate();
 
   const workflowId = missionData?.workflow_id?.toString();
   const workflowTitle = missionData?.workflow_title;
   const versionIdString = missionData?.workflow_version_id;
+  const [selectedItemId, setSelectedItemId] = useState<number>();
+  const handleSelectItem = (itemId: number) => {
+    setSelectedItemId(itemId);
+  };
 
   const publicUrl = `/public/${orgIdString}/${createIdString(
     workflowTitle,
@@ -137,7 +177,14 @@ const MissionProgress: React.FC<Props> = ({ missionData }) => {
     }
     items.push({
       color: color,
-      children: <HistoryItem item={item} />,
+      children: (
+        <HistoryItem
+          item={item}
+          isSelected={selectedItemId === item.id}
+          setHistoricalCheckpointData={setHistoricalCheckpointData}
+          onSelectItem={handleSelectItem}
+        />
+      ),
       dot: dot,
     });
     existed.push(originalCheckpoint?.id);
