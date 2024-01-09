@@ -1,15 +1,21 @@
-import { ClockCircleOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+  ClockCircleOutlined,
+  LoadingOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 import {
   formatDate,
   getTimeElapsedSinceStart,
   getTimeRemainingToEnd,
 } from '@utils/helpers';
-import { Button, Card, Space, Tag, message } from 'antd';
+import { Button, Card, Empty, Space, Tag, message } from 'antd';
 import { Icon } from 'icon';
 import ShowDescription from './ShowDescription';
 import ProposalDocuments from './ProposalDocuments';
 import { shortenString } from 'directed-graph';
 import moment from 'moment';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 const MissionSummary = ({
   currentCheckpointData,
@@ -27,6 +33,22 @@ const MissionSummary = ({
   const isExpired =
     getTimeRemainingToEnd(currentCheckpointData.endToVote) === 'expired';
   const { created_at, workflow_icon_url } = missionData;
+  console.log('missionData: ', missionData);
+  const proposal = missionData?.data?.variables?.proposal;
+  const [proposalContent, setProposalContent] = useState(
+    proposal ? 'Loading proposal content...' : ''
+  );
+  useEffect(() => {
+    if (proposal) {
+      const url = proposal.includes('https://arweave.net/')
+        ? proposal
+        : `https://arweave.net/${proposal}`;
+      axios.get(url).then((res) => {
+        setProposalContent(res.data.raw);
+      });
+    }
+  }, []);
+
   return (
     <>
       <div className='flex flex-col mb-4 gap-6'>
@@ -88,7 +110,7 @@ const MissionSummary = ({
         ) : null}
         <ShowDescription
           titleDescription={'Proposal content'}
-          description={missionData?.m_desc}
+          description={proposalContent}
         />
         {/* {currentCheckpointData?.description ? (
           <ShowDescription

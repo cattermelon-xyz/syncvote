@@ -2,7 +2,7 @@ import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
 type CollapsiblePanelProps = {
-  title: string;
+  title: string | JSX.Element;
   children: React.ReactNode;
   className?: string;
   bodyStyle?: React.CSSProperties;

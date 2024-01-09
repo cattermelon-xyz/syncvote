@@ -3,7 +3,12 @@ const { DISCOURSE_ACTION, isValidAction } = require('../../configs/constants');
 const { supabase } = require('../../configs/supabaseClient');
 const { createPost, updateTopic } = require('../../services/PostService');
 const { createTopic, moveTopic } = require('../../services/TopicService');
-const { upsertVariable, selectVariable } = require('../../functions');
+const {
+  upsertVariable,
+  selectVariable,
+  createArweave,
+} = require('../../functions');
+
 class Discourse extends VotingMachine {
   constructor(props) {
     super(props);
@@ -85,11 +90,28 @@ class Discourse extends VotingMachine {
         };
       }
       const dataToStore = data?.topicId + ',' + data?.firstPostId;
+      // store id of topic and firstPostId
       const variableStored = await upsertVariable(
         this,
         this.data.variables[0],
         dataToStore
       );
+      // store description of topic
+      console.log('this.data.variables[1]: ', this.data.variables[1]);
+      if (this.data.variables[1]) {
+        const { arweave_id, error } = await createArweave({
+          title: voteData.submission.title,
+          raw: voteData.submission.raw,
+        });
+        if (arweave_id) {
+          const variableStored = await upsertVariable(
+            this,
+            this.data.variables[1],
+            arweave_id
+          );
+          // TODO: handle error
+        }
+      }
       if (!variableStored) {
         return {
           notRecorded: true,
@@ -166,6 +188,20 @@ class Discourse extends VotingMachine {
           firstPostId: Number(postId),
         });
 
+        if (this.data.variables[1]) {
+          const { arweave_id, error } = await createArweave({
+            raw: voteData.submission.raw,
+          });
+          if (arweave_id) {
+            const variableStored = await upsertVariable(
+              this,
+              this.data.variables[1],
+              arweave_id
+            );
+            // TODO: handle error
+          }
+        }
+
         if (error_update_topic) {
           console.log('UpdateTopicError ', error_update_topic);
           return {
@@ -202,6 +238,20 @@ class Discourse extends VotingMachine {
           org_id: this.org_id,
           topic_id: Number(topicId),
         });
+
+        if (this.data.variables[1]) {
+          const { arweave_id, error } = await createArweave({
+            raw: voteData.submission.raw,
+          });
+          if (arweave_id) {
+            const variableStored = await upsertVariable(
+              this,
+              this.data.variables[1],
+              arweave_id
+            );
+            // TODO: handle error
+          }
+        }
 
         if (error_create_post) {
           console.log('CreatePostError ', error_create_post);
