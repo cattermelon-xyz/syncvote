@@ -3,7 +3,6 @@ import { LeftOutlined } from '@ant-design/icons';
 import Input from 'antd/es/input/Input';
 import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
-import { createProposalDemo } from '@data/org';
 import { resetLastProposalId } from '../utils';
 import { createMission } from '@axios/createMission';
 
@@ -12,6 +11,7 @@ interface Props {
   setCurrentProposalId: any;
   currentOrgData: any;
   user: any;
+  setLoading: any;
 }
 
 const CreateProposal: React.FC<Props> = ({
@@ -19,6 +19,7 @@ const CreateProposal: React.FC<Props> = ({
   setCurrentProposalId,
   currentOrgData,
   user,
+  setLoading,
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [currentWorkflowData, setCurrentWorkflowData] = useState<any>();
@@ -26,7 +27,6 @@ const CreateProposal: React.FC<Props> = ({
   const [workflowsOption, setWorkflowsOption] = useState<any>();
 
   const handleCreateProposal = async () => {
-
     const missionData = {
       creator_id: user.id,
       status: 'PUBLIC',
@@ -39,13 +39,14 @@ const CreateProposal: React.FC<Props> = ({
 
     createMission({
       missionData,
-      onSuccess: (data) => {
-        console.log('create proposal success', data);
-        setCurrentProposalId(data?.id);
+      onSuccess: (response) => {
+        console.log('create proposal success', response);
+        setCurrentProposalId(response.data[0]?.id);
       },
       onError: (error) => {
         console.log('error', error);
       },
+      author: user?.email,
     });
   };
 
@@ -127,7 +128,9 @@ const CreateProposal: React.FC<Props> = ({
           size='large'
           disabled={isButtonDisabled}
           onClick={async () => {
+            setLoading(true);
             await handleCreateProposal();
+            setLoading(false);
             setPage(PAGE_ROUTER.DONE_CREATE_PROPOSAL);
           }}
         >

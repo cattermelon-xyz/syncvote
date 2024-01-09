@@ -1,13 +1,15 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { useSDK } from '@metamask/sdk-react';
+import { Card, Button, Radio, Input, Tag } from 'antd';
+import Client from '@snapshot-labs/snapshot.js/dist/sign';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { IVoteUIWebProps } from 'directed-graph';
 import snapshot from '@snapshot-labs/snapshot.js';
 import moment from 'moment';
 import { TextEditor } from 'rich-text-editor';
 import html2md from 'html-to-md';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
-import { Button, Card, Input } from 'antd';
+import { BorderOutlined } from '@ant-design/icons';
 
 export type Receipt = {
   id: string;
@@ -42,74 +44,92 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const [web3, setWeb3] = useState<Web3Provider>();
   const [title, setTitle] = useState('');
   const [description, setDiscription] = useState('');
-  const { connected } = useSDK();
-
+  const options = checkpointData?.data?.snapShotOption || [];
+  const space = checkpointData?.data?.space || '';
   return (
     <div>
       <Card className='p-4'>
-        {connected ? (
-          <div className='flex flex-col gap-6'>
-            {checkpointData &&
-            checkpointData?.data?.action === 'create-proposal' ? (
-              <>
-                <p className='text-xl font-medium'>Create Proposal</p>
-                <div className='flex-col w-full'>
-                  <div className='text-base mb-1'>Title</div>
-                  <Input
-                    value={title}
-                    placeholder='Testing Syncvote MVP'
-                    onChange={(e) => {
-                      setTitle(e.target.value);
-                    }}
-                  />
-                </div>
-                <div className='flex-col w-full'>
-                  <div className='text-base mb-1'>Description</div>
-                  <TextEditor value={description} setValue={setDiscription} />
-                </div>
-                <Button
-                  type='primary'
-                  className='w-full'
-                  onClick={async () => {
-                    if (isExternalProvider(window.ethereum)) {
-                      setWeb3(new Web3Provider(window.ethereum));
-                    }
-                    if (web3) {
-                      const accounts = await web3.listAccounts();
-                      const receipt = await client.proposal(web3, accounts[0], {
-                        space: checkpointData?.data?.space,
-                        type: checkpointData?.data?.type,
-                        title: title,
-                        body: html2md(description),
-                        choices: checkpointData?.data?.snapShotOption,
-                        start: moment().unix(),
-                        end: moment().unix() + checkpointData?.duration,
-                        snapshot: 13620822,
-                        plugins: JSON.stringify({}),
-                        app: 'my-app',
-                        discussion: '',
-                      });
-
-                      if (isReceipt(receipt)) {
-                        onSubmit({
-                          submission: {
-                            proposalId: receipt.id,
-                          },
-                        });
-                      }
-                    }
+        <div className='flex flex-col gap-6'>
+          {checkpointData &&
+          checkpointData?.data?.action === 'create-proposal' ? (
+            <>
+              <p className='text-xl font-medium'>Create Proposal</p>
+              <div className='flex-col w-full'>
+                <div className='text-base mb-1'>Title</div>
+                <Input
+                  value={title}
+                  placeholder='Testing Syncvote MVP'
+                  onChange={(e) => {
+                    setTitle(e.target.value);
                   }}
-                >
-                  Vote
-                </Button>
-              </>
-            ) : null}
-          </div>
-        ) : (
-          <>
-            <div>Need connect wallet to create proposal</div>
-          </>
-        )}
+                />
+              </div>
+              <div className='flex-col w-full'>
+                <div className='text-base mb-1'>Description</div>
+                <TextEditor value={description} setValue={setDiscription} />
+              </div>
+              {options.length > 0 ? (
+                <div>
+                  <div>
+                    A proposal will be held in{' '}
+                    <a href={`https://snapshot.org/#/${space}`} target='_blank'>
+                      <Tag>{space}</Tag>
+                    </a>{' '}
+                    space
+                  </div>
+                  <div className='font-bold'>
+                    Voter can choose among these options:
+                  </div>
+                  {options.map((option: any, index: number) => {
+                    return (
+                      <div key={index}>
+                        <BorderOutlined className='mr-2' />
+                        {option}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+              <Button
+                type='primary'
+                className='w-full'
+                onClick={async () => {
+                  if (isExternalProvider(window.ethereum)) {
+                    setWeb3(new Web3Provider(window.ethereum));
+                  }
+                  if (web3) {
+                    const accounts = await web3.listAccounts();
+                    const receipt = await client.proposal(web3, accounts[0], {
+                      space: checkpointData?.data?.space,
+                      type: checkpointData?.data?.type,
+                      title: title,
+                      body: html2md(description),
+                      choices: checkpointData?.data?.snapShotOption,
+                      start: moment().unix(),
+                      end:
+                        moment().unix() +
+                        checkpointData?.data?.snapshotDuration,
+                      snapshot: 13620822,
+                      plugins: JSON.stringify({}),
+                      app: 'my-app',
+                      discussion: '',
+                    });
+
+                    if (isReceipt(receipt)) {
+                      onSubmit({
+                        submission: {
+                          proposalId: receipt.id,
+                        },
+                      });
+                    }
+                  }
+                }}
+              >
+                Vote
+              </Button>
+            </>
+          ) : null}
+        </div>
       </Card>
     </div>
   );

@@ -6,13 +6,16 @@ import { PAGE_ROUTER } from '@constants/common';
 import { useEffect, useState } from 'react';
 import { resetLastProposalId } from '../utils';
 import { queryOrgs } from '@data/org';
+import moment from 'moment';
 
 interface Props {
   setPage: any;
   setCurrentProposalId: any;
   setCurrentOrgData: any;
   user: any;
-  dataMissions: any;
+  myMissions: any;
+  followingMissions: any;
+  setLoading: any;
 }
 
 const HomePage: React.FC<Props> = ({
@@ -20,7 +23,9 @@ const HomePage: React.FC<Props> = ({
   setCurrentProposalId,
   setCurrentOrgData,
   user,
-  dataMissions,
+  myMissions,
+  followingMissions,
+  setLoading,
 }) => {
   const [orgsOption, setOrgsOption] = useState<any>();
   const [dataOrgs, setDataOrgs] = useState<any>();
@@ -35,17 +40,10 @@ const HomePage: React.FC<Props> = ({
         params: { userId: user.id },
         onSuccess: (data) => {
           const sortedData = data.sort((a: any, b: any) => {
-            const titleA = a.title.toUpperCase();
-            const titleB = b.title.toUpperCase();
-            if (titleA < titleB) {
-              return -1;
-            }
-            if (titleA > titleB) {
-              return 1;
-            }
-            return 0;
+            return (
+              moment(a.last_updated).unix() - moment(b.last_updated).unix()
+            );
           });
-          console.log('data org', sortedData);
           const handleDataOrgs = sortedData.map((dataOrg: any) => {
             return {
               value: dataOrg?.id,
@@ -69,8 +67,8 @@ const HomePage: React.FC<Props> = ({
       label: 'For you',
       children: (
         <div className='flex flex-col gap-2'>
-          {dataMissions && dataMissions.length > 0 ? (
-            dataMissions.map((proposal: any, index: any) => (
+          {myMissions && myMissions.length > 0 ? (
+            myMissions.map((proposal: any, index: any) => (
               <MissionCard
                 key={index}
                 proposal={proposal}
@@ -84,6 +82,32 @@ const HomePage: React.FC<Props> = ({
         </div>
       ),
     },
+    {
+      key: '2',
+      label: 'Followings',
+      children: (
+        <div className='flex flex-col gap-2'>
+          {followingMissions && followingMissions.length > 0 ? (
+            followingMissions.map((proposal: any, index: any) => (
+              <MissionCard
+                key={index}
+                proposal={proposal}
+                setPage={setPage}
+                setCurrentProposalId={setCurrentProposalId}
+              />
+            ))
+          ) : (
+            <Empty />
+          )}
+        </div>
+      ),
+    },
+    {
+      key: '3',
+      label: 'Mentions',
+      children: <></>,
+      disabled: true,
+    },
   ];
 
   const onChangeTabs = (key: string) => {
@@ -96,8 +120,8 @@ const HomePage: React.FC<Props> = ({
       (dataOrg: any) => dataOrg?.id === value
     );
     setCurrentOrgData(selectedDataOrg[0]);
+    setLoading(true);
   };
-
   return (
     <>
       {orgsOption && (

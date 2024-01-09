@@ -10,7 +10,7 @@ import { extractCurrentCheckpointId } from '@utils/helpers';
 import { queryDocInput } from '@dal/data';
 import { config } from '@dal/config';
 // =============================== METAMASK SECTION ===============================
-import { useSDK } from '@metamask/sdk-react';
+import { MetaMaskProvider, useSDK } from '@metamask/sdk-react';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import MissionProgressSummary from './fragments/MissionProgressSummary';
 import MissionSummary from './fragments/MissionSummary';
@@ -41,7 +41,7 @@ const getCheckpointData = (data: any) => {
   if (!checkpointData[0].isEnd) {
     const startToVote = new Date(data.startToVote);
     // convert second to millisecond of duration
-    const duration = checkpointData[0].duration || 0 * 1000;
+    const duration = (checkpointData[0].duration || 0) * 1000;
     const endTovote = new Date(startToVote.getTime() + duration).toISOString();
     checkpointDataAfterHandle.endToVote = endTovote;
     checkpointDataAfterHandle.initData = data.initData || {};
@@ -272,10 +272,11 @@ const MissionVotingDetail = () => {
 
   // =============================== METAMASK SECTION ===============================
   const [account, setAccount] = useState<any>();
-  const { sdk, connected, connecting, provider, chainId } = useSDK();
+  const { sdk } = useSDK();
 
   const connect = async () => {
     try {
+      console.log(sdk);
       const accounts = await sdk?.connect();
 
       if (Array.isArray(accounts) && accounts.length > 0) {
@@ -326,6 +327,7 @@ const MissionVotingDetail = () => {
         );
         if (checkpointData[0].vote_machine_type === 'forkNode') {
           subMissionIds = data.initData?.start || [];
+
           for (var i = 0; i < subMissionIds.length; i++) {
             await queryAMissionDetail({
               missionId: subMissionIds[i],
@@ -376,39 +378,50 @@ const MissionVotingDetail = () => {
   );
   return (
     <>
-      {missionData && currentCheckpointData && (
-        <div className='lg:w-[1024px] md:w-[640px] sm:w-[400px] flex gap-4'>
-          <Space direction='vertical' className='w-2/3' size='small'>
-            <MissionSummary
-              currentCheckpointData={currentCheckpointData}
-              missionData={missionData}
-              listVersionDocs={listVersionDocs}
-              dataOfAllDocs={[]}
-            />
-            {renderId(user, dispatch, account, connect, disconnect)}
-            <Space direction='vertical' size={16} className='w-full'>
-              {isForkNode && (
-                <>
-                  <Tabs defaultActiveKey='0' items={subMissionTabItems} />
-                </>
-              )}
-              {renderVoteMachine(missionData, user, account, dispatch)}
+      <MetaMaskProvider
+        debug={false}
+        sdkOptions={{
+          checkInstallationImmediately: false,
+          dappMetadata: {
+            name: 'Syncvote',
+            url: 'http://' + window.location.host,
+          },
+        }}
+      >
+        {missionData && currentCheckpointData && (
+          <div className='lg:w-[1024px] md:w-[640px] sm:w-[400px] flex gap-4'>
+            <Space direction='vertical' className='w-2/3' size='small'>
+              <MissionSummary
+                currentCheckpointData={currentCheckpointData}
+                missionData={missionData}
+                listVersionDocs={listVersionDocs}
+                dataOfAllDocs={[]}
+              />
+              {renderId(user, dispatch, account, connect, disconnect)}
+              <Space direction='vertical' size={16} className='w-full'>
+                {isForkNode && (
+                  <>
+                    <Tabs defaultActiveKey='0' items={subMissionTabItems} />
+                  </>
+                )}
+                {renderVoteMachine(missionData, user, account, dispatch)}
+              </Space>
             </Space>
-          </Space>
-          <div className='flex-1 flex flex-col gap-4'>
-            <MissionProgressSummary
-              missionData={missionData}
-              currentCheckpointData={currentCheckpointData}
-              setOpenModalListParticipants={setOpenModalListParticipants}
-            />
+            <div className='flex-1 flex flex-col gap-4'>
+              <MissionProgressSummary
+                missionData={missionData}
+                currentCheckpointData={currentCheckpointData}
+                setOpenModalListParticipants={setOpenModalListParticipants}
+              />
+            </div>
           </div>
-        </div>
-      )}
-      <ModalListParticipants
-        open={openModalListParticipants}
-        onClose={() => setOpenModalListParticipants(false)}
-        listParticipants={currentCheckpointData?.participation?.data || []}
-      />
+        )}
+        <ModalListParticipants
+          open={openModalListParticipants}
+          onClose={() => setOpenModalListParticipants(false)}
+          listParticipants={currentCheckpointData?.participation?.data || []}
+        />
+      </MetaMaskProvider>
     </>
   );
 };

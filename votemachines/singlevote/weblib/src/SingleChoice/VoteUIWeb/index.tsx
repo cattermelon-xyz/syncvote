@@ -39,7 +39,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               onSubmit({ option: [selectedOption - 1] });
             }}
             disabled={
-              selectedOption
+              selectedOption !== null
                 ? // && getTimeRemainingToEnd(currentCheckpointData.endToVote) !='expired'
                   false
                 : true

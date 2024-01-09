@@ -3,6 +3,11 @@ const { DISCOURSE_ACTION, isValidAction } = require('../../configs/constants');
 const { supabase } = require('../../configs/supabaseClient');
 const { createPost, updateTopic } = require('../../services/PostService');
 const { createTopic, moveTopic } = require('../../services/TopicService');
+const {
+  upsertVariable,
+  selectVariable,
+  createArweave,
+} = require('../../functions');
 
 class Discourse extends VotingMachine {
   constructor(props) {
@@ -66,14 +71,10 @@ class Discourse extends VotingMachine {
 
     // handle with action: create-topic
     if (this.data.action === DISCOURSE_ACTION.CREATE_TOPIC) {
-      if (!voteData.submission.title) {
-        return { notRecorded: true, error: 'Missing title to create topic' };
-      }
-
-      if (!voteData.submission.raw) {
+      if (!voteData.submission.title || !voteData.submission.raw) {
         return {
           notRecorded: true,
-          error: 'Missing description of proposal to create topic',
+          error: 'Missing title or description to create topic',
         };
       }
 
@@ -81,7 +82,6 @@ class Discourse extends VotingMachine {
         ...voteData.submission,
         org_id: this.org_id,
       });
-
       if (error_create_topic) {
         console.log('CreateTopicError', error_create_topic);
         return {
@@ -90,7 +90,34 @@ class Discourse extends VotingMachine {
         };
       }
       const dataToStore = data?.topicId + ',' + data?.firstPostId;
-
+      // store id of topic and firstPostId
+      const variableStored = await upsertVariable(
+        this,
+        this.data.variables[0],
+        dataToStore
+      );
+      // store description of topic
+      console.log('this.data.variables[1]: ', this.data.variables[1]);
+      if (this.data.variables[1]) {
+        const { arweave_id, error } = await createArweave({
+          title: voteData.submission.title,
+          raw: voteData.submission.raw,
+        });
+        if (arweave_id) {
+          const variableStored = await upsertVariable(
+            this,
+            this.data.variables[1],
+            arweave_id
+          );
+          // TODO: handle error
+        }
+      }
+      if (!variableStored) {
+        return {
+          notRecorded: true,
+          error: 'Error when store variables',
+        };
+      }
       this.tallyResult = {
         index: this.children.indexOf(this.data.next) || 0,
         submission: {
@@ -99,75 +126,17 @@ class Discourse extends VotingMachine {
           [this.data.variables[0]]: dataToStore,
         },
       };
-      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
-      // update variables
-      const { data: variables } = await supabase
-        .from('variables')
-        .insert({
-          name: this.data.variables[0],
-          value: dataToStore,
-          mission_id: root_mission_id,
-        })
-        .select('*');
-    } else if (this.data.action === DISCOURSE_ACTION.CREATE_POST) {
-      if (!voteData.submission.raw) {
-        return {
-          notRecorded: true,
-          error: 'Missing description of proposal to create post',
-        };
-      }
-      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
-      const { data: variables, error } = await supabase
-        .from('variables')
-        .select('*')
-        .eq('name', this.data.variables[0])
-        .eq('mission_id', root_mission_id);
-      variables;
-      if (error) {
-        return {
-          notRecorded: true,
-          error: 'Cannot get value of topicId',
-        };
-      } else {
-        const topicId = variables[0]?.value?.split(',')[0];
-        const { data, error: error_create_post } = await createPost({
-          raw: voteData.submission.raw,
-          org_id: this.org_id,
-          topic_id: Number(topicId),
-        });
-
-        if (error_create_post) {
-          console.log('CreatePostError ', error_create_post);
-          return {
-            notRecorded: true,
-            error: 'Error when create post',
-          };
-        }
-
-        this.tallyResult = {
-          index: this.children.indexOf(this.data.next) || 0,
-          submission: {
-            linkDiscourse: data?.linkDiscourse,
-          },
-        };
-      }
     } else if (this.data.action === DISCOURSE_ACTION.MOVE_TOPIC) {
-      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
-      const { data: variables, error } = await supabase
-        .from('variables')
-        .select('*')
-        .eq('name', this.data.variables[0])
-        .eq('mission_id', root_mission_id);
-
-      if (error) {
+      const variables = await selectVariable(this, this.data.variables[0]);
+      if (!variables) {
         return {
           notRecorded: true,
           error: 'Cannot get value of topicId',
         };
       } else {
-        console.log('root_mission_id', this.m_parent);
-        console.log(this.data.variables[0], variables);
-        const topicId = variables[0]?.value?.split(',')[0];
+        // console.log('root_mission_id', this.m_parent);
+        // console.log(this.data.variables[0], variables);
+        const topicId = variables?.split(',')[0];
         console.log(topicId, this.org_id, this.data.categoryId);
         const { data, error: error_move_topic } = await moveTopic({
           topic_id: Number(topicId),
@@ -195,33 +164,43 @@ class Discourse extends VotingMachine {
           error: 'Missing raw to update topic',
         };
       }
-      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
-      const { data: variables, error } = await supabase
-        .from('variables')
-        .select('*')
-        .eq('name', this.data.variables[0])
-        .eq('mission_id', root_mission_id);
+      const variables = await selectVariable(this, this.data.variables[0]);
 
-      if (error) {
+      if (!variables) {
         return {
           notRecorded: true,
           error: 'Cannot get value of topicId',
         };
       } else {
-        const postId = variables[0]?.value?.split(',')[1];
-        if (error) {
+        // console.log('variables: ', variables);
+        const postId = variables?.split(',')[1];
+        if (!postId) {
           return {
             notRecorded: true,
             error: 'Cannot get value of firstTopicId',
           };
         }
 
-        const { data, error: error_update_topic } = await updateTopic({
+        const { error: error_update_topic } = await updateTopic({
           raw: voteData.submission.raw,
           org_id: this.org_id,
           edit_reason: voteData.submission.edit_reason || 'Not specified',
           firstPostId: Number(postId),
         });
+
+        if (this.data.variables[1]) {
+          const { arweave_id, error } = await createArweave({
+            raw: voteData.submission.raw,
+          });
+          if (arweave_id) {
+            const variableStored = await upsertVariable(
+              this,
+              this.data.variables[1],
+              arweave_id
+            );
+            // TODO: handle error
+          }
+        }
 
         if (error_update_topic) {
           console.log('UpdateTopicError ', error_update_topic);
@@ -235,6 +214,57 @@ class Discourse extends VotingMachine {
           index: this.children.indexOf(this.data.next) || 0,
           submission: {
             [this.data.variables[0]]: Number(postId),
+          },
+        };
+      }
+    } else if (this.data.action === DISCOURSE_ACTION.CREATE_POST) {
+      if (!voteData.submission.raw) {
+        return {
+          notRecorded: true,
+          error: 'Missing description of proposal to create post',
+        };
+      }
+      const variable = await selectVariable(this, this.data.variables[0]);
+
+      if (!variable) {
+        return {
+          notRecorded: true,
+          error: 'Cannot get value of topicId',
+        };
+      } else {
+        const topicId = variable.split(',')[0];
+        const { data, error: error_create_post } = await createPost({
+          raw: voteData.submission.raw,
+          org_id: this.org_id,
+          topic_id: Number(topicId),
+        });
+
+        if (this.data.variables[1]) {
+          const { arweave_id, error } = await createArweave({
+            raw: voteData.submission.raw,
+          });
+          if (arweave_id) {
+            const variableStored = await upsertVariable(
+              this,
+              this.data.variables[1],
+              arweave_id
+            );
+            // TODO: handle error
+          }
+        }
+
+        if (error_create_post) {
+          console.log('CreatePostError ', error_create_post);
+          return {
+            notRecorded: true,
+            error: 'Error when create post',
+          };
+        }
+
+        this.tallyResult = {
+          index: this.children.indexOf(this.data.next) || 0,
+          submission: {
+            linkDiscourse: data?.linkDiscourse,
           },
         };
       }

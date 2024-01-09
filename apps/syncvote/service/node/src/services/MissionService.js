@@ -43,12 +43,10 @@ async function insertMission(props) {
         });
         return;
       }
-      console.log('arweave_id: ', arweave_id);
       const { data: newMission, error } = await supabase
         .from('mission')
         .insert({ ...props, arweave_id: arweave_id })
         .select('*');
-      console.log('newMission: ', newMission[0].data.checkpoints);
       if (!error) {
         if (newMission[0].status === 'PUBLIC') {
           console.log(
@@ -91,6 +89,7 @@ async function insertMission(props) {
               children: checkpoint?.children,
               isEnd: checkpoint?.isEnd,
               includedAbstain: checkpoint?.includedAbstain,
+              desc: checkpoint?.description,
               props: checkpoint?.data,
             };
 

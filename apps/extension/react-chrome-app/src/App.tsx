@@ -12,6 +12,15 @@ import {
 import { queryAMissionDetail } from '@data/mission';
 import { queryMission } from '@data/mission';
 import { extractCurrentCheckpointId } from './utils';
+import { Spin } from 'antd';
+
+const Loading = () => {
+  return (
+    <div className='w-full h-full flex justify-center items-center'>
+      <Spin />
+    </div>
+  );
+};
 
 function App() {
   const [user, setUser] = useState<any>();
@@ -19,14 +28,19 @@ function App() {
   const [currentProposalId, setCurrentProposalId] = useState<number>();
   const [currentProposalData, setCurrentProposalData] = useState<any>();
   const [currentOrgData, setCurrentOrgData] = useState<any>();
-  const [dataMissions, setDataMissions] = useState<any>();
+  const [myMissions, setMyMissions] = useState<any>();
+  const [followingMissions, setFollowingMissions] = useState<any[]>();
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
   const [listVersionDocs, setListVersionDocs] = useState<any[]>();
+  const [lastRequest, setLastRequest] = useState<any>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    setLoading(true);
     getCurrentUser().then((resp) => {
       if (resp) {
         setUser(resp.user);
+        setLoading(false);
       } else {
         console.log('user is not found');
       }
@@ -34,6 +48,7 @@ function App() {
     getLastProposalId().then((resp) => {
       if (resp) {
         setCurrentProposalId(resp.id);
+        setLoading(false);
       }
     });
   }, []);
@@ -44,7 +59,6 @@ function App() {
       queryAMissionDetail({
         missionId: currentProposalId,
         onSuccess: (data: any) => {
-          console.log('data query', data);
           setCurrentProposalData(data);
           const currentCheckpointId = extractCurrentCheckpointId(data.id);
           const checkpointData = data?.data?.checkpoints.filter(
@@ -68,65 +82,54 @@ function App() {
             checkpointDataAfterHandle.endToVote = endTovote;
           }
 
-          switch (checkpointData[0]?.vote_machine_type) {
-            case 'SingleChoiceRaceToMax':
-              if (checkpointData[0]?.includedAbstain === true) {
-                checkpointDataAfterHandle.data.options.push('Abstain');
-              }
-              break;
-            case 'UpVote':
-              checkpointDataAfterHandle.data.options = [];
-              checkpointDataAfterHandle.data.options.push('Upvote');
-              if (checkpointData[0]?.includedAbstain === true) {
-                checkpointDataAfterHandle.data.options.push('Abstain');
-              }
-              break;
-            case 'Veto':
-              checkpointDataAfterHandle.data.options = [];
-              checkpointDataAfterHandle.data.options.push('Upvote');
-              if (checkpointData[0]?.includedAbstain === true) {
-                checkpointDataAfterHandle.data.options.push('Abstain');
-              }
-              break;
-            default:
-              break;
-          }
           setCurrentCheckpointData(checkpointDataAfterHandle);
+          setLoading(false);
         },
         onError: (error) => {
           console.log('error', error);
+          setLoading(false);
         },
       });
     }
-  }, [currentProposalId]);
+  }, [currentProposalId, lastRequest]);
 
   useEffect(() => {
     if (currentOrgData) {
       queryMission({
         orgId: currentOrgData?.id,
         onSuccess: (data) => {
-          const filteredMissions = data.filter(
-            (missionData: any) => missionData?.creator_id === user?.id
+          const tmpMyMissions = data.filter(
+            (missionData: any) =>
+              missionData?.creator_id === user?.id && missionData.title
           );
-          setDataMissions(filteredMissions);
+          const tmpFollowingMissions = data.filter(
+            (missionData: any) =>
+              missionData?.creator_id !== user?.id && missionData.title
+          );
+          tmpMyMissions.sort((a: any, b: any) => {
+            return b.id - a.id;
+          });
+          tmpFollowingMissions.sort((a: any, b: any) => {
+            return b.id - a.id;
+          });
+          console.log('tmpFollowingMissions', tmpFollowingMissions);
+          setMyMissions(tmpMyMissions);
+          setFollowingMissions(tmpFollowingMissions);
+          setLoading(false);
         },
         onError: (error) => {
           console.log('error', error);
+          setLoading(false);
         },
       });
     }
   }, [currentOrgData, user]);
 
-  // useEffect(() => {
-  //   console.log('user', user);
-  //   console.log('currentProposalId', currentProposalId);
-  //   console.log('currentOrgData', currentOrgData);
-  //   console.log('dataMissions', dataMissions);
-  // }, [currentProposalData, currentProposalId, currentOrgData, dataMissions]);
-
   return (
     <div className='w-[260px] h-[380px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
-      {user === null || user === undefined ? (
+      {loading === true ? (
+        <Loading />
+      ) : user === null || user === undefined ? (
         <Login />
       ) : currentProposalData ? (
         <Voting
@@ -135,6 +138,11 @@ function App() {
           currentCheckpointData={currentCheckpointData}
           setCurrentProposalId={setCurrentProposalId}
           setCurrentProposalData={setCurrentProposalData}
+          user={user}
+          reload={() => {
+            setLastRequest(new Date().getTime());
+          }}
+          setLoading={setLoading}
         />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
         <HomePage
@@ -142,7 +150,9 @@ function App() {
           setPage={setPage}
           setCurrentOrgData={setCurrentOrgData}
           setCurrentProposalId={setCurrentProposalId}
-          dataMissions={dataMissions}
+          myMissions={myMissions}
+          followingMissions={followingMissions}
+          setLoading={setLoading}
         />
       ) : currentOrgData && page === PAGE_ROUTER.CREATE_PROPOSAL ? (
         <CreateProposal
@@ -150,11 +160,12 @@ function App() {
           currentOrgData={currentOrgData}
           setCurrentProposalId={setCurrentProposalId}
           user={user}
+          setLoading={setLoading}
         />
       ) : page === PAGE_ROUTER.DONE_CREATE_PROPOSAL ? (
         <DoneCreateProposal setPage={setPage} />
       ) : (
-        <></>
+        <Loading />
       )}
     </div>
   );

@@ -12,11 +12,10 @@ const Meta = ({
   currentMission: IMission;
   setCurrentMission: (data: any) => void;
 }) => {
-
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
-  
+
   return (
     <Space direction='vertical' size='large' className='w-full'>
       <Space direction='vertical' className='w-full'>
@@ -53,7 +52,7 @@ const Meta = ({
           disabled={currentMission.status === 'PUBLISHED'}
         />
       </Space>
-      <Space direction='vertical' className='w-full'>
+      {/* <Space direction='vertical' className='w-full'>
         <span>Description</span>
         <TextArea
           placeholder='Mission description'
@@ -68,7 +67,7 @@ const Meta = ({
           }}
           disabled={currentMission.status === 'PUBLISHED'}
         />
-      </Space>
+      </Space> */}
       {/* <div>
         <TextArea
           value={currentMission.data}

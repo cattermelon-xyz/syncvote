@@ -7,6 +7,7 @@ import {
   Modal,
   Button,
   Select,
+  Checkbox,
 } from 'antd';
 import { useContext, useState } from 'react';
 import { EditOutlined } from '@ant-design/icons';
@@ -274,6 +275,19 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-gray-400'>Checkpoint color & label</div>
               <MarkerEditNode />
+              <div className='w-full flex items-center justify-between'>
+                <div>In Happy Path?</div>
+                <Checkbox
+                  checked={selectedNode?.inHappyPath}
+                  onClick={() => {
+                    const newNode = structuredClone(selectedNode);
+                    if (newNode) {
+                      newNode.inHappyPath = !newNode.inHappyPath;
+                      onChange(newNode);
+                    }
+                  }}
+                />
+              </div>
             </Space>
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-gray-400'>Note</div>

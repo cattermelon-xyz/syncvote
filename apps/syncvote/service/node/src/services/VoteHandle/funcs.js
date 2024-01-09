@@ -7,48 +7,6 @@ const moment = require('moment');
 var CronJob = require('cron').CronJob;
 const { createArweave, convertToCron } = require('../../functions');
 
-const checkIfFirstTimeOfVoting = async (details) => {
-  let voteMachineController = new VoteMachineController(details);
-  let firstTimeToVote = false;
-
-  if (!details.result) {
-    console.log(`It's first time of voting`);
-    // 1. Get the data was created by voteMachine
-    const {
-      initData,
-      error: init_error,
-      result,
-    } = voteMachineController.initDataForCVD();
-
-    // check if cannot init the data for current_vote_data
-    if (!initData) {
-      resolve({
-        status: 'ERR',
-        message: init_error,
-      });
-      return;
-    }
-
-    // 2. Update result current_vote_data for checkpoint
-    await supabase
-      .from('current_vote_data')
-      .update({
-        result: result,
-      })
-      .eq('id', details.cvd_id);
-
-    // 3. Update the result of mission_vote_details
-    details.result = result;
-
-    // 4. Update voteController
-    voteMachineController = new VoteMachineController(details);
-
-    firstTimeToVote = true;
-  }
-
-  return { firstTimeToVote, voteMachineController };
-};
-
 const handleMovingToNextCheckpoint = async (
   details,
   tallyResult,
@@ -88,9 +46,7 @@ const handleMovingToNextCheckpoint = async (
     }
 
     // Next checkpontId
-    const next_checkpoint_id = `${details.mission_id}-${
-      details.children[tallyResult.index]
-    }`;
+    const next_checkpoint_id = `${details.mission_id}-${details.children[index]}`;
 
     // create current vote data for next checkpoint
     const { data: new_current_vote_data } = await supabase
@@ -199,7 +155,7 @@ const startEndNode = async (details) => {
 
         // Check if parent misson satisfy the conditions to go to JoinNode
         if (
-          deepEqual(
+          arraysEqual(
             result.condition,
             misison_parent_data.current_vote_data.initData.end
           )
@@ -207,7 +163,6 @@ const startEndNode = async (details) => {
           // Update current_vote_data for ForkNode
           await supabase
             .from('current_vote_data')
-
             .update({ tallyResult: result, endedAt: moment().format() })
             .eq('id', misison_parent_data.current_vote_data.id);
 
@@ -226,6 +181,22 @@ const startEndNode = async (details) => {
             .from('mission')
             .update({ current_vote_data_id: new_current_vote_data[0].id })
             .eq('id', details.m_parent);
+
+          // Get new details
+          const { data: new_details } = await supabase
+            .from('mission_vote_details')
+            .select('*')
+            .eq('mission_id', details.m_parent);
+
+          const tallyResult = { index: 0 };
+          const timeDefault = moment();
+          // go to next checkpoint
+
+          await handleMovingToNextCheckpoint(
+            new_details[0],
+            tallyResult,
+            timeDefault
+          );
         }
       } else {
         console.log(
@@ -355,8 +326,15 @@ function deepEqual(obj1, obj2) {
   return true;
 }
 
+function arraysEqual(arr1, arr2) {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  return arr1.every((element) => arr2.includes(element));
+}
+
 module.exports = {
-  checkIfFirstTimeOfVoting,
   handleMovingToNextCheckpoint,
   startEndNode,
   startForkNode,

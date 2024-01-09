@@ -5,6 +5,8 @@ import {
   VerticalLeftOutlined,
   VerticalRightOutlined,
   FlagOutlined,
+  TeamOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { memo, useContext } from 'react';
 import { Handle, Position } from 'reactflow';
@@ -42,12 +44,37 @@ const Node = memo(
     id: string | undefined;
   }) => {
     const duration = data.raw?.duration * 1000 || 0;
-    const selected = data.selected
+    const inHappyPath = data.raw?.inHappyPath;
+
+    const borderStyle = data.selected
       ? 'border-2 border-violet-500 border-dashed'
+      : inHappyPath
+      ? 'border-2 border-green-500 border-solid'
       : 'border border-slate-700 border-solid';
+    const endNodeBorderStyle = data.selected
+      ? 'border-2 border-violet-500 border-dashed bg-white'
+      : inHappyPath
+      ? 'border-2 border-green-500 border-solid bg-white'
+      : 'border-2 border-red-500 border-solid bg-white';
     const style = data.style;
     const { openCreateProposalModal } = useContext(GraphContext);
     const type = data.raw?.vote_machine_type;
+
+    const participation = data.raw?.participation || {};
+
+    let partipationIcon =
+      participation?.type === 'identity' ? (
+        <TeamOutlined title='Admin(s) make the decision' />
+      ) : null;
+    partipationIcon =
+      participation?.type === 'identity' &&
+      participation?.data &&
+      (participation?.data[0] === 'author' ||
+        participation?.data[0] === 'proposer') ? (
+        <UserOutlined title='Only author make the decision' />
+      ) : (
+        partipationIcon
+      );
     const env = import.meta.env.VITE_ENV;
     const { subWorkflowId, isStart } = data;
     return (
@@ -149,17 +176,17 @@ const Node = memo(
           (data.isEnd === true && (
             <div className='items-center flex flex-col'>
               <div
-                className={`rounded-full text-base w-4 h-4 ${selected} bg-zinc-700 text-white items-center justify-center flex`}
+                className={`rounded-full text-base w-4 h-4 ${endNodeBorderStyle} text-white items-center justify-center flex`}
               >
                 <div
-                  className={`rounded-full text-base w-3 h-3 ${selected} bg-zinc-100 text-white`}
+                  className={`rounded-full text-base w-3 h-3 ${endNodeBorderStyle} text-white`}
                 ></div>
               </div>
               <div>{data.label}</div>
             </div>
           )) || (
             <>
-              <div className={`rounded-md text-base ${selected}`}>
+              <div className={`rounded-md text-base ${borderStyle}`}>
                 <div className='hover:opacity-50'>
                   <div
                     className={`p-2 font-bold`}
@@ -171,6 +198,7 @@ const Node = memo(
                         : data.label
                       : 'untitled'}
                   </div>
+
                   {data.abstract ? (
                     <div
                       style={style.content ? style.content : {}}
@@ -184,6 +212,9 @@ const Node = memo(
               {duration > 0 ? (
                 <div className='mt-2 py-1 px-2 bg-violet-200 rounded-md text-violet-500 flex items-center text-xs'>
                   {displayDelayDuration(moment.duration(duration))}
+                  {partipationIcon ? (
+                    <div className='px-1'>{partipationIcon}</div>
+                  ) : null}
                 </div>
               ) : null}
             </>

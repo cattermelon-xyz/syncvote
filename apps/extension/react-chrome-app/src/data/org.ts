@@ -1,6 +1,5 @@
 import { supabase } from '@configs/supabaseClient';
 
-
 export const queryOrgs = async ({
   params,
   onSuccess,
@@ -141,8 +140,6 @@ export const queryOrgs = async ({
     onError(error);
   }
 };
-
-
 
 export const queryDemo = async ({
   onSuccess,

@@ -9,7 +9,7 @@ async function handleSubmission(props) {
   return new Promise(async (resolve, reject) => {
     try {
       const { identify, mission_id } = props;
-
+      console.log('Voting at mission: ', mission_id);
       let { data: mission_vote_details, error: mvd_error } = await supabase
         .from('mission_vote_details')
         .select(`*`)
@@ -33,7 +33,6 @@ async function handleSubmission(props) {
           }
 
           const details = mission_vote_details[0];
-          console.log('details: ', details);
           // 2️⃣ check mission is stopped
           if (details.status === 'STOPPED') {
             resolve({

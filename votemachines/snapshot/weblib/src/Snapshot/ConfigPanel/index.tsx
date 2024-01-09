@@ -17,6 +17,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import '../styles.scss';
 import { Snapshot as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
+import moment from 'moment';
 
 /**
  *
@@ -43,6 +44,7 @@ export default (props: IVoteMachineConfigProps) => {
       fallback: '',
       action: 'create-proposal',
       proposalId: '',
+      snapshotDuration: 0,
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -50,8 +52,18 @@ export default (props: IVoteMachineConfigProps) => {
     optionsDescription,
   } = props;
 
-  const { fallback, next, action, snapShotOption, proposalId } = data;
+  const { fallback, next, action, snapShotOption, snapshotDuration } = data;
   const delays = props.delays || Array(2).fill(0);
+
+  // Duration snapshot
+  const days = snapshotDuration ? Math.floor(snapshotDuration / 86400) : 0;
+  const hours = snapshotDuration
+    ? Math.floor((snapshotDuration - days * 86400) / 3600)
+    : 0;
+  const mins = snapshotDuration
+    ? Math.floor((snapshotDuration - days * 86400 - hours * 3600) / 60)
+    : 0;
+
   const delayUnits = props.delayUnits || Array(2).fill(0);
   const delayNotes = props.delayNotes || Array(2).fill('');
 
@@ -287,6 +299,77 @@ export default (props: IVoteMachineConfigProps) => {
                   });
                 }}
               />
+            </Space>
+            <Space direction='vertical'>
+              <div>
+                {snapshotDuration ? (
+                  <>
+                    apprx.{' '}
+                    {moment.duration(snapshotDuration, 'seconds').humanize()}
+                  </>
+                ) : (
+                  <span className='text-red-500'>Duration is missing</span>
+                )}
+              </div>
+              <Space
+                direction='horizontal'
+                className='w-full flex justify-between'
+              >
+                <Input
+                  addonAfter='Days'
+                  value={days}
+                  placeholder='Day'
+                  className='text-center'
+                  onChange={(e) => {
+                    onChange({
+                      data: {
+                        ...data,
+                        snapshotDuration:
+                          parseInt(e.target.value || '0', 10) * 86400 +
+                          hours * 3600 +
+                          mins * 60,
+                      },
+                    });
+                  }}
+                  // disabled={locked.duration}
+                />
+                <Input
+                  value={hours}
+                  addonAfter='Hour'
+                  placeholder='Hour'
+                  className='text-center'
+                  onChange={(e) => {
+                    onChange({
+                      data: {
+                        ...data,
+                        snapshotDuration:
+                          days * 86400 +
+                          parseInt(e.target.value || '0', 10) * 3600 +
+                          mins * 60,
+                      },
+                    });
+                  }}
+                  // disabled={locked.duration}
+                />
+                <Input
+                  value={mins}
+                  addonAfter='Minute'
+                  placeholder='Minute'
+                  className='text-center'
+                  onChange={(e) => {
+                    onChange({
+                      data: {
+                        ...data,
+                        snapshotDuration:
+                          days * 86400 +
+                          hours * 3600 +
+                          parseInt(e.target.value || '0', 10) * 60,
+                      },
+                    });
+                  }}
+                  // disabled={locked.duration}
+                />
+              </Space>
             </Space>
 
             <Space direction='vertical' size='small' className='w-full'>

@@ -46,8 +46,9 @@ export default (props: IVoteMachineConfigProps) => {
     children = [],
     allNodes = [], //eslint-disable-line
     optionsDescription,
+    raw,
   } = props;
-
+  console.log('raw: ', raw);
   const { options, action, variables, next, fallback, categoryId } = data;
 
   const fallbackNode = allNodes.find((n) => n.id === fallback);
@@ -192,7 +193,12 @@ export default (props: IVoteMachineConfigProps) => {
                 placeholder='Please select action'
                 className='w-full'
                 options={SelectOptions}
-                onChange={(value, option) => {
+                onChange={(value) => {
+                  if (action === 'move-topic') {
+                    delete data.variables[1];
+                  } else {
+                    delete data.categoryId;
+                  }
                   onChange({
                     data: {
                       ...data,
@@ -203,24 +209,56 @@ export default (props: IVoteMachineConfigProps) => {
               />
             </Space>
             <Space direction='vertical' size='small' className='w-full'>
-              <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Variables
+              <div
+                className='text-sm text-slate-600 flex items-center gap-2'
+                title='(topic_id, first_post_id)'
+              >
+                {action === 'create-topic' && 'Write id into variable:'}
+                {(action === 'update-topic' ||
+                  action === 'create-post' ||
+                  action === 'move-topic') &&
+                  'Read topic id from variable:'}
               </div>
               <Select
                 value={variables ? variables[0] : null}
                 placeholder='Please select variables'
                 className='w-full'
                 options={variablesOption}
-                onChange={(value, option) => {
+                onChange={(value: any, option) => {
                   onChange({
                     data: {
                       ...data,
-                      variables: [value],
+                      variables: [value, data.variables[1]],
                     },
                   });
                 }}
               />
             </Space>
+            {action && action !== 'move-topic' && (
+              <Space direction='vertical' size='small' className='w-full'>
+                <div className='text-sm text-slate-600 flex items-center gap-2'>
+                  {action === 'create-post'
+                    ? 'Store comment into variable:'
+                    : 'Store description into variable:'}
+                </div>
+                <Select
+                  value={variables ? variables[1] : null}
+                  placeholder='Please select variables'
+                  className='w-full'
+                  options={variablesOption?.filter(
+                    (v: any) => v.value !== variables[0]
+                  )}
+                  onChange={(value, option) => {
+                    onChange({
+                      data: {
+                        ...data,
+                        variables: [data.variables[0], value],
+                      },
+                    });
+                  }}
+                />
+              </Space>
+            )}
             {action && action === 'move-topic' && (
               <>
                 <Space direction='vertical' size='small' className='w-full'>
