@@ -1,4 +1,5 @@
 const { VotingMachine } = require('.');
+const { supabase } = require('../../configs/supabaseClient');
 
 class Tally extends VotingMachine {
   constructor(props) {

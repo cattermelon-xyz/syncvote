@@ -36,7 +36,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             type='primary'
             className='w-full'
             onClick={async () => {
-              onSubmit({ option: [selectedOption - 1] });
+              onSubmit({ option: [selectedOption] });
             }}
             disabled={
               selectedOption !== null
