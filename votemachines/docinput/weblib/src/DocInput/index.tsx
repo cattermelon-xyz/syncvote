@@ -16,7 +16,7 @@ import VoteUIWeb from './VoteUIWeb';
 import { DocInput, DocInput as Interface } from './interface';
 import { DocInput as Funcs } from './funcs';
 import parse from 'html-react-parser';
-import { Button, Modal, Space } from 'antd';
+import { Button, Modal, Space, Tag } from 'antd';
 import { FaInfo } from 'react-icons/fa6';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
@@ -133,7 +133,7 @@ const explain = ({
             const predefinedDoc: any =
               predefinedDocs.find((p: any) => p.id === doc.id) || {};
             return (
-              <li>
+              <li key={index}>
                 <Space
                   direction='horizontal'
                   size='small'
@@ -188,33 +188,45 @@ const abstract = ({
   data: DocInput.IData;
   graphData?: IWorkflowVersionData;
 }) => {
-  const { docs } = data;
+  const { docs, variables } = data;
   const predefinedDocs: IDoc[] = graphData?.docs || [];
-  return docs && docs.length > 0 ? (
+  // return docs && docs.length > 0 ? (
+  //   <div className='p-2'>
+  //     {docs.map((doc: DocInput.IDoc, index: number) => {
+  //       if (index < 3) {
+  //         const predefinedDoc: any = predefinedDocs.find(
+  //           (p: any) => p.id === doc.id
+  //         ) || { id: doc.id };
+  //         return (
+  //           <div key={index}>
+  //             <div>
+  //               {doc.action}{' '}
+  //               <span className='text-violet-500'>
+  //                 {predefinedDoc.title ? predefinedDoc.title : predefinedDoc.id}
+  //               </span>
+  //             </div>
+  //           </div>
+  //         );
+  //       } else if (index === 3) {
+  //         return <div>...</div>;
+  //       } else {
+  //         return null;
+  //       }
+  //     })}
+  //   </div>
+  // ) : null;
+  return variables && variables.length > 0 ? (
     <div className='p-2'>
-      {docs.map((doc: DocInput.IDoc, index: number) => {
-        if (index < 3) {
-          const predefinedDoc: any = predefinedDocs.find(
-            (p: any) => p.id === doc.id
-          ) || { id: doc.id };
-          return (
-            <div key={index}>
-              <div>
-                {doc.action}{' '}
-                <span className='text-violet-500'>
-                  {predefinedDoc.title ? predefinedDoc.title : predefinedDoc.id}
-                </span>
-              </div>
-            </div>
-          );
-        } else if (index === 3) {
-          return <div>...</div>;
-        } else {
-          return null;
-        }
-      })}
+      Update{' '}
+      <span>
+        {variables.map((variable: string, index: number) => {
+          return <Tag key={index}>{variable}</Tag>;
+        })}
+      </span>
     </div>
-  ) : null;
+  ) : (
+    <></>
+  );
 };
 
 const VoteMachine: IVoteMachine = {

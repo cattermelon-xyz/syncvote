@@ -59,9 +59,7 @@ const VariableList = ({
   version: any;
   setVersion: any;
 }) => {
-  const variables = version.data?.variables
-    ? [...version.data?.variables]
-    : ['proposal'];
+  const variables = version.data?.variables ? [...version.data?.variables] : [];
   const [showDialog, setShowDialog] = useState(false);
   return (
     <CollapsiblePanel

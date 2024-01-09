@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Card, Button, Radio } from 'antd';
+import { Card, Button, Radio, Input, Tag } from 'antd';
 import { IDoc } from 'directed-graph';
 import { getTimeRemainingToEnd } from '../funcs';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -12,14 +12,14 @@ import { IVoteUIWebProps } from 'directed-graph';
 
 const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const { onSubmit, missionData, checkpointData } = props;
-  console.log('missionData: ', missionData);
-  console.log('checkpointData: ', checkpointData);
+  const variables = missionData.props?.variables || [];
   const dataOfAllDocs = missionData?.data?.docs || [];
   // TODO: later acquire this through PDA-style design
   const listVersionDocs: any[] = [];
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [expandedDocIds, setExpandedDocIds] = useState<string[]>([]);
-  const [expandVoteForDocInput, setExpandVoteForDocInput] = useState<boolean>();
+  const [expandVoteForDocInput, setExpandVoteForDocInput] =
+    useState<boolean>(true);
   const [editorValues, setEditorValues] = useState<{ [key: string]: string }>(
     {}
   );
@@ -70,23 +70,47 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   }
 
   const handleConfirm = () => {
-    const finalValues = Object.keys(editorValues).reduce((acc: any, docId) => {
-      const optionDoc = optionDocs.find((doc: any) => doc.id === docId);
-      if (optionDoc.action === 'Append ') {
-        acc[docId] = optionDoc.template + editorValues[docId];
-      } else {
-        acc[docId] = editorValues[docId];
-      }
-      return acc;
-    }, {});
+    // const finalValues = Object.keys(editorValues).reduce((acc: any, docId) => {
+    //   const optionDoc = optionDocs.find((doc: any) => doc.id === docId);
+    //   if (optionDoc.action === 'Append ') {
+    //     acc[docId] = optionDoc.template + editorValues[docId];
+    //   } else {
+    //     acc[docId] = editorValues[docId];
+    //   }
+    //   return acc;
+    // }, {});
+    const finalValues = {
+      variables: variableValues,
+      option: selectedOption,
+    };
     console.log('confirm: ', finalValues);
+    // onSubmit(finalValues)
   };
+
+  const [variableValues, setVariableValues] = useState<{
+    [key: string]: string;
+  }>({});
 
   return (
     <>
-      <p className='text-xl font-medium'>Checkpoint requirements</p>
-      <div className='flex flex-col gap-4 mt-5'>
-        {optionDocs &&
+      <p className='text-base font-semibold mb-2'>Plase input these values</p>
+      <div className='flex flex-col gap-2 w-full mb-2'>
+        {variables?.map((v: any) => {
+          return (
+            <div className='w-full flex items-center justify-between' key={v}>
+              <Tag>{v}</Tag>
+              <Input
+                value={variableValues[v] || ''}
+                className='w-1/2'
+                onChange={(e) => {
+                  variableValues[v] = e.target.value;
+                  setVariableValues({ ...variableValues });
+                }}
+              />
+            </div>
+          );
+        })}
+        {/* {optionDocs &&
           optionDocs.map((optionDoc: any, index: any) => {
             return (
               <div
@@ -166,21 +190,17 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 </div>
               </div>
             );
-          })}
+          })} */}
       </div>
       <div
         className={`flex gap-3 ${
           expandVoteForDocInput ? 'items-start' : 'items-start'
         }`}
       >
-        <div className='w-12 h-12 rounded-full bg-[#F6F6F6] flex items-center justify-center'>
-          {optionDocs.length + 1}
-        </div>
         <div className='flex flex-col gap-6 w-full'>
           <div className={` flex justify-between`}>
             <div className='flex flex-col gap-2 mt-1'>
-              <p>Navigate to</p>
-              <p className='text-base font-semibold'>Next action</p>
+              <p className='text-base font-semibold'>Choose option</p>
             </div>
             {expandVoteForDocInput ? (
               <DownOutlined onClick={() => setExpandVoteForDocInput(false)} />
