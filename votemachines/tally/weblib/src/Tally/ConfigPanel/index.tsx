@@ -12,10 +12,7 @@ import {
   CollapsiblePanel,
   SideNote,
 } from 'directed-graph';
-import NewOptionDrawer from './NewOptionDrawer';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import '../styles.scss';
-import { Tally as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
 
 /**
@@ -41,6 +38,7 @@ export default (props: IVoteMachineConfigProps) => {
       next: '',
       fallback: '',
       proposalId: '',
+      tallyLink: '',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -180,6 +178,34 @@ export default (props: IVoteMachineConfigProps) => {
 
         <CollapsiblePanel title='Tally Info'>
           <Space direction='vertical' size='small' className='w-full'>
+            <Space direction='vertical' size='small' className='w-full'>
+              <div className='text-sm text-slate-600 flex items-center gap-2'>
+                DAO Link
+                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
+                  <MdHelpOutline />
+                </Popover>
+              </div>
+              <Input
+                className='w-full'
+                placeholder='https://www.tally.xyz/gov/syncvote'
+                value={data?.tallyLink}
+                onChange={(e: any) => {
+                  let url = e.target.value;
+
+                  if (url.endsWith('/')) {
+                    url = url.slice(0, -1);
+                  }
+
+                  onChange({
+                    data: {
+                      ...data,
+                      tallyLink: url,
+                    },
+                  });
+                }}
+              />
+            </Space>
+
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-sm text-slate-600 flex items-center gap-2'>
                 Governor contract
