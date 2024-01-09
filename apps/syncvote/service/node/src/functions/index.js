@@ -78,6 +78,7 @@ async function upsertVariable(mission, variableName, dataToStore) {
       .eq('name', variableName)
       .eq('mission_id', root_mission_id);
     if (err) {
+      console.log('update variable error', err);
       return false;
     } else {
       return true;
@@ -85,7 +86,7 @@ async function upsertVariable(mission, variableName, dataToStore) {
   } else {
     // insert variables
     const { error: err } = await supabase.from('variables').insert({
-      name: mission.data.variables[0],
+      name: variableName,
       value: dataToStore,
       mission_id: root_mission_id,
     });
