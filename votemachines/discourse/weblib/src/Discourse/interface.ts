@@ -31,16 +31,16 @@ export namespace Discourse {
       value: 'create-topic',
     },
     {
-      label: 'Create post into topic',
-      value: 'create-post',
-    },
-    {
-      label: 'Update first post of topic',
+      label: 'Update description',
       value: 'update-topic',
     },
     {
-      label: 'Move Topic',
+      label: 'Move Topic to other category',
       value: 'move-topic',
+    },
+    {
+      label: 'Comment into topic',
+      value: 'create-post',
     },
   ];
 }

@@ -1,4 +1,8 @@
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  InfoCircleOutlined,
+} from '@ant-design/icons';
 import { Button, Input, Modal, Space } from 'antd';
 import { CollapsiblePanel } from 'directed-graph';
 import { useState } from 'react';
@@ -55,10 +59,20 @@ const VariableList = ({
   version: any;
   setVersion: any;
 }) => {
-  const variables = version.data?.variables ? [...version.data?.variables] : [];
+  const variables = version.data?.variables
+    ? [...version.data?.variables]
+    : ['proposal'];
   const [showDialog, setShowDialog] = useState(false);
   return (
-    <CollapsiblePanel title='Variables' className='w-full'>
+    <CollapsiblePanel
+      title={
+        <span>
+          <InfoCircleOutlined title='Raw data kept on-chain' className='mr-1' />
+          Variable
+        </span>
+      }
+      className='w-full'
+    >
       <VariableDialog
         open={showDialog}
         setShowDialog={setShowDialog}
