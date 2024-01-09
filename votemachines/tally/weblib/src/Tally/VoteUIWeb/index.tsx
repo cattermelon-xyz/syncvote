@@ -1,94 +1,94 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { Card, Button, Radio } from 'antd';
-import Client from '@snapshot-labs/snapshot.js/dist/sign';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { useSDK } from '@metamask/sdk-react';
+import { Log, ethers } from 'ethers';
+import { Card, Button, Radio, Input } from 'antd';
+import { IVoteUIWebProps } from 'directed-graph';
+import ABI_GOVERNOR from '../../utils/abis/OzGovernor_ABI.json';
+import ABI_TOKEN from '../../utils/abis/ERC20Votes_ABI.json';
 
-interface Props {
-  proposalData: any;
-  onSelectedOption: any;
-  currentCheckpointData: any;
-  client?: Client;
-}
+const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
+  const { onSubmit, checkpointData } = props;
+  const [title, setTitle] = useState('');
+  const [loading, setLoading] = useState(false);
 
-function isExternalProvider(provider: any): provider is ExternalProvider {
-  return provider && typeof provider.request === 'function';
-}
-
-const VoteUIWeb = (props: Props): JSX.Element => {
-  console.log('Testing');
-
-  const { proposalData, currentCheckpointData, onSelectedOption, client } =
-    props;
-
-  const [selectedOption, setSelectedOption] = useState<number>();
-
-  useEffect(() => {
-    if (selectedOption) {
-      onSelectedOption(selectedOption);
-    }
-  }, [selectedOption]);
-
-  useEffect(() => {
-    console.log('selectedOption', selectedOption);
-  }, [selectedOption]);
-
-  const createVote = async () => {
-    let web3;
-    if (isExternalProvider(window.ethereum)) {
-      web3 = new Web3Provider(window.ethereum);
-    }
-
-    if (web3 && client && selectedOption) {
-      const accounts = await web3.listAccounts();
-      const receipt = await client.vote(web3, accounts[0], {
-        space: currentCheckpointData?.data?.space,
-        proposal: proposalData?.id,
-        type: currentCheckpointData?.data?.type?.value,
-        choice: selectedOption - 1,
-        reason: 'Choice 1 make lot of sense',
-        app: 'my-app',
-      });
-    }
-  };
+  const { connected } = useSDK();
 
   return (
-    <Card className='p-4'>
-      <div className='flex flex-col gap-6'>
-        <p className='text-xl font-medium'>Vote</p>
-        {proposalData && (
+    <div>
+      <Card className='p-4'>
+        {connected ? (
+          <div className='flex flex-col gap-6'>
+            <div>
+              <div className='flex-col w-full'>
+                <div className='text-base mb-1'>Title</div>
+                <Input
+                  value={title}
+                  placeholder='Testing Syncvote MVP'
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+            <Button
+              loading={loading}
+              disabled={title ? false : true}
+              onClick={async () => {
+                if (window.ethereum) {
+                  setLoading(true);
+                  const provider = new ethers.BrowserProvider(window.ethereum);
+                  const signer = await provider.getSigner();
+                  console.log(checkpointData?.data.governor);
+
+                  const governor = new ethers.Contract(
+                    checkpointData?.data.governor,
+                    ABI_GOVERNOR,
+                    signer
+                  );
+                  const addressArray = await window.ethereum.request({
+                    method: 'eth_requestAccounts',
+                  });
+
+                  let tx = await governor.propose(
+                    addressArray,
+                    [0],
+                    ['0x'],
+                    title
+                  );
+                  const signature = await tx.wait();
+
+                  const new_tx = await provider.getTransactionReceipt(
+                    signature.hash
+                  );
+                  if (new_tx !== null) {
+                    const log: any = new_tx.logs[0];
+
+                    const parsedLog = governor.interface.parseLog(log);
+                    if (parsedLog) {
+                      const proposaId = parsedLog.args[0].toString();
+                      onSubmit({
+                        submission: {
+                          proposalId: proposaId,
+                        },
+                      });
+                    }
+                  }
+
+                  setLoading(false);
+                }
+              }}
+            >
+              Create proposal
+            </Button>
+          </div>
+        ) : (
           <>
-            {proposalData.choices.map((option: any, index: any) => (
-              <Card className='w-full' key={index}>
-                {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                <Radio
-                  checked={selectedOption === index + 1}
-                  onChange={() => setSelectedOption(index + 1)}
-                >
-                  {`${index + 1}. ${option}`}
-                </Radio>
-              </Card>
-            ))}
+            <div>Need connect wallet to create proposal</div>
           </>
         )}
-
-        <Button
-          type='primary'
-          className='w-full'
-          onClick={async () => {
-            await createVote();
-          }}
-          disabled={
-            selectedOption
-              ? // && getTimeRemainingToEnd(currentCheckpointData.endToVote) !='expired'
-                false
-              : true
-          }
-        >
-          Vote
-        </Button>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

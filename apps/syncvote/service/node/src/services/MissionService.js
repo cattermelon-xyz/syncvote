@@ -11,6 +11,7 @@ const { createArweave } = require('../functions');
 const { start } = require('./VoteHandle/funcs');
 const { Snapshot } = require('../models/votemachines/Snapshot');
 const { Discourse } = require('../models/votemachines/Discourse');
+const { Tally } = require('../models/votemachines/Tally');
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: new SingleVote({}),
@@ -19,6 +20,7 @@ const VoteMachineValidate = {
   UpVote: new UpVote({}),
   Snapshot: new Snapshot({}),
   Discourse: new Discourse({}),
+  Tally: new Tally({}),
 };
 
 async function insertMission(props) {

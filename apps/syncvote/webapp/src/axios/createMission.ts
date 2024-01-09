@@ -8,6 +8,7 @@ import { Veto } from 'veto/src/Veto/funcs';
 import { UpVote } from 'upvote/src/UpVote/funcs';
 import { Discourse } from 'discourse/src/Discourse/funcs';
 import { Snapshot } from 'snapshot/src/Snapshot/funcs';
+import { Tally } from 'tally-xyz/src/Tally/funcs';
 
 // TODO: fix this, syncvote should not depend on any votemachine
 const VoteMachineValidate = {
@@ -17,6 +18,7 @@ const VoteMachineValidate = {
   UpVote: UpVote.validate,
   Discourse: Discourse.validate,
   Snapshot: Snapshot.validate,
+  Tally: Tally.validate,
 };
 type VoteMachineType =
   | 'SingleChoiceRaceToMax'
@@ -24,7 +26,8 @@ type VoteMachineType =
   | 'Veto'
   | 'UpVote'
   | 'Discourse'
-  | 'Snapshot';
+  | 'Snapshot'
+  | 'Tally';
 
 export const createMission = async ({
   missionData,
