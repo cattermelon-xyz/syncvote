@@ -140,7 +140,7 @@ const renderId = (
         {user?.email ? (
           <div>
             <span>
-              You are voting with email <Tag>{user.email}</Tag>
+              You are logged in with email <Tag>{user.email}</Tag>
               <Button
                 type='text'
                 onClick={async () => {
@@ -157,8 +157,11 @@ const renderId = (
         ) : (
           <div>
             <Button
-              onClick={() => {
+              onClick={async () => {
                 login(dispatch);
+                await window?.ethereum?.request({
+                  method: 'eth_requestAccounts',
+                });
               }}
             >
               Login

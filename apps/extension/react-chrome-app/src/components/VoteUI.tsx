@@ -8,6 +8,8 @@ import {
 import moment from 'moment';
 import parse from 'html-react-parser';
 import VoteButton from './VoteButton';
+import { Divider } from 'antd';
+import { openWorkflowPage } from '../utils';
 
 const isInteractable = ({
   checkpointId,
@@ -52,8 +54,15 @@ const VoteUI = ({
 }) => {
   console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
+  const { workflow_id, workflow_version_id, org_id, mission_id } =
+    currentProposalData;
   const { isEnd, vote_machine_type, title, endToVote, description } =
     checkpointData;
+  const originalCheckPointId = checkpointData?.id?.replace(
+    checkpointData?.mission_id,
+    '-'
+  );
+  console.log('checkpointData: ', checkpointData);
   const isExpired = moment(endToVote || 0).isBefore(moment());
   const isAuthorOnly = isInteractable({
     checkpointId: checkpointData.id,
@@ -65,28 +74,30 @@ const VoteUI = ({
     <>
       <div className='bg-white p-3 rounded flex justify-between items-center'>
         <div>
+          <div>
+            {isExpired
+              ? 'Expired'
+              : `${moment(endToVote || 0).fromNow(true)} left`}
+          </div>
           <div className='text-md font-bold'>{title}</div>
+          <Divider className='my-2' />
+          <p
+            className='w-full mt-2 text-[10px] cursor-pointer text-[#6200EE]'
+            onClick={() => {
+              openWorkflowPage(
+                org_id,
+                workflow_id,
+                workflow_version_id,
+                originalCheckPointId
+              );
+            }}
+          >
+            View Guideline
+          </p>
         </div>
         <div onClick={() => setExpanded(!expanded)}>
           {expanded ? <DownOutlined /> : <UpOutlined />}
         </div>
-      </div>
-      <div
-        className={`p-3 border  border-solid rounded ${
-          isExpired
-            ? 'bg-red-100 border-red-500'
-            : 'bg-violet-100 border-violet-500'
-        }`}
-      >
-        <ClockCircleOutlined
-          className={`${isExpired ? 'text-red-500' : 'text-violet-500'}`}
-        />
-        <span
-          className={`ml-2 ${isExpired ? 'text-red-500' : 'text-violet-500'}`}
-        >
-          {isExpired ? 'Expire ' : ''}
-          {moment(endToVote || 0).fromNow()}
-        </span>
       </div>
       {expanded && (
         <>

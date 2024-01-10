@@ -38,11 +38,13 @@ const HistoryItem = ({ item }: { item: any }) => {
                   <div className='mr-2'>Completed -</div>
                   {arweave_id ? (
                     <a href={arweave_id}>
-                      {endedAt ? moment(endedAt || 0).fromNow() : null}
+                      {endedAt
+                        ? moment(endedAt || 0).format('MMM DD, hh:mm A')
+                        : null}
                       <AuditOutlined className='ml-1' />
                     </a>
                   ) : (
-                    moment(endedAt || 0).fromNow()
+                    moment(endedAt || 0).format('MMM DD, hh:mm A')
                   )}
                 </div>
               )}
@@ -51,7 +53,7 @@ const HistoryItem = ({ item }: { item: any }) => {
             {!isEnd &&
               (selectedOption || linkDiscourse || linkSnapshot || desc) && (
                 <div onClick={() => setExpanded(!expanded)}>
-                  {expanded ? <DownOutlined /> : <UpOutlined />}
+                  {expanded ? <UpOutlined /> : <DownOutlined />}
                 </div>
               )}
           </div>

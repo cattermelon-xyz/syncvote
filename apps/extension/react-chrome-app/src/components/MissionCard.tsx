@@ -13,7 +13,6 @@ const MissionCard: React.FC<Props> = ({
   setPage,
   setCurrentProposalId,
 }) => {
-  console.log('proposal: ', proposal);
   let { startToVote, duration } = proposal;
   duration = duration === null ? 0 : duration;
   const endToVote = moment(startToVote).add(duration, 'seconds');

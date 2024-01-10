@@ -228,7 +228,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             className='w-full'
             onClick={handleConfirm}
             disabled={
-              selectedOption &&
+              selectedOption !== null &&
               getTimeRemainingToEnd(checkpointData.endToVote) != 'expired'
                 ? false
                 : true
