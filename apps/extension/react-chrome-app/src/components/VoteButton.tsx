@@ -121,7 +121,6 @@ const VoteButton = ({
     default:
       jsxObject = (
         <div>
-          <div>Action not supported</div>
           <Button
             type='primary'
             block

@@ -8,7 +8,6 @@ import {
 import moment from 'moment';
 import parse from 'html-react-parser';
 import VoteButton from './VoteButton';
-import Card from 'antd/es/card/Card';
 
 const isInteractable = ({
   checkpointId,
@@ -122,12 +121,12 @@ const VoteUI = ({
               Waiting for admin(s) to take action
             </div>
           )}
-          <div>Vote notes</div>
+
           <div className='bg-white p-3 rounded'>
             {checkpointData?.note ? (
               <div>{parse(checkpointData?.note)}</div>
             ) : (
-              <p>Note is empty!</p>
+              <></>
             )}
           </div>
         </>
