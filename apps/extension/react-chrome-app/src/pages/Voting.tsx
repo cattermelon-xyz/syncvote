@@ -32,6 +32,21 @@ const Voting: React.FC<Props> = ({
     console.log('currentProposalData', currentProposalData);
     console.log('currentCheckpointData', currentCheckpointData);
   }, [currentProposalData, currentCheckpointData]);
+
+  useEffect(() => {
+    console.log('currentProposalData in voting page', currentProposalData);
+    // let's persist the data
+    if (currentProposalData) {
+      const saveLastProposalId = async () => {
+        await chrome.runtime.sendMessage({
+          action: 'saveLastProposalId',
+          payload: currentProposalData.id,
+        });
+      };
+      saveLastProposalId();
+    }
+  }, [currentProposalData]);
+
   const historyItems = currentProposalData?.progress || [];
   return (
     <div className='pb-2'>
