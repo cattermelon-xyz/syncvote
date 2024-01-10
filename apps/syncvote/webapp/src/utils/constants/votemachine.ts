@@ -3,4 +3,5 @@ export const VM_TYPE = {
   SINGLE_VOTE: 'SingleChoiceRaceToMax',
   SNAPSHOT: 'Snapshot',
   DISCOURSE: 'Discourse',
+  TALLY: 'Tally',
 };

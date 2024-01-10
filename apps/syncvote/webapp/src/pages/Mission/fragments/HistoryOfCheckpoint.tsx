@@ -37,6 +37,7 @@ const HistoryOfCheckpoint: React.FC<Props> = ({ historicalCheckpointData }) => {
           <p className='text-xl font-medium truncate'>
             {historicalCheckpointData?.checkpoint_title}
           </p>
+          <hr className='w-full h-px bg-gray-200 border-0 dark:bg-gray-200' />
           <div className='flex flex-col gap-1'>
             <div className='flex justify-between'>
               <p className='text-xl font-medium'>Result</p>
@@ -51,7 +52,7 @@ const HistoryOfCheckpoint: React.FC<Props> = ({ historicalCheckpointData }) => {
                 <AuditOutlined className='ml-1' />
               </div>
             </div>
-            <p>Ended at: {formatDate(historicalCheckpointData?.endedAt)}</p>
+            <p>End date: {formatDate(historicalCheckpointData?.endedAt)}</p>
           </div>
 
           {historicalCheckpointData?.vote_machine_type ===
@@ -112,6 +113,18 @@ const HistoryOfCheckpoint: React.FC<Props> = ({ historicalCheckpointData }) => {
                 }
               )}
             </>
+          ) : historicalCheckpointData?.vote_machine_type === VM_TYPE?.TALLY ? (
+            <p
+              className='text-[#6200EE] hover:cursor-pointer truncate'
+              onClick={() => {
+                if (historicalCheckpointData?.tallyResult?.proposalLink)
+                  handleOpenLink(
+                    historicalCheckpointData?.tallyResult?.proposalLink
+                  );
+              }}
+            >
+              {historicalCheckpointData?.tallyResult?.proposalLink}
+            </p>
           ) : (
             <></>
           )}
