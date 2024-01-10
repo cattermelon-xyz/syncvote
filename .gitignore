@@ -9,6 +9,7 @@ lerna-debug.log*
 local.code-workspace
 .vscode/local.code-workspace
 *.lock
+*-lock.json
 # OS 
 .DS_Store
 
