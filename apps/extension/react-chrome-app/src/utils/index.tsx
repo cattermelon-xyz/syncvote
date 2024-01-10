@@ -62,10 +62,14 @@ export const openMissionPage = (orgId: string, proposalId: string) => {
 export const openWorkflowPage = (
   orgId: string,
   workflowId: string,
-  wvId: string
+  wvId: string,
+  checkpointId?: string
 ) => {
+  const cpUrl = checkpointId ? `?cp=${checkpointId}` : '';
   chrome.runtime.sendMessage({
     action: 'openUrl',
-    payload: { url: `${frontEndUrl}/public/${orgId}/${workflowId}/${wvId}` },
+    payload: {
+      url: `${frontEndUrl}/public/${orgId}/${workflowId}/${wvId}${cpUrl}`,
+    },
   });
 };

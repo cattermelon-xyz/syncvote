@@ -38,16 +38,19 @@ function isExternalProvider(provider: any): provider is ExternalProvider {
 }
 
 const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
-  const { onSubmit, checkpointData } = props;
+  const { onSubmit, checkpointData, missionData } = props;
   const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
   const client = new snapshot.Client712(hub);
   const [web3, setWeb3] = useState<Web3Provider>();
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(missionData?.m_title || '');
   const defaultDescription = checkpointData?.data?.template || '';
   const variables = props?.missionData?.data?.variables || {};
-  const [description, setDiscription] = useState(
-    replaceVariables(defaultDescription, variables)
-  );
+  const [description, setDiscription] = useState('');
+  useEffect(() => {
+    replaceVariables(defaultDescription, variables, (val: any) => {
+      setDiscription(val);
+    });
+  }, []);
   const options = checkpointData?.data?.snapShotOption || [];
   const space = checkpointData?.data?.space || '';
   return (

@@ -48,6 +48,8 @@ import LogoSyncVoteShort from '@assets/icons/svg-icons/LogoSyncVoteShort';
 import { CreateProposalModal } from '@fragments/CreateProposalModal';
 
 export const PublicVersion = () => {
+  const [searchParams, setSearchParams] = useSearchParams('');
+  const urlSelectedCheckPointId = searchParams.get('cp') || '';
   const { orgIdString, workflowIdString, versionIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
@@ -61,7 +63,7 @@ export const PublicVersion = () => {
   const [org, setOrg] = useState<any>();
   const [profile, setProfile] = useState<any>();
   const [session, setSession] = useState<Session | null>(null);
-  const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [selectedNodeId, setSelectedNodeId] = useState(urlSelectedCheckPointId);
   const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [rightSiderStatus, setRSiderStatus] = useState('description');
@@ -77,7 +79,7 @@ export const PublicVersion = () => {
     setSession(_session);
     setShowRegisterInvitation(_session?.user?.user_metadata ? false : true);
   };
-  const [searchParams, setSearchParams] = useSearchParams('');
+
   console.log(searchParams);
 
   const diagramFullScreen =
