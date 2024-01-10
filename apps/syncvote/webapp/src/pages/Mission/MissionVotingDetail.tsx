@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Space, MenuProps, Button, Card, Tag, Tabs } from 'antd';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { queryAMissionDetail } from '@dal/data';
 import { extractIdFromIdString, supabase, useGetDataHook } from 'utils';
 import { Modal } from 'antd';
@@ -80,7 +80,8 @@ const renderVoteMachine = (
   missionData: any,
   user: any,
   account: any,
-  dispatch: any
+  dispatch: any,
+  isFullVote: boolean
 ) => {
   const { currentCheckpointData } = getCheckpointData(missionData);
   const voteMachine = getVoteMachine(currentCheckpointData?.vote_machine_type);
@@ -104,7 +105,8 @@ const renderVoteMachine = (
               missionData.mission_id,
               user,
               account,
-              dispatch
+              dispatch,
+              isFullVote
             );
           }}
         />
@@ -196,7 +198,8 @@ const submit = (
   missionId: any,
   user: any,
   account: any,
-  dispatch: any
+  dispatch: any,
+  isFullVote?: boolean
 ) => {
   const { option, submission } = submitted;
   const participants = currentCheckpointData?.participation?.data || [];
@@ -229,7 +232,11 @@ const submit = (
         } else {
           Modal.success({
             title: 'Success',
-            content: 'Voting successfully',
+            maskClosable: !isFullVote,
+            content: isFullVote
+              ? 'Please open Extension to continue'
+              : 'Voted successfully',
+            footer: isFullVote ? null : undefined,
             onOk: () => {
               window.location.reload();
             },
@@ -254,6 +261,8 @@ const submit = (
 };
 
 const MissionVotingDetail = () => {
+  const [searchParams, setSearchParams] = useSearchParams('');
+  const isFullVote = searchParams.get('view') === 'full' ? true : false;
   const { missionIdString } = useParams();
   const dispatch = useDispatch();
   const missionId = extractIdFromIdString(missionIdString);
@@ -371,7 +380,13 @@ const MissionVotingDetail = () => {
       return {
         label: subMission?.title,
         key: index.toString(),
-        children: renderVoteMachine(subMission, user, account, dispatch),
+        children: renderVoteMachine(
+          subMission,
+          user,
+          account,
+          dispatch,
+          isFullVote
+        ),
       };
     }
   );
@@ -387,7 +402,32 @@ const MissionVotingDetail = () => {
           },
         }}
       >
-        {missionData && currentCheckpointData && (
+        {isFullVote && missionData && currentCheckpointData && (
+          <div className='max-w-2xl px-4'>
+            <div>{renderId(user, dispatch, account, connect, disconnect)}</div>
+            <Space direction='vertical' size={16} className='w-full'>
+              {isForkNode && (
+                <>
+                  <Tabs defaultActiveKey='0' items={subMissionTabItems} />
+                </>
+              )}
+              {historicalCheckpointData ? (
+                <HistoryOfCheckpoint
+                  historicalCheckpointData={historicalCheckpointData}
+                />
+              ) : (
+                renderVoteMachine(
+                  missionData,
+                  user,
+                  account,
+                  dispatch,
+                  isFullVote
+                )
+              )}
+            </Space>
+          </div>
+        )}
+        {!isFullVote && missionData && currentCheckpointData && (
           <div className='lg:w-[1024px] md:w-[640px] sm:w-[400px] flex gap-4'>
             <Space direction='vertical' className='w-2/3' size='small'>
               <MissionSummary
@@ -408,7 +448,13 @@ const MissionVotingDetail = () => {
                     historicalCheckpointData={historicalCheckpointData}
                   />
                 ) : (
-                  renderVoteMachine(missionData, user, account, dispatch)
+                  renderVoteMachine(
+                    missionData,
+                    user,
+                    account,
+                    dispatch,
+                    isFullVote
+                  )
                 )}
               </Space>
             </Space>
