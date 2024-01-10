@@ -4,7 +4,7 @@ import { useSDK } from '@metamask/sdk-react';
 import { Card, Button, Radio, Input, Tag } from 'antd';
 import Client from '@snapshot-labs/snapshot.js/dist/sign';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
-import { IVoteUIWebProps } from 'directed-graph';
+import { IVoteUIWebProps, replaceVariables } from 'directed-graph';
 import snapshot from '@snapshot-labs/snapshot.js';
 import moment from 'moment';
 import { TextEditor } from 'rich-text-editor';
@@ -43,7 +43,11 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const client = new snapshot.Client712(hub);
   const [web3, setWeb3] = useState<Web3Provider>();
   const [title, setTitle] = useState('');
-  const [description, setDiscription] = useState('');
+  const defaultDescription = checkpointData?.data?.template || '';
+  const variables = props?.missionData?.data?.variables || {};
+  const [description, setDiscription] = useState(
+    replaceVariables(defaultDescription, variables)
+  );
   const options = checkpointData?.data?.snapShotOption || [];
   const space = checkpointData?.data?.space || '';
   return (

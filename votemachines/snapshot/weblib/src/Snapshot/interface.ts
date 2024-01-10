@@ -18,6 +18,7 @@ export namespace Snapshot {
     fallback?: string;
     next?: string;
     proposalId: string;
+    template?: string;
   }
 
   export interface IOption {

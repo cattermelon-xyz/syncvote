@@ -7,6 +7,7 @@ export namespace Discourse {
     action: string;
     variables: string[];
     categoryId?: number;
+    template?: string;
     // start?: number;
     // end?: number;
     // title?: string;
