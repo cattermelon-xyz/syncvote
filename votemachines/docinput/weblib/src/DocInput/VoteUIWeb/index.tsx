@@ -30,7 +30,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
 
     const filteredDocs = missionDocs
       .filter((missionDoc) =>
-        checkpointDocs.some(
+        checkpointDocs?.some(
           (checkpointDoc: any) => checkpointDoc.id === missionDoc.id
         )
       )
