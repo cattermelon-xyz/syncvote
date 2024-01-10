@@ -57,7 +57,12 @@ const handleMovingToNextCheckpoint = async (
         initData: tallyResult,
       })
       .select('*');
-
+    // console.log('data to insert new_current_vote_data: ', {
+    //   checkpoint_id: next_checkpoint_id,
+    //   startToVote: startToVote,
+    //   initData: tallyResult,
+    // });
+    // console.log('new_current_vote_data: ', new_current_vote_data);
     // Update next current vote data for mission
     const { error } = await supabase
       .from('mission')
