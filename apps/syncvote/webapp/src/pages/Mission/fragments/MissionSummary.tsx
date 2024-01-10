@@ -35,6 +35,7 @@ const MissionSummary = ({
   const { created_at, workflow_icon_url } = missionData;
   console.log('missionData: ', missionData);
   const proposal = missionData?.data?.variables?.proposal;
+  const allVariables = missionData?.data?.variables;
   const [proposalContent, setProposalContent] = useState(
     proposal ? 'Loading proposal content...' : ''
   );
@@ -111,6 +112,10 @@ const MissionSummary = ({
         <ShowDescription
           titleDescription={'Proposal content'}
           description={proposalContent}
+        />
+        <ShowDescription
+          titleDescription={'Proposal variables'}
+          description={JSON.stringify(allVariables, null, 2)}
         />
         {/* {currentCheckpointData?.description ? (
           <ShowDescription

@@ -48,6 +48,7 @@ export const emptyStage: IWorkflowVersionData = {
   checkpoints: [rootCheckPoint],
   cosmetic: emptyCosmetic,
   docs: [],
+  variables: ['proposal'],
   start: 'root',
 };
 
