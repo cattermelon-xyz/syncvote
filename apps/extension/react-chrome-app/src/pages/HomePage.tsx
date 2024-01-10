@@ -120,7 +120,7 @@ const HomePage: React.FC<Props> = ({
       (dataOrg: any) => dataOrg?.id === value
     );
     setCurrentOrgData(selectedDataOrg[0]);
-    setLoading(true);
+    setLoading(false);
   };
   return (
     <>

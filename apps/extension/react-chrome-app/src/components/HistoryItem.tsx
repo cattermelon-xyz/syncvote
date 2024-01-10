@@ -29,84 +29,86 @@ const HistoryItem = ({ item }: { item: any }) => {
   console.log(isEnd, selectedOption, linkDiscourse, linkSnapshot, desc);
   return (
     endedAt && (
-      <div className='flex flex-col gap-2'>
-        <div className='bg-white p-3 rounded flex justify-between items-center'>
-          <div className='flex flex-col gap-1'>
-            {!isEnd && (
-              <div className='flex items-center text-xs'>
-                <div className='mr-2'>Completed -</div>
-                {arweave_id ? (
-                  <a href={arweave_id}>
-                    {endedAt ? moment(endedAt || 0).fromNow() : null}
-                    <AuditOutlined className='ml-1' />
-                  </a>
-                ) : (
-                  moment(endedAt || 0).fromNow()
-                )}
-              </div>
-            )}
-            <div className='font-bold text-md'>{checkpoint_title}</div>
+      <>
+        <div className='flex flex-col gap-2'>
+          <div className='bg-white p-3 rounded flex justify-between items-center'>
+            <div className='flex flex-col gap-1'>
+              {!isEnd && (
+                <div className='flex items-center text-xs'>
+                  <div className='mr-2'>Completed -</div>
+                  {arweave_id ? (
+                    <a href={arweave_id}>
+                      {endedAt ? moment(endedAt || 0).fromNow() : null}
+                      <AuditOutlined className='ml-1' />
+                    </a>
+                  ) : (
+                    moment(endedAt || 0).fromNow()
+                  )}
+                </div>
+              )}
+              <div className='font-bold text-md'>{checkpoint_title}</div>
+            </div>
+            {!isEnd &&
+              (selectedOption || linkDiscourse || linkSnapshot || desc) && (
+                <div onClick={() => setExpanded(!expanded)}>
+                  {expanded ? <DownOutlined /> : <UpOutlined />}
+                </div>
+              )}
           </div>
-          {!isEnd &&
-            (selectedOption || linkDiscourse || linkSnapshot || desc) && (
-              <div onClick={() => setExpanded(!expanded)}>
-                {expanded ? <DownOutlined /> : <UpOutlined />}
-              </div>
-            )}
-        </div>
-        {expanded && !isEnd && (
-          <>
-            {/* {desc && (
+          {expanded && !isEnd && (
+            <>
+              {/* {desc && (
               <div className='bg-white p-3 rounded flex justify-between items-center'>
                 {parse(desc || '')}
               </div>
             )} */}
-            {selectedOption || linkDiscourse || linkSnapshot ? (
-              <div className='bg-white p-3 rounded flex justify-between items-center'>
-                <div className='text-xs'>
-                  {selectedOption ? (
-                    <div className='flex flex-row gap-1 items-center'>
-                      <DoneIcon />
-                      <div>
-                        Choice: <Tag>{selectedOption}</Tag>
+              {selectedOption || linkDiscourse || linkSnapshot ? (
+                <div className='bg-white p-3 rounded flex justify-between items-center'>
+                  <div className='text-xs'>
+                    {selectedOption ? (
+                      <div className='flex flex-row gap-1 items-center'>
+                        <DoneIcon />
+                        <div>
+                          Choice: <Tag>{selectedOption}</Tag>
+                        </div>
                       </div>
-                    </div>
-                  ) : null}{' '}
-                  {linkDiscourse ? (
-                    <div className='flex flex-row gap-1 items-center'>
-                      <DoneIcon />
-                      <a
-                        href={linkDiscourse}
-                        target='_blank'
-                        className='text-green-500'
-                        rel='noreferrer'
-                      >
-                        {trimTitle(linkDiscourse, 30)}
-                      </a>
-                    </div>
-                  ) : null}
-                  {linkSnapshot ? (
-                    <div className='flex flex-row gap-1 items-center'>
-                      <DoneIcon />
-                      <a
-                        href={linkSnapshot}
-                        target='_blank'
-                        className='text-green-500'
-                        rel='noreferrer'
-                      >
-                        {trimTitle(linkSnapshot, 30)}
-                      </a>
-                    </div>
-                  ) : null}
+                    ) : null}{' '}
+                    {linkDiscourse ? (
+                      <div className='flex flex-row gap-1 items-center'>
+                        <DoneIcon />
+                        <a
+                          href={linkDiscourse}
+                          target='_blank'
+                          className='text-green-500'
+                          rel='noreferrer'
+                        >
+                          {trimTitle(linkDiscourse, 30)}
+                        </a>
+                      </div>
+                    ) : null}
+                    {linkSnapshot ? (
+                      <div className='flex flex-row gap-1 items-center'>
+                        <DoneIcon />
+                        <a
+                          href={linkSnapshot}
+                          target='_blank'
+                          className='text-green-500'
+                          rel='noreferrer'
+                        >
+                          {trimTitle(linkSnapshot, 30)}
+                        </a>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <></>
-            )}
-            <Divider className='my-1' />
-          </>
-        )}
-      </div>
+              ) : (
+                <></>
+              )}
+            </>
+          )}
+        </div>
+        <Divider className='my-1' />
+      </>
     )
   );
 };

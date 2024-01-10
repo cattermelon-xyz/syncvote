@@ -8,6 +8,7 @@ import {
 import moment from 'moment';
 import parse from 'html-react-parser';
 import VoteButton from './VoteButton';
+import Card from 'antd/es/card/Card';
 
 const isInteractable = ({
   checkpointId,
@@ -63,6 +64,14 @@ const VoteUI = ({
   const isForkNode = vote_machine_type === 'forkNode';
   return !isEnd ? (
     <>
+      <div className='bg-white p-3 rounded flex justify-between items-center'>
+        <div>
+          <div className='text-md font-bold'>{title}</div>
+        </div>
+        <div onClick={() => setExpanded(!expanded)}>
+          {expanded ? <DownOutlined /> : <UpOutlined />}
+        </div>
+      </div>
       <div
         className={`p-3 border  border-solid rounded ${
           isExpired
@@ -79,14 +88,6 @@ const VoteUI = ({
           {isExpired ? 'Expire ' : ''}
           {moment(endToVote || 0).fromNow()}
         </span>
-      </div>
-      <div className='bg-white p-3 rounded flex justify-between items-center'>
-        <div>
-          <div className='text-md font-bold'>{title}</div>
-        </div>
-        <div onClick={() => setExpanded(!expanded)}>
-          {expanded ? <DownOutlined /> : <UpOutlined />}
-        </div>
       </div>
       {expanded && (
         <>
@@ -122,6 +123,13 @@ const VoteUI = ({
             </div>
           )}
           <div>Vote notes</div>
+          <div className='bg-white p-3 rounded'>
+            {checkpointData?.note ? (
+              <div>{parse(checkpointData?.note)}</div>
+            ) : (
+              <p>Note is empty!</p>
+            )}
+          </div>
         </>
       )}
     </>
