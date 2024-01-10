@@ -80,11 +80,10 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
     //   return acc;
     // }, {});
     const finalValues = {
-      variables: variableValues,
-      option: selectedOption,
+      submission: variableValues,
+      option: [selectedOption],
     };
-    console.log('confirm: ', finalValues);
-    // onSubmit(finalValues)
+    onSubmit(finalValues);
   };
 
   const [variableValues, setVariableValues] = useState<{
@@ -214,10 +213,10 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
                 <Radio
                   checked={
-                    selectedOption === (option === 'Abstain' ? -1 : index + 1)
+                    selectedOption === (option === 'Abstain' ? -1 : index)
                   }
                   onChange={() =>
-                    setSelectedOption(option === 'Abstain' ? -1 : index + 1)
+                    setSelectedOption(option === 'Abstain' ? -1 : index)
                   }
                 >
                   {`${index + 1}. ${option}`}
