@@ -38,6 +38,7 @@ export namespace DocInput {
     const data: Interface.IData = {
       options: [],
       docs: [],
+      variables: [],
     };
     return data;
   };
