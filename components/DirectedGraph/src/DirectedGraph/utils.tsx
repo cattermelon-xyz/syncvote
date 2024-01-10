@@ -78,3 +78,13 @@ export const shortenString = (str: string, maxLength: number = 30) => {
   console.log(str);
   return str.substring(0, maxLength) + '...';
 };
+
+export const replaceVariables = (template: string, variables: any) => {
+  let result = template;
+  Object.keys(variables).forEach((key) => {
+    if (variables[key]) {
+      result = result.replace(`{{${key}}}`, variables[key]);
+    }
+  });
+  return result;
+};

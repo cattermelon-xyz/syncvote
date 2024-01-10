@@ -1,15 +1,20 @@
 import { Button, Input, Select, Space } from 'antd';
-import { IVoteUIWebProps } from 'directed-graph';
+import { IVoteUIWebProps, replaceVariables } from 'directed-graph';
 import { useEffect, useState } from 'react';
 import { TextEditor } from 'rich-text-editor';
 
 const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const { checkpointData, missionData, onSubmit } = props;
-  const [title, setTitle] = useState<any>();
-  const [missionDesc, setMissionDesc] = useState<any>();
+  const [title, setTitle] = useState<any>(missionData?.m_title || '');
+
   const action = checkpointData?.data?.action;
   let topicId = '';
   let firstPostId = '';
+  const defaultDescription = checkpointData?.data?.template || '';
+  const variables = props?.missionData?.data?.variables || {};
+  const [missionDesc, setMissionDesc] = useState<any>(
+    replaceVariables(defaultDescription, variables)
+  );
   if (action === 'update-topic' || action === 'move-topic') {
     const k = checkpointData?.data?.variables[0];
     const v = missionData?.data?.variables[k];

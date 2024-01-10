@@ -23,6 +23,8 @@ import { MdDeleteOutline } from 'react-icons/md';
 import NewDocActionDrawer from './NewDocActionDrawer';
 import { FaInfo } from 'react-icons/fa6';
 
+// TODO: DocInput do not require voting quorum
+
 /**
  *
  * @param IVoteMachineConfigProps
