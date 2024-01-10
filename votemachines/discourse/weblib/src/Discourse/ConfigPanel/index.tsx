@@ -13,6 +13,7 @@ import { Discourse as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
 import { GraphContext } from 'directed-graph';
 import { useContext } from 'react';
+import { TextEditor } from 'rich-text-editor';
 const SelectOptions = Interface.SelectOptions;
 
 /**
@@ -41,6 +42,7 @@ export default (props: IVoteMachineConfigProps) => {
       next: '',
       fallback: '',
       categoryId: '',
+      template: '',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -48,7 +50,6 @@ export default (props: IVoteMachineConfigProps) => {
     optionsDescription,
     raw,
   } = props;
-  console.log('raw: ', raw);
   const { options, action, variables, next, fallback, categoryId } = data;
 
   const fallbackNode = allNodes.find((n) => n.id === fallback);
@@ -61,11 +62,6 @@ export default (props: IVoteMachineConfigProps) => {
   const variablesMission = graphData?.variables;
   const [variablesOption, setVariablesOption] =
     useState<{ label: string; value: string }[]>();
-
-  useEffect(() => {
-    console.log('variables', variables);
-    console.log('action', action);
-  }, [action, variables]);
 
   useEffect(() => {
     if (variablesMission) {
@@ -196,6 +192,7 @@ export default (props: IVoteMachineConfigProps) => {
                 onChange={(value) => {
                   if (action === 'move-topic') {
                     delete data.variables[1];
+                    delete data.template;
                   } else {
                     delete data.categoryId;
                   }
@@ -235,29 +232,47 @@ export default (props: IVoteMachineConfigProps) => {
               />
             </Space>
             {action && action !== 'move-topic' && (
-              <Space direction='vertical' size='small' className='w-full'>
-                <div className='text-sm text-slate-600 flex items-center gap-2'>
-                  {action === 'create-post'
-                    ? 'Store comment into variable:'
-                    : 'Store description into variable:'}
-                </div>
-                <Select
-                  value={variables ? variables[1] : null}
-                  placeholder='Please select variables'
-                  className='w-full'
-                  options={variablesOption?.filter(
-                    (v: any) => v.value !== variables[0]
-                  )}
-                  onChange={(value, option) => {
-                    onChange({
-                      data: {
-                        ...data,
-                        variables: [data.variables[0], value],
-                      },
-                    });
-                  }}
-                />
-              </Space>
+              <>
+                <Space direction='vertical' size='small' className='w-full'>
+                  <div className='text-sm text-slate-600 flex items-center gap-2'>
+                    Template
+                  </div>
+                  <TextEditor
+                    value={data?.template}
+                    setValue={(val: any) => {
+                      onChange({
+                        data: {
+                          ...data,
+                          template: val,
+                        },
+                      });
+                    }}
+                  />
+                </Space>
+                <Space direction='vertical' size='small' className='w-full'>
+                  <div className='text-sm text-slate-600 flex items-center gap-2'>
+                    {action === 'create-post'
+                      ? 'Store comment into variable:'
+                      : 'Store description into variable:'}
+                  </div>
+                  <Select
+                    value={variables ? variables[1] : null}
+                    placeholder='Please select variables'
+                    className='w-full'
+                    options={variablesOption?.filter(
+                      (v: any) => v.value !== variables[0]
+                    )}
+                    onChange={(value, option) => {
+                      onChange({
+                        data: {
+                          ...data,
+                          variables: [data.variables[0], value],
+                        },
+                      });
+                    }}
+                  />
+                </Space>
+              </>
             )}
             {action && action === 'move-topic' && (
               <>

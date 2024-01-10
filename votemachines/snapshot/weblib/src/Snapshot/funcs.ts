@@ -41,6 +41,7 @@ export namespace Snapshot {
       action: 'create-proposal',
       type: 'single-choice',
       proposalId: '',
+      template: '',
     };
     return data;
   };

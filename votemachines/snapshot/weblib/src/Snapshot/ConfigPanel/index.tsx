@@ -18,6 +18,7 @@ import '../styles.scss';
 import { Snapshot as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
 import moment from 'moment';
+import { TextEditor } from 'rich-text-editor';
 
 /**
  *
@@ -45,6 +46,7 @@ export default (props: IVoteMachineConfigProps) => {
       action: 'create-proposal',
       proposalId: '',
       snapshotDuration: 0,
+      template: '',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -295,6 +297,22 @@ export default (props: IVoteMachineConfigProps) => {
                     data: {
                       ...data,
                       type: value,
+                    },
+                  });
+                }}
+              />
+            </Space>
+            <Space direction='vertical'>
+              <div className='text-sm text-slate-600 flex items-center gap-2'>
+                Template
+              </div>
+              <TextEditor
+                value={data?.template || ''}
+                setValue={(val: any) => {
+                  onChange({
+                    data: {
+                      ...data,
+                      template: val,
                     },
                   });
                 }}
