@@ -4,6 +4,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import { Typography } from 'antd';
+import { CollapsiblePanel } from 'directed-graph';
 
 const ColorLegend = ({
   showColorLegend,
@@ -26,20 +27,12 @@ const ColorLegend = ({
 }) => {
   return (
     <>
-      <div
-        className='text-gray-400 font-bold flex items-center gap-2'
-        style={{ marginBottom: '0px' }}
+      <CollapsiblePanel
+        title='Color Legend'
+        className='p-0 w-full'
+        open={false}
       >
-        <div>Color legend</div>
-        <div
-          className='hover:text-violet-500 cursor-pointer'
-          onClick={() => setShowColorLegend(!showColorLegend)}
-        >
-          {showColorLegend ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-        </div>
-      </div>
-      {showColorLegend &&
-        markers.map((marker: any) => {
+        {markers.map((marker: any) => {
           return (
             <div className='flex gap-2 items-center' key={marker.color}>
               <div
@@ -91,6 +84,7 @@ const ColorLegend = ({
             </div>
           );
         })}
+      </CollapsiblePanel>
     </>
   );
 };

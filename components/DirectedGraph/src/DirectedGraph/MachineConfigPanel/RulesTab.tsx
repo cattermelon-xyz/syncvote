@@ -26,6 +26,7 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
   const { data, selectedNodeId, onChange, viewMode } =
     useContext(GraphPanelContext);
   const allCheckPoints = data.checkpoints ? [...data.checkpoints] : [];
+  const phases = data.phases || [];
   data.subWorkflows?.map((sw: any) => {
     sw.checkpoints?.map((chk: any) => {
       allCheckPoints.push({ ...chk, subWorkflowId: sw.refId });
@@ -84,6 +85,23 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
         />
       </Drawer>
       <Space className='w-full pb-4' direction='vertical' size='large'>
+        <div className='w-full flex justify-between items-center bg-white p-4 gap-6 flex-row'>
+          <div className='font-bold text-md'>Phase</div>
+          <Select
+            value={selectedNode?.phase}
+            className='w-full'
+            options={phases.map((phase: any) => {
+              return { label: phase.title, value: phase.title };
+            })}
+            onChange={(val: string) => {
+              const newNode = structuredClone(selectedNode);
+              if (newNode) {
+                newNode.phase = val;
+                onChange(newNode);
+              }
+            }}
+          />
+        </div>
         <CollapsiblePanel title='Purpose & description'>
           <Space direction='vertical' size='small' className='w-full'>
             {/* <Space direction="horizontal" className="justify-between w-full">

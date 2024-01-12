@@ -7,6 +7,7 @@ type CollapsiblePanelProps = {
   className?: string;
   bodyStyle?: React.CSSProperties;
   collapsable?: boolean;
+  open?: boolean;
 };
 
 const CollapsiblePanel = ({
@@ -15,9 +16,9 @@ const CollapsiblePanel = ({
   className = '',
   bodyStyle = {},
   collapsable = true,
-  ...props
+  open = true,
 }: CollapsiblePanelProps) => {
-  const [open, setOpen] = useState(collapsable);
+  const [isOpen, setIsOpen] = useState(open);
   return (
     <div
       className={`${className ? className : 'p-4 bg-white rounded-lg w-full'}`}
@@ -28,15 +29,15 @@ const CollapsiblePanel = ({
           className={`cursor-pointer select-none ${
             collapsable ? '' : 'hidden'
           }`}
-          onClick={() => setOpen(!open)}
+          onClick={() => setIsOpen(!isOpen)}
         >
-          {open ? <UpOutlined /> : <DownOutlined />}
+          {isOpen ? <UpOutlined /> : <DownOutlined />}
         </div>
       </div>
       <div
         style={bodyStyle}
         className={`w-full mt-4 ${
-          !collapsable ? null : !open ? 'hidden' : null
+          !collapsable ? null : !isOpen ? 'hidden' : null
         }`}
       >
         {children}

@@ -290,6 +290,15 @@ export const changeVersion = ({
         changedCheckPointData.inHappyPath;
     }
   }
+  if (changedCheckPointData.hasOwnProperty('phase')) {
+    console.log('phase', changedCheckPointData.phase);
+    if (subWorkflowId === undefined || indexOfSubWorkflow === -1) {
+      newData.checkpoints[index].phase = changedCheckPointData.phase;
+    } else {
+      newData.subWorkflows[indexOfSubWorkflow].checkpoints[index].phase =
+        changedCheckPointData.phase;
+    }
+  }
   return newData;
 };
 
