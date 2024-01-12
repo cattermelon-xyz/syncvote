@@ -86,20 +86,20 @@ export const replaceVariables = async (
   onSuccess: any
 ) => {
   let result = template;
-  // Object.keys(variables).forEach(async (key) => {
-  //   if (variables[key]) {
-  //     const v = variables[key];
-  //     result = result.replace(`{{${key}}}`, v);
-  //     const regex = new RegExp(`{{${key}.\\w*}}`, 'g');
-  //     const matches = result.matchAll(regex);
-  //     for (const match of matches) {
-  //       const _key = match[0].replace('{{', '').replace('}}', '').split('.')[1];
-  //       await axios.get(v).then((res) => {
-  //         result = result.replace(match[0], res.data[_key]);
-  //       });
-  //     }
-  //   }
-  //   onSuccess(result);
-  // });
+  Object.keys(variables).forEach(async (key) => {
+    if (variables[key]) {
+      const v = variables[key];
+      result = result.replace(`{{${key}}}`, v);
+      const regex = new RegExp(`{{${key}.\\w*}}`, 'g');
+      const matches = result.matchAll(regex);
+      for (const match of matches) {
+        const _key = match[0].replace('{{', '').replace('}}', '').split('.')[1];
+        await axios.get(v).then((res) => {
+          result = result.replace(match[0], res.data[_key]);
+        });
+      }
+    }
+    onSuccess(result);
+  });
   return result;
 };
