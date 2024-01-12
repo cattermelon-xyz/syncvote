@@ -32,7 +32,6 @@ const Voting: React.FC<Props> = ({
     console.log('currentProposalData', currentProposalData);
     console.log('currentCheckpointData', currentCheckpointData);
   }, [currentProposalData, currentCheckpointData]);
-
   useEffect(() => {
     console.log('currentProposalData in voting page', currentProposalData);
     // let's persist the data
@@ -46,8 +45,20 @@ const Voting: React.FC<Props> = ({
       saveLastProposalId();
     }
   }, [currentProposalData]);
-
+  const allCkps = currentProposalData?.data?.checkpoints || [];
+  currentProposalData?.data?.subWorkflows?.map((w: any) =>
+    allCkps.push(...(w.checkpoints || []))
+  );
+  console.log('allCkps', allCkps);
   const historyItems = currentProposalData?.progress || [];
+  for (var i = 0; i < historyItems.length; i++) {
+    const item = historyItems[i];
+    const itm = allCkps.find(
+      (ckp: any) =>
+        ckp.id === item.checkpoint_id.replace(item.mission_id + '-', '')
+    );
+    item.phase = itm?.phase;
+  }
   return (
     <div className='pb-2'>
       <div>
@@ -81,7 +92,14 @@ const Voting: React.FC<Props> = ({
         </div>
         <div className='mb-3 flex flex-col gap-2'>
           {historyItems.map((item: any, index: number) => {
-            return <HistoryItem key={index} item={item} />;
+            const lastPhase = index !== 0 ? historyItems[index - 1].phase : '';
+            return (
+              <HistoryItem
+                key={index}
+                item={{ ...item, phase: item?.phase }}
+                lastPhase={lastPhase}
+              />
+            );
           })}
           <VoteUI
             currentProposalData={currentProposalData}
@@ -89,6 +107,7 @@ const Voting: React.FC<Props> = ({
             user={user}
             reload={reload}
             setLoading={setLoading}
+            lastPhase={historyItems[historyItems.length - 1]?.phase}
           />
         </div>
       </div>

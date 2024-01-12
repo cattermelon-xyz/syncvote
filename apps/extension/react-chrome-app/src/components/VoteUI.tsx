@@ -45,24 +45,26 @@ const VoteUI = ({
   user,
   reload,
   setLoading,
+  lastPhase,
 }: {
   currentProposalData: any;
   checkpointData: any;
   user: any;
   reload: any;
   setLoading: any;
+  lastPhase: any;
 }) => {
   console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
   const { workflow_id, workflow_version_id, org_id, mission_id } =
     currentProposalData;
-  const { isEnd, vote_machine_type, title, endToVote, description } =
+  const { isEnd, vote_machine_type, title, endToVote, description, phase } =
     checkpointData;
   const originalCheckPointId = checkpointData?.id?.replace(
     checkpointData?.mission_id,
     '-'
   );
-  console.log('checkpointData: ', checkpointData);
+  console.log('lastPhase: ', lastPhase, '; current phase: ', phase);
   const isExpired = moment(endToVote || 0).isBefore(moment());
   const isAuthorOnly = isInteractable({
     checkpointId: checkpointData.id,
@@ -70,79 +72,116 @@ const VoteUI = ({
     user,
   });
   const isForkNode = vote_machine_type === 'forkNode';
-  return !isEnd ? (
-    <>
-      <div className='bg-white p-3 rounded flex justify-between items-center'>
-        <div>
+  const renderButton = () => {
+    return (
+      <>
+        {isAuthorOnly && (
           <div>
-            {isExpired
-              ? 'Expired'
-              : `${moment(endToVote || 0).fromNow(true)} left`}
+            <VoteButton
+              currentProposalData={currentProposalData}
+              checkpointData={checkpointData}
+              reload={reload}
+              user={user}
+              setLoading={setLoading}
+            />
           </div>
-          <div className='text-md font-bold'>{title}</div>
-          <Divider className='my-2' />
-          <p
-            className='w-full mt-2 text-[10px] cursor-pointer text-[#6200EE]'
-            onClick={() => {
-              openWorkflowPage(
-                org_id,
-                workflow_id,
-                workflow_version_id,
-                originalCheckPointId
-              );
-            }}
-          >
-            View Guideline
-          </p>
+        )}
+        {isForkNode && (
+          <div>
+            <div className='bg-white p-3 rounded flex justify-between items-center'>
+              TODO:Show multiple buttons
+            </div>
+          </div>
+        )}
+        {!isAuthorOnly && !isForkNode && (
+          <div className='bg-white p-3 rounded flex items-center'>
+            <LoadingOutlined className='mr-1' />
+            Waiting for admin(s) to take action
+          </div>
+        )}
+
+        {checkpointData?.note ? (
+          <div className='bg-white p-3 rounded'>
+            <div>{parse(checkpointData?.note)}</div>
+          </div>
+        ) : (
+          <></>
+        )}
+      </>
+    );
+  };
+  return !isEnd ? (
+    !phase ? (
+      <>
+        <div className='bg-white p-3 rounded flex justify-between items-center'>
+          <div>
+            <div>
+              {isExpired
+                ? 'Expired'
+                : `${moment(endToVote || 0).fromNow(true)} left`}
+            </div>
+            <div className='text-md font-bold'>{title}</div>
+            <Divider className='my-2' />
+            <p
+              className='w-full mt-2 text-[10px] cursor-pointer text-[#6200EE]'
+              onClick={() => {
+                openWorkflowPage(
+                  org_id,
+                  workflow_id,
+                  workflow_version_id,
+                  originalCheckPointId
+                );
+              }}
+            >
+              View Guideline
+            </p>
+          </div>
+          <div onClick={() => setExpanded(!expanded)}>
+            {expanded ? <DownOutlined /> : <UpOutlined />}
+          </div>
         </div>
-        <div onClick={() => setExpanded(!expanded)}>
-          {expanded ? <DownOutlined /> : <UpOutlined />}
-        </div>
-      </div>
-      {expanded && (
-        <>
-          {/* {description ? (
+        {expanded && (
+          <>
+            {/* {description ? (
             <div className='bg-white p-3 rounded flex justify-between items-center'>
               {parse(description || '')}
             </div>
           ) : (
             <></>
           )} */}
-          {isAuthorOnly && (
-            <div>
-              <VoteButton
-                currentProposalData={currentProposalData}
-                checkpointData={checkpointData}
-                reload={reload}
-                user={user}
-                setLoading={setLoading}
-              />
-            </div>
-          )}
-          {isForkNode && (
-            <div>
-              <div className='bg-white p-3 rounded flex justify-between items-center'>
-                TODO:Show multiple buttons
-              </div>
-            </div>
-          )}
-          {!isAuthorOnly && !isForkNode && (
-            <div className='bg-white p-3 rounded flex items-center'>
-              <LoadingOutlined className='mr-1' />
-              Waiting for admin(s) to take action
-            </div>
-          )}
-
-          <div className='bg-white p-3 rounded'>
-            {checkpointData?.note ? (
-              <div>{parse(checkpointData?.note)}</div>
-            ) : (
-              <></>
-            )}
+            {renderButton()}
+          </>
+        )}
+      </>
+    ) : phase === lastPhase ? (
+      renderButton()
+    ) : (
+      <>
+        <div className='bg-white p-3 rounded flex justify-between items-center'>
+          <div>
+            <div className='text-md font-bold'>{phase}</div>
+            <Divider className='my-2' />
+            <p
+              className='w-full mt-2 text-[10px] cursor-pointer text-[#6200EE]'
+              onClick={() => {
+                openWorkflowPage(
+                  org_id,
+                  workflow_id,
+                  workflow_version_id,
+                  originalCheckPointId
+                );
+              }}
+            >
+              View Guideline
+            </p>
           </div>
-        </>
-      )}
-    </>
+          <div onClick={() => setExpanded(!expanded)}>
+            {expanded ? <DownOutlined /> : <UpOutlined />}
+          </div>
+        </div>
+        {renderButton()}
+      </>
+    )
   ) : (
     <></>
   );

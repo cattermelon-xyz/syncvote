@@ -6,7 +6,7 @@ import { trimTitle } from '../utils';
 import parse from 'html-react-parser';
 import DoneIcon from '@assets/icons/DoneIcon';
 
-const HistoryItem = ({ item }: { item: any }) => {
+const HistoryItem = ({ item, lastPhase }: { item: any; lastPhase: any }) => {
   console.log('item: ', item);
   const [expanded, setExpanded] = useState(false);
   // TODO: this is a hack, should use votemachine function instead
@@ -19,6 +19,7 @@ const HistoryItem = ({ item }: { item: any }) => {
     isEnd,
     options,
     arweave_id,
+    phase,
   } = item;
   console.log(tallyResult?.index);
   const selectedOption = tallyResult?.index
@@ -26,10 +27,60 @@ const HistoryItem = ({ item }: { item: any }) => {
     : null;
   const linkDiscourse = tallyResult?.submission?.linkDiscourse || null;
   const linkSnapshot = tallyResult?.linkSnapshot || null;
-  console.log(isEnd, selectedOption, linkDiscourse, linkSnapshot, desc);
-  return (
-    endedAt && (
+  const renderResult = () => {
+    return (
       <>
+        {selectedOption || linkDiscourse || linkSnapshot ? (
+          <div className='bg-white p-3 rounded flex justify-between items-center'>
+            <div className='text-xs'>
+              {selectedOption ? (
+                <div className='flex flex-row gap-1 items-center'>
+                  <DoneIcon />
+                  <div>
+                    Choice: <Tag>{selectedOption}</Tag>
+                  </div>
+                </div>
+              ) : null}{' '}
+              {linkDiscourse ? (
+                <div className='flex flex-row gap-1 items-center'>
+                  <DoneIcon />
+                  <a
+                    href={linkDiscourse}
+                    target='_blank'
+                    className='text-green-500'
+                    rel='noreferrer'
+                  >
+                    {trimTitle(linkDiscourse, 30)}
+                  </a>
+                </div>
+              ) : null}
+              {linkSnapshot ? (
+                <div className='flex flex-row gap-1 items-center'>
+                  <DoneIcon />
+                  <a
+                    href={linkSnapshot}
+                    target='_blank'
+                    className='text-green-500'
+                    rel='noreferrer'
+                  >
+                    {trimTitle(linkSnapshot, 30)}
+                  </a>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : (
+          <></>
+        )}
+      </>
+    );
+  };
+  console.log('lastPhase: ', lastPhase, '; current phase: ', phase);
+  return (
+    endedAt &&
+    (!phase ? (
+      <>
+        <Divider className='my-1' />
         <div className='flex flex-col gap-2'>
           <div className='bg-white p-3 rounded flex justify-between items-center'>
             <div className='flex flex-col gap-1'>
@@ -64,54 +115,46 @@ const HistoryItem = ({ item }: { item: any }) => {
                 {parse(desc || '')}
               </div>
             )} */}
-              {selectedOption || linkDiscourse || linkSnapshot ? (
-                <div className='bg-white p-3 rounded flex justify-between items-center'>
-                  <div className='text-xs'>
-                    {selectedOption ? (
-                      <div className='flex flex-row gap-1 items-center'>
-                        <DoneIcon />
-                        <div>
-                          Choice: <Tag>{selectedOption}</Tag>
-                        </div>
-                      </div>
-                    ) : null}{' '}
-                    {linkDiscourse ? (
-                      <div className='flex flex-row gap-1 items-center'>
-                        <DoneIcon />
-                        <a
-                          href={linkDiscourse}
-                          target='_blank'
-                          className='text-green-500'
-                          rel='noreferrer'
-                        >
-                          {trimTitle(linkDiscourse, 30)}
-                        </a>
-                      </div>
-                    ) : null}
-                    {linkSnapshot ? (
-                      <div className='flex flex-row gap-1 items-center'>
-                        <DoneIcon />
-                        <a
-                          href={linkSnapshot}
-                          target='_blank'
-                          className='text-green-500'
-                          rel='noreferrer'
-                        >
-                          {trimTitle(linkSnapshot, 30)}
-                        </a>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              ) : (
-                <></>
-              )}
+              {renderResult()}
             </>
           )}
         </div>
-        <Divider className='my-1' />
       </>
-    )
+    ) : phase === lastPhase ? (
+      renderResult()
+    ) : (
+      <>
+        <Divider className='my-1' />
+        <div className='flex flex-col gap-2'>
+          <div className='bg-white p-3 rounded flex justify-between items-center'>
+            <div className='flex flex-col gap-1'>
+              {!isEnd && (
+                <div className='flex items-center text-xs'>
+                  <div className='mr-2'>Completed</div>
+                </div>
+              )}
+              <div className='font-bold text-md'>{phase}</div>
+            </div>
+            {!isEnd &&
+              (selectedOption || linkDiscourse || linkSnapshot || desc) && (
+                <div onClick={() => setExpanded(!expanded)}>
+                  {expanded ? <UpOutlined /> : <DownOutlined />}
+                </div>
+              )}
+          </div>
+          {expanded && !isEnd && (
+            <>
+              {/* {desc && (
+              <div className='bg-white p-3 rounded flex justify-between items-center'>
+                {parse(desc || '')}
+              </div>
+            )} */}
+              {renderResult()}
+            </>
+          )}
+        </div>
+      </>
+    ))
   );
 };
 

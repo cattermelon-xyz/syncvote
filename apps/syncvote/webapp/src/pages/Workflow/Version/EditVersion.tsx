@@ -48,6 +48,7 @@ import {
   save,
 } from './funcs';
 import VariableList from './fragment/VariableList';
+import Phases from './fragment/Phases';
 
 export const EditVersion = () => {
   const { orgIdString, workflowIdString, versionIdString } = useParams();
@@ -429,6 +430,7 @@ export const EditVersion = () => {
                           version={version}
                           setVersion={setVersion}
                         />
+                        <Phases version={version} setVersion={setVersion} />
                       </Space>
                     }
                     viewMode={viewMode}

@@ -24,6 +24,7 @@ export interface ICheckPoint {
   durationDescription?: string;
   subWorkflowId?: string;
   inHappyPath?: boolean;
+  phase?: string;
 }
 
 // TODO: add version
@@ -181,6 +182,7 @@ export interface IWorkflowVersionData {
   docs?: IDoc[]; // docs of all workflows
   cosmetic?: IWorkflowVersionCosmetic; // cosmetic & positions of all checkpoints
   subWorkflows?: ISubWorkflow[];
+  phases?: any[];
   variables?: string[];
 }
 
