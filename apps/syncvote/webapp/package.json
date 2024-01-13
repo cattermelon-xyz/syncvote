@@ -60,6 +60,7 @@
     "rich-text-editor": "1.0.0",
     "sass": "^1.58.3",
     "scss": "^0.2.4",
+    "realms-solana": "1.0.0",
     "tally-xyz": "1.0.0",
     "single-vote": "1.0.0",
     "snapshot": "1.0.0",

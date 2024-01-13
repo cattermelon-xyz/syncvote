@@ -12,6 +12,7 @@ import { DocInput } from 'doc-input';
 import { Snapshot } from 'snapshot';
 import { Discourse } from 'discourse';
 import { Tally } from 'tally-xyz';
+import { Realms } from 'realms-solana';
 import { AuthContext } from '@layout/context/AuthContext';
 
 function App({ layout }: { layout: any }) {
@@ -29,6 +30,7 @@ function App({ layout }: { layout: any }) {
     registerVoteMachine(Snapshot);
     registerVoteMachine(Discourse);
     registerVoteMachine(Tally);
+    registerVoteMachine(Realms);
   }, [session]);
 
   const Layout: any = layout;

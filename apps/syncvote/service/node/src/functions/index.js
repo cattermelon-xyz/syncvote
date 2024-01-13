@@ -31,6 +31,7 @@ async function createArweave(metadata) {
 
     return { arweave_id: 'https://arweave.net/' + metadataTransaction.id };
   } catch (error) {
+    console.log(error);
     return { error: error };
   }
 }
