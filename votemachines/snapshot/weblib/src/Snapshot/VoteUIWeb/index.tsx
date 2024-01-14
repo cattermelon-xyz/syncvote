@@ -129,7 +129,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                   }
                 }}
               >
-                Vote
+                Submit
               </Button>
             </>
           ) : null}
