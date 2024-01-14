@@ -113,7 +113,20 @@ const HistoryItem = ({ item }: { item: any }) => {
               </div>
             )} */}
               <div className='bg-gray-200 p-3 rounded flex flex-col gap-1'>
-                <div className='text-md font-bold'>{checkpoint_title}</div>
+                <div className='flex flex-row w-full justify-between'>
+                  <div className='text-md font-bold'>{checkpoint_title}</div>
+                  {arweave_id ? (
+                    <a href={arweave_id}>
+                      {endedAt
+                        ? moment(endedAt || 0).format('MMM DD, hh:mm A')
+                        : null}
+                      <AuditOutlined className='ml-1' />
+                    </a>
+                  ) : (
+                    moment(endedAt || 0).format('MMM DD, hh:mm A')
+                  )}
+                </div>
+
                 {renderResult()}
               </div>
             </>
@@ -122,7 +135,17 @@ const HistoryItem = ({ item }: { item: any }) => {
       </>
     ) : (
       <div className='bg-gray-200 p-3 rounded flex flex-col gap-1'>
-        <div className='text-md font-bold'>{checkpoint_title}</div>
+        <div className='flex flex-row w-full justify-between'>
+          <div className='text-md font-bold'>{checkpoint_title}</div>
+          {arweave_id ? (
+            <a href={arweave_id}>
+              {endedAt ? moment(endedAt || 0).format('MMM DD, hh:mm A') : null}
+              <AuditOutlined className='ml-1' />
+            </a>
+          ) : (
+            moment(endedAt || 0).format('MMM DD, hh:mm A')
+          )}
+        </div>
         {renderResult()}
       </div>
     ))
