@@ -9,6 +9,7 @@ import { UpVote } from 'upvote/src/UpVote/funcs';
 import { Discourse } from 'discourse/src/Discourse/funcs';
 import { Snapshot } from 'snapshot/src/Snapshot/funcs';
 import { Tally } from 'tally-xyz/src/Tally/funcs';
+import { Realms } from 'realms-solana/src/Realms/funcs';
 
 // TODO: fix this, syncvote should not depend on any votemachine
 const VoteMachineValidate = {
@@ -19,6 +20,7 @@ const VoteMachineValidate = {
   Discourse: Discourse.validate,
   Snapshot: Snapshot.validate,
   Tally: Tally.validate,
+  Realms: Realms.validate,
 };
 type VoteMachineType =
   | 'SingleChoiceRaceToMax'
@@ -27,7 +29,8 @@ type VoteMachineType =
   | 'UpVote'
   | 'Discourse'
   | 'Snapshot'
-  | 'Tally';
+  | 'Tally'
+  | 'Realms';
 
 export const createMission = async ({
   missionData,

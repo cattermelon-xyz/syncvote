@@ -12,6 +12,7 @@ const { start } = require('./VoteHandle/funcs');
 const { Snapshot } = require('../models/votemachines/Snapshot');
 const { Discourse } = require('../models/votemachines/Discourse');
 const { Tally } = require('../models/votemachines/Tally');
+const { Realms } = require('../models/votemachines/Realms');
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: new SingleVote({}),
@@ -21,6 +22,7 @@ const VoteMachineValidate = {
   Snapshot: new Snapshot({}),
   Discourse: new Discourse({}),
   Tally: new Tally({}),
+  Realms: new Realms({}),
 };
 
 async function insertMission(props) {
