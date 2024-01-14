@@ -1,10 +1,10 @@
 import { L } from '@utils/locales/L';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import LogoSyncVote from '@assets/icons/svg-icons/LogoSyncVote';
 import { supabase, useGetDataHook } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { extractIdFromIdString, getImageUrl } from 'utils';
-import { Button, Divider, Modal, Popover, Space } from 'antd';
+import { Button, Divider, Drawer, Modal, Popover, Space, Timeline } from 'antd';
 import {
   BellOutlined,
   FolderOutlined,
@@ -31,9 +31,12 @@ import {
 import moment from 'moment';
 import VersionHistoryDialog from './VersionHistoryDialog';
 import ShareModal from './ShareModal';
-import { GraphViewMode } from 'directed-graph';
+import { GraphViewMode, shortenString } from 'directed-graph';
 import AvatarAndNoti from '@layout/fragments/AvatarAndNoti';
 import { config } from '@dal/config';
+import { GrOverview } from 'react-icons/gr';
+import parse from 'html-react-parser';
+import PhaseDrawer from './PhaseDrawer';
 const env = import.meta.env.VITE_ENV;
 
 type HeaderProps = {
@@ -65,7 +68,8 @@ function Header({
   const handleClearStore = () => {};
   const [showWorkflowPanel, setShowWorkflowPanel] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-
+  const [searchParams, setSearchParams] = useSearchParams('');
+  const cp = searchParams.get('cp');
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
@@ -157,8 +161,14 @@ function Header({
       },
     });
   };
+  const [showOverView, setShowOverView] = useState(cp === 'overview' || false);
   return (
     <>
+      <PhaseDrawer
+        workflow={workflow}
+        shown={showOverView}
+        setShown={setShowOverView}
+      />
       <EditWorkflow
         open={showWorkflowPanel}
         setOpen={setShowWorkflowPanel}
@@ -219,7 +229,9 @@ function Header({
               iconUrl={workflow?.icon_url}
               size='medium'
             />
-            <div className='flex items-center font-semibold mr-4 max-w-md'>{workflow?.title}</div>
+            <div className='flex items-center font-semibold mr-4 max-w-md'>
+              {workflow?.title}
+            </div>
           </Space>
         </Space>
         <Space
@@ -301,9 +313,17 @@ function Header({
               />
             ) : null}
             <Popover
-              trigger='click'
+              trigger='hover'
               content={
                 <Space direction='vertical' className='w-full'>
+                  <Button
+                    type='link'
+                    icon={<GrOverview />}
+                    className='flex items-center p-0 m-0 text-zinc-500 hover:text-violet-500'
+                    onClick={() => setShowOverView(true)}
+                  >
+                    Overview
+                  </Button>
                   <Button
                     type='link'
                     icon={<ClockCircleOutlined />}

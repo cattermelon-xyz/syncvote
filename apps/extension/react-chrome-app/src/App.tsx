@@ -54,7 +54,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log('inUseEffect ** currentProposalId', currentProposalId);
+    // console.log('inUseEffect ** currentProposalId', currentProposalId);
     if (currentProposalId && currentProposalId !== -1) {
       queryAMissionDetail({
         missionId: currentProposalId,
@@ -68,8 +68,8 @@ function App() {
             return progress?.tallyResult?.submission || [];
           });
           setListVersionDocs(listVersionDocs);
-          console.log('missiondata', data);
-          console.log('checkpointData', checkpointData[0]);
+          // console.log('missiondata', data);
+          // console.log('checkpointData', checkpointData[0]);
           let checkpointDataAfterHandle = checkpointData[0];
 
           if (!checkpointData[0].isEnd) {
@@ -112,7 +112,7 @@ function App() {
           tmpFollowingMissions.sort((a: any, b: any) => {
             return b.id - a.id;
           });
-          console.log('tmpFollowingMissions', tmpFollowingMissions);
+          // console.log('tmpFollowingMissions', tmpFollowingMissions);
           setMyMissions(tmpMyMissions);
           setFollowingMissions(tmpFollowingMissions);
           setLoading(false);
@@ -126,7 +126,7 @@ function App() {
   }, [currentOrgData, user]);
 
   return (
-    <div className='w-[260px] h-[380px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
+    <div className='w-[357px] h-[600px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto'>
       {loading === true ? (
         <Loading />
       ) : user === null || user === undefined ? (

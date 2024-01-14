@@ -16,7 +16,7 @@ import { extractIdFromIdString } from 'utils';
 import { Button, Modal, Skeleton, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   GraphViewMode,
   IWorkflowVersionCosmetic,
@@ -51,6 +51,11 @@ import VariableList from './fragment/VariableList';
 import Phases from './fragment/Phases';
 
 export const EditVersion = () => {
+  const [searchParams, setSearchParams] = useSearchParams('');
+  const urlSelectedCheckPointId =
+    searchParams.get('cp') !== null && searchParams.get('cp') !== 'overview'
+      ? searchParams.get('cp')
+      : '';
   const { orgIdString, workflowIdString, versionIdString } = useParams();
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isDataFetchedFromServer, setIsDataFetchedFromServer] = useState(false);
@@ -75,7 +80,9 @@ export const EditVersion = () => {
   const [workflow, setWorkflow] = useState<any>(
     workflows.find((w: any) => w.id === workflowId)
   );
-  const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [selectedNodeId, setSelectedNodeId] = useState(
+    urlSelectedCheckPointId || ''
+  );
   const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     version?.data?.cosmetic?.defaultLayout?.horizontal

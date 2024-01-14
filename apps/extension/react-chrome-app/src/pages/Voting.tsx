@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { LeftOutlined, ExportOutlined } from '@ant-design/icons';
+import {
+  LeftOutlined,
+  ExportOutlined,
+  UpOutlined,
+  DownOutlined,
+} from '@ant-design/icons';
 import { PAGE_ROUTER } from '@constants/common';
 import { openMissionPage, openWorkflowPage, trimTitle } from '../utils';
 import HistoryItem from '@components/HistoryItem';
@@ -29,11 +34,6 @@ const Voting: React.FC<Props> = ({
   const { workflow_id, workflow_version_id, org_id, mission_id } =
     currentProposalData;
   useEffect(() => {
-    console.log('currentProposalData', currentProposalData);
-    console.log('currentCheckpointData', currentCheckpointData);
-  }, [currentProposalData, currentCheckpointData]);
-  useEffect(() => {
-    console.log('currentProposalData in voting page', currentProposalData);
     // let's persist the data
     if (currentProposalData) {
       const saveLastProposalId = async () => {
@@ -49,7 +49,6 @@ const Voting: React.FC<Props> = ({
   currentProposalData?.data?.subWorkflows?.map((w: any) =>
     allCkps.push(...(w.checkpoints || []))
   );
-  console.log('allCkps', allCkps);
   const historyItems = currentProposalData?.progress || [];
   for (var i = 0; i < historyItems.length; i++) {
     const item = historyItems[i];
@@ -59,6 +58,42 @@ const Voting: React.FC<Props> = ({
     );
     item.phase = itm?.phase;
   }
+
+  let lastPhase = '';
+  const runningPhase = currentCheckpointData?.phase;
+  const lastHistoryItemPhase =
+    currentCheckpointData?.phase && historyItems.length
+      ? historyItems[historyItems.length - 1]?.phase
+      : null;
+  const [expandedPhases, setExpandedPhases] = useState<string[]>(
+    runningPhase ? [runningPhase] : []
+  );
+  const renderPhaseHeader = (phase: string, completed: boolean) => {
+    const expanded = expandedPhases.indexOf(phase) !== -1;
+    return (
+      <div className='flex flex-col gap-2'>
+        <div className='bg-white p-3 rounded flex justify-between items-center'>
+          <div className='flex flex-col gap-1'>
+            {completed ? <div>Completed</div> : null}
+            <div className='font-bold text-md'>{phase}</div>
+          </div>
+          {completed ? (
+            <div
+              onClick={() => {
+                if (expanded) {
+                  setExpandedPhases(expandedPhases.filter((p) => p !== phase));
+                } else {
+                  setExpandedPhases([...expandedPhases, phase]);
+                }
+              }}
+            >
+              {expanded ? <UpOutlined /> : <DownOutlined />}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    );
+  };
   return (
     <div className='pb-2'>
       <div>
@@ -92,22 +127,34 @@ const Voting: React.FC<Props> = ({
         </div>
         <div className='mb-3 flex flex-col gap-2'>
           {historyItems.map((item: any, index: number) => {
-            const lastPhase = index !== 0 ? historyItems[index - 1].phase : '';
+            lastPhase = index !== 0 ? historyItems[index - 1].phase : '';
             return (
-              <HistoryItem
-                key={index}
-                item={{ ...item, phase: item?.phase }}
-                lastPhase={lastPhase}
-              />
+              <>
+                {item?.phase && (index === 0 || lastPhase !== item?.phase)
+                  ? renderPhaseHeader(
+                      item.phase,
+                      runningPhase !== item?.phase ? true : false
+                    )
+                  : null}
+                {!item?.phase || expandedPhases.indexOf(item.phase) !== -1 ? (
+                  <HistoryItem
+                    key={index}
+                    item={{ ...item, phase: item?.phase }}
+                  />
+                ) : null}
+              </>
             );
           })}
+          {lastHistoryItemPhase !== currentCheckpointData?.phase &&
+          currentCheckpointData?.phase
+            ? renderPhaseHeader(currentCheckpointData?.phase, false)
+            : null}
           <VoteUI
             currentProposalData={currentProposalData}
             checkpointData={currentCheckpointData}
             user={user}
             reload={reload}
             setLoading={setLoading}
-            lastPhase={historyItems[historyItems.length - 1]?.phase}
           />
         </div>
       </div>

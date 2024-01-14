@@ -7,7 +7,6 @@ import { DeleteOutlined } from '@ant-design/icons';
 
 const Phases = ({ version, setVersion }: { version: any; setVersion: any }) => {
   const phases = version.data.phases || [];
-  console.log('phases', phases);
   const [newPhase, setNewPhase] = useState({ title: '', desc: '' });
   const [isShown, setIsShown] = useState(false);
   return (
