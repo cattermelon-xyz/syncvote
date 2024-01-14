@@ -9,6 +9,7 @@ import { PAGE_ROUTER } from '@constants/common';
 import { openMissionPage, openWorkflowPage, trimTitle } from '../utils';
 import HistoryItem from '@components/HistoryItem';
 import VoteUI from '@components/VoteUI';
+import { Divider } from 'antd';
 
 interface Props {
   setPage: any;
@@ -71,27 +72,32 @@ const Voting: React.FC<Props> = ({
   const renderPhaseHeader = (phase: string, completed: boolean) => {
     const expanded = expandedPhases.indexOf(phase) !== -1;
     return (
-      <div className='flex flex-col gap-2'>
-        <div className='bg-white p-3 rounded flex justify-between items-center'>
-          <div className='flex flex-col gap-1'>
-            {completed ? <div>Completed</div> : null}
-            <div className='font-bold text-md'>{phase}</div>
-          </div>
-          {completed ? (
-            <div
-              onClick={() => {
-                if (expanded) {
-                  setExpandedPhases(expandedPhases.filter((p) => p !== phase));
-                } else {
-                  setExpandedPhases([...expandedPhases, phase]);
-                }
-              }}
-            >
-              {expanded ? <UpOutlined /> : <DownOutlined />}
+      <>
+        <Divider className='my-1' />
+        <div className='flex flex-col gap-2'>
+          <div className='bg-white p-3 rounded flex justify-between items-center'>
+            <div className='flex flex-col gap-1'>
+              {completed ? <div>Completed</div> : null}
+              <div className='font-bold text-md'>{phase}</div>
             </div>
-          ) : null}
+            {completed ? (
+              <div
+                onClick={() => {
+                  if (expanded) {
+                    setExpandedPhases(
+                      expandedPhases.filter((p) => p !== phase)
+                    );
+                  } else {
+                    setExpandedPhases([...expandedPhases, phase]);
+                  }
+                }}
+              >
+                {expanded ? <UpOutlined /> : <DownOutlined />}
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
+      </>
     );
   };
   return (
@@ -118,7 +124,12 @@ const Voting: React.FC<Props> = ({
             <span
               className='text-violet-500 font-bold cursor-pointer'
               onClick={() => {
-                openWorkflowPage(org_id, workflow_id, workflow_version_id);
+                openWorkflowPage(
+                  org_id,
+                  workflow_id,
+                  workflow_version_id,
+                  'overview'
+                );
               }}
             >
               View Live Workflow
