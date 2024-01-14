@@ -15,6 +15,7 @@
     "votemachines/snapshot/weblib",
     "votemachines/discourse/weblib",
     "votemachines/tally/weblib",
+    "votemachines/realms/weblib",
     "utils",
     "apps/extension/react-chrome-app"
   ]

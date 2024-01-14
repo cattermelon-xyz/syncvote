@@ -6,6 +6,8 @@ const { DocInput } = require('./DocInput');
 const { Discourse } = require('./Discourse');
 const { Snapshot } = require('./Snapshot');
 const { Tally } = require('./Tally');
+const { Realms } = require('./Realms');
+
 
 class VoteMachineController {
   constructor(props) {
@@ -18,6 +20,7 @@ class VoteMachineController {
       Discourse: new Discourse(props),
       Snapshot: new Snapshot(props),
       Tally: new Tally(props),
+      Realms: new Realms(props),
     };
     this.vote_machine_type = props.vote_machine_type;
     this.id = props.id;
