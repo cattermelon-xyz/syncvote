@@ -45,14 +45,12 @@ const VoteUI = ({
   user,
   reload,
   setLoading,
-  lastPhase,
 }: {
   currentProposalData: any;
   checkpointData: any;
   user: any;
   reload: any;
   setLoading: any;
-  lastPhase: any;
 }) => {
   console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
@@ -64,7 +62,6 @@ const VoteUI = ({
     checkpointData?.mission_id,
     '-'
   );
-  console.log('lastPhase: ', lastPhase, '; current phase: ', phase);
   const isExpired = moment(endToVote || 0).isBefore(moment());
   const isAuthorOnly = isInteractable({
     checkpointId: checkpointData.id,
@@ -153,34 +150,8 @@ const VoteUI = ({
           </>
         )}
       </>
-    ) : phase === lastPhase ? (
-      renderButton()
     ) : (
-      <>
-        <div className='bg-white p-3 rounded flex justify-between items-center'>
-          <div>
-            <div className='text-md font-bold'>{phase}</div>
-            <Divider className='my-2' />
-            <p
-              className='w-full mt-2 text-[10px] cursor-pointer text-[#6200EE]'
-              onClick={() => {
-                openWorkflowPage(
-                  org_id,
-                  workflow_id,
-                  workflow_version_id,
-                  originalCheckPointId
-                );
-              }}
-            >
-              View Guideline
-            </p>
-          </div>
-          <div onClick={() => setExpanded(!expanded)}>
-            {expanded ? <DownOutlined /> : <UpOutlined />}
-          </div>
-        </div>
-        {renderButton()}
-      </>
+      renderButton()
     )
   ) : (
     <></>

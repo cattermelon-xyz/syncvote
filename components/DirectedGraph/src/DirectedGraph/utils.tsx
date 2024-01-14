@@ -76,7 +76,6 @@ export const shortenString = (str: string, maxLength: number = 30) => {
   if (!str || str.length <= maxLength) {
     return str;
   }
-  console.log(str);
   return str.substring(0, maxLength) + '...';
 };
 

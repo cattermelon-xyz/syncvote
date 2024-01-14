@@ -6,7 +6,7 @@ import { trimTitle } from '../utils';
 import parse from 'html-react-parser';
 import DoneIcon from '@assets/icons/DoneIcon';
 
-const HistoryItem = ({ item, lastPhase }: { item: any; lastPhase: any }) => {
+const HistoryItem = ({ item }: { item: any }) => {
   console.log('item: ', item);
   const [expanded, setExpanded] = useState(false);
   // TODO: this is a hack, should use votemachine function instead
@@ -75,7 +75,6 @@ const HistoryItem = ({ item, lastPhase }: { item: any; lastPhase: any }) => {
       </>
     );
   };
-  console.log('lastPhase: ', lastPhase, '; current phase: ', phase);
   return (
     endedAt &&
     (!phase ? (
@@ -120,40 +119,8 @@ const HistoryItem = ({ item, lastPhase }: { item: any; lastPhase: any }) => {
           )}
         </div>
       </>
-    ) : phase === lastPhase ? (
-      renderResult()
     ) : (
-      <>
-        <Divider className='my-1' />
-        <div className='flex flex-col gap-2'>
-          <div className='bg-white p-3 rounded flex justify-between items-center'>
-            <div className='flex flex-col gap-1'>
-              {!isEnd && (
-                <div className='flex items-center text-xs'>
-                  <div className='mr-2'>Completed</div>
-                </div>
-              )}
-              <div className='font-bold text-md'>{phase}</div>
-            </div>
-            {!isEnd &&
-              (selectedOption || linkDiscourse || linkSnapshot || desc) && (
-                <div onClick={() => setExpanded(!expanded)}>
-                  {expanded ? <UpOutlined /> : <DownOutlined />}
-                </div>
-              )}
-          </div>
-          {expanded && !isEnd && (
-            <>
-              {/* {desc && (
-              <div className='bg-white p-3 rounded flex justify-between items-center'>
-                {parse(desc || '')}
-              </div>
-            )} */}
-              {renderResult()}
-            </>
-          )}
-        </div>
-      </>
+      renderResult()
     ))
   );
 };
