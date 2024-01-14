@@ -87,20 +87,34 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
       <Space className='w-full pb-4' direction='vertical' size='large'>
         <div className='w-full flex justify-between items-center bg-white p-4 gap-6 flex-row'>
           <div className='font-bold text-md'>Phase</div>
-          <Select
-            value={selectedNode?.phase}
-            className='w-full'
-            options={phases.map((phase: any) => {
-              return { label: phase.title, value: phase.title };
-            })}
-            onChange={(val: string) => {
-              const newNode = structuredClone(selectedNode);
-              if (newNode) {
-                newNode.phase = val;
-                onChange(newNode);
-              }
-            }}
-          />
+          <div className='flex w-full'>
+            <Select
+              value={selectedNode?.phase}
+              className='w-full'
+              options={phases.map((phase: any) => {
+                return { label: phase.title, value: phase.title };
+              })}
+              onChange={(val: string) => {
+                const newNode = structuredClone(selectedNode);
+                if (newNode) {
+                  newNode.phase = val;
+                  onChange(newNode);
+                }
+              }}
+            />
+            <Button
+              onClick={() => {
+                const newNode = structuredClone(selectedNode);
+                if (newNode) {
+                  newNode.phase = undefined;
+                  onChange(newNode);
+                }
+              }}
+              type='link'
+            >
+              Clear
+            </Button>
+          </div>
         </div>
         <CollapsiblePanel title='Purpose & description'>
           <Space direction='vertical' size='small' className='w-full'>

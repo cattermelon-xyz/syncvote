@@ -54,10 +54,8 @@ const VoteUI = ({
 }) => {
   console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
-  const { workflow_id, workflow_version_id, org_id, mission_id } =
-    currentProposalData;
-  const { isEnd, vote_machine_type, title, endToVote, description, phase } =
-    checkpointData;
+  const { workflow_id, workflow_version_id, org_id } = currentProposalData;
+  const { isEnd, vote_machine_type, title, endToVote, phase } = checkpointData;
   const originalCheckPointId = checkpointData?.id?.replace(
     checkpointData?.mission_id,
     '-'
@@ -85,22 +83,26 @@ const VoteUI = ({
         )}
         {isForkNode && (
           <div>
-            <div className='bg-white p-3 rounded flex justify-between items-center'>
+            <div className='bg-white p-3 rounded flex flex-col'>
               TODO:Show multiple buttons
             </div>
           </div>
         )}
         {!isAuthorOnly && !isForkNode && (
-          <div className='bg-white p-3 rounded flex items-center'>
-            <LoadingOutlined className='mr-1' />
-            Waiting for admin(s) to take action
-          </div>
+          <>
+            <div className='flex flex-row gap-1'>
+              <div className='block'>
+                <LoadingOutlined className='mr-1' />
+              </div>
+              <div>Waiting for admin(s) to take action</div>
+            </div>
+          </>
         )}
 
         {checkpointData?.note ? (
-          <div className='bg-white p-3 rounded'>
+          <>
             <div>{parse(checkpointData?.note)}</div>
-          </div>
+          </>
         ) : (
           <></>
         )}
@@ -110,7 +112,7 @@ const VoteUI = ({
   return !isEnd ? (
     !phase ? (
       <>
-        <div className='bg-white p-3 rounded flex justify-between items-center'>
+        <div className='bg-white p-3 rounded flex'>
           <div>
             <div>
               {isExpired
@@ -146,12 +148,44 @@ const VoteUI = ({
           ) : (
             <></>
           )} */}
-            {renderButton()}
+            <div className='w-full bg-gray-200 p-3 rounded flex flex-col gap-1'>
+              <div className='text-md font-bold'>{title}</div>
+              <span
+                className='text-sm text-violet-500 font-bold cursor-pointer'
+                onClick={() => {
+                  openWorkflowPage(
+                    org_id,
+                    workflow_id,
+                    workflow_version_id,
+                    originalCheckPointId
+                  );
+                }}
+              >
+                View Guideline
+              </span>
+              {renderButton()}
+            </div>
           </>
         )}
       </>
     ) : (
-      renderButton()
+      <div className='w-full bg-gray-200 p-3 rounded flex flex-col gap-1'>
+        <div className='text-md font-bold'>{title}</div>
+        <span
+          className='text-violet-500 font-bold cursor-pointer'
+          onClick={() => {
+            openWorkflowPage(
+              org_id,
+              workflow_id,
+              workflow_version_id,
+              originalCheckPointId
+            );
+          }}
+        >
+          View Guideline
+        </span>
+        {renderButton()}
+      </div>
     )
   ) : (
     <></>

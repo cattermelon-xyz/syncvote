@@ -31,43 +31,41 @@ const HistoryItem = ({ item }: { item: any }) => {
     return (
       <>
         {selectedOption || linkDiscourse || linkSnapshot ? (
-          <div className='bg-white p-3 rounded flex justify-between items-center'>
-            <div className='text-xs'>
-              {selectedOption ? (
-                <div className='flex flex-row gap-1 items-center'>
-                  <DoneIcon />
-                  <div>
-                    Choice: <Tag>{selectedOption}</Tag>
-                  </div>
+          <div className='text-xs'>
+            {selectedOption ? (
+              <div className='flex flex-row gap-1 items-center'>
+                <DoneIcon />
+                <div>
+                  Choice: <Tag>{selectedOption}</Tag>
                 </div>
-              ) : null}{' '}
-              {linkDiscourse ? (
-                <div className='flex flex-row gap-1 items-center'>
-                  <DoneIcon />
-                  <a
-                    href={linkDiscourse}
-                    target='_blank'
-                    className='text-green-500'
-                    rel='noreferrer'
-                  >
-                    {trimTitle(linkDiscourse, 30)}
-                  </a>
-                </div>
-              ) : null}
-              {linkSnapshot ? (
-                <div className='flex flex-row gap-1 items-center'>
-                  <DoneIcon />
-                  <a
-                    href={linkSnapshot}
-                    target='_blank'
-                    className='text-green-500'
-                    rel='noreferrer'
-                  >
-                    {trimTitle(linkSnapshot, 30)}
-                  </a>
-                </div>
-              ) : null}
-            </div>
+              </div>
+            ) : null}{' '}
+            {linkDiscourse ? (
+              <div className='flex flex-row gap-1 items-center'>
+                <DoneIcon />
+                <a
+                  href={linkDiscourse}
+                  target='_blank'
+                  className='text-green-500'
+                  rel='noreferrer'
+                >
+                  {trimTitle(linkDiscourse, 30)}
+                </a>
+              </div>
+            ) : null}
+            {linkSnapshot ? (
+              <div className='flex flex-row gap-1 items-center'>
+                <DoneIcon />
+                <a
+                  href={linkSnapshot}
+                  target='_blank'
+                  className='text-green-500'
+                  rel='noreferrer'
+                >
+                  {trimTitle(linkSnapshot, 30)}
+                </a>
+              </div>
+            ) : null}
           </div>
         ) : (
           <></>
@@ -114,13 +112,19 @@ const HistoryItem = ({ item }: { item: any }) => {
                 {parse(desc || '')}
               </div>
             )} */}
-              {renderResult()}
+              <div className='bg-gray-200 p-3 rounded flex flex-col gap-1'>
+                <div className='text-md font-bold'>{checkpoint_title}</div>
+                {renderResult()}
+              </div>
             </>
           )}
         </div>
       </>
     ) : (
-      renderResult()
+      <div className='bg-gray-200 p-3 rounded flex flex-col gap-1'>
+        <div className='text-md font-bold'>{checkpoint_title}</div>
+        {renderResult()}
+      </div>
     ))
   );
 };
