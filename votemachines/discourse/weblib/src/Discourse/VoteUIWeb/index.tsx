@@ -33,12 +33,11 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             {isEditorUI ? null : (
               <div className='text-md text-[#575655]'>Title</div>
             )}
-
             <div>
               {isEditorUI ? (
                 <input
                   type='text'
-                  className='w-full border-none text-4xl focus:outline-none focus:border-none'
+                  className='w-full border-none text-4xl focus:outline-none focus:border-none mb-2'
                   placeholder='Proposal title'
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -62,7 +61,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                   setMissionDesc(val);
                 }}
                 id='text-editor'
-                isEditorUI={true}
+                isEditorUI={isEditorUI}
               />
             </div>
             <Button

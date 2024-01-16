@@ -38,7 +38,7 @@ function isExternalProvider(provider: any): provider is ExternalProvider {
 }
 
 const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
-  const { onSubmit, checkpointData, missionData } = props;
+  const { onSubmit, checkpointData, missionData, isEditorUI } = props;
   const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
   const client = new snapshot.Client712(hub);
   const [web3, setWeb3] = useState<Web3Provider>();
@@ -55,14 +55,25 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const space = checkpointData?.data?.space || '';
   return (
     <div>
-      <Card className='p-4'>
-        <div className='flex flex-col gap-6'>
-          {checkpointData &&
-          checkpointData?.data?.action === 'create-proposal' ? (
-            <>
+      {/* <Card className='p-4'> */}
+      <div className='flex flex-col gap-4'>
+        {checkpointData &&
+        checkpointData?.data?.action === 'create-proposal' ? (
+          <>
+            {isEditorUI ? null : (
               <p className='text-xl font-medium'>Create Proposal</p>
-              <div className='flex-col w-full'>
-                <div className='text-base mb-1'>Title</div>
+            )}
+            <div className='flex-col w-full'>
+              {isEditorUI ? null : <div className='text-base mb-1'>Title</div>}
+              {isEditorUI ? (
+                <input
+                  type='text'
+                  className='w-full border-none text-4xl focus:outline-none focus:border-none'
+                  placeholder='Proposal title'
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              ) : (
                 <Input
                   value={title}
                   placeholder='Testing Syncvote MVP'
@@ -70,74 +81,80 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     setTitle(e.target.value);
                   }}
                 />
-              </div>
-              <div className='flex-col w-full'>
+              )}
+            </div>
+            <div className='flex-col w-full'>
+              {isEditorUI ? null : (
                 <div className='text-base mb-1'>Description</div>
-                <TextEditor value={description} setValue={setDiscription} />
-              </div>
-              {options.length > 0 ? (
+              )}
+              <TextEditor
+                value={description}
+                setValue={setDiscription}
+                isEditorUI={isEditorUI}
+              />
+            </div>
+            {options.length > 0 ? (
+              <div>
                 <div>
-                  <div>
-                    A proposal will be held in{' '}
-                    <a href={`https://snapshot.org/#/${space}`} target='_blank'>
-                      <Tag>{space}</Tag>
-                    </a>{' '}
-                    space
-                  </div>
-                  <div className='font-bold'>
-                    Voter can choose among these options:
-                  </div>
-                  {options.map((option: any, index: number) => {
-                    return (
-                      <div key={index}>
-                        <BorderOutlined className='mr-2' />
-                        {option}
-                      </div>
-                    );
-                  })}
+                  A proposal will be held in{' '}
+                  <a href={`https://snapshot.org/#/${space}`} target='_blank'>
+                    <Tag>{space}</Tag>
+                  </a>{' '}
+                  space
                 </div>
-              ) : null}
-              <Button
-                type='primary'
-                className='w-full'
-                onClick={async () => {
-                  if (isExternalProvider(window.ethereum)) {
-                    setWeb3(new Web3Provider(window.ethereum));
-                  }
-                  if (web3) {
-                    const accounts = await web3.listAccounts();
-                    const receipt = await client.proposal(web3, accounts[0], {
-                      space: checkpointData?.data?.space,
-                      type: checkpointData?.data?.type,
-                      title: title,
-                      body: html2md(description),
-                      choices: checkpointData?.data?.snapShotOption,
-                      start: moment().unix(),
-                      end:
-                        moment().unix() +
-                        checkpointData?.data?.snapshotDuration,
-                      snapshot: 13620822,
-                      plugins: JSON.stringify({}),
-                      app: 'my-app',
-                      discussion: '',
-                    });
+                <div className='font-bold'>
+                  Voter can choose among these options:
+                </div>
+                {options.map((option: any, index: number) => {
+                  return (
+                    <div key={index}>
+                      <BorderOutlined className='mr-2' />
+                      {option}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+            <Button
+              type='primary'
+              className='w-full mb-4'
+              onClick={async () => {
+                if (isExternalProvider(window.ethereum)) {
+                  setWeb3(new Web3Provider(window.ethereum));
+                }
+                if (web3) {
+                  const accounts = await web3.listAccounts();
+                  const receipt = await client.proposal(web3, accounts[0], {
+                    space: checkpointData?.data?.space,
+                    type: checkpointData?.data?.type,
+                    title: title,
+                    body: html2md(description),
+                    choices: checkpointData?.data?.snapShotOption,
+                    start: moment().unix(),
+                    end:
+                      moment().unix() + checkpointData?.data?.snapshotDuration,
+                    snapshot: 13620822,
+                    plugins: JSON.stringify({}),
+                    app: 'my-app',
+                    discussion: '',
+                  });
 
-                    if (isReceipt(receipt)) {
-                      onSubmit({
-                        submission: {
-                          proposalId: receipt.id,
-                        },
-                      });
-                    }
+                  if (isReceipt(receipt)) {
+                    onSubmit({
+                      submission: {
+                        proposalId: receipt.id,
+                      },
+                    });
                   }
-                }}
-              >
-                Submit
-              </Button>
-            </>
-          ) : null}
-        </div>
-      </Card>
+                }
+              }}
+            >
+              Submit
+            </Button>
+          </>
+        ) : null}
+      </div>
+      {/* </Card> */}
     </div>
   );
 };

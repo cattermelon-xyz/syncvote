@@ -372,8 +372,8 @@ const MissionEditor = () => {
   }, []);
 
   useEffect(() => {
-    console.log('historicalCheckpointData', historicalCheckpointData);
-  }, [historicalCheckpointData]);
+    console.log('account', account);
+  }, [account]);
 
   // TODO: change to PDA-style design to query all docs version
 
@@ -391,7 +391,7 @@ const MissionEditor = () => {
     <>
       <AuthContext.Consumer>
         {({ session }) => (
-          <div className='flex flex-col w-full items-center gap-10'>
+          <div className='flex flex-col w-full items-center gap-10 mb-4'>
             <HeaderEditorPage
               session={session}
               account={account}

@@ -55,7 +55,7 @@ export const vote = async (data: any) => {
 export const openMissionPage = (orgId: string, proposalId: string) => {
   chrome.runtime.sendMessage({
     action: 'openUrl',
-    payload: { url: `${frontEndUrl}/${orgId}/${proposalId}?view=full` },
+    payload: { url: `${frontEndUrl}/${orgId}/${proposalId}/vote` },
   });
 };
 

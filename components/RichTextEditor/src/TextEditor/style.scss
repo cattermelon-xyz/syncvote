@@ -43,7 +43,7 @@
 .editor-ui .ck.ck-editor__main > .ck-editor__editable.ck-focused {
   // border: 0px !important;
   // height: auto !important;
-  height: 600px !important;
+  height: calc(100vh - 250px) !important;
   overflow-y: scroll !important;
   // min-height: calc(
   //   100vh - 150px
