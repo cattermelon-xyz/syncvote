@@ -81,6 +81,7 @@ export interface IVoteUIWebProps {
   onSubmit: (data: any) => void; // submit the choice & its data
   missionData: any; // data of the mission
   checkpointData: any; // data of current checkpoint
+  isEditorUI?: boolean; // if show UI for editor page when click link in extension
 }
 
 export interface IVoteMachine {
