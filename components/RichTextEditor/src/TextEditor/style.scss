@@ -33,3 +33,19 @@
 .ck-editor__editable ol {
   padding-left: 15px !important;
 }
+
+.editor-ui .ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
+  // border: 0px !important;
+  height: calc(100vh - 250px) !important;
+  overflow-y: scroll !important;
+}
+
+.editor-ui .ck.ck-editor__main > .ck-editor__editable.ck-focused {
+  // border: 0px !important;
+  // height: auto !important;
+  height: 600px !important;
+  overflow-y: scroll !important;
+  // min-height: calc(
+  //   100vh - 150px
+  // ) !important; // Thay đổi giá trị này theo yêu cầu
+}

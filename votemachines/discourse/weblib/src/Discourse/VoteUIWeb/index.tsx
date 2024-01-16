@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { TextEditor } from 'rich-text-editor';
 
 const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
-  const { checkpointData, missionData, onSubmit } = props;
+  const { checkpointData, missionData, onSubmit, isEditorUI } = props;
 
   const [title, setTitle] = useState<any>(missionData?.m_title || '');
   const action = checkpointData?.data?.action;
@@ -27,19 +27,34 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   }
   return (
     <>
-      <div className='flex flex-col gap-4 mt-5'>
+      <div className='flex flex-col gap-4'>
         {action === 'create-topic' && (
           <Space direction='vertical' className='w-full'>
-            <div className='text-md text-[#575655]'>Title</div>
+            {isEditorUI ? null : (
+              <div className='text-md text-[#575655]'>Title</div>
+            )}
+
             <div>
-              <Input
-                className='w-full'
-                placeholder={'Governance revision'}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
+              {isEditorUI ? (
+                <input
+                  type='text'
+                  className='w-full border-none text-4xl focus:outline-none focus:border-none'
+                  placeholder='Proposal title'
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              ) : (
+                <Input
+                  className='w-full'
+                  placeholder='Governance revision'
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              )}
             </div>
-            <div className='text-md text-[#575655] mb-2'>Description</div>
+            {isEditorUI ? null : (
+              <div className='text-md text-[#575655] mb-2'>Description</div>
+            )}
             <div>
               <TextEditor
                 value={missionDesc}
@@ -47,11 +62,12 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                   setMissionDesc(val);
                 }}
                 id='text-editor'
+                isEditorUI={true}
               />
             </div>
             <Button
               type='primary'
-              className='w-full'
+              className='w-full '
               onClick={() => {
                 onSubmit({
                   option: 1,
