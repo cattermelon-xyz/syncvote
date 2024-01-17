@@ -36,9 +36,12 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               loading={loading}
               disabled={title ? false : true}
               onClick={async () => {
-                if (window.ethereum) {
+                const anyWindow = window as any;
+                if (anyWindow.ethereum) {
                   setLoading(true);
-                  const provider = new ethers.BrowserProvider(window.ethereum);
+                  const provider = new ethers.BrowserProvider(
+                    anyWindow.ethereum
+                  );
                   const signer = await provider.getSigner();
                   console.log(checkpointData?.data.governor);
 
@@ -47,7 +50,8 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     ABI_GOVERNOR,
                     signer
                   );
-                  const addressArray = await window.ethereum.request({
+
+                  const addressArray = await anyWindow.ethereum.request({
                     method: 'eth_requestAccounts',
                   });
 

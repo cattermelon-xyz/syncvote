@@ -98,8 +98,9 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 type='primary'
                 className='w-full'
                 onClick={async () => {
-                  if (isExternalProvider(window.ethereum)) {
-                    setWeb3(new Web3Provider(window.ethereum));
+                  const anyWindow = window as any;
+                  if (isExternalProvider(anyWindow.ethereum)) {
+                    setWeb3(new Web3Provider(anyWindow.ethereum));
                   }
                   if (web3) {
                     const accounts = await web3.listAccounts();
