@@ -2,10 +2,10 @@ import { Button, Input, Select, Space } from 'antd';
 import { IVoteUIWebProps, replaceVariables } from 'directed-graph';
 import { useEffect, useState } from 'react';
 import { TextEditor } from 'rich-text-editor';
+import ModalSubmission from './ModalSubmission';
 
 const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const { checkpointData, missionData, onSubmit, isEditorUI } = props;
-
   const [title, setTitle] = useState<any>(missionData?.m_title || '');
   const action = checkpointData?.data?.action;
   let topicId = '';
@@ -13,6 +13,10 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const defaultDescription = checkpointData?.data?.template || '';
   const variables = props?.missionData?.data?.variables || {};
   const [missionDesc, setMissionDesc] = useState<any>('');
+  const [openModalSubmission, setOpenModalSubmission] =
+    useState<boolean>(false);
+  const [submissionData, setSubmissionData] = useState<any>();
+
   useEffect(() => {
     replaceVariables(defaultDescription, variables, (val: any) => {
       setMissionDesc(val);
@@ -68,7 +72,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               type='primary'
               className='w-full '
               onClick={() => {
-                onSubmit({
+                setSubmissionData({
                   option: 1,
                   submission: {
                     action: checkpointData?.data?.action,
@@ -77,6 +81,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     raw: missionDesc,
                   },
                 });
+                setOpenModalSubmission(true);
               }}
             >
               Submit
@@ -115,6 +120,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 setMissionDesc(val);
               }}
               id='text-editor'
+              isEditorUI={isEditorUI}
             />
             <Button
               type='primary'
@@ -144,6 +150,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                   setMissionDesc(val);
                 }}
                 id='text-editor'
+                isEditorUI={isEditorUI}
               />
             </div>
             <Button
@@ -165,6 +172,12 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </Space>
         )}
       </div>
+      <ModalSubmission
+        open={openModalSubmission}
+        onClose={() => setOpenModalSubmission(false)}
+        onSubmit={onSubmit}
+        submissionData={submissionData}
+      />
     </>
   );
 };

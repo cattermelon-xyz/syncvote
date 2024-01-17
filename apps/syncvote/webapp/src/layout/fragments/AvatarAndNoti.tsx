@@ -30,12 +30,14 @@ interface AvatarAndNotiProps {
   user?: any;
   account?: any;
   setAccount?: any;
+  isEditorPage?: boolean;
 }
 
 const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
   user,
   account,
   setAccount,
+  isEditorPage,
 }) => {
   const { sdk } = useSDK();
   const dispatch = useDispatch();
@@ -86,24 +88,55 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
 
   const contentPopOver = (
     <div>
-      {account ? (
-        <div className='flex items-center gap-2'>
-          <p>{shortenAddress(account)}</p>
+      {isEditorPage ? (
+        account ? (
+          <div className='flex items-center gap-2'>
+            <p>{shortenAddress(account)}</p>
+            <div>
+              <Button
+                type='text'
+                // icon={<LogoutOutlined />}
+                className='w-full flex items-center'
+                onClick={async () => {
+                  disconnectWallet;
+                }}
+              >
+                Disconnect wallet
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p>No wallet connected</p>
+        )
+      ) : (
+        <>
           <div>
             <Button
               type='text'
-              // icon={<LogoutOutlined />}
-              className='w-full flex items-center'
-              onClick={async () => {
-                disconnectWallet;
+              icon={<SettingOutlined />}
+              onClick={() => {
+                setOpenPopover(false);
+                navigate(`/account/setting`);
               }}
             >
-              Disconnect wallet
+              {L('accountSettings')}
             </Button>
           </div>
-        </div>
-      ) : (
-        <p>No wallet connected</p>
+          <div>
+            <Button
+              type='text'
+              icon={<LogoutOutlined />}
+              className=' flex items-center'
+              onClick={async () => {
+                dispatch(startLoading({}));
+                await supabase.auth.signOut();
+                dispatch(finishLoading({}));
+              }}
+            >
+              {L('logOut')}
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );
