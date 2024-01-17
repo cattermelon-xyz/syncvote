@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Card, Button, Radio, Input, Tag } from 'antd';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { Card, Button, Input, Tag } from 'antd';
 import { IVoteUIWebProps, replaceVariables } from 'directed-graph';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import snapshot from '@snapshot-labs/snapshot.js';
 import moment from 'moment';
 import { TextEditor } from 'rich-text-editor';
@@ -113,6 +113,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                       end:
                         moment().unix() +
                         checkpointData?.data?.snapshotDuration,
+                      // TODO: block number
                       snapshot: 13620822,
                       plugins: JSON.stringify({}),
                       app: 'my-app',

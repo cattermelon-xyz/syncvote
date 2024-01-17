@@ -28,7 +28,6 @@ import TemplateDetail from '@pages/Template/Detail';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 import { config } from '@dal/config';
 import DocDetail from '@pages/Mission/DocDetail';
-import DemoRoutes from './DemoRoutes';
 const env = import.meta.env.VITE_ENV;
 
 const AppRoutes = () => {
@@ -84,7 +83,6 @@ const AppRoutes = () => {
           {VotingRoutes}
           {HomeRoutes}
           {TemplateRoutes}
-          {DemoRoutes}
           <Route path='/' element={<App layout={WebLayoutWithoutSider} />}>
             <Route
               path='doc/:orgIdString/:workflowIdString/:versionIdString/:docId'

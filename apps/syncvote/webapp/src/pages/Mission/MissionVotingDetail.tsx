@@ -9,9 +9,7 @@ import ModalListParticipants from './fragments/ModalListParticipants';
 import { extractCurrentCheckpointId } from '@utils/helpers';
 import { queryDocInput } from '@dal/data';
 import { config } from '@dal/config';
-// =============================== METAMASK SECTION ===============================
-import { useSDK } from '@metamask/sdk-react';
-import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { ExternalProvider } from '@ethersproject/providers';
 import MissionProgressSummary from './fragments/MissionProgressSummary';
 import MissionSummary from './fragments/MissionSummary';
 import { getVoteMachine } from 'directed-graph';
@@ -20,6 +18,8 @@ import Metamask from '@assets/icons/svg-icons/Metamask';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
 import HistoryOfCheckpoint from './fragments/HistoryOfCheckpoint';
+import { ConnectModal, getAccount } from 'syncvote-wallet';
+
 export function isExternalProvider(
   provider: any
 ): provider is ExternalProvider {
@@ -159,9 +159,6 @@ const renderId = (
             <Button
               onClick={async () => {
                 login(dispatch);
-                await window?.ethereum?.request({
-                  method: 'eth_requestAccounts',
-                });
               }}
             >
               Login
@@ -171,23 +168,27 @@ const renderId = (
         )}
         {account ? (
           <div>
-            <span>You are voting with wallet </span>
-            <Tag>{account}</Tag>{' '}
-            <Button type='text' onClick={disconnect}>
-              Sign out
-            </Button>
+            <span>
+              You are voting with wallet{' '}
+              <Tag>
+                {account.substr(0, 3) +
+                  '...' +
+                  account.substr(account.length - 3, account.length - 1)}
+              </Tag>
+              <Button type='text' onClick={disconnect}>
+                Disconnect
+              </Button>
+            </span>
           </div>
         ) : (
           <div className='flex gap-2 items-center'>
-            Or
             <Button
               icon={<Metamask />}
               className='flex items-center'
               onClick={connect}
             >
-              Login
+              Connect a wallet
             </Button>
-            with MetaMask
           </div>
         )}
       </Space>
@@ -286,25 +287,20 @@ const MissionVotingDetail = () => {
   }).data;
 
   // =============================== METAMASK SECTION ===============================
-  const [account, setAccount] = useState<any>();
-  const { sdk } = useSDK();
+  const [account, setAccount] = useState<any>(getAccount());
 
-  const connect = async () => {
-    try {
-      console.log(sdk);
-      const accounts = await sdk?.connect();
+  useEffect(() => {
+    console.log('try to getAccount: ', getAccount());
+    setAccount(getAccount());
+  });
 
-      if (Array.isArray(accounts) && accounts.length > 0) {
-        setAccount(accounts[0]);
-        console.log(accounts[0]);
-      }
-    } catch (err) {
-      console.warn(`failed to connect..`, err);
-    }
+  const connect = () => {
+    setOpenConnectModal(true);
   };
 
   const disconnect = async () => {
-    sdk?.terminate();
+    // TODO: disconnect
+    // sdk?.terminate();
     setAccount('');
   };
   // =============================== METAMASK SECTION ===============================
@@ -393,8 +389,13 @@ const MissionVotingDetail = () => {
       };
     }
   );
+  const [openConnectModal, setOpenConnectModal] = useState(false);
   return (
     <>
+      <ConnectModal
+        open={openConnectModal}
+        onCancel={() => setOpenConnectModal(false)}
+      />
       {isFullVote && missionData && currentCheckpointData && (
         <div className='max-w-2xl px-4'>
           <div>{renderId(user, dispatch, account, connect, disconnect)}</div>

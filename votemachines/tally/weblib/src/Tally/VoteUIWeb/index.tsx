@@ -1,6 +1,5 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { useSDK } from '@metamask/sdk-react';
 import { Log, ethers } from 'ethers';
 import { Card, Button, Radio, Input } from 'antd';
 import { IVoteUIWebProps } from 'directed-graph';
@@ -12,7 +11,9 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { connected } = useSDK();
+  // const { connected } = useSDK();
+  // TODO: check if connected
+  const connected = false;
 
   return (
     <div>
