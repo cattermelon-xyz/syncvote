@@ -9,28 +9,25 @@ interface TextEditorProps {
   value?: any;
   onBlur?: () => Promise<void>;
   id?: string;
-  isEditorUI?: boolean;
+  onReady?: (editor: any) => void;
 }
 
 const TextEditor: React.FC<TextEditorProps> = ({
   setValue,
   value,
   onBlur,
-  isEditorUI,
+  onReady,
 }) => {
-  const editorClass = isEditorUI ? 'editor-ui' : '';
-
   return (
-    <div className={editorClass}>
-      <CKEditor
-        editor={ClassicEditor}
-        data={value}
-        onBlur={onBlur}
-        onChange={(event, editor) => {
-          setValue(editor.getData());
-        }}
-      />
-    </div>
+    <CKEditor
+      editor={ClassicEditor}
+      data={value}
+      onBlur={onBlur}
+      onChange={(event, editor) => {
+        setValue(editor.getData());
+      }}
+      onReady={onReady}
+    />
   );
 };
 

@@ -7,13 +7,9 @@ import { Modal } from 'antd';
 import { useDispatch } from 'react-redux';
 import ModalListParticipants from './fragments/ModalListParticipants';
 import { extractCurrentCheckpointId } from '@utils/helpers';
-import { queryDocInput } from '@dal/data';
 import { config } from '@dal/config';
-// =============================== METAMASK SECTION ===============================
 import { useSDK } from '@metamask/sdk-react';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
-import MissionProgressSummary from './fragments/MissionProgressSummary';
-import MissionSummary from './fragments/MissionSummary';
 import { getVoteMachine } from 'directed-graph';
 import { vote } from '@axios/vote';
 import Metamask from '@assets/icons/svg-icons/Metamask';
@@ -110,7 +106,6 @@ const renderVoteMachine = (
               dispatch
             );
           }}
-          isEditorUI={true}
         />
       )}
       {!currentCheckpointData.isEnd &&
@@ -263,7 +258,7 @@ const submit = (
   }
 };
 
-const MissionEditor = () => {
+const MissionVoting = () => {
   const { missionIdString } = useParams();
   const dispatch = useDispatch();
   const missionId = extractIdFromIdString(missionIdString);
@@ -391,43 +386,32 @@ const MissionEditor = () => {
     <>
       <AuthContext.Consumer>
         {({ session }) => (
-          <div className='flex flex-col w-full items-center gap-10 mb-4'>
+          <div className='flex flex-col w-full items-center gap-10'>
             <HeaderEditorPage
               session={session}
               account={account}
               setAccount={setAccount}
             />
             {missionData && currentCheckpointData && (
-              <div className='max-w-2xl px-4'>
-                {/* <div>{renderId(user, dispatch, account, connect, disconnect)}</div> */}
-                <Space direction='vertical' size={16} className='w-full'>
-                  {isForkNode && (
-                    <>
-                      <Tabs defaultActiveKey='0' items={subMissionTabItems} />
-                    </>
-                  )}
-                  {historicalCheckpointData ? (
-                    <HistoryOfCheckpoint
-                      historicalCheckpointData={historicalCheckpointData}
-                    />
-                  ) : (
-                    renderVoteMachine(missionData, user, account, dispatch)
-                  )}
-                </Space>
+              <div className='w-full h-full'>
+                {isForkNode && (
+                  <>
+                    <Tabs defaultActiveKey='0' items={subMissionTabItems} />
+                  </>
+                )}
+                {historicalCheckpointData ? (
+                  <HistoryOfCheckpoint
+                    historicalCheckpointData={historicalCheckpointData}
+                  />
+                ) : (
+                  renderVoteMachine(missionData, user, account, dispatch)
+                )}
               </div>
             )}
             <ModalConnectWallet
               open={openModalConnectWallet}
               onClose={() => setOpenModalConnectWallet(false)}
               setAccount={setAccount}
-            />
-            <ModalListParticipants
-              open={openModalListParticipants}
-              onClose={() => setOpenModalListParticipants(false)}
-              listParticipants={
-                currentCheckpointData?.participation?.data || []
-              }
-              historicalCheckpointData={historicalCheckpointData}
             />
           </div>
         )}
@@ -436,4 +420,4 @@ const MissionEditor = () => {
   );
 };
 
-export default MissionEditor;
+export default MissionVoting;
