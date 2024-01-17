@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { useSDK } from '@metamask/sdk-react';
 import { Card, Button, Radio, Input, Tag } from 'antd';
-import Client from '@snapshot-labs/snapshot.js/dist/sign';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { IVoteUIWebProps, replaceVariables } from 'directed-graph';
 import snapshot from '@snapshot-labs/snapshot.js';
@@ -123,6 +123,26 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                   setWeb3(new Web3Provider(window.ethereum));
                 }
                 if (web3) {
+                  // get Network lasted block
+                  const clientApollo = new ApolloClient({
+                    uri: 'https://hub.snapshot.org/graphql',
+                    cache: new InMemoryCache(),
+                  });
+
+                  const respone = await clientApollo.query({
+                    query: gql`
+                      query {
+                        space(id: "${checkpointData?.data.space}") {
+                          network
+                        }
+                      }
+                    `,
+                  });
+
+                  const provider = snapshot.utils.getProvider(
+                    respone.data?.space?.network
+                  );
+                  
                   const accounts = await web3.listAccounts();
                   const receipt = await client.proposal(web3, accounts[0], {
                     space: checkpointData?.data?.space,
@@ -133,7 +153,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     start: moment().unix(),
                     end:
                       moment().unix() + checkpointData?.data?.snapshotDuration,
-                    snapshot: 13620822,
+                    snapshot: await provider.getBlockNumber(),
                     plugins: JSON.stringify({}),
                     app: 'my-app',
                     discussion: '',
