@@ -1,5 +1,9 @@
 import { Button, Divider, Input, Modal, Select, Space } from 'antd';
-import { IVoteUIWebProps, replaceVariables } from 'directed-graph';
+import {
+  IVoteUIWebProps,
+  replaceVariables,
+  shortenString,
+} from 'directed-graph';
 import { useEffect, useState } from 'react';
 import { TextEditor } from 'rich-text-editor';
 import ModalSubmission from './ModalSubmission';
@@ -67,7 +71,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </div>
         }
       >
-        {parse(missionDesc)}
+        {parse(shortenString(missionDesc || '', 200))}
       </Modal>
       <div className='w-full h-full flex flex-col items-center justify-between'>
         {action === 'create-topic' && (
