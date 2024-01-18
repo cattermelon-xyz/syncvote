@@ -76,7 +76,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             <div className='w-full flex flex-col items-center'>
               <div
                 className='w-full flex flex-col'
-                style={{ maxWidth: '700px' }}
+                style={{ maxWidth: '700px', minWidth: '70%' }}
               >
                 <div className='mb-8'>
                   <div className='mb-2 text-gray-500'>
@@ -110,7 +110,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '300px',
+                            '450px',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -163,7 +163,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             <div className='w-full flex flex-col items-center'>
               <div
                 className='w-full flex flex-col'
-                style={{ maxWidth: '700px' }}
+                style={{ maxWidth: '700px', minWidth: '70%' }}
               >
                 <div className='mb-8'>
                   <div className='mb-2 text-gray-500'>Update Topic</div>
@@ -218,7 +218,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             <div className='w-full flex flex-col items-center'>
               <div
                 className='w-full flex flex-col'
-                style={{ maxWidth: '700px' }}
+                style={{ maxWidth: '700px', minWidth: '70%' }}
               >
                 <div className='mb-8'>
                   <div className='mb-2 text-gray-500'>

@@ -163,7 +163,10 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
       {checkpointData && checkpointData?.data?.action === 'create-proposal' ? (
         <>
           <div className='w-full flex flex-col items-center'>
-            <div className='w-full flex flex-col' style={{ maxWidth: '700px' }}>
+            <div
+              className='w-full flex flex-col'
+              style={{ maxWidth: '700px', minWidth: '70%' }}
+            >
               <div className='mb-8'>
                 <div className='mb-2 text-gray-500'>
                   Create a new Proposal on Snapshot
