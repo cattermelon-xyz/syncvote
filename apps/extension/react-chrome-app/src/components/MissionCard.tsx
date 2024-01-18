@@ -16,29 +16,38 @@ const MissionCard: React.FC<Props> = ({
   let { startToVote, duration } = proposal;
   duration = duration === null ? 0 : duration;
   const endToVote = moment(startToVote).add(duration, 'seconds');
+  const tagClass = !(
+    proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
+  )
+    ? 'text-green-500 border-green-500 bg-green-100 rounded-xl'
+    : 'bg-gray-200 rounded-xl';
   return (
     <Card
-      bodyStyle={{ padding: '12px' }}
+      bodyStyle={{ padding: '14px', cursor: 'pointer', borderRadius: '12px' }}
+      className='hover:shadow-xl transition duration-300 ease-in-out border-transparent'
       onClick={() => {
         setCurrentProposalId(proposal.id);
         setPage(PAGE_ROUTER.VOTING);
       }}
     >
-      <Tag
-        color={
-          proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
-            ? 'default'
-            : 'green'
-        }
-      >
-        {proposal?.status === 'DRAFT' ? 'Draft' : proposal?.checkpoint_title}
-      </Tag>
-      <div className='flex flex-col gap-1 mt-1'>
-        <p className='text-[13px]'>{proposal?.title}</p>
-        <p className='text-[10px]'>{`End at ${moment(endToVote || 0).format(
-          'MMM Do,YYYY - h:mm a'
-        )}`}</p>
+      <div className='mb-4'>
+        <Tag
+          color={
+            proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
+              ? 'default'
+              : ''
+          }
+          className={tagClass}
+          style={{ borderColor: 'transparent', left: '-8px' }}
+        >
+          {proposal?.status === 'DRAFT' ? 'Draft' : proposal?.checkpoint_title}
+        </Tag>
+        <p className='text-[16px] text-gray-700 mt-1'>{proposal?.title}</p>
       </div>
+      <p className='text-[13px] text-gray-500'>
+        {`End at ${moment(endToVote || 0).format('MMM Do,YYYY  ')}`}&bull;
+        {`${moment(endToVote || 0).format('h:mm a')}`}
+      </p>
     </Card>
   );
 };

@@ -1,4 +1,4 @@
-import { Select, Avatar, Tabs, Empty } from 'antd';
+import { Select, Avatar, Tabs, Empty, Card } from 'antd';
 import { BellOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import MissionCard from '@components/MissionCard';
@@ -105,8 +105,7 @@ const HomePage: React.FC<Props> = ({
     {
       key: '3',
       label: 'Mentions',
-      children: <></>,
-      disabled: true,
+      children: <Card>Comming Soon</Card>,
     },
   ];
 
@@ -129,27 +128,33 @@ const HomePage: React.FC<Props> = ({
           <div className='flex justify-between mb-6'>
             <Select
               defaultValue={orgsOption[0]?.value}
-              style={{ width: 120 }}
+              style={{ width: 135, height: 40, borderColor: 'transparent' }}
               onChange={handleChangeOrg}
               options={orgsOption}
             />
 
             <div className='flex gap-3 items-center'>
-              <div className='flex rounded-full h-[28px] w-[28px] bg-[#E6E6E6] justify-center cursor-pointer'>
+              <div
+                className='flex rounded-full h-[28px] w-[28px] bg-[#E6E6E6] justify-center cursor-pointer '
+                style={{ padding: '20px' }}
+              >
                 <BellOutlined style={{ fontSize: '20px' }} />
               </div>
-              <Avatar src={user?.user_metadata?.avatar_url} />
+              <Avatar
+                className='w-[40px] h-[40px]'
+                src={user?.user_metadata?.avatar_url}
+              />
             </div>
           </div>
           <div className='flex justify-between items-center'>
-            <p>Proposal</p>
+            <div className='text-xl font-bold'>Proposal</div>
             <div
-              className='flex rounded-full h-[36px] w-[36px] bg-[#E6E6E6] justify-center cursor-pointer'
+              className='flex rounded-full h-[48px] w-[48px] bg-[#E6E6E6] justify-center cursor-pointer'
               onClick={() => {
                 setPage(PAGE_ROUTER.CREATE_PROPOSAL);
               }}
             >
-              <PlusOutlined />
+              <PlusOutlined style={{ fontSize: '20px' }} />
             </div>
           </div>
           <Tabs
@@ -157,6 +162,7 @@ const HomePage: React.FC<Props> = ({
             defaultActiveKey='1'
             items={items}
             onChange={onChangeTabs}
+            tabBarStyle={{ color: '#898989' }}
           />
         </>
       )}

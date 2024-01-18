@@ -110,6 +110,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   return (
     <div className='flex flex-col h-full justify-between'>
       <Modal
+        className='rounded-xl'
         open={showTemplate}
         title='Template'
         onCancel={() => setShowTemplate(false)}
@@ -195,7 +196,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                         writer.setStyle(
                           //use max-height(for scroll) or min-height(static)
                           'min-height',
-                          '300px',
+                          '450px',
                           editor.editing.view.document.getRoot()
                         );
                       });

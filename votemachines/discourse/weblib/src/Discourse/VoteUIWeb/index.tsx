@@ -109,7 +109,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '300px',
+                            '450px',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -187,7 +187,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '300px',
+                            '450px',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -244,7 +244,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '300px',
+                            '450px',
                             editor.editing.view.document.getRoot()
                           );
                         });
