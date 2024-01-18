@@ -56,6 +56,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                   submission: {
                     action: checkpointData?.data?.action,
                     variables: checkpointData?.data?.variables[0],
+                    title: title,
                     raw: missionDesc,
                   },
                 });
