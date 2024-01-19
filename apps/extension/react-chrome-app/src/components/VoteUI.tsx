@@ -3,13 +3,14 @@ import {
   DownOutlined,
   UpOutlined,
   ClockCircleOutlined,
+  ExportOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import parse from 'html-react-parser';
 import VoteButton from './VoteButton';
 import { Divider } from 'antd';
-import { openWorkflowPage } from '../utils';
+import { openWorkflowPage, shortenString } from '../utils';
 
 const isInteractable = ({
   checkpointId,
@@ -55,7 +56,8 @@ const VoteUI = ({
   console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
   const { workflow_id, workflow_version_id, org_id } = currentProposalData;
-  const { isEnd, vote_machine_type, title, endToVote, phase } = checkpointData;
+  const { isEnd, vote_machine_type, title, endToVote, phase, description } =
+    checkpointData;
   const originalCheckPointId = checkpointData?.id?.replace(
     checkpointData?.mission_id,
     '-'
@@ -111,6 +113,7 @@ const VoteUI = ({
   };
   return !isEnd ? (
     !phase ? (
+      // no phase
       <>
         <div className='bg-white p-3 rounded flex'>
           <div>
@@ -169,22 +172,35 @@ const VoteUI = ({
         )}
       </>
     ) : (
-      <div className='w-full bg-gray-200 p-3 rounded flex flex-col gap-1'>
-        <div className='text-md font-bold'>{title}</div>
-        <span
-          className='text-violet-500 font-bold cursor-pointer'
-          onClick={() => {
-            openWorkflowPage(
-              org_id,
-              workflow_id,
-              workflow_version_id,
-              originalCheckPointId
-            );
-          }}
-        >
-          View Guideline
-        </span>
-        {renderButton()}
+      // in a phase
+      <div className='w-full bg-white p-3 rounded flex flex-col gap-1'>
+        <div className='text-xs font-bold'>{title}</div>
+        <Divider className='my-1' />
+        <div className='flex flex-row justify-between  text-xs'>
+          <div>Remaining duration</div>
+          <div>{moment(endToVote).fromNow()}</div>
+        </div>
+        <Divider className='my-1' />
+        <div className='flex flex-row justify-between text-xs mb-2'>
+          <div>View guidelines</div>
+          <ExportOutlined
+            className='cursor-pointer'
+            onClick={() => {
+              openWorkflowPage(
+                org_id,
+                workflow_id,
+                workflow_version_id,
+                originalCheckPointId
+              );
+            }}
+          />
+        </div>
+        {description ? (
+          <div className='text-xs mb-2'>
+            {parse(shortenString(description, 50))}
+          </div>
+        ) : null}
+        <div className='mt-2'>{renderButton()}</div>
       </div>
     )
   ) : (

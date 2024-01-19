@@ -36,6 +36,8 @@ const HomePage: React.FC<Props> = ({
 
   useEffect(() => {
     if (user) {
+      // TODO: useCallback to solve infinite loop
+      // setLoading(true);
       queryOrgs({
         params: { userId: user.id },
         onSuccess: (data) => {
@@ -53,9 +55,11 @@ const HomePage: React.FC<Props> = ({
           setCurrentOrgData(data[0]);
           setOrgsOption(handleDataOrgs);
           setDataOrgs(data);
+          setLoading(false);
         },
         onError: (error) => {
           console.log('error', error);
+          setLoading(false);
         },
       });
     }
@@ -115,7 +119,6 @@ const HomePage: React.FC<Props> = ({
   };
 
   const handleChangeOrg = (value: string) => {
-    console.log(`selected ${value}`);
     const selectedDataOrg = dataOrgs.filter(
       (dataOrg: any) => dataOrg?.id === value
     );
@@ -126,30 +129,33 @@ const HomePage: React.FC<Props> = ({
     <>
       {orgsOption && (
         <>
-          <div className='flex justify-between mb-6'>
+          <div className='flex flex-row justify-between mb-6 items-center'>
             <Select
               defaultValue={orgsOption[0]?.value}
-              style={{ width: 120 }}
+              style={{ width: 135, borderColor: 'transparent', height: 40 }}
               onChange={handleChangeOrg}
               options={orgsOption}
             />
 
             <div className='flex gap-3 items-center'>
-              <div className='flex rounded-full h-[28px] w-[28px] bg-[#E6E6E6] justify-center cursor-pointer'>
+              <div className='flex rounded-full h-[40px] w-[40px] bg-[#E6E6E6] justify-center cursor-pointer'>
                 <BellOutlined style={{ fontSize: '20px' }} />
               </div>
-              <Avatar src={user?.user_metadata?.avatar_url} />
+              <Avatar
+                className='w-[40px] h-[40px]'
+                src={user?.user_metadata?.avatar_url}
+              />
             </div>
           </div>
           <div className='flex justify-between items-center'>
-            <p>Proposal</p>
+            <div className='text-xl font-bold text-gray-700'>Proposal</div>
             <div
-              className='flex rounded-full h-[36px] w-[36px] bg-[#E6E6E6] justify-center cursor-pointer'
+              className='flex rounded-full h-[48px] w-[48px] bg-[#E6E6E6] justify-center cursor-pointer hover:shadow-xl'
               onClick={() => {
                 setPage(PAGE_ROUTER.CREATE_PROPOSAL);
               }}
             >
-              <PlusOutlined />
+              <PlusOutlined className='text-xl' />
             </div>
           </div>
           <Tabs

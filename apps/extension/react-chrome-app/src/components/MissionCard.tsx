@@ -1,6 +1,7 @@
 import { Card, Tag } from 'antd';
 import { PAGE_ROUTER } from '@constants/common';
 import moment from 'moment';
+import { StatusTag } from './StatusTag';
 
 interface Props {
   proposal: any;
@@ -18,27 +19,28 @@ const MissionCard: React.FC<Props> = ({
   const endToVote = moment(startToVote).add(duration, 'seconds');
   return (
     <Card
-      bodyStyle={{ padding: '12px' }}
+      className='hover:shadow-xl cursor-pointer'
+      bodyStyle={{ padding: '14px 12px' }}
       onClick={() => {
         setCurrentProposalId(proposal.id);
         setPage(PAGE_ROUTER.VOTING);
       }}
     >
-      <Tag
+      <StatusTag
         color={
           proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
             ? 'default'
-            : 'green'
+            : 'active'
         }
+        className='ml-[-6px] mb-2'
       >
         {proposal?.status === 'DRAFT' ? 'Draft' : proposal?.checkpoint_title}
-      </Tag>
-      <div className='flex flex-col gap-1 mt-1'>
-        <p className='text-[13px]'>{proposal?.title}</p>
-        <p className='text-[10px]'>{`End at ${moment(endToVote || 0).format(
-          'MMM Do,YYYY - h:mm a'
-        )}`}</p>
-      </div>
+      </StatusTag>
+      <p className='text-base text-gray-700 mb-4'>{proposal?.title}</p>
+      <p className='text-xs text-gray-500'>
+        {`End at ${moment(endToVote || 0).format('MMM Do,YYYY ')}`}&bull;{' '}
+        {`${moment(endToVote || 0).format('h:mm a')}`}
+      </p>
     </Card>
   );
 };

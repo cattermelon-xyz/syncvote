@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { DownOutlined, UpOutlined, AuditOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  UpOutlined,
+  AuditOutlined,
+  ExportOutlined,
+} from '@ant-design/icons';
 import moment from 'moment';
 import { Tag, Divider } from 'antd';
-import { trimTitle } from '../utils';
-import parse from 'html-react-parser';
+import { shortenString } from '../utils';
 import DoneIcon from '@assets/icons/DoneIcon';
 
 const HistoryItem = ({ item }: { item: any }) => {
@@ -14,12 +18,12 @@ const HistoryItem = ({ item }: { item: any }) => {
     checkpoint_title,
     endedAt,
     desc,
-    vote_machine_type,
     tallyResult,
     isEnd,
     options,
     arweave_id,
     phase,
+    vote_machine_type,
   } = item;
   console.log(tallyResult?.index);
   const selectedOption = tallyResult?.index
@@ -49,7 +53,7 @@ const HistoryItem = ({ item }: { item: any }) => {
                   className='text-green-500'
                   rel='noreferrer'
                 >
-                  {trimTitle(linkDiscourse, 30)}
+                  {shortenString(linkDiscourse, 30)}
                 </a>
               </div>
             ) : null}
@@ -62,7 +66,7 @@ const HistoryItem = ({ item }: { item: any }) => {
                   className='text-green-500'
                   rel='noreferrer'
                 >
-                  {trimTitle(linkSnapshot, 30)}
+                  {shortenString(linkSnapshot, 30)}
                 </a>
               </div>
             ) : null}
@@ -73,31 +77,24 @@ const HistoryItem = ({ item }: { item: any }) => {
       </>
     );
   };
+  console.log(
+    'in HistoryItem, endedAt: ',
+    endedAt,
+    '; phase: ',
+    phase,
+    ';  checkpoint: ',
+    checkpoint_title,
+    'item: ',
+    item
+  );
   return (
     endedAt &&
     (!phase ? (
+      // phase is null
       <>
-        <Divider className='my-1' />
-        <div className='flex flex-col gap-2'>
-          <div className='bg-white p-3 rounded flex justify-between items-center'>
-            <div className='flex flex-col gap-1'>
-              {!isEnd && (
-                <div className='flex items-center text-xs'>
-                  <div className='mr-2'>Completed -</div>
-                  {arweave_id ? (
-                    <a href={arweave_id}>
-                      {endedAt
-                        ? moment(endedAt || 0).format('MMM DD, hh:mm A')
-                        : null}
-                      <AuditOutlined className='ml-1' />
-                    </a>
-                  ) : (
-                    moment(endedAt || 0).format('MMM DD, hh:mm A')
-                  )}
-                </div>
-              )}
-              <div className='font-bold text-md'>{checkpoint_title}</div>
-            </div>
+        <div className='flex flex-col'>
+          <div className='flex flex-row w-full justify-between'>
+            <div className='text-md font-bold'>{checkpoint_title}</div>
             {!isEnd &&
               (selectedOption || linkDiscourse || linkSnapshot || desc) && (
                 <div onClick={() => setExpanded(!expanded)}>
@@ -105,45 +102,54 @@ const HistoryItem = ({ item }: { item: any }) => {
                 </div>
               )}
           </div>
+          <div className='bg-white p-3 rounded flex justify-between items-center'>
+            <div className='flex flex-row justify-between'>
+              <div className='flex items-center text-xs'>
+                <div className='mr-2'>Completed on</div>
+                <div>{moment(endedAt || 0).format('MMM DD, hh:mm A')}</div>
+              </div>
+            </div>
+          </div>
           {expanded && !isEnd && (
             <>
-              {/* {desc && (
-              <div className='bg-white p-3 rounded flex justify-between items-center'>
-                {parse(desc || '')}
+              <Divider className='my-1' />
+              <div className='flex flex-row w-full justify-between text-xs'>
+                <div>Result</div>
+                {arweave_id ? (
+                  <a href={arweave_id}>
+                    <ExportOutlined />
+                  </a>
+                ) : (
+                  <></>
+                )}
               </div>
-            )} */}
-              <div className='bg-gray-200 p-3 rounded flex flex-col gap-1'>
-                <div className='flex flex-row w-full justify-between'>
-                  <div className='text-md font-bold'>{checkpoint_title}</div>
-                  {arweave_id ? (
-                    <a href={arweave_id}>
-                      {endedAt
-                        ? moment(endedAt || 0).format('MMM DD, hh:mm A')
-                        : null}
-                      <AuditOutlined className='ml-1' />
-                    </a>
-                  ) : (
-                    moment(endedAt || 0).format('MMM DD, hh:mm A')
-                  )}
-                </div>
-
-                {renderResult()}
-              </div>
+              {renderResult()}
             </>
           )}
         </div>
       </>
     ) : (
-      <div className='bg-gray-200 p-3 rounded flex flex-col gap-1'>
+      // do have a phase
+      <div className='flex flex-col bg-white rounded p-3 gap-1'>
         <div className='flex flex-row w-full justify-between'>
-          <div className='text-md font-bold'>{checkpoint_title}</div>
+          <div className='text-md font-bold'>
+            <div>{checkpoint_title}</div>
+          </div>
+        </div>
+        <Divider className='my-1' />
+        <div className='flex flex-row w-full justify-between'>
+          <div>Completed on</div>
+          <div>{moment(endedAt || 0).format('MMM DD, hh:mm A')}</div>
+        </div>
+        <Divider className='my-1' />
+        <div className='w-full flex flex-row justify-between text-xs'>
+          <div>Result</div>
           {arweave_id ? (
             <a href={arweave_id}>
-              {endedAt ? moment(endedAt || 0).format('MMM DD, hh:mm A') : null}
-              <AuditOutlined className='ml-1' />
+              <ExportOutlined className='ml-1' />
             </a>
           ) : (
-            moment(endedAt || 0).format('MMM DD, hh:mm A')
+            <></>
           )}
         </div>
         {renderResult()}
