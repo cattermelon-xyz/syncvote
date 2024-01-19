@@ -97,10 +97,11 @@ export namespace Snapshot {
       const snapshotOption = checkpoint?.data?.snapShotOption
         ? checkpoint?.data?.snapShotOption
         : [];
+
       if (
         !checkpoint?.children ||
         checkpoint.children.length === 0 ||
-        checkpoint.children.length !== snapshotOption.length
+        checkpoint.children.length !== snapshotOption.length + 1
       ) {
         isValid = false;
         message.push('Missing children checkpoint for option');

@@ -60,7 +60,7 @@ class Snapshot extends VotingMachine {
       if (
         !checkpoint?.children ||
         checkpoint.children.length === 0 ||
-        checkpoint.children.length !== snapshotOption.length
+        checkpoint.children.length !== snapshotOption.length + 1
       ) {
         isValid = false;
         message.push('Missing children checkpoint for option');
@@ -76,14 +76,6 @@ class Snapshot extends VotingMachine {
       isValid,
       message,
     };
-  }
-
-  fallBack() {
-    // check fallback of VotingMachine class
-    const { fallback, error } = super.fallBack();
-    if (fallback) {
-      return { fallback, error };
-    }
   }
 
   async recordVote(voteData) {
