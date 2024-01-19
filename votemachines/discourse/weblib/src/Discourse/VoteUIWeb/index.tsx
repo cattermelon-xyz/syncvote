@@ -1,5 +1,9 @@
 import { Button, Divider, Input, Modal, Select, Space } from 'antd';
-import { IVoteUIWebProps, replaceVariables } from 'directed-graph';
+import {
+  IVoteUIWebProps,
+  replaceVariables,
+  shortenString,
+} from 'directed-graph';
 import { useEffect, useState } from 'react';
 import { TextEditor } from 'rich-text-editor';
 import ModalSubmission from './ModalSubmission';
@@ -68,7 +72,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </div>
         }
       >
-        {parse(missionDesc)}
+        {parse(shortenString(missionDesc, 200) || '')}
       </Modal>
       <div className='w-full h-full flex flex-col items-center justify-between'>
         {action === 'create-topic' && (
@@ -76,7 +80,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             <div className='w-full flex flex-col items-center'>
               <div
                 className='w-full flex flex-col'
-                style={{ maxWidth: '700px', minWidth: '70%' }}
+                style={{ maxWidth: '700px' }}
               >
                 <div className='mb-8'>
                   <div className='mb-2 text-gray-500'>
@@ -163,7 +167,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             <div className='w-full flex flex-col items-center'>
               <div
                 className='w-full flex flex-col'
-                style={{ maxWidth: '700px', minWidth: '70%' }}
+                style={{ maxWidth: '700px' }}
               >
                 <div className='mb-8'>
                   <div className='mb-2 text-gray-500'>Update Topic</div>
@@ -218,7 +222,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             <div className='w-full flex flex-col items-center'>
               <div
                 className='w-full flex flex-col'
-                style={{ maxWidth: '700px', minWidth: '70%' }}
+                style={{ maxWidth: '700px' }}
               >
                 <div className='mb-8'>
                   <div className='mb-2 text-gray-500'>

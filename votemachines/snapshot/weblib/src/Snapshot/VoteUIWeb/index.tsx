@@ -88,12 +88,12 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
 
       const respone = await clientApollo.query({
         query: gql`
-          query {
-            space(id: "${checkpointData?.data.space}") {
-              network
-            }
+        query {
+          space(id: "${checkpointData?.data.space}") {
+            network
           }
-        `,
+        }
+      `,
       });
 
       const provider = snapshot.utils.getProvider(respone.data?.space?.network);
@@ -125,7 +125,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const [showTemplate, setShowTemplate] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   return (
-    <div className='flex flex-col h-full justify-between'>
+    <div className='flex flex-col h-full justify-between w-full items-center'>
       <Modal
         className='rounded-xl'
         open={showTemplate}
@@ -182,80 +182,51 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
 
       {checkpointData && checkpointData?.data?.action === 'create-proposal' ? (
         <>
-          <div className='w-full flex flex-col items-center'>
-            <div
-              className='w-full flex flex-col'
-              style={{ maxWidth: '700px', minWidth: '70%' }}
-            >
-              <div className='mb-8'>
-                <div className='mb-2 text-gray-500'>
-                  Create a new Proposal on Snapshot
-                </div>
-                <input
-                  type='text'
-                  className='w-full border-none text-4xl focus:outline-none focus:border-none'
-                  placeholder='Proposal Title'
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+          <div className='w-full flex flex-col' style={{ maxWidth: '700px' }}>
+            <div className='mb-8'>
+              <div className='mb-2 text-gray-500'>
+                Create a new Proposal on Snapshot
+              </div>
+              <input
+                type='text'
+                className='w-full border-none text-4xl focus:outline-none focus:border-none'
+                placeholder='Proposal Title'
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+            <div className='flex flex-row relative'>
+              <Button
+                icon={<FileOutlined />}
+                shape='circle'
+                size='large'
+                className='absolute '
+                style={{ left: '-60px' }}
+                onClick={() => setShowTemplate(true)}
+                title='Show Template'
+              />
+              <div className='flex flex-col w-full'>
+                <TextEditor
+                  value={description}
+                  setValue={setDiscription}
+                  onReady={(editor) => {
+                    editor.editing.view.change((writer: any) => {
+                      writer.setStyle(
+                        //use max-height(for scroll) or min-height(static)
+                        'min-height',
+                        '450px',
+                        editor.editing.view.document.getRoot()
+                      );
+                    });
+                  }}
                 />
               </div>
-
-              <Button
-                type='primary'
-                className='w-full mb-4'
-                loading={loading}
-                onClick={async () => {
-                  if (isExternalProvider(window.ethereum)) {
-                    setWeb3(new Web3Provider(window.ethereum));
-                  }
-                  if (web3) {
-                    // get Network lasted block
-                    const clientApollo = new ApolloClient({
-                      uri: 'https://hub.snapshot.org/graphql',
-                      cache: new InMemoryCache(),
-                    });
-
-                    const respone = await clientApollo.query({
-                      query: gql`
-                      query {
-                        space(id: "${checkpointData?.data.space}") {
-                          network
-                        }
-                      }
-                    `,
-                    });
-
-                    const provider = snapshot.utils.getProvider(
-                      respone.data?.space?.network
-                    );
-
-                    const accounts = await web3.listAccounts();
-                    const receipt = await client.proposal(web3, accounts[0], {
-                      space: checkpointData?.data?.space,
-                      type: checkpointData?.data?.type,
-                      title: title,
-                      body: html2md(description),
-                      choices: checkpointData?.data?.snapShotOption,
-                      start: moment().unix(),
-                      end:
-                        moment().unix() +
-                        checkpointData?.data?.snapshotDuration,
-                      snapshot: await provider.getBlockNumber(),
-                      plugins: JSON.stringify({}),
-                      app: 'my-app',
-                      discussion: '',
-                    });
-
-                    if (isReceipt(receipt)) {
-                      onSubmit({
-                        submission: {
-                          proposalId: receipt.id,
-                        },
-                      });
-                    }
-                  }
-                }}
-              >
+            </div>
+          </div>
+          <div className='w-full'>
+            <Divider className='my-1' />
+            <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
+              <Button type='primary' loading={loading} onClick={submitSnapshot}>
                 Submit
               </Button>
             </div>
