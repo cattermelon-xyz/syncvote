@@ -339,6 +339,34 @@ export default (props: IVoteMachineConfigProps) => {
                     </>
                   );
                 })}
+
+              <NavConfigPanel
+                title='Fail'
+                currentNode={fallbackNode}
+                possibleNodes={posibleNodes}
+                index={children.indexOf(fallback || '')}
+                navLabel='Total votes fail Quorum and/or Vetos pass Threshold'
+                delay={
+                  fallbackNode ? delays[children.indexOf(fallback || '')] : 0
+                }
+                delayUnit={
+                  fallbackNode
+                    ? delayUnits[children.indexOf(fallback || '')]
+                    : 0
+                }
+                delayNote={
+                  fallbackNode
+                    ? delayNotes[children.indexOf(fallback || '')]
+                    : 0
+                }
+                changeDelayHandler={changeDelayHandler}
+                replaceHandler={(val: any, idx: number) => {
+                  onChange({
+                    children: replaceHandler(val, idx),
+                    data: { ...data, fallback: val.id },
+                  });
+                }}
+              />
             </>
           )}
         </CollapsiblePanel>

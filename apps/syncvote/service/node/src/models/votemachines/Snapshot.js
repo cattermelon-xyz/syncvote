@@ -6,6 +6,8 @@ const { supabase } = require('../../configs/supabaseClient');
 class Snapshot extends VotingMachine {
   constructor(props) {
     super(props);
+    this.status = 'active';
+    this.proposal = {};
   }
 
   validate(checkpoint) {
@@ -63,12 +65,25 @@ class Snapshot extends VotingMachine {
         isValid = false;
         message.push('Missing children checkpoint for option');
       }
+
+      if (!checkpoint?.data.fallback) {
+        isValid = false;
+        message.push('Missing fallback checkpoint');
+      }
     }
 
     return {
       isValid,
       message,
     };
+  }
+
+  fallBack() {
+    // check fallback of VotingMachine class
+    const { fallback, error } = super.fallBack();
+    if (fallback) {
+      return { fallback, error };
+    }
   }
 
   async recordVote(voteData) {
@@ -79,7 +94,7 @@ class Snapshot extends VotingMachine {
     }
 
     // check if dont have action
-    if (!voteData.submission) {
+    if (this.data.action === 'create-proposal' && !voteData.submission) {
       return {
         notRecorded: true,
         error: 'Snapshot: Missing submission',
@@ -123,11 +138,40 @@ class Snapshot extends VotingMachine {
         .eq('name', this.data.proposalId);
 
       if (variables) {
-        const { data } = await getSnapshotData({
+        const { respone } = await getSnapshotData({
           proposalId: variables[0].value,
         });
-        this.who = [voteData.identify];
-        this.result = data;
+
+        if (respone) {
+          let result = {};
+          for (let i = 0; i < respone?.data.proposal.choices.length; i++) {
+            result[i] = {
+              voting_power: respone.data.proposal.scores[i],
+            };
+          }
+          this.result = result;
+
+          if (respone.data.proposal.state === 'closed') {
+            this.state = 'closed';
+            let maxVotingPower = -Infinity;
+            let maxIndex;
+
+            for (const key in result) {
+              if (result.hasOwnProperty(key)) {
+                const votingPower = result[key].voting_power;
+                if (votingPower > maxVotingPower) {
+                  maxVotingPower = votingPower;
+                  maxIndex = key;
+                }
+              }
+            }
+
+            this.tallyResult = {
+              index: maxIndex,
+              voting_power: maxVotingPower,
+            };
+          }
+        }
       } else {
         return {
           notRecorded: true,
@@ -146,6 +190,18 @@ class Snapshot extends VotingMachine {
         tallyResult: this.tallyResult,
       };
     } else if (this.data.action === SNAPSHOT_ACTION.SYNC_PROPOSAL) {
+      if (this.state === 'closed') {
+        if (Number(this.tallyResult.voting_power) === 0) {
+          return {
+            error:
+              'Cannot move to next checkpoint because voting power is not enough',
+          };
+        }
+        return {
+          shouldTally: true,
+          tallyResult: this.tallyResult,
+        };
+      }
     }
     return {};
   }
@@ -168,8 +224,6 @@ const getSnapshotData = async (props) => {
           query {
             proposal(id: "${proposalId}") {
               id
-              title
-              body
               choices
               start
               end
@@ -183,21 +237,12 @@ const getSnapshotData = async (props) => {
               scores_updated
               plugins
               network
-              strategies {
-                name
-                network
-                params
-              }
-              space {
-                id
-                name
-              }
             }
           }
         `,
     });
 
-    return { data: respone };
+    return { respone };
   } catch (error) {
     console.log('GetDataProposalError: ', e);
     return {};

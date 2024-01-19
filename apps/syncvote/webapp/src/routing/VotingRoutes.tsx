@@ -3,7 +3,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import WebLayoutWithoutSider from '@layout/WebLayoutWithoutSider';
 import MissionVotingDetail from '@pages/Mission/MissionVotingDetail';
-import MissionEditor from '@pages/Mission/MissionEditor';
+import MissionVoting from '@pages/Mission/MissionVoting';
 import NoHeaderAppLayout from '@layout/NoHeaderAppLayout';
 
 export default (
@@ -17,7 +17,7 @@ export default (
     <Route path='/' element={<App layout={NoHeaderAppLayout} />}>
       <Route
         path=':orgIdString/:missionIdString/vote'
-        element={<MissionEditor />}
+        element={<MissionVoting />}
       />
     </Route>
   </React.Fragment>

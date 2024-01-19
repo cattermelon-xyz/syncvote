@@ -33,7 +33,7 @@
 .ck-editor__editable ol {
   padding-left: 15px !important;
 }
-
+// TODO: use this for fixing UI
 .editor-ui .ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
   // border: 0px !important;
   height: calc(100vh - 250px) !important;

@@ -168,6 +168,7 @@ function HeaderEditorPage({ session, account, setAccount }: HeaderProps) {
               user={user}
               account={account}
               setAccount={setAccount}
+              isEditorPage={true}
             />
           )}
         </div>

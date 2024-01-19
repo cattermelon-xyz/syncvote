@@ -105,6 +105,11 @@ export namespace Snapshot {
         isValid = false;
         message.push('Missing children checkpoint for option');
       }
+
+      if (!checkpoint?.data.fallback) {
+        isValid = false;
+        message.push('Missing fallback checkpoint');
+      }
     }
 
     return {

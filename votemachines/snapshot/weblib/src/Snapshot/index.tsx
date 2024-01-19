@@ -132,7 +132,11 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
         </>
       ) : (
         <>
-          <span>{source.data.snapShotOption[idx]}</span>
+          {source?.data.fallback === target?.id ? (
+            <span>Fail</span>
+          ) : (
+            <span>{source.data.snapShotOption[idx]}</span>
+          )}
         </>
       )}
     </>
