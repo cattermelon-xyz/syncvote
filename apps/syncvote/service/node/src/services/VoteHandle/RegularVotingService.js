@@ -142,10 +142,27 @@ async function handleSubmission(props) {
 
             // check if tally have error
             if (t_error) {
-              console.log('Move this mission to fallback checkpoint');
+              console.log('FallbackError: ', t_error);
+              const tallyResult = {
+                index: details?.props?.fallback
+                  ? details.children.indexOf(details?.props?.fallback)
+                  : 0,
+              };
+
+              const timeDefault = moment(details.startToVote).add(
+                details.duration,
+                'seconds'
+              );
+
+              let { next_checkpoint_id } = await handleMovingToNextCheckpoint(
+                details,
+                tallyResult,
+                timeDefault
+              );
+
               resolve({
-                status: 'ERR',
-                message: t_error,
+                status: 'OK',
+                message: `FALLBACK: Move this checkpoint to ${next_checkpoint_id}`,
               });
               return;
             }

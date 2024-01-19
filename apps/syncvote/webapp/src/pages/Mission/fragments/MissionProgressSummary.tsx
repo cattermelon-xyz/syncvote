@@ -82,6 +82,42 @@ const MissionProgressSummary = ({
             }
           )}
 
+          {currentCheckpointData.data.snapShotOption?.map(
+            (option: any, index: any) => {
+              // still calculate voting_power of Abstain but not show in result
+              if (option === 'Abstain') {
+                return <div key={-1}></div>;
+              }
+              let totalVotingPower = 0;
+              let percentage = 0;
+
+              totalVotingPower = Object.values(missionData.result).reduce(
+                (acc: number, voteData: any) => acc + voteData.voting_power,
+                0
+              );
+
+              if (currentCheckpointData.quorum >= totalVotingPower) {
+                percentage =
+                  (missionData.result[index]?.voting_power /
+                    currentCheckpointData.quorum) *
+                  100;
+              } else {
+                percentage =
+                  (missionData.result[index]?.voting_power / totalVotingPower) *
+                  100;
+              }
+              percentage = parseFloat(percentage.toFixed(2));
+              console.log(percentage);
+
+              return (
+                <div key={index} className='flex flex-col gap-2'>
+                  <p className='text-base font-semibold'>{option}</p>
+                  <Progress percent={percentage} size='small' />
+                </div>
+              );
+            }
+          )}
+
           {isReachedQuorum ? (
             <div className='w-full flex justify-center items-center mt-2'>
               <Button className='w-full bg-[#EAF6EE] text-[#29A259]'>
@@ -95,6 +131,7 @@ const MissionProgressSummary = ({
           )}
         </Card>
       ) : null}
+
       {historicalCheckpointData ? (
         <Card className=''>
           <p className='mb-4 text-base font-semibold'>Proposal details</p>

@@ -213,7 +213,10 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
             )}
           </>
         </CollapsiblePanel>
-        {!selectedNode?.isEnd && type !== 'forkNode' && type !== 'joinNode' ? (
+        {!selectedNode?.isEnd &&
+        type !== 'forkNode' &&
+        type !== 'joinNode' &&
+        selectedNode?.data.fallback ? (
           <>
             <CollapsiblePanel title='Fallback Option'>
               <Space

@@ -31,7 +31,7 @@ export interface ICheckPoint {
 // TODO: separate between data & cosmetic options
 
 export interface IParticipant {
-  type?: 'token' | 'identity' | 'author';
+  type?: 'token' | 'identity' | 'author' | 'all';
   data?: IToken | string[];
 }
 
