@@ -319,7 +319,7 @@ export default (props: IVoteMachineConfigProps) => {
                   return (
                     <>
                       <NavConfigPanel
-                        title={`Option ${index}"`}
+                        title={`Option ${index}`}
                         key={option}
                         index={index}
                         navLabel={option}

@@ -39,7 +39,7 @@ function isExternalProvider(provider: any): provider is ExternalProvider {
 
 const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const { onSubmit, checkpointData, missionData, isEditorUI } = props;
-  const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+  const hub = 'https://hub.snapshot.org';
   const client = new snapshot.Client712(hub);
   const [web3, setWeb3] = useState<Web3Provider>();
   const [title, setTitle] = useState(missionData?.m_title || '');
@@ -53,6 +53,14 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   }, []);
   const options = checkpointData?.data?.snapShotOption || [];
   const space = checkpointData?.data?.space || '';
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (checkpointData && checkpointData?.data?.action === 'sync-proposal') {
+      onSubmit({
+        submission: {},
+      });
+    }
+  }, []);
   return (
     <div>
       {/* <Card className='p-4'> */}
@@ -118,7 +126,9 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             <Button
               type='primary'
               className='w-full mb-4'
+              loading={loading}
               onClick={async () => {
+                setLoading(true);
                 if (isExternalProvider(window.ethereum)) {
                   setWeb3(new Web3Provider(window.ethereum));
                 }
@@ -142,7 +152,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                   const provider = snapshot.utils.getProvider(
                     respone.data?.space?.network
                   );
-                  
+
                   const accounts = await web3.listAccounts();
                   const receipt = await client.proposal(web3, accounts[0], {
                     space: checkpointData?.data?.space,
@@ -159,6 +169,8 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     discussion: '',
                   });
 
+                  setLoading(false);
+
                   if (isReceipt(receipt)) {
                     onSubmit({
                       submission: {
@@ -172,7 +184,19 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               Submit
             </Button>
           </>
-        ) : null}
+        ) : (
+          <>
+            <Button
+              onClick={() => {
+                onSubmit({
+                  submission: {},
+                });
+              }}
+            >
+              Sync proposal
+            </Button>
+          </>
+        )}
       </div>
       {/* </Card> */}
     </div>

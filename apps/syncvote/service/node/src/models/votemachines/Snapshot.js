@@ -1,5 +1,5 @@
 const { VotingMachine } = require('.');
-const { SNAPSHOT_ACTION, isValidAction } = require('../../configs/constants');
+const { SNAPSHOT_ACTION } = require('../../configs/constants');
 const { ApolloClient, InMemoryCache, gql } = require('@apollo/client');
 const { supabase } = require('../../configs/supabaseClient');
 
@@ -11,29 +11,58 @@ class Snapshot extends VotingMachine {
   validate(checkpoint) {
     let isValid = true;
     const message = [];
-    if (!checkpoint?.children || checkpoint.children.length === 0) {
+    if (!checkpoint?.data.type) {
       isValid = false;
-      message.push('Missing options');
+      message.push('Missing type of vote in snapshot');
     }
 
-    if (!checkpoint?.data?.fallback || !checkpoint?.data?.next) {
+    if (!checkpoint?.data.space) {
       isValid = false;
-      message.push('Missing fallback and next checkpoint');
+      message.push('Missing space of snapshot');
     }
 
-    if (!checkpoint?.data?.space || !checkpoint?.data?.type) {
+    if (!checkpoint?.data.action) {
       isValid = false;
-      message.push('Missing attributes of snapshot');
+      message.push('Missing action for snapshot checkpoint');
     }
 
-    if (!checkpoint?.data?.proposalId) {
-      isValid = false;
-      message.push('Missing variable proposalId');
-    }
+    if (checkpoint?.data.action === 'create-proposal') {
+      if (!checkpoint.data.proposalId) {
+        isValid = false;
+        message.push('Missiong variable to store proposalId');
+      }
 
-    if (!isValidAction(SNAPSHOT_ACTION, checkpoint?.data?.action)) {
-      isValid = false;
-      message.push('Wrong or missing action');
+      if (!checkpoint?.data.fallback || !checkpoint.data.next) {
+        isValid = false;
+        message.push('Missing fallback or next checkpoint');
+      }
+
+      if (!checkpoint?.children || checkpoint.children.length === 0) {
+        isValid = false;
+        message.push('Missing options');
+      }
+
+      if (!checkpoint?.data.snapshotDuration) {
+        isValid = false;
+        message.push('Missing duration for Snapshot proposal');
+      }
+    } else {
+      if (!checkpoint?.data.snapshotIdToSync) {
+        isValid = false;
+        message.push('Missing checkpoint snapshot parent');
+      }
+
+      const snapshotOption = checkpoint?.data?.snapShotOption
+        ? checkpoint?.data?.snapShotOption
+        : [];
+      if (
+        !checkpoint?.children ||
+        checkpoint.children.length === 0 ||
+        checkpoint.children.length !== snapshotOption.length
+      ) {
+        isValid = false;
+        message.push('Missing children checkpoint for option');
+      }
     }
 
     return {
@@ -56,11 +85,13 @@ class Snapshot extends VotingMachine {
         error: 'Snapshot: Missing submission',
       };
     } else {
-      if (!voteData.submission.proposalId) {
-        return {
-          notRecorded: true,
-          error: 'Snapshot: Missing proposalId',
-        };
+      if (this.data.action === 'create-proposal') {
+        if (!voteData.submission.proposalId) {
+          return {
+            notRecorded: true,
+            error: 'Snapshot: Missing proposalId',
+          };
+        }
       }
     }
 
@@ -83,7 +114,26 @@ class Snapshot extends VotingMachine {
         })
         .select('*');
     } else if (this.data.action === SNAPSHOT_ACTION.SYNC_PROPOSAL) {
-      const { data } = await getSnapshotData('proposalId');
+      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
+
+      const { data: variables } = await supabase
+        .from('variables')
+        .select('*')
+        .eq('mission_id', root_mission_id)
+        .eq('name', this.data.proposalId);
+
+      if (variables) {
+        const { data } = await getSnapshotData({
+          proposalId: variables[0].value,
+        });
+        this.who = [voteData.identify];
+        this.result = data;
+      } else {
+        return {
+          notRecorded: true,
+          error: 'Snapshot: Cannot find proposalId of checkpoinr parent',
+        };
+      }
     }
 
     return {};
