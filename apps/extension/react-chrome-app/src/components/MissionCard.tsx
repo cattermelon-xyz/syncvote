@@ -17,6 +17,11 @@ const MissionCard: React.FC<Props> = ({
   let { startToVote, duration } = proposal;
   duration = duration === null ? 0 : duration;
   const endToVote = moment(startToVote).add(duration, 'seconds');
+  const tagClass = !(
+    proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
+  )
+    ? 'text-green-500 border-green-500 bg-green-100 rounded-xl'
+    : 'bg-gray-200 rounded-xl';
   return (
     <Card
       className='hover:shadow-xl cursor-pointer'

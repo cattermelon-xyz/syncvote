@@ -15,6 +15,7 @@ import { TextEditor } from 'rich-text-editor';
 import html2md from 'html-to-md';
 import { BorderOutlined, FileOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
+import axios from 'axios';
 
 export type Receipt = {
   id: string;
@@ -56,8 +57,24 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
       setDiscription(val);
     });
   }, []);
+
   const options = checkpointData?.data?.snapShotOption || [];
   const space = checkpointData?.data?.space || '';
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (checkpointData && checkpointData?.data?.action === 'sync-proposal') {
+      axios
+        .post(`${import.meta.env.VITE_SERVER_URL}/vote/create`, {
+          mission_id: missionData?.mission_id,
+          identify: 'everyone',
+        })
+        .then((respone) => {
+          console.log('Vote respone', respone);
+        });
+    }
+  }, []);
+
   const submitSnapshot = async () => {
     if (isExternalProvider(window.ethereum)) {
       setWeb3(new Web3Provider(window.ethereum));
@@ -71,12 +88,12 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
 
       const respone = await clientApollo.query({
         query: gql`
-          query {
-            space(id: "${checkpointData?.data.space}") {
-              network
-            }
+        query {
+          space(id: "${checkpointData?.data.space}") {
+            network
           }
-        `,
+        }
+      `,
       });
 
       const provider = snapshot.utils.getProvider(respone.data?.space?.network);
@@ -108,8 +125,9 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const [showTemplate, setShowTemplate] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   return (
-    <div className='flex flex-col h-full justify-between'>
+    <div className='flex flex-col h-full justify-between w-full items-center'>
       <Modal
+        className='rounded-xl'
         open={showTemplate}
         title='Template'
         onCancel={() => setShowTemplate(false)}
@@ -119,6 +137,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           {parse(checkpointData?.data?.template || '')}
         </div>
       </Modal>
+
       <Modal
         open={showConfirm}
         title='Confirm Submission'
@@ -160,65 +179,61 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </div>
         </div>
       </Modal>
+
       {checkpointData && checkpointData?.data?.action === 'create-proposal' ? (
         <>
-          <div className='w-full flex flex-col items-center'>
-            <div className='w-full flex flex-col' style={{ maxWidth: '700px' }}>
-              <div className='mb-8'>
-                <div className='mb-2 text-gray-500'>
-                  Create a new Proposal on Snapshot
-                </div>
-                <input
-                  type='text'
-                  className='w-full border-none text-4xl focus:outline-none focus:border-none'
-                  placeholder='Proposal Title'
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
+          <div className='w-full flex flex-col' style={{ maxWidth: '700px' }}>
+            <div className='mb-8'>
+              <div className='mb-2 text-gray-500'>
+                Create a new Proposal on Snapshot
               </div>
-              <div className='flex flex-row relative'>
-                <Button
-                  icon={<FileOutlined />}
-                  shape='circle'
-                  size='large'
-                  className='absolute '
-                  style={{ left: '-60px' }}
-                  onClick={() => setShowTemplate(true)}
-                  title='Show Template'
+              <input
+                type='text'
+                className='w-full border-none text-4xl focus:outline-none focus:border-none'
+                placeholder='Proposal Title'
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+            <div className='flex flex-row relative'>
+              <Button
+                icon={<FileOutlined />}
+                shape='circle'
+                size='large'
+                className='absolute '
+                style={{ left: '-60px' }}
+                onClick={() => setShowTemplate(true)}
+                title='Show Template'
+              />
+              <div className='flex flex-col w-full'>
+                <TextEditor
+                  value={description}
+                  setValue={setDiscription}
+                  onReady={(editor) => {
+                    editor.editing.view.change((writer: any) => {
+                      writer.setStyle(
+                        //use max-height(for scroll) or min-height(static)
+                        'min-height',
+                        '450px',
+                        editor.editing.view.document.getRoot()
+                      );
+                    });
+                  }}
                 />
-                <div className='flex flex-col'>
-                  <TextEditor
-                    value={description}
-                    setValue={setDiscription}
-                    onReady={(editor) => {
-                      editor.editing.view.change((writer: any) => {
-                        writer.setStyle(
-                          //use max-height(for scroll) or min-height(static)
-                          'min-height',
-                          '300px',
-                          editor.editing.view.document.getRoot()
-                        );
-                      });
-                    }}
-                  />
-                </div>
               </div>
             </div>
           </div>
           <div className='w-full'>
             <Divider className='my-1' />
             <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
-              <Button
-                type='primary'
-                onClick={() => setShowConfirm(true)}
-                className='px-8'
-              >
+              <Button type='primary' loading={loading} onClick={submitSnapshot}>
                 Submit
               </Button>
             </div>
           </div>
         </>
       ) : null}
+      {/* </Card> */}
     </div>
   );
 };

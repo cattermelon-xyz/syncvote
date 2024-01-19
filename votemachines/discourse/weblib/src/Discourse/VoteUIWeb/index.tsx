@@ -60,6 +60,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                   submission: {
                     action: checkpointData?.data?.action,
                     variables: checkpointData?.data?.variables[0],
+                    title: title,
                     raw: missionDesc,
                   },
                 });
@@ -71,7 +72,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </div>
         }
       >
-        {parse(shortenString(missionDesc || '', 200))}
+        {parse(shortenString(missionDesc, 200) || '')}
       </Modal>
       <div className='w-full h-full flex flex-col items-center justify-between'>
         {action === 'create-topic' && (
@@ -113,7 +114,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '300px',
+                            '450px',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -191,7 +192,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '300px',
+                            '450px',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -248,7 +249,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '300px',
+                            '450px',
                             editor.editing.view.document.getRoot()
                           );
                         });

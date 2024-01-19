@@ -1,4 +1,4 @@
-import { Select, Avatar, Tabs, Empty } from 'antd';
+import { Select, Avatar, Tabs, Empty, Card } from 'antd';
 import { BellOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import MissionCard from '@components/MissionCard';
@@ -109,8 +109,7 @@ const HomePage: React.FC<Props> = ({
     {
       key: '3',
       label: 'Mentions',
-      children: <></>,
-      disabled: true,
+      children: <Card>Comming Soon</Card>,
     },
   ];
 
@@ -132,7 +131,7 @@ const HomePage: React.FC<Props> = ({
           <div className='flex flex-row justify-between mb-6 items-center'>
             <Select
               defaultValue={orgsOption[0]?.value}
-              style={{ width: 135, borderColor: 'transparent', height: 40 }}
+              style={{ width: 135, height: 40, borderColor: 'transparent' }}
               onChange={handleChangeOrg}
               options={orgsOption}
             />
@@ -163,6 +162,7 @@ const HomePage: React.FC<Props> = ({
             defaultActiveKey='1'
             items={items}
             onChange={onChangeTabs}
+            tabBarStyle={{ color: '#898989' }}
           />
         </>
       )}

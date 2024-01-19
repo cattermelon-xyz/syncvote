@@ -30,7 +30,8 @@ export const validateWorkflow = ({
   } else {
     if (
       checkPoint?.participation === undefined ||
-      checkPoint?.participation?.data === undefined
+      (checkPoint?.participation?.data === undefined &&
+        checkPoint?.participation.type !== 'all')
     ) {
       isValid = false;
       message.push('Missing voting participation condition');

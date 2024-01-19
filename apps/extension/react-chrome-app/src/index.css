@@ -71,7 +71,7 @@ h6 {
 
 @media (min-width: 768px) {
   body {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 
@@ -185,4 +185,11 @@ html body {
 
 .task-bar.hidden {
   opacity: 0;
+}
+
+.ant-select .ant-select-selector {
+  border: transparent;
+}
+.ant-tabs-tab .ant-tabs-tab-btn {
+  color: #898989;
 }
