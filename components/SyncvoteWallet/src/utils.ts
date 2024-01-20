@@ -1,4 +1,4 @@
-const SVW_STORAGE_KEY = 'svw-1.0.0';
+export const SVW_STORAGE_KEY = 'svw-1.0.0';
 
 export interface SVW {
   network?: string; // mainnet, testnet
