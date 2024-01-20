@@ -160,6 +160,17 @@ export const changeVersion = ({
         changedCheckPointData.duration;
     }
   }
+
+  if (changedCheckPointData.hasOwnProperty('minDuration')) {
+    if (subWorkflowId === undefined || indexOfSubWorkflow === -1) {
+      newData.checkpoints[index].minDuration =
+        changedCheckPointData.minDuration;
+    } else {
+      newData.subWorkflows[indexOfSubWorkflow].checkpoints[index].minDuration =
+        changedCheckPointData.minDuration;
+    }
+  }
+
   if (changedCheckPointData.isEnd === true) {
     if (subWorkflowId === undefined || indexOfSubWorkflow === -1) {
       newData.checkpoints[index].children = [];

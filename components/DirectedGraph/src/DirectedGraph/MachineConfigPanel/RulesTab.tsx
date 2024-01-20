@@ -21,6 +21,7 @@ import CollapsiblePanel from '../components/CollapsiblePanel';
 import { TextEditor } from 'rich-text-editor';
 import MarkerEditNode from '../MarkerEdit/MarkerEditNode';
 import SideNote from '../components/SideNote';
+import MinDuration from './rules/MinDuration';
 
 const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
   const { data, selectedNodeId, onChange, viewMode } =
@@ -280,7 +281,10 @@ const RulesTab = ({ vmConfigPanel }: { vmConfigPanel: JSX.Element }) => {
         ) : null}
         {vmConfigPanel}
         {!selectedNode?.isEnd && type !== 'forkNode' && type !== 'joinNode' ? (
-          <VotingDuration />
+          <>
+            <VotingDuration />
+            <MinDuration />
+          </>
         ) : null}
         <CollapsiblePanel title='Other info'>
           <Space direction='vertical' size='middle' className='w-full'>
