@@ -1,6 +1,9 @@
 const { supabase } = require('../../configs/supabaseClient');
 const moment = require('moment');
-const { handleMovingToNextCheckpoint } = require('./funcs');
+const {
+  handleMovingToNextCheckpoint,
+  checkMinDurationTally,
+} = require('./funcs');
 const {
   VoteMachineController,
 } = require('../../models/votemachines/VotingController');
@@ -167,7 +170,7 @@ async function handleSubmission(props) {
               return;
             }
 
-            if (shouldTally && tallyResult) {
+            if (shouldTally && tallyResult && checkMinDurationTally(details)) {
               let timeDefault = moment();
 
               const { next_checkpoint_id } = await handleMovingToNextCheckpoint(

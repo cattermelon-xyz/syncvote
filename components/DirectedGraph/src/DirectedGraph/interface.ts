@@ -9,6 +9,7 @@ export interface ICheckPoint {
   vote_machine_type?: string;
   isEnd?: boolean;
   duration?: number; // in seconds
+  minDuration?: number;
   locked?: any;
   triggers?: any[];
   participation?: IParticipant;
