@@ -31,7 +31,6 @@ function App() {
   const [myMissions, setMyMissions] = useState<any>();
   const [followingMissions, setFollowingMissions] = useState<any[]>();
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
-  const [listVersionDocs, setListVersionDocs] = useState<any[]>();
   const [lastRequest, setLastRequest] = useState<any>(0);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -56,6 +55,7 @@ function App() {
   useEffect(() => {
     // console.log('inUseEffect ** currentProposalId', currentProposalId);
     if (currentProposalId && currentProposalId !== -1) {
+      setLoading(true);
       queryAMissionDetail({
         missionId: currentProposalId,
         onSuccess: (data: any) => {
@@ -64,10 +64,6 @@ function App() {
           const checkpointData = data?.data?.checkpoints.filter(
             (checkpoint: any) => checkpoint.id === currentCheckpointId
           );
-          const listVersionDocs = data?.progress.flatMap((progress: any) => {
-            return progress?.tallyResult?.submission || [];
-          });
-          setListVersionDocs(listVersionDocs);
           // console.log('missiondata', data);
           // console.log('checkpointData', checkpointData[0]);
           let checkpointDataAfterHandle = checkpointData[0];
@@ -126,27 +122,11 @@ function App() {
   }, [currentOrgData, user]);
 
   return (
-    <div
-      className='w-[357px] h-[600px] rounded-xl bg-[#F4F4F4] overflow-y-auto no-scrollbar'
-      style={{ padding: '20px' }}
-    >
+    <div className='w-[357px] h-[600px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto no-scrollbar'>
       {loading === true ? (
         <Loading />
       ) : user === null || user === undefined ? (
         <Login />
-      ) : currentProposalData ? (
-        <Voting
-          setPage={setPage}
-          currentProposalData={currentProposalData}
-          currentCheckpointData={currentCheckpointData}
-          setCurrentProposalId={setCurrentProposalId}
-          setCurrentProposalData={setCurrentProposalData}
-          user={user}
-          reload={() => {
-            setLastRequest(new Date().getTime());
-          }}
-          setLoading={setLoading}
-        />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
         <HomePage
           user={user}
@@ -166,7 +146,23 @@ function App() {
           setLoading={setLoading}
         />
       ) : page === PAGE_ROUTER.DONE_CREATE_PROPOSAL ? (
-        <DoneCreateProposal setPage={setPage} />
+        <DoneCreateProposal
+          setPage={setPage}
+          currentProposalData={currentProposalData}
+        />
+      ) : currentProposalData ? (
+        <Voting
+          setPage={setPage}
+          currentProposalData={currentProposalData}
+          currentCheckpointData={currentCheckpointData}
+          setCurrentProposalId={setCurrentProposalId}
+          setCurrentProposalData={setCurrentProposalData}
+          user={user}
+          reload={() => {
+            setLastRequest(new Date().getTime());
+          }}
+          setLoading={setLoading}
+        />
       ) : (
         <Loading />
       )}

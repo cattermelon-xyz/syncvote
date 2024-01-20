@@ -226,6 +226,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           <div className='w-full'>
             <Divider className='my-1' />
             <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
+              {/* TODO: double click bug & if wallet is not connected, there is not try to connect it */}
               <Button type='primary' loading={loading} onClick={submitSnapshot}>
                 Submit
               </Button>

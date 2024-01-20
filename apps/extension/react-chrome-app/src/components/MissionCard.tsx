@@ -1,6 +1,7 @@
 import { Card, Tag } from 'antd';
 import { PAGE_ROUTER } from '@constants/common';
 import moment from 'moment';
+import { StatusTag } from './StatusTag';
 
 interface Props {
   proposal: any;
@@ -23,29 +24,26 @@ const MissionCard: React.FC<Props> = ({
     : 'bg-gray-200 rounded-xl';
   return (
     <Card
-      bodyStyle={{ padding: '14px', cursor: 'pointer', borderRadius: '12px' }}
-      className='hover:shadow-xl transition duration-300 ease-in-out border-transparent'
+      className='hover:shadow-xl cursor-pointer'
+      bodyStyle={{ padding: '14px 12px' }}
       onClick={() => {
         setCurrentProposalId(proposal.id);
         setPage(PAGE_ROUTER.VOTING);
       }}
     >
-      <div className='mb-4'>
-        <Tag
-          color={
-            proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
-              ? 'default'
-              : ''
-          }
-          className={tagClass}
-          style={{ borderColor: 'transparent', left: '-8px' }}
-        >
-          {proposal?.status === 'DRAFT' ? 'Draft' : proposal?.checkpoint_title}
-        </Tag>
-        <p className='text-[16px] text-gray-700 mt-1'>{proposal?.title}</p>
-      </div>
-      <p className='text-[13px] text-gray-500'>
-        {`End at ${moment(endToVote || 0).format('MMM Do,YYYY  ')}`}&bull;
+      <StatusTag
+        color={
+          proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
+            ? 'default'
+            : 'active'
+        }
+        className='ml-[-6px] mb-2'
+      >
+        {proposal?.status === 'DRAFT' ? 'Draft' : proposal?.checkpoint_title}
+      </StatusTag>
+      <p className='text-base text-gray-700 mb-4'>{proposal?.title}</p>
+      <p className='text-xs text-gray-500'>
+        {`End at ${moment(endToVote || 0).format('MMM Do,YYYY ')}`}&bull;{' '}
         {`${moment(endToVote || 0).format('h:mm a')}`}
       </p>
     </Card>
