@@ -239,8 +239,4 @@ const Voting: React.FC<Props> = ({
   );
 };
 
-// TODO: curernt checkpoint is showing twice, something is very wrong
-// the last checkpoint in "[Extension test] Hire a co-working space"
-// has no "phase"
-
 export default Voting;
