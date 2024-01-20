@@ -9,9 +9,15 @@ interface TextEditorProps {
   value?: any;
   onBlur?: () => Promise<void>;
   id?: string;
+  onReady?: (editor: any) => void;
 }
 
-const TextEditor: React.FC<TextEditorProps> = ({ setValue, value, onBlur }) => {
+const TextEditor: React.FC<TextEditorProps> = ({
+  setValue,
+  value,
+  onBlur,
+  onReady,
+}) => {
   return (
     <CKEditor
       editor={ClassicEditor}
@@ -20,6 +26,7 @@ const TextEditor: React.FC<TextEditorProps> = ({ setValue, value, onBlur }) => {
       onChange={(event, editor) => {
         setValue(editor.getData());
       }}
+      onReady={onReady}
     />
   );
 };

@@ -2,10 +2,11 @@ import axios from 'axios';
 const serverUrl = process.env.BACKEND_URL as string;
 const frontEndUrl = process.env.FRONTEND_URL as string;
 
-export const trimTitle = (title: string, len?: number) => {
-  const maxLen = len || 30;
-  if (!title) return '';
-  return title.length > maxLen ? title.slice(0, maxLen) + '...' : title;
+export const shortenString = (str: string, length: number = 30) => {
+  if (str.length > length) {
+    return str.substring(0, length) + '...';
+  }
+  return str;
 };
 
 export const resetLastProposalId = async () => {
@@ -55,7 +56,7 @@ export const vote = async (data: any) => {
 export const openMissionPage = (orgId: string, proposalId: string) => {
   chrome.runtime.sendMessage({
     action: 'openUrl',
-    payload: { url: `${frontEndUrl}/${orgId}/${proposalId}?view=full` },
+    payload: { url: `${frontEndUrl}/${orgId}/${proposalId}/vote` },
   });
 };
 

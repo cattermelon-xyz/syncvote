@@ -53,11 +53,6 @@ export namespace Snapshot {
   }) => {
     let isValid = true;
     const message = [];
-    if (!checkpoint?.children || checkpoint.children.length === 0) {
-      isValid = false;
-      message.push('Missing options');
-    }
-    // if (!checkpoint?.data || !checkpoint.data.max) {
     if (!checkpoint?.data.type) {
       isValid = false;
       message.push('Missing type of vote in snapshot');
@@ -66,11 +61,6 @@ export namespace Snapshot {
     if (!checkpoint?.data.space) {
       isValid = false;
       message.push('Missing space of snapshot');
-    }
-
-    if (!checkpoint?.data.fallback || !checkpoint.data.next) {
-      isValid = false;
-      message.push('Missing fallback or next checkpoint');
     }
 
     if (!checkpoint?.data.action) {
@@ -83,11 +73,44 @@ export namespace Snapshot {
         isValid = false;
         message.push('Missiong variable to store proposalId');
       }
-    }
 
-    if (!checkpoint?.data.snapshotDuration) {
-      isValid = false;
-      message.push('Missing duration for Snapshot proposal');
+      if (!checkpoint?.data.fallback || !checkpoint.data.next) {
+        isValid = false;
+        message.push('Missing fallback or next checkpoint');
+      }
+
+      if (!checkpoint?.children || checkpoint.children.length === 0) {
+        isValid = false;
+        message.push('Missing options');
+      }
+
+      if (!checkpoint?.data.snapshotDuration) {
+        isValid = false;
+        message.push('Missing duration for Snapshot proposal');
+      }
+    } else {
+      if (!checkpoint?.data.snapshotIdToSync) {
+        isValid = false;
+        message.push('Missing checkpoint snapshot parent');
+      }
+
+      const snapshotOption = checkpoint?.data?.snapShotOption
+        ? checkpoint?.data?.snapShotOption
+        : [];
+
+      if (
+        !checkpoint?.children ||
+        checkpoint.children.length === 0 ||
+        checkpoint.children.length !== snapshotOption.length + 1
+      ) {
+        isValid = false;
+        message.push('Missing children checkpoint for option');
+      }
+
+      if (!checkpoint?.data.fallback) {
+        isValid = false;
+        message.push('Missing fallback checkpoint');
+      }
     }
 
     return {

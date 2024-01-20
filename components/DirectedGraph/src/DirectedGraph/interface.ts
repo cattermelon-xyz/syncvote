@@ -9,6 +9,7 @@ export interface ICheckPoint {
   vote_machine_type?: string;
   isEnd?: boolean;
   duration?: number; // in seconds
+  minDuration?: number;
   locked?: any;
   triggers?: any[];
   participation?: IParticipant;
@@ -31,7 +32,7 @@ export interface ICheckPoint {
 // TODO: separate between data & cosmetic options
 
 export interface IParticipant {
-  type?: 'token' | 'identity' | 'author';
+  type?: 'token' | 'identity' | 'author' | 'all';
   data?: IToken | string[];
 }
 
@@ -81,6 +82,7 @@ export interface IVoteUIWebProps {
   onSubmit: (data: any) => void; // submit the choice & its data
   missionData: any; // data of the mission
   checkpointData: any; // data of current checkpoint
+  isEditorUI?: boolean; // if show UI for editor page when click link in extension
 }
 
 export interface IVoteMachine {

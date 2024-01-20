@@ -1,39 +1,75 @@
 const { VotingMachine } = require('.');
-const { SNAPSHOT_ACTION, isValidAction } = require('../../configs/constants');
+const { SNAPSHOT_ACTION } = require('../../configs/constants');
 const { ApolloClient, InMemoryCache, gql } = require('@apollo/client');
 const { supabase } = require('../../configs/supabaseClient');
 
 class Snapshot extends VotingMachine {
   constructor(props) {
     super(props);
+    this.status = 'active';
+    this.proposal = {};
   }
 
   validate(checkpoint) {
     let isValid = true;
     const message = [];
-    if (!checkpoint?.children || checkpoint.children.length === 0) {
+    if (!checkpoint?.data.type) {
       isValid = false;
-      message.push('Missing options');
+      message.push('Missing type of vote in snapshot');
     }
 
-    if (!checkpoint?.data?.fallback || !checkpoint?.data?.next) {
+    if (!checkpoint?.data.space) {
       isValid = false;
-      message.push('Missing fallback and next checkpoint');
+      message.push('Missing space of snapshot');
     }
 
-    if (!checkpoint?.data?.space || !checkpoint?.data?.type) {
+    if (!checkpoint?.data.action) {
       isValid = false;
-      message.push('Missing attributes of snapshot');
+      message.push('Missing action for snapshot checkpoint');
     }
 
-    if (!checkpoint?.data?.proposalId) {
-      isValid = false;
-      message.push('Missing variable proposalId');
-    }
+    if (checkpoint?.data.action === 'create-proposal') {
+      if (!checkpoint.data.proposalId) {
+        isValid = false;
+        message.push('Missiong variable to store proposalId');
+      }
 
-    if (!isValidAction(SNAPSHOT_ACTION, checkpoint?.data?.action)) {
-      isValid = false;
-      message.push('Wrong or missing action');
+      if (!checkpoint?.data.fallback || !checkpoint.data.next) {
+        isValid = false;
+        message.push('Missing fallback or next checkpoint');
+      }
+
+      if (!checkpoint?.children || checkpoint.children.length === 0) {
+        isValid = false;
+        message.push('Missing options');
+      }
+
+      if (!checkpoint?.data.snapshotDuration) {
+        isValid = false;
+        message.push('Missing duration for Snapshot proposal');
+      }
+    } else {
+      if (!checkpoint?.data.snapshotIdToSync) {
+        isValid = false;
+        message.push('Missing checkpoint snapshot parent');
+      }
+
+      const snapshotOption = checkpoint?.data?.snapShotOption
+        ? checkpoint?.data?.snapShotOption
+        : [];
+      if (
+        !checkpoint?.children ||
+        checkpoint.children.length === 0 ||
+        checkpoint.children.length !== snapshotOption.length + 1
+      ) {
+        isValid = false;
+        message.push('Missing children checkpoint for option');
+      }
+
+      if (!checkpoint?.data.fallback) {
+        isValid = false;
+        message.push('Missing fallback checkpoint');
+      }
     }
 
     return {
@@ -50,17 +86,19 @@ class Snapshot extends VotingMachine {
     }
 
     // check if dont have action
-    if (!voteData.submission) {
+    if (this.data.action === 'create-proposal' && !voteData.submission) {
       return {
         notRecorded: true,
         error: 'Snapshot: Missing submission',
       };
     } else {
-      if (!voteData.submission.proposalId) {
-        return {
-          notRecorded: true,
-          error: 'Snapshot: Missing proposalId',
-        };
+      if (this.data.action === 'create-proposal') {
+        if (!voteData.submission.proposalId) {
+          return {
+            notRecorded: true,
+            error: 'Snapshot: Missing proposalId',
+          };
+        }
       }
     }
 
@@ -83,7 +121,55 @@ class Snapshot extends VotingMachine {
         })
         .select('*');
     } else if (this.data.action === SNAPSHOT_ACTION.SYNC_PROPOSAL) {
-      const { data } = await getSnapshotData('proposalId');
+      const root_mission_id = this.m_parent ? this.m_parent : this.mission_id;
+
+      const { data: variables } = await supabase
+        .from('variables')
+        .select('*')
+        .eq('mission_id', root_mission_id)
+        .eq('name', this.data.proposalId);
+
+      if (variables) {
+        const { respone } = await getSnapshotData({
+          proposalId: variables[0].value,
+        });
+
+        if (respone) {
+          let result = {};
+          for (let i = 0; i < respone?.data.proposal.choices.length; i++) {
+            result[i] = {
+              voting_power: respone.data.proposal.scores[i],
+            };
+          }
+          this.result = result;
+
+          if (respone.data.proposal.state === 'closed') {
+            this.state = 'closed';
+            let maxVotingPower = -Infinity;
+            let maxIndex;
+
+            for (const key in result) {
+              if (result.hasOwnProperty(key)) {
+                const votingPower = result[key].voting_power;
+                if (votingPower > maxVotingPower) {
+                  maxVotingPower = votingPower;
+                  maxIndex = key;
+                }
+              }
+            }
+
+            this.tallyResult = {
+              index: maxIndex,
+              voting_power: maxVotingPower,
+            };
+          }
+        }
+      } else {
+        return {
+          notRecorded: true,
+          error: 'Snapshot: Cannot find proposalId of checkpoinr parent',
+        };
+      }
     }
 
     return {};
@@ -96,6 +182,18 @@ class Snapshot extends VotingMachine {
         tallyResult: this.tallyResult,
       };
     } else if (this.data.action === SNAPSHOT_ACTION.SYNC_PROPOSAL) {
+      if (this.state === 'closed') {
+        if (Number(this.tallyResult.voting_power) === 0) {
+          return {
+            error:
+              'Cannot move to next checkpoint because voting power is not enough',
+          };
+        }
+        return {
+          shouldTally: true,
+          tallyResult: this.tallyResult,
+        };
+      }
     }
     return {};
   }
@@ -118,8 +216,6 @@ const getSnapshotData = async (props) => {
           query {
             proposal(id: "${proposalId}") {
               id
-              title
-              body
               choices
               start
               end
@@ -133,21 +229,12 @@ const getSnapshotData = async (props) => {
               scores_updated
               plugins
               network
-              strategies {
-                name
-                network
-                params
-              }
-              space {
-                id
-                name
-              }
             }
           }
         `,
     });
 
-    return { data: respone };
+    return { respone };
   } catch (error) {
     console.log('GetDataProposalError: ', e);
     return {};
