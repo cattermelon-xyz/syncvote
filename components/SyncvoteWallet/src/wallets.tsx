@@ -17,14 +17,20 @@ const wallets = [
         // rpc: 'https://mainnet.infura.io/v3/',
         connect: async () => {
           const anyWindow = window as any;
-          const accounts = await anyWindow.ethereum?.request({
-            method: 'eth_requestAccounts',
+          const res = await anyWindow.ethereum?.request({
+            method: 'wallet_requestPermissions',
+            params: [
+              {
+                eth_accounts: {},
+              },
+            ],
           });
+          console.log('res', res);
           setValue('wallet', 'metamask');
           setValue('chain', 'ethereum');
-          setValue('account', accounts[0]);
+          setValue('account', res[0]?.caveats[0]?.value[0]);
           return {
-            account: accounts[0],
+            account: res[0]?.caveats[0]?.value[0],
             chain: 'ethereum',
             wallet: 'metamask',
           };
