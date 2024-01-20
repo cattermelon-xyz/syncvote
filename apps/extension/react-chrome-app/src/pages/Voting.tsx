@@ -101,7 +101,7 @@ const Voting: React.FC<Props> = ({
             </div>
             {completed ? (
               <div
-                className='ftext-[12px] w-[28px] h-[28px] bg-white text-center items-center rounded hover:shadow-xl cursor-pointer'
+                className='text-[12px] w-[28px] h-[28px] bg-white text-center items-center rounded hover:shadow-xl cursor-pointer'
                 style={{ paddingTop: '8px' }}
                 onClick={() => {
                   if (expanded) {
@@ -143,7 +143,7 @@ const Voting: React.FC<Props> = ({
     return lastChkp.endedAt;
   };
   return (
-    <div className='pb-2'>
+    <div className='pb-2 text-gray-600'>
       <div>
         <div className='flex flex-col mb-9'>
           <div className='flex flex-row justify-between mb-5'>
@@ -192,7 +192,7 @@ const Voting: React.FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className='mb-3 flex flex-col gap-2'>
+        <div className='mb-3 flex flex-col gap-6'>
           {historyItems.map((item: any, index: number) => {
             lastPhase = index !== 0 ? historyItems[index - 1].phase : '';
             return (
@@ -238,5 +238,9 @@ const Voting: React.FC<Props> = ({
     </div>
   );
 };
+
+// TODO: curernt checkpoint is showing twice, something is very wrong
+// the last checkpoint in "[Extension test] Hire a co-working space"
+// has no "phase"
 
 export default Voting;

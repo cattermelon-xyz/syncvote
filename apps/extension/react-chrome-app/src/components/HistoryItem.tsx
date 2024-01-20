@@ -92,40 +92,43 @@ const HistoryItem = ({ item }: { item: any }) => {
     (!phase ? (
       // phase is null
       <>
-        <div className='flex flex-col'>
-          <div className='flex flex-row w-full justify-between'>
-            <div className='text-md font-bold'>{checkpoint_title}</div>
-            {!isEnd &&
-              (selectedOption || linkDiscourse || linkSnapshot || desc) && (
-                <div onClick={() => setExpanded(!expanded)}>
-                  {expanded ? <UpOutlined /> : <DownOutlined />}
-                </div>
-              )}
-          </div>
-          <div className='bg-white p-3 rounded flex justify-between items-center'>
-            <div className='flex flex-row justify-between'>
-              <div className='flex items-center text-xs'>
-                <div className='mr-2'>Completed on</div>
-                <div>{moment(endedAt || 0).format('MMM DD, hh:mm A')}</div>
+        <div className='flex flex-col text-gray-600 gap-4'>
+          <div className='flex flex-row justify-between text-base'>
+            <div className='flex flex-row items-center'>
+              <div className='rounded-full w-[8px] h-[8px] bg-gray-500'></div>
+              <div className='ml-[12px] text-md font-bold'>
+                {checkpoint_title}
               </div>
             </div>
+            <div
+              onClick={() => setExpanded(!expanded)}
+              className='text-[12px] w-[28px] h-[28px] bg-white text-center items-center rounded hover:shadow-xl cursor-pointer'
+            >
+              {expanded ? <DownOutlined /> : <UpOutlined />}
+            </div>
           </div>
-          {expanded && !isEnd && (
-            <>
-              <Divider className='my-1' />
-              <div className='flex flex-row w-full justify-between text-xs'>
-                <div>Result</div>
-                {arweave_id ? (
-                  <a href={arweave_id}>
-                    <ExportOutlined />
-                  </a>
-                ) : (
-                  <></>
-                )}
-              </div>
-              {renderResult()}
-            </>
-          )}
+          <div className='bg-white p-3 rounded flex flex-col gap-1'>
+            <div className='flex flex-row justify-between items-center'>
+              <div className='mr-2'>Completed on</div>
+              <div>{moment(endedAt || 0).format('MMM DD, hh:mm A')}</div>
+            </div>
+            {expanded && !isEnd && (
+              <>
+                <Divider className='my-1' />
+                <div className='flex flex-row w-full justify-between text-xs'>
+                  <div>Result</div>
+                  {arweave_id ? (
+                    <a href={arweave_id}>
+                      <ExportOutlined />
+                    </a>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                {renderResult()}
+              </>
+            )}
+          </div>
         </div>
       </>
     ) : (

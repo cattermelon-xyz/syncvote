@@ -115,46 +115,33 @@ const VoteUI = ({
     !phase ? (
       // no phase
       <>
-        <div className='bg-white p-3 rounded flex'>
-          <div>
-            <div>
-              {isExpired
-                ? 'Expired'
-                : `${moment(endToVote || 0).fromNow(true)} left`}
+        <div className='flex flex-col w-full gap-4'>
+          <div className='flex flex-row justify-between text-base'>
+            <div className='flex flex-row items-center'>
+              <div className='rounded-full w-[8px] h-[8px] bg-violet-500'></div>
+              <div className='ml-[12px] text-md font-bold'>{title}</div>
             </div>
-            <div className='text-md font-bold'>{title}</div>
-            <Divider className='my-2' />
-            <p
-              className='w-full mt-2 text-[10px] cursor-pointer text-[#6200EE]'
-              onClick={() => {
-                openWorkflowPage(
-                  org_id,
-                  workflow_id,
-                  workflow_version_id,
-                  originalCheckPointId
-                );
-              }}
+            {/* <div
+              onClick={() => setExpanded(!expanded)}
+              className='bg-white w-[28px] h-[28px] rounded-md cursor-pointer hover:shadow-xl'
             >
-              View Guideline
-            </p>
+              {expanded ? <DownOutlined /> : <UpOutlined />}
+            </div> */}
           </div>
-          <div onClick={() => setExpanded(!expanded)}>
-            {expanded ? <DownOutlined /> : <UpOutlined />}
-          </div>
-        </div>
-        {expanded && (
-          <>
-            {/* {description ? (
-            <div className='bg-white p-3 rounded flex justify-between items-center'>
-              {parse(description || '')}
+          <div className='flex flex-col bg-white p-3 w-full text-xs rounded'>
+            <div className='flex flex-row justify-between'>
+              <div>{isExpired ? 'Expired' : 'Remaining duration'}</div>
+              <div>
+                {isExpired
+                  ? `${moment(endToVote || 0).fromNow(true)} ago`
+                  : `${moment(endToVote || 0).fromNow(true)} left`}
+              </div>
             </div>
-          ) : (
-            <></>
-          )} */}
-            <div className='w-full bg-gray-200 p-3 rounded flex flex-col gap-1'>
-              <div className='text-md font-bold'>{title}</div>
-              <span
-                className='text-sm text-violet-500 font-bold cursor-pointer'
+            <Divider className='my-2' />
+            <div className='flex flex-row justify-between w-full mb-2'>
+              <div>View guidelines</div>
+              <div
+                className='cursor-pointer text-[#6200EE]'
                 onClick={() => {
                   openWorkflowPage(
                     org_id,
@@ -164,12 +151,18 @@ const VoteUI = ({
                   );
                 }}
               >
-                View Guideline
-              </span>
-              {renderButton()}
+                <ExportOutlined />
+              </div>
             </div>
-          </>
-        )}
+            {description ? (
+              <div className='text-xs mb-2 text-gray-700'>
+                {parse(shortenString(description, 50))}
+              </div>
+            ) : null}
+            <div className='mt-2'>{renderButton()}</div>
+          </div>
+        </div>
+        {/* {expanded} */}
       </>
     ) : (
       // in a phase
@@ -196,7 +189,7 @@ const VoteUI = ({
           />
         </div>
         {description ? (
-          <div className='text-xs mb-2'>
+          <div className='text-xs mb-2 text-gray-700'>
             {parse(shortenString(description, 50))}
           </div>
         ) : null}
