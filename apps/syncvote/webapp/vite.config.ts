@@ -12,9 +12,4 @@ export default defineConfig({
     host: true,
     port: 8003,
   },
-  // define: {
-  //   // By default, Vite doesn't include shims for NodeJS/
-  //   // necessary for segment analytics lib to work
-  //   global: {},
-  // },
 });
