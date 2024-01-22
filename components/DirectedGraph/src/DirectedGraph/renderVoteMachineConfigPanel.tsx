@@ -24,10 +24,9 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
     (chk: any) => chk.id === selectedNodeId
   );
   let configPanel = <></>;
+  let machine: any = undefined;
   if (selectedNode !== undefined) {
-    const machine: any = getVoteMachine(
-      selectedNode.vote_machine_type || ''
-    ) || {
+    machine = getVoteMachine(selectedNode.vote_machine_type || '') || {
       ConfigPanel: () => <></>,
     };
     const { ConfigPanel } = machine;
@@ -72,25 +71,28 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
       open={selectedNodeId !== '' && selectedNodeId !== undefined}
       onClose={onClose}
       title={
-        <Typography.Paragraph
-          className='text-2xl font-bold pl-0'
-          style={{ marginBottom: '0px' }}
-          editable={
-            viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
-              ? {
-                  onChange: (value) => {
-                    const newNode = structuredClone(selectedNode);
-                    if (newNode) {
-                      newNode.title = value;
-                      onChange(newNode);
-                    }
-                  },
-                }
-              : false
-          }
-        >
-          {selectedNode?.title ? selectedNode.title : selectedNodeId}
-        </Typography.Paragraph>
+        <div className='flex flex-row gap-1'>
+          {machine?.getIcon ? machine.getIcon() : <></>}
+          <Typography.Paragraph
+            className='text-2xl font-bold pl-0'
+            style={{ marginBottom: '0px' }}
+            editable={
+              viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION
+                ? {
+                    onChange: (value) => {
+                      const newNode = structuredClone(selectedNode);
+                      if (newNode) {
+                        newNode.title = value;
+                        onChange(newNode);
+                      }
+                    },
+                  }
+                : false
+            }
+          >
+            {selectedNode?.title ? selectedNode.title : selectedNodeId}
+          </Typography.Paragraph>
+        </div>
       }
       bodyStyle={{ padding: '0px', backgroundColor: '#f6f6f6' }}
       size={window.innerWidth > 700 ? 'large' : 'default'}

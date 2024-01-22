@@ -3,7 +3,6 @@ import {
   TwitterOutlined,
   VerticalAlignTopOutlined,
 } from '@ant-design/icons';
-import { HiOutlineBolt } from 'react-icons/hi2';
 import moment from 'moment';
 import {
   DelayUnit,
@@ -24,6 +23,7 @@ import parse from 'html-react-parser';
 import VoteUIWeb from './VoteUIWeb';
 import { Tag } from 'antd';
 const SelectOptions = Interface.SelectOptions;
+import icon from '../assets/icon.svg';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
@@ -36,7 +36,7 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
 // label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
 
 const getIcon = () => {
-  return <HiOutlineBolt />;
+  return <img src={icon} className='w-[14px]' />;
 };
 
 const explain = ({

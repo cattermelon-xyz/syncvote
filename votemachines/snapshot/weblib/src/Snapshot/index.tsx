@@ -1,6 +1,6 @@
 import { Snapshot as Funcs } from './funcs';
 import ConfigPanel from './ConfigPanel/index';
-import { HiOutlineBolt } from 'react-icons/hi2';
+import icon from '../assets/icon.svg';
 import {
   ICheckPoint,
   IVoteMachine,
@@ -144,7 +144,7 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
 };
 
 const getIcon = () => {
-  return <HiOutlineBolt />;
+  return <img src={icon} className='w-[14px]' />;
 };
 
 const VoteMachine: IVoteMachine = {
