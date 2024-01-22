@@ -3,7 +3,7 @@ import { CollapsiblePanel } from 'directed-graph';
 import { useState } from 'react';
 import { TextEditor } from 'rich-text-editor';
 import parse from 'html-react-parser';
-import { DeleteOutlined } from '@ant-design/icons';
+import { BookOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const Phases = ({ version, setVersion }: { version: any; setVersion: any }) => {
   const phases = version.data.phases || [];
@@ -45,7 +45,16 @@ const Phases = ({ version, setVersion }: { version: any; setVersion: any }) => {
           />
         </div>
       </Modal>
-      <CollapsiblePanel title='Phases' className='p-0 w-full' open={false}>
+      <CollapsiblePanel
+        title={
+          <div className='text-sm flex flex-row'>
+            <BookOutlined className='mr-1' />
+            Phases
+          </div>
+        }
+        className='p-0 w-full'
+        open={false}
+      >
         <div className='w-full flex flex-col gap-1'>
           {phases.map((phase: any, index: number) => {
             return (

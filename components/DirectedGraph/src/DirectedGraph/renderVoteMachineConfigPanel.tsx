@@ -71,8 +71,8 @@ export const renderVoteMachineConfigPanel = (props: IConfigPanel) => {
       open={selectedNodeId !== '' && selectedNodeId !== undefined}
       onClose={onClose}
       title={
-        <div className='flex flex-row gap-1'>
-          {machine?.getIcon ? machine.getIcon() : <></>}
+        <div className='flex flex-row gap-1 items-center'>
+          {machine?.getIcon ? machine.getIcon('w-8 h-8') : <></>}
           <Typography.Paragraph
             className='text-2xl font-bold pl-0'
             style={{ marginBottom: '0px' }}

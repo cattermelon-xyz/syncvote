@@ -35,8 +35,8 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
 };
 // label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
 
-const getIcon = () => {
-  return <img src={icon} className='w-[14px]' />;
+const getIcon = (className?: string) => {
+  return <img src={icon} className={`w-4 ${className ? className : ''}`} />;
 };
 
 const explain = ({
