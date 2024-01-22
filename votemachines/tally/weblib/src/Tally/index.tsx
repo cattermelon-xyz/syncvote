@@ -127,12 +127,12 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
   );
 };
 
-const getIcon = () => {
+const getIcon = (className?: string) => {
   return (
     <img
       src='https://cdn-images-1.medium.com/max/184/1*yDU1ckzLBOBhtRSjPQWULw@2x.png'
       alt=''
-      className='w-4 h-4'
+      className={`w-4 h-4 ${className ? className : ''}`}
     />
   );
 };

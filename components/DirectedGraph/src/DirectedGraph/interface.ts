@@ -95,7 +95,7 @@ export interface IVoteMachine {
   getType: () => string;
   deleteChildNode: (data: any, children: string[], childId: string) => void;
   getLabel: (props: IVoteMachineGetLabelProps) => JSX.Element;
-  getIcon: () => JSX.Element;
+  getIcon: (className?: string) => JSX.Element;
   getInitialData: () => any;
   abstract: ({
     checkpoint,
@@ -219,6 +219,9 @@ export interface IGraph {
   onChangeLayout?: (data: IWorkflowVersionLayout) => void;
   openCreateProposalModal?: () => void;
   shouldFitView?: boolean;
+  onInit?: (reactflowInstance: any) => void;
+  onDrop?: (event: any) => void;
+  onDragOver?: (event: any) => void;
 }
 
 export interface IConfigPanel {

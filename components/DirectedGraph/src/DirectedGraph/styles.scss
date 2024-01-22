@@ -22,11 +22,12 @@
 
 .directed-graph {
   .react-flow__panel.top.left {
-    padding: 16px;
-    margin-left: 48px;
-    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    // box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.15);
+    margin: 0px;
     background-color: white;
-    border-radius: 16px;
+    height: 100%;
+    border: 1px solid #e8e8e8;
+    border-width: 0px 1px 0px 0px;
   }
   .react-flow__panel.bottom.right {
     padding: 16px;

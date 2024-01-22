@@ -13,8 +13,8 @@ import {
 import { changeCosmetic, changeLayout, changeVersion } from '@middleware/logic';
 import { shouldUseCachedData } from '@utils/helpers';
 import { extractIdFromIdString } from 'utils';
-import { Button, Modal, Skeleton, Space } from 'antd';
-import { useEffect, useState } from 'react';
+import { Button, Divider, Modal, Skeleton, Space } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
@@ -49,6 +49,7 @@ import {
 } from './funcs';
 import VariableList from './fragment/VariableList';
 import Phases from './fragment/Phases';
+import VoteMachineList from './fragment/VoteMachinesList';
 
 export const EditVersion = () => {
   const [searchParams, setSearchParams] = useSearchParams('');
@@ -87,6 +88,7 @@ export const EditVersion = () => {
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     version?.data?.cosmetic?.defaultLayout?.horizontal
   );
+  const [reactflowInstance, setReactflowInstance] = useState<any>(null);
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [lastSaved, setLastSaved] = useState(-1);
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
@@ -286,7 +288,13 @@ export const EditVersion = () => {
   };
   const [gridX, setGridX] = useState(0); // initialize gridX with 0
   const [gridY, setGridY] = useState(0); // initialize gridY with 0
-  const onAddNewNode = () => {
+  const onAddNewNode = (
+    posX?: any,
+    posY?: any,
+    type?: any,
+    initialData?: any,
+    name?: any
+  ) => {
     newNode(
       version,
       setVersion,
@@ -297,7 +305,12 @@ export const EditVersion = () => {
       setGridX,
       setGridY,
       setSelectedNodeId,
-      selectedNodeId
+      selectedNodeId,
+      posX,
+      posY,
+      type,
+      initialData,
+      name
     );
   };
   const onViewPortChange = (viewport: any) => {
@@ -353,6 +366,34 @@ export const EditVersion = () => {
     : [];
   version?.data?.subWorkflows?.map((w: any) =>
     allCheckPoints.push(...(w.checkpoints || []))
+  );
+  const [showLeftPanel, setShowLeftPanel] = useState(true);
+  const onDragOver = useCallback((event: any) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+  const onDrop = useCallback(
+    (event: any) => {
+      console.log('onDrop ', event);
+      event.preventDefault();
+
+      const type = event.dataTransfer.getData('application/nodeType');
+      const initialData = event.dataTransfer.getData(
+        'application/nodeInitData'
+      );
+      const name = event.dataTransfer.getData('application/nodeName');
+
+      if (typeof type === 'undefined' || !type) {
+        return;
+      }
+
+      const position = reactflowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+      onAddNewNode(position.x - 30, position.y - 20, type, initialData, name);
+    },
+    [reactflowInstance, onAddNewNode]
   );
   return (
     <>
@@ -417,28 +458,43 @@ export const EditVersion = () => {
                       setOpenCreateProposalModal(true);
                     }}
                     navPanel={
-                      <Space direction='vertical' size='middle'>
-                        <ColorLegend
-                          showColorLegend={showColorLegend}
-                          setShowColorLegend={setShowColorLegend}
-                          markers={markers}
-                          version={version}
-                          selectedLayoutId={selectedLayoutId}
-                          changeCosmetic={changeCosmetic}
-                          setVersion={setVersion}
-                          setDataHasChanged={setDataHasChanged}
-                        />
-                        <WorkflowList
-                          version={version}
-                          setVersion={setVersion}
-                          allCheckPoints={allCheckPoints}
-                        />
-                        <VariableList
-                          version={version}
-                          setVersion={setVersion}
-                        />
-                        <Phases version={version} setVersion={setVersion} />
-                      </Space>
+                      <div className='w-full h-full flex flex-row'>
+                        {showLeftPanel && (
+                          <div className='px-3 py-4 gap-2 flex flex-col w-[250px] h-full'>
+                            <VoteMachineList />
+                            <ColorLegend
+                              showColorLegend={showColorLegend}
+                              setShowColorLegend={setShowColorLegend}
+                              markers={markers}
+                              version={version}
+                              selectedLayoutId={selectedLayoutId}
+                              changeCosmetic={changeCosmetic}
+                              setVersion={setVersion}
+                              setDataHasChanged={setDataHasChanged}
+                            />
+                            <Divider className='my-1' />
+                            <WorkflowList
+                              version={version}
+                              setVersion={setVersion}
+                              allCheckPoints={allCheckPoints}
+                            />
+                            <Divider className='my-1' />
+                            <VariableList
+                              version={version}
+                              setVersion={setVersion}
+                            />
+                            <Divider className='my-1' />
+                            <Phases version={version} setVersion={setVersion} />
+                          </div>
+                        )}
+                        <div
+                          className={`bg-gray-100 cursor-pointer hover:bg-gray-200 ${
+                            showLeftPanel ? 'w-2' : 'w-3'
+                          }`}
+                          title='Toggle tool box'
+                          onClick={() => setShowLeftPanel(!showLeftPanel)}
+                        ></div>
+                      </div>
                     }
                     viewMode={viewMode}
                     data={version?.data || emptyStage}
@@ -469,6 +525,9 @@ export const EditVersion = () => {
                     onAddNewDoc={onAddNewDoc}
                     onChangeDoc={onChangeDoc}
                     onDeleteDoc={onDeleteDoc}
+                    onInit={setReactflowInstance}
+                    onDragOver={onDragOver}
+                    onDrop={onDrop}
                   />
                 </div>
               )}

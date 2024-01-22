@@ -143,8 +143,8 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
   );
 };
 
-const getIcon = () => {
-  return <img src={icon} className='w-[14px]' />;
+const getIcon = (className?: string) => {
+  return <img src={icon} className={`w-4 ${className ? className : ''}`} />;
 };
 
 const VoteMachine: IVoteMachine = {

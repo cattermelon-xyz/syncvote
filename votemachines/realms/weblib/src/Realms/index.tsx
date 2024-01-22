@@ -125,12 +125,12 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
   );
 };
 
-const getIcon = () => {
+const getIcon = (className?: string) => {
   return (
     <img
       src='https://app.realms.today/favicons/android-icon-192x192.png'
       alt=''
-      className='w-5 h-5'
+      className={`w-5 h-5 ${className ? className : ''}`}
     />
   );
 };

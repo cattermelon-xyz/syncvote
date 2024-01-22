@@ -1,4 +1,5 @@
 import {
+  BgColorsOutlined,
   CloseCircleOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
@@ -28,7 +29,12 @@ const ColorLegend = ({
   return (
     <>
       <CollapsiblePanel
-        title='Color Legend'
+        title={
+          <div className='text-sm flex flex-row'>
+            <BgColorsOutlined className='mr-1' />
+            <div>Color Legend</div>
+          </div>
+        }
         className='p-0 w-full'
         open={false}
       >

@@ -194,7 +194,7 @@ function Header({
         onCancel={() => setShowVersionHistory(false)}
       />
       <div
-        className={`flex justify-between items-center px-[32px] md:px-p_1 h-20 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white drop-shadow-md`}
+        className={`flex justify-between items-center p-3 h-18 w-full border-b-b_1 border-gray-normal font-sans z-20 bg-white border-solid`}
       >
         <Space
           className='flex items-center'
@@ -207,13 +207,13 @@ function Header({
               navigate('/');
             }}
           >
-            <div className='flex items-center pb-2 cursor-pointer gap-2'>
+            <div className='flex items-center cursor-pointer gap-2'>
               <LogoSyncVote />
             </div>
           </div>
           <Divider type='vertical' />
           <div
-            className='px-3 py-2 rounded-lg bg-violet-100 text-violet-700 hover:bg-violet-200 cursor-pointer'
+            className='p-1 rounded-lg bg-violet-100 text-violet-700 hover:bg-violet-200 cursor-pointer'
             onClick={() => navigate(`/${orgIdString}`)}
           >
             <FolderOutlined className='stroke-2' />

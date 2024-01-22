@@ -1,4 +1,8 @@
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  BranchesOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { Button, Input, Modal, Select, Space } from 'antd';
 import { CollapsiblePanel } from 'directed-graph';
 import { useState } from 'react';
@@ -113,7 +117,19 @@ const WorkflowList = ({
   const [showAddNewSubWorkflowModal, setShowAddNewSubWorkflowModal] =
     useState(false);
   return (
-    <CollapsiblePanel title='Workflow List' className='p-0 w-full'>
+    <CollapsiblePanel
+      title={
+        <div className='text-sm flex flex-row'>
+          <BranchesOutlined
+            title='Workflows that run in parallel with the main workflow'
+            className='mr-1'
+          />
+          <div>Sub Workflows</div>
+        </div>
+      }
+      className='p-0 w-full'
+      open={false}
+    >
       <Space direction='vertical' size='small'>
         <NewSubWorkflowModal
           isShown={showAddNewSubWorkflowModal}

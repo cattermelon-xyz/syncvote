@@ -253,22 +253,43 @@ export const newNode = (
   setGridX: any,
   setGridY: any,
   setSelectedNodeId: any,
-  selectedNodeId: any
+  selectedNodeId: any,
+  posX?: any,
+  posY?: any,
+  type?: any,
+  initData?: any,
+  name?: any
 ) => {
   const newData = structuredClone(version?.data);
   const newId = `node-${new Date().getTime()}`;
   const nodeSpacing = 130;
 
   let newPos = {
-    x: centerPos.x + gridX * nodeSpacing,
-    y: centerPos.y + gridY * nodeSpacing,
+    x: posX ? posX : centerPos.x + gridX * nodeSpacing,
+    y: posY ? posY : centerPos.y + gridY * nodeSpacing,
   };
+  let newChkpData = {};
+  try {
+    newChkpData = JSON.parse(initData);
+  } catch (e) {
+    newChkpData = initData;
+  }
 
+  const chkpData =
+    type === 'endNode'
+      ? {
+          isEnd: true,
+        }
+      : {
+          vote_machine_type: type,
+          data: newChkpData,
+        };
+  const titlePrefix = type === 'endNode' ? `End Node ` : name + ` `;
   newData.checkpoints.push({
-    title: `Checkpoint ` + version?.data?.checkpoints?.length,
+    title: titlePrefix + version?.data?.checkpoints?.length,
     id: newId,
     position: newPos,
-    isEnd: true,
+    ...chkpData,
   });
 
   if (gridX < 5) {
