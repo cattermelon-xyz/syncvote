@@ -1,9 +1,14 @@
 import { Button, Select, Space } from 'antd';
-import { LeftOutlined } from '@ant-design/icons';
+import { ExportOutlined, LeftOutlined } from '@ant-design/icons';
 import Input from 'antd/es/input/Input';
 import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
-import { resetLastProposalId } from '../utils';
+import {
+  openWorkflowPage,
+  resetLastProposalId,
+  shortenString,
+  stripHTML,
+} from '../utils';
 import { createMission } from '@axios/createMission';
 
 interface Props {
@@ -82,7 +87,6 @@ const CreateProposal: React.FC<Props> = ({
   }, [currentOrgData]);
 
   const handleChangeWorkflow = (value: string) => {
-    console.log(`selected ${value}`);
     const selectedDataWorkflow = currentOrgData?.workflows?.filter(
       (dataOrg: any) => dataOrg?.id === value
     );
@@ -130,6 +134,26 @@ const CreateProposal: React.FC<Props> = ({
               options={workflowsOption}
               dropdownStyle={{ maxHeight: '120px', overflow: 'auto' }}
             />
+            {currentWorkflowData && (
+              <div className='p-3 bg-white rounded w-full'>
+                <div className='flex flex-row w-full justify-between items-center'>
+                  <div className='text-sm text-gray-600'>Description</div>
+                  <ExportOutlined
+                    className='cursor-pointer'
+                    onClick={() => {
+                      openWorkflowPage(
+                        currentOrgData?.id,
+                        currentWorkflowData?.id,
+                        currentWorkflowData?.versions[0]?.id
+                      );
+                    }}
+                  />
+                </div>
+                <div className='text-sm mt-3 text-gray-700'>
+                  {shortenString(stripHTML(currentWorkflowData?.desc), 245)}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

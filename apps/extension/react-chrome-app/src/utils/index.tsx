@@ -9,6 +9,10 @@ export const shortenString = (str: string, length: number = 30) => {
   return str;
 };
 
+export const stripHTML = (str: string) => {
+  return (str || '').replace(/<[^>]*>?/gm, '');
+};
+
 export const resetLastProposalId = async () => {
   await chrome.runtime.sendMessage({
     action: 'saveLastProposalId',
