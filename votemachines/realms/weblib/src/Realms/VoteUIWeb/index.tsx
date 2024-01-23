@@ -63,27 +63,36 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               }
               onClick={async () => {
                 setLoading(true);
-                const anywindow = window as any;
-                const data = checkpointData?.data;
-                const { address, error } = await createProposal(
-                  title,
-                  description,
-                  data?.realms,
-                  anywindow?.phantom?.solana,
-                  data?.governance_program,
-                  data?.proposal_mint,
-                  governance_address
-                );
-                if (error) {
-                  console.log(error);
-                } else {
-                  onSubmit({
-                    submission: {
-                      proposalId: address,
-                    },
-                  });
+                try {
+                  const anywindow = window as any;
+                  const data = checkpointData?.data;
+                  if (!anywindow.phantom.solana.publicKey) {
+                    await anywindow.phantom.solana.connect();
+                  }
+
+                  const { address, error } = await createProposal(
+                    title,
+                    description,
+                    data?.realms,
+                    anywindow?.phantom?.solana,
+                    data?.governance_program,
+                    data?.proposal_mint,
+                    governance_address
+                  );
+                  if (error) {
+                    console.log(error);
+                  } else {
+                    onSubmit({
+                      submission: {
+                        proposalId: address,
+                      },
+                    });
+                  }
+                  setLoading(false);
+                } catch (error) {
+                  setLoading(false);
+                  return error;
                 }
-                setLoading(false);
               }}
             >
               Create proposal

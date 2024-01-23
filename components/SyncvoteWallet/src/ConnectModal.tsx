@@ -62,10 +62,10 @@ const WalletSelector = ({
 }) => {
   return (
     <Space direction='vertical' size='middle' className='w-full mt-2'>
-      {wallets.map((wallet) => {
+      {wallets.map((wallet, index) => {
         const { name, icon, chains } = wallet;
         return (
-          <div className='flex flex-col gap-1'>
+          <div className='flex flex-col gap-1' key={index}>
             <Button
               key={name}
               icon={icon}
@@ -101,9 +101,19 @@ const WalletSelector = ({
   );
 };
 
-const ConnectModal = ({ open, onCancel }: { open: boolean; onCancel: any }) => {
+const ConnectModal = ({
+  open,
+  onCancel,
+  account,
+  setAccount,
+}: {
+  open: boolean;
+  onCancel: any;
+  account: any;
+  setAccount: (account: any) => void;
+}) => {
   const [wallet, setWallet] = useState(null);
-  const [account, setAccount] = useState(null);
+  // const [account, setAccount] = useState(null);
   useEffect(() => {
     setAccount(getAccount());
     const anyWindow = window as any;

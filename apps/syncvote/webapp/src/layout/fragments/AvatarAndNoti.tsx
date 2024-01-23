@@ -16,6 +16,7 @@ import { AuthContext } from '@layout/context/AuthContext';
 import { config } from '@dal/config';
 import { DownOutlined } from '@ant-design/icons';
 import { useSDK } from '@metamask/sdk-react';
+import { disconnect, disconnectWallet } from 'syncvote-wallet';
 
 function shortenAddress(address: string): string {
   if (address.length < 11) {
@@ -39,7 +40,6 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
   setAccount,
   isEditorPage,
 }) => {
-  const { sdk } = useSDK();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openPopover, setOpenPopover] = useState(false);
@@ -47,11 +47,6 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
   const presetIcons = useGetDataHook({
     configInfo: config.queryPresetIcons,
   }).data;
-
-  const disconnectWallet = async () => {
-    sdk?.terminate();
-    setAccount('');
-  };
 
   const handleLoginClick = async () => {
     dispatch(startLoading({}));
@@ -98,7 +93,9 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
                 // icon={<LogoutOutlined />}
                 className='w-full flex items-center'
                 onClick={async () => {
-                  disconnectWallet;
+                  await disconnect();
+                  disconnectWallet();
+                  setAccount('');
                 }}
               >
                 Disconnect wallet
