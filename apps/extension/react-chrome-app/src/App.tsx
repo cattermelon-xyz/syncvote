@@ -45,11 +45,15 @@ function App() {
       }
     });
     getLastProposalId().then((resp) => {
+      console.log('Get last proposal Id');
+
       if (resp) {
+        console.log(resp);
         setCurrentProposalId(resp.id);
         setLoading(false);
       }
     });
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -59,6 +63,7 @@ function App() {
       queryAMissionDetail({
         missionId: currentProposalId,
         onSuccess: (data: any) => {
+          console.log('current proposal data', data);
           setCurrentProposalData(data);
           const currentCheckpointId = extractCurrentCheckpointId(data.id);
           const checkpointData = data?.data?.checkpoints.filter(
@@ -127,6 +132,19 @@ function App() {
         <Loading />
       ) : user === null || user === undefined ? (
         <Login />
+      ) : currentProposalData ? (
+        <Voting
+          setPage={setPage}
+          currentProposalData={currentProposalData}
+          currentCheckpointData={currentCheckpointData}
+          setCurrentProposalId={setCurrentProposalId}
+          setCurrentProposalData={setCurrentProposalData}
+          user={user}
+          reload={() => {
+            setLastRequest(new Date().getTime());
+          }}
+          setLoading={setLoading}
+        />
       ) : page === PAGE_ROUTER.HOME_PAGE ? (
         <HomePage
           user={user}
@@ -149,19 +167,6 @@ function App() {
         <DoneCreateProposal
           setPage={setPage}
           currentProposalData={currentProposalData}
-        />
-      ) : currentProposalData ? (
-        <Voting
-          setPage={setPage}
-          currentProposalData={currentProposalData}
-          currentCheckpointData={currentCheckpointData}
-          setCurrentProposalId={setCurrentProposalId}
-          setCurrentProposalData={setCurrentProposalData}
-          user={user}
-          reload={() => {
-            setLastRequest(new Date().getTime());
-          }}
-          setLoading={setLoading}
         />
       ) : (
         <Loading />
