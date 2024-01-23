@@ -1,18 +1,22 @@
 import { getValue } from './utils';
+import { SVW_STORAGE_KEY } from './utils';
 
 export const getAccount = () => {
   const anyWindow = window as any;
   const chain = getValue('chain');
-  console.log('chain: ', chain);
-  const ethAddress = anyWindow.ethereum?.selectedAddress;
-  const solAddress = anyWindow.solana?.publicKey?.toBase58();
+  // console.log('chain: ', chain);
+  // const ethAddress = anyWindow.ethereum?.selectedAddress;
+  // const solAddress = anyWindow.solana?.publicKey?.toBase58();
+  console.log('anyWindow.ethereum: ', anyWindow.ethereum);
+  console.log('anyWindow.solana: ', anyWindow.solana);
   if (chain === 'ethereum') {
-    return ethAddress;
+    return getValue('account');
   } else if (chain === 'solana') {
-    return solAddress;
-  } else {
-    return ethAddress || solAddress;
+    return getValue('account');
   }
+  // else {
+  //   return ethAddress || solAddress;
+  // }
 };
 
 export const disconnect = async () => {
@@ -29,6 +33,10 @@ export const disconnect = async () => {
       default:
     }
   };
+};
+
+export const disconnectWallet = () => {
+  localStorage.removeItem(SVW_STORAGE_KEY);
 };
 
 export const getProvider = () => {

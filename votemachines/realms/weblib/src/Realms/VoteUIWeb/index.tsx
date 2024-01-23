@@ -2,13 +2,13 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { Card, Button, Radio, Input } from 'antd';
 import { IVoteUIWebProps } from 'directed-graph';
+import { createProposal } from '../funcs/createProposal';
 
 const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const { onSubmit, checkpointData } = props;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [governance_address, setGovernanceAddress] = useState('');
-
   const [loading, setLoading] = useState(false);
   const [connected, setConnected] = useState(true);
 
@@ -62,12 +62,28 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 title && description && governance_address ? false : true
               }
               onClick={async () => {
-                const proposaId = 'proposal_address';
-                onSubmit({
-                  submission: {
-                    proposalId: proposaId,
-                  },
-                });
+                setLoading(true);
+                const anywindow = window as any;
+                const data = checkpointData?.data;
+                const { address, error } = await createProposal(
+                  title,
+                  description,
+                  data?.realms,
+                  anywindow?.phantom?.solana,
+                  data?.governance_program,
+                  data?.proposal_mint,
+                  governance_address
+                );
+                if (error) {
+                  console.log(error);
+                } else {
+                  onSubmit({
+                    submission: {
+                      proposalId: address,
+                    },
+                  });
+                }
+                setLoading(false);
               }}
             >
               Create proposal

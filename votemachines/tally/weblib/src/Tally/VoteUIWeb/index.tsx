@@ -13,7 +13,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
 
   // const { connected } = useSDK();
   // TODO: check if connected
-  const connected = false;
+  const connected = true;
 
   return (
     <div>

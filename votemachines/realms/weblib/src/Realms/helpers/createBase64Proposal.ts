@@ -5,7 +5,6 @@ import {
   ProgramAccount,
   TokenOwnerRecord,
   VoteType,
-  WalletSigner,
   withAddSignatory,
   withCreateProposal,
   withInsertTransaction,
@@ -16,9 +15,12 @@ import { chunk } from 'lodash';
 import { sendSignAndConfirmTransactions } from '@blockworks-foundation/mangolana/lib/transactions';
 import { SequenceType } from '@blockworks-foundation/mangolana/lib/globalTypes';
 
+import * as buffer from 'buffer';
+window.Buffer = buffer.Buffer;
+
 export const createBase64Proposal = async (
   connection: Connection,
-  wallet: WalletSigner,
+  wallet: any,
   tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
   governance: PublicKey,
   realm: PublicKey,
@@ -30,7 +32,7 @@ export const createBase64Proposal = async (
   base64Instructions: string[]
 ) => {
   const instructions: TransactionInstruction[] = [];
-  const walletPk = wallet.publicKey!;
+  const walletPk = wallet.publicKey;
   const governanceAuthority = walletPk;
   const signatory = walletPk;
   const payer = walletPk;

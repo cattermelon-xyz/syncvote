@@ -18,7 +18,7 @@ import Metamask from '@assets/icons/svg-icons/Metamask';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { L } from '@utils/locales/L';
 import HistoryOfCheckpoint from './fragments/HistoryOfCheckpoint';
-import { ConnectModal, getAccount } from 'syncvote-wallet';
+import { ConnectModal, getAccount, disconnectWallet } from 'syncvote-wallet';
 
 export function isExternalProvider(
   provider: any
@@ -299,10 +299,29 @@ const MissionVotingDetail = () => {
   };
 
   const disconnect = async () => {
-    // TODO: disconnect
-    // sdk?.terminate();
-    setAccount('');
+    disconnectWallet();
+    console.log('account ', getAccount());
+    setAccount(getAccount());
+    // // TODO: disconnect
+    // // sdk?.terminate();
+    // setAccount('');
   };
+
+  useEffect(() => {
+    const anyWindow = window as any;
+    anyWindow.ethereum?.on('accountsChanged', (accounts: any) => {
+      console.log('accounts changed: ', accounts);
+      disconnectWallet();
+      setAccount(getAccount());
+    });
+    // handle account change in phantom solana
+    anyWindow.phantom?.solana?.on('disconnect', () => {
+      console.log('disconnect');
+      disconnectWallet();
+      setAccount(getAccount());
+    });
+  });
+
   // =============================== METAMASK SECTION ===============================
 
   const fetchData = () => {
