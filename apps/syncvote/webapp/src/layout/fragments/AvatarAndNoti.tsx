@@ -9,17 +9,37 @@ import {
   LogoutOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase, useGetDataHook } from 'utils';
 import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
 import { AuthContext } from '@layout/context/AuthContext';
 import { config } from '@dal/config';
+import { DownOutlined } from '@ant-design/icons';
+import { useSDK } from '@metamask/sdk-react';
+
+function shortenAddress(address: string): string {
+  if (address.length < 11) {
+    return address;
+  }
+  return `${address.substring(0, 6)}...${address.substring(
+    address.length - 4
+  )}`;
+}
 
 interface AvatarAndNotiProps {
   user?: any;
+  account?: any;
+  setAccount?: any;
+  isEditorPage?: boolean;
 }
 
-const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
+const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({
+  user,
+  account,
+  setAccount,
+  isEditorPage,
+}) => {
+  const { sdk } = useSDK();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openPopover, setOpenPopover] = useState(false);
@@ -28,9 +48,14 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
     configInfo: config.queryPresetIcons,
   }).data;
 
+  const disconnectWallet = async () => {
+    sdk?.terminate();
+    setAccount('');
+  };
+
   const handleLoginClick = async () => {
     dispatch(startLoading({}));
-    
+
     // Store the current page URL for redirection after OAuth
     const currentURL = window.location.href;
 
@@ -53,7 +78,7 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
         content: error.message || '',
       });
     }
-};
+  };
 
   const { isAuth } = useContext(AuthContext);
 
@@ -63,32 +88,56 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
 
   const contentPopOver = (
     <div>
-      <div>
-        <Button
-          type='text'
-          icon={<SettingOutlined />}
-          onClick={() => {
-            setOpenPopover(false);
-            navigate(`/account/setting`);
-          }}
-        >
-          {L('accountSettings')}
-        </Button>
-      </div>
-      <div>
-        <Button
-          type='text'
-          icon={<LogoutOutlined />}
-          className='w-full flex items-center'
-          onClick={async () => {
-            dispatch(startLoading({}));
-            await supabase.auth.signOut();
-            dispatch(finishLoading({}));
-          }}
-        >
-          {L('logOut')}
-        </Button>
-      </div>
+      {isEditorPage ? (
+        account ? (
+          <div className='flex items-center gap-2'>
+            <p>{shortenAddress(account)}</p>
+            <div>
+              <Button
+                type='text'
+                // icon={<LogoutOutlined />}
+                className='w-full flex items-center'
+                onClick={async () => {
+                  disconnectWallet;
+                }}
+              >
+                Disconnect wallet
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p>No wallet connected</p>
+        )
+      ) : (
+        <>
+          <div>
+            <Button
+              type='text'
+              icon={<SettingOutlined />}
+              onClick={() => {
+                setOpenPopover(false);
+                navigate(`/account/setting`);
+              }}
+            >
+              {L('accountSettings')}
+            </Button>
+          </div>
+          <div>
+            <Button
+              type='text'
+              icon={<LogoutOutlined />}
+              className=' flex items-center'
+              onClick={async () => {
+                dispatch(startLoading({}));
+                await supabase.auth.signOut();
+                dispatch(finishLoading({}));
+              }}
+            >
+              {L('logOut')}
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 
@@ -108,18 +157,20 @@ const AvatarAndNoti: React.FC<AvatarAndNotiProps> = ({ user }) => {
           trigger='click'
           open={openPopover}
           onOpenChange={handleOpenChange}
-          className='max-w-[208px] h-[36px]'
+          className='max-w-[320px] h-[36px]'
         >
-          <div className='border-b_2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center'>
+          <div className='border-2 h-11 px-2 py-2 mr-0 rounded-full border-gray-normal bg-gray-100 cursor-pointer flex items-center '>
             <Icon
               presetIcon={presetIcons}
               size='medium'
               iconUrl={user?.avatar_url}
             />
-            <p className='text-text_2 text-[#252422] ml-2 truncate'>
+            <p className='text-text_2 text-[#252422] mx-2 truncate'>
               {/* {token ? sliceAddressToken(AddressToken.ip_address, 5) : 'Connect wallet'} */}
-              {user?.full_name ? user?.full_name : user?.email}
+              {/* {user?.full_name ? user?.full_name : user?.email} */}
+              {user?.email}
             </p>
+            <DownOutlined />
           </div>
         </Popover>
       ) : (

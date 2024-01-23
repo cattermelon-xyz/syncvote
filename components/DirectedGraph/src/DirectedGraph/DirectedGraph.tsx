@@ -87,6 +87,9 @@ const Flow = () => {
     shouldExportImage,
     setExportImage,
     shouldFitView,
+    onInit,
+    onDragOver,
+    onDrop,
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -227,16 +230,18 @@ const Flow = () => {
         proOptions={proOptions}
         onEdgeClick={onEdgeClick}
         fitView={true}
+        onInit={onInit}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
       >
         {window.innerWidth > 700 ? (
-          <Controls position='bottom-left' showInteractive={false} />
+          <Controls position='top-right' showInteractive={false} />
         ) : null}
         <Background color='#aaa' variant={BackgroundVariant.Dots} />
         {navPanel ? (
           <Panel position='top-left'>
-            <Space direction='vertical'>
-              <Space direction='horizontal'>{navPanel}</Space>
-              {/* <Space
+            {navPanel}
+            {/* <Space
               direction="horizontal"
               size="middle"
               className="p-2 border rounded-md flex items-center bg-white"
@@ -274,7 +279,6 @@ const Flow = () => {
                 );
               })}
             </Space> */}
-            </Space>
           </Panel>
         ) : null}
 

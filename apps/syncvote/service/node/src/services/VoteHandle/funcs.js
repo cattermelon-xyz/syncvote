@@ -339,10 +339,26 @@ function arraysEqual(arr1, arr2) {
   return arr1.every((element) => arr2.includes(element));
 }
 
+function checkMinDurationTally(details) {
+  if (details.minDuration) {
+    const now = moment().unix();
+    const startToVoteMoment = moment(details.startToVote).unix();
+
+    if (startToVoteMoment + details.minDuration <= now) {
+      return true;
+    }
+
+    return false;
+  }
+
+  return true;
+}
+
 module.exports = {
   handleMovingToNextCheckpoint,
   startEndNode,
   startForkNode,
   deepEqual,
   start,
+  checkMinDurationTally,
 };

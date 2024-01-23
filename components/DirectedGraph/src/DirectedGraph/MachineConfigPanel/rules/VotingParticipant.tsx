@@ -96,6 +96,16 @@ const VotingPartipation = () => {
             ),
             value: 'token',
           },
+          {
+            key: 'all',
+            value: 'all',
+            label: (
+              <div className='flex items-center'>
+                <HighlightOutlined className='mr-2' />
+                Everyone can vote
+              </div>
+            ),
+          },
         ]}
       />
       {type ? <div className='py-1'>{/* <hr /> */}</div> : null}

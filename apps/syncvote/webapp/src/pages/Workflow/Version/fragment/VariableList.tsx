@@ -64,12 +64,13 @@ const VariableList = ({
   return (
     <CollapsiblePanel
       title={
-        <span>
+        <div className='flex flex-row text-sm'>
           <InfoCircleOutlined title='Raw data kept on-chain' className='mr-1' />
           Variable
-        </span>
+        </div>
       }
       className='w-full'
+      open={false}
     >
       <VariableDialog
         open={showDialog}

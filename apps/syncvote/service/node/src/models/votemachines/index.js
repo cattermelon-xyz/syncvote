@@ -17,6 +17,7 @@ class VotingMachine {
       props: data,
       mission_id,
       m_parent,
+      minDuration,
     } = props;
     this.duration = duration;
     this.cvd_created_at = cvd_created_at;
@@ -32,6 +33,7 @@ class VotingMachine {
     this.children = children;
     this.data = data;
     this.m_parent = m_parent;
+    this.minDuration = minDuration;
   }
 
   initDataForCVD() {

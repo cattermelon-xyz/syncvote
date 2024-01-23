@@ -34,6 +34,9 @@ export const GraphContext = React.createContext<IGraph>({
   onConfigPanelClose: () => {},
   onChangeLayout: (data: IWorkflowVersionLayout) => {},
   onConfigEdgePanelClose: () => {},
+  onInit: (reactflowInstance: any) => {},
+  onDrop: (event: any) => {},
+  onDragOver: (event: any) => {},
 });
 
 export const GraphPanelContext = React.createContext<IConfigPanel>({

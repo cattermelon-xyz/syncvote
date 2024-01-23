@@ -1,21 +1,43 @@
-import { Snapshot as Interface } from './interface';
 import { Snapshot as Funcs } from './funcs';
 import ConfigPanel from './ConfigPanel/index';
-import { HiOutlineBolt } from 'react-icons/hi2';
+import icon from '../assets/icon.svg';
 import {
   ICheckPoint,
   IVoteMachine,
-  NumberWithPercentageInput,
-  TokenInput,
   SideNote,
-  isRTE,
   IVoteMachineGetLabelProps,
 } from 'directed-graph';
 import { Space } from 'antd';
 import { SolutionOutlined, VerticalAlignTopOutlined } from '@ant-design/icons';
-import { LuMapPin } from 'react-icons/lu';
-import parse from 'html-react-parser';
 import VoteUIWeb from './VoteUIWeb';
+import { TwitterOutlined } from '@ant-design/icons';
+
+const selectOptions = [
+  {
+    label: 'Single Choice',
+    value: 'single-choice',
+  },
+  {
+    label: 'Approval',
+    value: 'approval',
+  },
+  {
+    label: 'Quadratic',
+    value: 'quadratic',
+  },
+  {
+    label: 'Ranked Choice',
+    value: 'ranked-choice',
+  },
+  {
+    label: 'Weighted',
+    value: 'weighted',
+  },
+  {
+    label: 'Basic',
+    value: 'basic',
+  },
+];
 
 const explain = ({
   checkpoint,
@@ -24,8 +46,8 @@ const explain = ({
   checkpoint: ICheckPoint | undefined;
   data: any;
 }) => {
-  const { quorum, resultDescription } = checkpoint || {};
-  const { token, threshold } = data || {};
+  const { resultDescription } = checkpoint || {};
+  const { token, threshold, space, type } = data || {};
   return (
     <Space direction='vertical' className='w-full'>
       <div className='text-gray-400'>Voting format</div>
@@ -34,40 +56,25 @@ const explain = ({
           Voting mechanism:{' '}
           <span className='text-violet-500'>{Funcs.getName()}</span>
         </li>
-        {quorum ? (
+        {space ? (
           <li>
             <span>
-              Voting quorum:{' '}
-              <span className='text-violet-500'>
-                {<NumberWithPercentageInput value={quorum} />}
-              </span>{' '}
-              {token ? (
-                <>
-                  <TokenInput address={token} /> tokens
-                </>
-              ) : (
-                'votes'
-              )}
+              Space: <span className='text-violet-500'>{space}</span>
             </span>
           </li>
         ) : null}
-        {threshold ? (
+
+        {type ? (
           <li>
             <span>
-              Voting threshold:{' '}
+              Voting method:{' '}
               <span className='text-violet-500'>
-                {<NumberWithPercentageInput value={threshold} />}
-              </span>{' '}
-              {token ? (
-                <>
-                  <TokenInput address={token} /> tokens
-                </>
-              ) : (
-                'votes'
-              )}
+                {selectOptions.find((o) => o.value === type)?.label}
+              </span>
             </span>
           </li>
         ) : null}
+
         <SideNote value={resultDescription} />
       </ul>
     </Space>
@@ -81,81 +88,38 @@ const abstract = ({
   checkpoint: ICheckPoint | undefined;
   data: any;
 }) => {
-  const { votingLocation, quorum } = checkpoint || {};
-  const threshold = data.threshold;
-  const token = data.token;
-  return threshold || isRTE(votingLocation) || quorum ? (
+  const { space, type } = data;
+  return type || space ? (
     <>
-      {quorum ? (
+      {space ? (
         <div className='flex text-ellipsis items-center px-2'>
           <SolutionOutlined className='mr-2' />
           <div className='flex gap-1'>
-            <span>Quorum</span>
-            <NumberWithPercentageInput value={quorum} />
-            {token ? <TokenInput address={token} /> : 'votes'}
+            <span>Space {space}</span>
           </div>
         </div>
       ) : null}
-      {threshold ? (
+      {type ? (
         <div className='flex text-ellipsis items-center px-2'>
           <VerticalAlignTopOutlined className='mr-2' />
-          {/* {`Threshold ${threshold} ${token}`} */}
           <div className='flex gap-1'>
-            <span>Threshold</span>
-            <NumberWithPercentageInput value={threshold} />
-            {token ? <TokenInput address={token} /> : 'votes'}
+            <span>
+              Voting method:{' '}
+              {selectOptions.find((o) => o.value === type)?.label}
+            </span>
           </div>
-        </div>
-      ) : null}
-      {isRTE(votingLocation) ? (
-        <div className='flex text-ellipsis items-center px-2'>
-          <LuMapPin className='mr-2' />
-          {parse(votingLocation || '')}
         </div>
       ) : null}
     </>
   ) : null;
 };
 
-// const getLabel = (props: IVoteMachineGetLabelProps) => {
-//   const { source, target } = props;
-//   console.log('GetLabel', source, target);
-
-//   const data = source.data || {};
-//   const { triggers } = source;
-//   const filteredTriggers = triggers?.filter(
-//     (trg: any) => trg.triggerAt === target.id
-//   );
-//   const children = source.children || [];
-//   const idx = children.indexOf(target.id);
-//   return data.options ? (
-//     <div>
-//       <div>{data.options[idx]}</div>
-//       <div>
-//         {filteredTriggers?.map((trg: any) =>
-//           trg.provider === 'twitter' ? (
-//             <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
-//           ) : (
-//             <span key={trg.id || Math.random()}>{trg.provider}</span>
-//           )
-//         )}
-//       </div>
-//     </div>
-//   ) : (
-//     <div>
-//       {filteredTriggers?.map((trg: any) =>
-//         trg.provider === 'twitter' ? (
-//           <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
-//         ) : (
-//           <span key={trg.id || Math.random()}>{trg.provider}</span>
-//         )
-//       )}
-//     </div>
-//   );
-// };
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
   const snapshotType = source?.data?.action;
+  const children = source.children || [];
+  const idx = children.indexOf(target.id);
+
   return (
     <>
       {snapshotType === 'create-proposal' ? (
@@ -166,13 +130,21 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
             <span>Fail</span>
           )}
         </>
-      ) : null}
+      ) : (
+        <>
+          {source?.data.fallback === target?.id ? (
+            <span>Fail</span>
+          ) : (
+            <span>{source.data.snapShotOption[idx]}</span>
+          )}
+        </>
+      )}
     </>
   );
 };
 
-const getIcon = () => {
-  return <HiOutlineBolt />;
+const getIcon = (className?: string) => {
+  return <img src={icon} className={`w-4 ${className ? className : ''}`} />;
 };
 
 const VoteMachine: IVoteMachine = {

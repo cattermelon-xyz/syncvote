@@ -23,10 +23,15 @@ const CollapsiblePanel = ({
     <div
       className={`${className ? className : 'p-4 bg-white rounded-lg w-full'}`}
     >
-      <div className='w-full flex items-center justify-between'>
-        <div className='font-bold text-lg select-none'>{title}</div>
+      <div className='w-full flex items-center justify-between mb-2'>
+        {typeof title === 'string' ? (
+          <div className='font-bold text-lg select-none'>{title}</div>
+        ) : (
+          <>{title}</>
+        )}
+
         <div
-          className={`cursor-pointer select-none ${
+          className={`cursor-pointer select-none text-sm ${
             collapsable ? '' : 'hidden'
           }`}
           onClick={() => setIsOpen(!isOpen)}
@@ -36,9 +41,7 @@ const CollapsiblePanel = ({
       </div>
       <div
         style={bodyStyle}
-        className={`w-full mt-4 ${
-          !collapsable ? null : !isOpen ? 'hidden' : null
-        }`}
+        className={`w-full ${!collapsable ? null : !isOpen ? 'hidden' : null}`}
       >
         {children}
       </div>
