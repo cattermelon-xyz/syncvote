@@ -1,16 +1,9 @@
 import { useState } from 'react';
-import {
-  DownOutlined,
-  UpOutlined,
-  ClockCircleOutlined,
-  ExportOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons';
+import { ExportOutlined, LoadingOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import parse from 'html-react-parser';
 import VoteButton from './VoteButton';
 import { Divider } from 'antd';
-import { openWorkflowPage, shortenString } from '../utils';
+import { openWorkflowPage, shortenString, stripHTML } from '../utils';
 
 const isInteractable = ({
   checkpointId,
@@ -53,7 +46,6 @@ const VoteUI = ({
   reload: any;
   setLoading: any;
 }) => {
-  console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
   const { workflow_id, workflow_version_id, org_id } = currentProposalData;
   const { isEnd, vote_machine_type, title, endToVote, phase, description } =
@@ -103,7 +95,7 @@ const VoteUI = ({
 
         {checkpointData?.note ? (
           <>
-            <div>{parse(checkpointData?.note)}</div>
+            <div>{shortenString(stripHTML(checkpointData?.note), 50)}</div>
           </>
         ) : (
           <></>
@@ -156,7 +148,7 @@ const VoteUI = ({
             </div>
             {description ? (
               <div className='text-xs mb-2 text-gray-700'>
-                {parse(shortenString(description, 50))}
+                {shortenString(stripHTML(description), 50)}
               </div>
             ) : null}
             <div className='mt-2'>{renderButton()}</div>
@@ -190,7 +182,7 @@ const VoteUI = ({
         </div>
         {description ? (
           <div className='text-xs mb-2 text-gray-700'>
-            {parse(shortenString(description, 50))}
+            {shortenString(stripHTML(description), 50)}
           </div>
         ) : null}
         <div className='mt-2'>{renderButton()}</div>

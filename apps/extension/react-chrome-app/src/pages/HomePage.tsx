@@ -16,12 +16,16 @@ interface Props {
   myMissions: any;
   followingMissions: any;
   setLoading: any;
+  setCurrentOrgId: any;
+  currentOrgId: any;
 }
 
 const HomePage: React.FC<Props> = ({
   setPage,
   setCurrentProposalId,
   setCurrentOrgData,
+  setCurrentOrgId,
+  currentOrgId,
   user,
   myMissions,
   followingMissions,
@@ -52,7 +56,9 @@ const HomePage: React.FC<Props> = ({
               label: dataOrg?.title,
             };
           });
-          setCurrentOrgData(data[0]);
+          setCurrentOrgData(
+            data.find((dataOrg: any) => dataOrg?.id === currentOrgId) || data[0]
+          );
           setOrgsOption(handleDataOrgs);
           setDataOrgs(data);
           setLoading(false);
@@ -78,6 +84,7 @@ const HomePage: React.FC<Props> = ({
                 proposal={proposal}
                 setPage={setPage}
                 setCurrentProposalId={setCurrentProposalId}
+                user={user}
               />
             ))
           ) : (
@@ -98,6 +105,7 @@ const HomePage: React.FC<Props> = ({
                 proposal={proposal}
                 setPage={setPage}
                 setCurrentProposalId={setCurrentProposalId}
+                user={user}
               />
             ))
           ) : (
@@ -113,14 +121,14 @@ const HomePage: React.FC<Props> = ({
     // },
   ];
 
-  const onChangeTabs = (key: string) => {
-    console.log(key);
-  };
+  const onChangeTabs = (key: string) => {};
 
   const handleChangeOrg = (value: string) => {
     const selectedDataOrg = dataOrgs.filter(
       (dataOrg: any) => dataOrg?.id === value
     );
+    console.log('** handleChangeOrg, setCurrentOrgId: ', value);
+    setCurrentOrgId(value);
     setCurrentOrgData(selectedDataOrg[0]);
     setLoading(false);
   };
@@ -130,7 +138,7 @@ const HomePage: React.FC<Props> = ({
         <>
           <div className='flex flex-row justify-between mb-6 items-center'>
             <Select
-              defaultValue={orgsOption[0]?.value}
+              defaultValue={currentOrgId ? currentOrgId : orgsOption[0]?.value}
               style={{ width: 135, height: 40, borderColor: 'transparent' }}
               onChange={handleChangeOrg}
               options={orgsOption}

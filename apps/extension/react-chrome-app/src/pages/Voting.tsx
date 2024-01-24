@@ -9,10 +9,8 @@ import { PAGE_ROUTER } from '@constants/common';
 import { openMissionPage, openWorkflowPage, shortenString } from '../utils';
 import HistoryItem from '@components/HistoryItem';
 import VoteUI from '@components/VoteUI';
-import { Divider, Tag } from 'antd';
 import moment from 'moment';
-import { StatusTag } from '@components/StatusTag';
-import { start } from 'repl';
+import { MissionStatusTag } from '@components/MissionStatusTag';
 
 interface Props {
   setPage: any;
@@ -170,11 +168,7 @@ const Voting: React.FC<Props> = ({
             </span>
           </div>
           <div className='mb-4'>
-            {currentProposalData.status === 'STOPPED' ? (
-              <StatusTag color='default'>Closed</StatusTag>
-            ) : (
-              <StatusTag color='active-border'>Active</StatusTag>
-            )}
+            <MissionStatusTag user={user} mission={currentProposalData} />
           </div>
           <div>
             <p

@@ -85,6 +85,21 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       });
       break;
     }
+
+    case 'saveLastPage': {
+      chrome.storage.sync.set({
+        [chromeStorageKeys.lastPage]: request.payload,
+      });
+      break;
+    }
+
+    case 'saveLastOrgId': {
+      chrome.storage.sync.set({
+        [chromeStorageKeys.lastOrgId]: request.payload,
+      });
+      break;
+    }
+
     default:
       break;
   }
