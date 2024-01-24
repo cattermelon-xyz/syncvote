@@ -93,6 +93,7 @@ async function insertMission(props) {
               includedAbstain: checkpoint?.includedAbstain,
               desc: checkpoint?.description,
               props: checkpoint?.data,
+              inHappyPath: checkpoint?.inHappyPath,
             };
 
             const error = await insertCheckpoint(checkpointData);

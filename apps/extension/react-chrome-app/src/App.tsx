@@ -1,5 +1,9 @@
 import { getCurrentUser } from '@configs/getCurrentUser';
-import { getLastProposalId } from '@configs/getLastProposalId';
+import {
+  getLastOrgId,
+  getLastPage,
+  getLastProposalId,
+} from '@configs/getLastProposalId';
 import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
 import {
@@ -24,12 +28,28 @@ const Loading = () => {
 
 function App() {
   const [user, setUser] = useState<any>();
-  const [page, setPage] = useState<string>(PAGE_ROUTER.HOME_PAGE);
+  const [page, _setPage] = useState<string>(PAGE_ROUTER.HOME_PAGE);
+  const setPage = async (val: string) => {
+    _setPage(val);
+    await chrome.runtime.sendMessage({
+      action: 'saveLastPage',
+      payload: val,
+    });
+  };
   const [currentProposalId, setCurrentProposalId] = useState<number>();
   const [currentProposalData, setCurrentProposalData] = useState<any>();
   const [currentOrgData, setCurrentOrgData] = useState<any>();
-  const [myMissions, setMyMissions] = useState<any>();
-  const [followingMissions, setFollowingMissions] = useState<any[]>();
+  const [currentOrgId, _setCurrentOrgId] = useState<string>();
+  const setCurrentOrgId = async (val: string) => {
+    await chrome.runtime.sendMessage({
+      action: 'saveLastOrgId',
+      payload: val,
+    });
+    console.log('save last org id', val);
+    _setCurrentOrgId(val);
+  };
+  const [myMissions, setMyMissions] = useState<any[]>([]);
+  const [followingMissions, setFollowingMissions] = useState<any[]>([]);
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
   const [lastRequest, setLastRequest] = useState<any>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,12 +61,24 @@ function App() {
         setUser(resp.user);
         setLoading(false);
       } else {
-        console.log('user is not found');
       }
     });
     getLastProposalId().then((resp) => {
       if (resp) {
         setCurrentProposalId(resp.id);
+        setLoading(false);
+      }
+    });
+    getLastPage().then((resp) => {
+      if (resp) {
+        _setPage(resp);
+        setLoading(false);
+      }
+    });
+    getLastOrgId().then((resp) => {
+      console.log('load last org id: ', resp);
+      if (resp) {
+        _setCurrentOrgId(resp);
         setLoading(false);
       }
     });
@@ -59,15 +91,16 @@ function App() {
       queryAMissionDetail({
         missionId: currentProposalId,
         onSuccess: (data: any) => {
-          setCurrentProposalData(data);
+          setCurrentProposalData({
+            ...data,
+            checkpoint_participation: data.participation,
+            checkpoint_inHappyPath: data.inHappyPath,
+          });
           const currentCheckpointId = extractCurrentCheckpointId(data.id);
           const checkpointData = data?.data?.checkpoints.filter(
             (checkpoint: any) => checkpoint.id === currentCheckpointId
           );
-          // console.log('missiondata', data);
-          // console.log('checkpointData', checkpointData[0]);
           let checkpointDataAfterHandle = checkpointData[0];
-
           if (!checkpointData[0].isEnd) {
             const startToVote = new Date(data.startToVote);
             // convert second to millisecond of duration
@@ -77,7 +110,6 @@ function App() {
             ).toISOString();
             checkpointDataAfterHandle.endToVote = endTovote;
           }
-
           setCurrentCheckpointData(checkpointDataAfterHandle);
           setLoading(false);
         },
@@ -127,16 +159,6 @@ function App() {
         <Loading />
       ) : user === null || user === undefined ? (
         <Login />
-      ) : page === PAGE_ROUTER.HOME_PAGE ? (
-        <HomePage
-          user={user}
-          setPage={setPage}
-          setCurrentOrgData={setCurrentOrgData}
-          setCurrentProposalId={setCurrentProposalId}
-          myMissions={myMissions}
-          followingMissions={followingMissions}
-          setLoading={setLoading}
-        />
       ) : currentOrgData && page === PAGE_ROUTER.CREATE_PROPOSAL ? (
         <CreateProposal
           setPage={setPage}
@@ -150,7 +172,7 @@ function App() {
           setPage={setPage}
           currentProposalData={currentProposalData}
         />
-      ) : currentProposalData ? (
+      ) : page === PAGE_ROUTER.VOTING && currentProposalData ? (
         <Voting
           setPage={setPage}
           currentProposalData={currentProposalData}
@@ -164,7 +186,17 @@ function App() {
           setLoading={setLoading}
         />
       ) : (
-        <Loading />
+        <HomePage
+          user={user}
+          setPage={setPage}
+          setCurrentOrgData={setCurrentOrgData}
+          setCurrentOrgId={setCurrentOrgId}
+          currentOrgId={currentOrgId}
+          setCurrentProposalId={setCurrentProposalId}
+          myMissions={myMissions}
+          followingMissions={followingMissions}
+          setLoading={setLoading}
+        />
       )}
     </div>
   );

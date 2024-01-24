@@ -11,7 +11,6 @@ import { shortenString } from '../utils';
 import DoneIcon from '@assets/icons/DoneIcon';
 
 const HistoryItem = ({ item }: { item: any }) => {
-  console.log('item: ', item);
   const [expanded, setExpanded] = useState(false);
   // TODO: this is a hack, should use votemachine function instead
   const {
@@ -77,16 +76,6 @@ const HistoryItem = ({ item }: { item: any }) => {
       </>
     );
   };
-  console.log(
-    'in HistoryItem, endedAt: ',
-    endedAt,
-    '; phase: ',
-    phase,
-    ';  checkpoint: ',
-    checkpoint_title,
-    'item: ',
-    item
-  );
   return (
     endedAt &&
     (!phase ? (
