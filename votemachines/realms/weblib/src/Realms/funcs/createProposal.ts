@@ -1,6 +1,4 @@
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { readFileSync } from 'fs';
-import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 import { createBase64Proposal } from '../helpers/createBase64Proposal';
 import {
   getAllProposals,

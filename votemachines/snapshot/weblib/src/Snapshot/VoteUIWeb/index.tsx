@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSDK } from '@metamask/sdk-react';
 import { Card, Button, Radio, Input, Tag, Divider, Modal } from 'antd';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
