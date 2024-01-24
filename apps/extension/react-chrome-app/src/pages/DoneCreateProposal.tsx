@@ -29,7 +29,7 @@ const DoneCreateProposal: React.FC<Props> = ({
           <div className='text-bold text-xl'>
             {currentProposalData ? currentProposalData.m_title : `Loading ...`}
           </div>
-          <div
+          {/* <div
             className='flex flex-row items-center justify-center mt-4'
             onClick={() =>
               openMissionPage(
@@ -40,7 +40,7 @@ const DoneCreateProposal: React.FC<Props> = ({
           >
             <ExportOutlined className='mr-1' />
             {`View on voting page`}
-          </div>
+          </div> */}
         </div>
       </div>
       <Button

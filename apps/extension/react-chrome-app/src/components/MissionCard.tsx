@@ -17,11 +17,13 @@ const MissionCard: React.FC<Props> = ({
   let { startToVote, duration } = proposal;
   duration = duration === null ? 0 : duration;
   const endToVote = moment(startToVote).add(duration, 'seconds');
-  const tagClass = !(
-    proposal?.status === 'DRAFT' || proposal?.status === 'STOPPED'
-  )
-    ? 'text-green-500 border-green-500 bg-green-100 rounded-xl'
-    : 'bg-gray-200 rounded-xl';
+  console.log('proposal', proposal);
+  // TODO: https://github.com/orgs/hectagon-finance/projects/2/views/1?pane=issue&itemId=50799761
+  // "Success" if proposal.status === 'STOPPED' && last checkpoint in happy path
+  // "Fail" if proposal.status === 'STOPPED' && last checkpoint NOT in happy path
+  // "Waiting for your action" if last checkpoint.participation.data[0] === user.email
+  // "Waiting for admin action" if last checkpoint.participation.data[0] !== user.email
+  // "Waiting fo community" if last checkpoint.participation.data[0] === null
   return (
     <Card
       className='hover:shadow-xl cursor-pointer'

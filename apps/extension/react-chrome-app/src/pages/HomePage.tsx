@@ -1,4 +1,4 @@
-import { Select, Avatar, Tabs, Empty, Card } from 'antd';
+import { Select, Avatar, Tabs, Empty } from 'antd';
 import { BellOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import MissionCard from '@components/MissionCard';
@@ -106,11 +106,11 @@ const HomePage: React.FC<Props> = ({
         </div>
       ),
     },
-    {
-      key: '3',
-      label: 'Mentions',
-      children: <Card>Comming Soon</Card>,
-    },
+    // {
+    //   key: '3',
+    //   label: 'Mentions',
+    //   children: <Card>Comming Soon</Card>,
+    // },
   ];
 
   const onChangeTabs = (key: string) => {
