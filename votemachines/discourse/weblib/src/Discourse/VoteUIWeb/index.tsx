@@ -37,16 +37,19 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   return (
     <>
       <Modal
+        className='rounded-xl'
         open={showTemplate}
-        title='Template'
+        title={<span style={{ fontSize: '32px' }}>Template</span>}
         onCancel={() => setShowTemplate(false)}
         footer={null}
+        width={'58vw'}
       >
         <div className='border rounded-md'>
           {parse(checkpointData?.data?.template || '')}
         </div>
       </Modal>
       <Modal
+        centered  
         open={showConfirm}
         title='Confirm submission'
         onCancel={() => setShowConfirm(false)}
@@ -72,7 +75,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </div>
         }
       >
-        {parse(shortenString(missionDesc, 200) || '')}
+        <p className='text-base text-gray-400'>Please double-check the information you've input. Once you click Confirm, this action will be submitted.</p>
       </Modal>
       <div className='w-full h-full flex flex-col items-center justify-between'>
         {action === 'create-topic' && (
@@ -114,7 +117,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '60vh',
+                            '65vh',
                             editor.editing.view.document.getRoot()
                           );
                         });
