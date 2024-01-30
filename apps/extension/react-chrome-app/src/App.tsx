@@ -154,7 +154,7 @@ function App() {
   }, [currentOrgData, user]);
 
   return (
-    <div className='w-[357px] h-[600px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto no-scrollbar'>
+    <div className='w-[357px] h-[600px] pt-[20px] pb-1 px-5 rounded-xl bg-[#F4F4F4] overflow-y-auto no-scrollbar'>
       {loading === true ? (
         <Loading />
       ) : user === null || user === undefined ? (

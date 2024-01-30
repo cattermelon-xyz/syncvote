@@ -87,11 +87,11 @@ const Voting: React.FC<Props> = ({
       <>
         <div className='flex flex-col gap-4'>
           <div className='flex flex-row justify-between items-center'>
-            <div className='flex flex-row items-center'>
+            <div className='flex flex-row items-center pl-1'>
               {completed ? (
-                <div className='rounded-full w-[8px] h-[8px] bg-gray-500'></div>
+                <div className='rounded-full w-[8px] h-[8px] bg-gray-400'></div>
               ) : (
-                <div className='rounded-full w-[8px] h-[8px] bg-violet-500'></div>
+                <div className='rounded-full w-[8px] h-[8px] bg-[#6200EE]'></div>
               )}
               <div className='ml-[12px] font-bold text-base'>
                 {shortenString(phase || '', 30)}
@@ -117,13 +117,13 @@ const Voting: React.FC<Props> = ({
           </div>
           <div className='flex flex-col rounded-md bg-white p-3 gap-1'>
             <div className='flex flex-row justify-between'>
-              <div>Started at</div>
+            <div className='text-xs text-gray-500 font-medium'>Started at</div>
               <div>{moment(startAt || '').format('MMM DD, hh:mm A')}</div>
             </div>
             {completed ? (
               <>
                 <div className='flex flex-row justify-between'>
-                  <div>Ended at</div>
+                <div className='text-xs text-gray-500 font-medium'>Ended at</div>
                   <div>{moment(endedAt || '').format('MMM DD, hh:mm A')}</div>
                 </div>
               </>
@@ -144,9 +144,9 @@ const Voting: React.FC<Props> = ({
     <div className='pb-2 text-gray-600'>
       <div>
         <div className='flex flex-col mb-9'>
-          <div className='flex flex-row justify-between mb-5'>
+          <div className='flex flex-row justify-between mb-6'>
             <LeftOutlined
-              className='text-2xl cursor-pointer'
+              className='text-base cursor-pointer'
               onClick={() => {
                 setPage(PAGE_ROUTER.HOME_PAGE);
                 setCurrentProposalData(null);
@@ -154,7 +154,7 @@ const Voting: React.FC<Props> = ({
               }}
             />
             <span
-              className='underline font-bold cursor-pointer text-base'
+              className='underline font-medium cursor-pointer text-xs'
               onClick={() => {
                 openWorkflowPage(
                   org_id,
@@ -167,26 +167,26 @@ const Voting: React.FC<Props> = ({
               Open workflow page
             </span>
           </div>
-          <div className='mb-4'>
+          <div className='mb-3'>
             <MissionStatusTag user={user} mission={currentProposalData} />
           </div>
           <div>
             <p
-              onClick={() => {
-                openMissionPage(org_id, mission_id);
-              }}
-              className='w-full mb-3 text-xl cursor-pointer text-gray-700 font-bold'
+              // onClick={() => {
+              //   openMissionPage(org_id, mission_id);
+              // }}
+              className='w-full pl-1 mb-3 text-xl cursor-pointer text-gray-700 font-bold'
             >
               {shortenString(currentProposalData?.m_title)}
-              <ExportOutlined className='ml-1' />
+              {/* <ExportOutlined className='ml-1' /> */}
             </p>
-            <div className='text-xs text-gray-6'>
+            <div className='text-xs pl-1 text-gray-500 font-medium'>
               {moment(created_at).format('MMM DD, YYYY h:mm A')} &bull;{' '}
               {shortenString(author_full_name, 15)}
             </div>
           </div>
         </div>
-        <div className='mb-3 flex flex-col gap-6'>
+        <div className='mb-3 flex flex-col gap-3'>
           {historyItems.map((item: any, index: number) => {
             lastPhase = index !== 0 ? historyItems[index - 1].phase : '';
             return (

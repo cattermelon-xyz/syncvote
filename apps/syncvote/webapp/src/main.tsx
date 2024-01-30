@@ -22,12 +22,12 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#5D23BB',
-            colorLink: '#5D23BB',
+            colorPrimary: '#6200EE',
+            colorLink: '#6200EE',
             colorSuccessBg: '#EAF6EE',
             colorSuccessText: '#29A259',
-            colorTextDisabled: '#BDA5E3',
-            colorBgContainerDisabled: '#F4F0FA',
+            colorTextDisabled: '#BBBBBA',
+            colorBgContainerDisabled: '#F6F6F6',
           },
         }}
       >
