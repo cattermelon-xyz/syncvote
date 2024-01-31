@@ -1,6 +1,5 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { useSDK } from '@metamask/sdk-react';
 import { Log, ethers } from 'ethers';
 import { Card, Button, Radio, Input } from 'antd';
 import { IVoteUIWebProps } from 'directed-graph';
@@ -12,7 +11,9 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { connected } = useSDK();
+  // const { connected } = useSDK();
+  // TODO: check if connected
+  const connected = true;
 
   return (
     <div>
@@ -35,9 +36,14 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               loading={loading}
               disabled={title ? false : true}
               onClick={async () => {
-                if (window.ethereum) {
+                const anyWindow = window as any;
+                if (anyWindow.ethereum) {
                   setLoading(true);
-                  const provider = new ethers.BrowserProvider(window.ethereum);
+
+                  const provider = new ethers.BrowserProvider(
+                    anyWindow.ethereum
+                  );
+
                   const signer = await provider.getSigner();
                   console.log(checkpointData?.data.governor);
 
@@ -46,7 +52,8 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     ABI_GOVERNOR,
                     signer
                   );
-                  const addressArray = await window.ethereum.request({
+
+                  const addressArray = await anyWindow.ethereum.request({
                     method: 'eth_requestAccounts',
                   });
 
@@ -56,6 +63,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     ['0x'],
                     title
                   );
+                  
                   const signature = await tx.wait();
 
                   const new_tx = await provider.getTransactionReceipt(
