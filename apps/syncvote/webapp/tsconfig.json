@@ -23,12 +23,17 @@
       "@assets": ["/assets/*"],
       "@stores": ["/stores/*"],
       "@utils": ["/utils/*"],
-      "@constants": ["/constants/*"],
+      "@constants": ["/constants/*"]
       // "@types": ["/types","/types/*"],
     },
     "types": ["node"]
   },
-  "include": ["src", "types/@ckeditor", "deprecated_src/pages/Authentication/creator.tsx", "checkImports.cjs"],
+  "include": [
+    "src",
+    "types/@ckeditor",
+    "deprecated_src/pages/Authentication/creator.tsx",
+    "checkImports.cjs"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"
