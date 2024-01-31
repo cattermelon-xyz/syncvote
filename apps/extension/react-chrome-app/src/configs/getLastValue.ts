@@ -34,3 +34,11 @@ export async function getLastOrgId(): Promise<string> {
 
   return lastOrgId !== null ? lastOrgId : '';
 }
+
+export async function getLastWorkflowId(): Promise<string> {
+  const lastWorkflowId = (
+    await chrome.storage.sync.get(chromeStorageKeys.lastWorkflowId)
+  )[chromeStorageKeys.lastWorkflowId];
+
+  return lastWorkflowId !== null ? lastWorkflowId : '';
+}

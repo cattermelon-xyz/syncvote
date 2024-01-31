@@ -1,0 +1,10 @@
+{
+  "name": "syncvote-wallet",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "peerDependencies": {
+    "antd": "^4.16.13"
+  }
+}

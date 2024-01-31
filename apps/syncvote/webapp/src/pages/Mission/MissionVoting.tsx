@@ -19,6 +19,7 @@ import HistoryOfCheckpoint from './fragments/HistoryOfCheckpoint';
 import HeaderEditorPage from '@layout/fragments/HeaderEditorPage';
 import { AuthContext } from '@layout/context/AuthContext';
 import ModalConnectWallet from './fragments/ModalConnectWallet';
+import { ConnectModal, disconnectWallet, getAccount } from 'syncvote-wallet';
 export function isExternalProvider(
   provider: any
 ): provider is ExternalProvider {
@@ -265,8 +266,7 @@ const MissionVoting = () => {
   const [missionData, setMissionData] = useState<any>();
   const [openModalListParticipants, setOpenModalListParticipants] =
     useState<boolean>(false);
-  const [openModalConnectWallet, setOpenModalConnectWallet] =
-    useState<boolean>(true);
+
   const [historicalCheckpointData, setHistoricalCheckpointData] =
     useState<any>();
   const { currentCheckpointData, listVersionDocs } = missionData
@@ -280,29 +280,11 @@ const MissionVoting = () => {
     configInfo: config.queryUserById,
   }).data;
 
-  // =============================== METAMASK SECTION ===============================
-  const [account, setAccount] = useState<any>();
-  const { sdk } = useSDK();
+  const [account, setAccount] = useState<any>(getAccount());
 
-  const connect = async () => {
-    try {
-      console.log(sdk);
-      const accounts = await sdk?.connect();
-
-      if (Array.isArray(accounts) && accounts.length > 0) {
-        setAccount(accounts[0]);
-        console.log(accounts[0]);
-      }
-    } catch (err) {
-      console.warn(`failed to connect..`, err);
-    }
-  };
-
-  const disconnect = async () => {
-    sdk?.terminate();
-    setAccount('');
-  };
-  // =============================== METAMASK SECTION ===============================
+  const [openModalConnectWallet, setOpenModalConnectWallet] = useState<boolean>(
+    account ? false : true
+  );
 
   const fetchData = () => {
     queryAMissionDetail({
@@ -366,9 +348,7 @@ const MissionVoting = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log('account', account);
-  }, [account]);
+  useEffect(() => {});
 
   // TODO: change to PDA-style design to query all docs version
 
@@ -382,8 +362,27 @@ const MissionVoting = () => {
       };
     }
   );
+
+  const [openConnectModal, setOpenConnectModal] = useState(false);
+
+  useEffect(() => {
+    const anyWindow = window as any;
+
+    anyWindow.ethereum?.on('accountsChanged', (accounts: any) => {
+      console.log('accounts changed: ', accounts);
+      disconnectWallet();
+      setAccount(getAccount());
+    });
+  });
+
   return (
     <>
+      <ConnectModal
+        account={account}
+        setAccount={setAccount}
+        open={openConnectModal}
+        onCancel={() => setOpenConnectModal(false)}
+      />
       <AuthContext.Consumer>
         {({ session }) => (
           <div className='flex flex-col w-full items-center gap-10'>
@@ -411,7 +410,10 @@ const MissionVoting = () => {
             <ModalConnectWallet
               open={openModalConnectWallet}
               onClose={() => setOpenModalConnectWallet(false)}
-              setAccount={setAccount}
+              onOpen={() => {
+                setOpenModalConnectWallet(false);
+                setOpenConnectModal(true);
+              }}
             />
           </div>
         )}

@@ -1,14 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, Button, Radio } from 'antd';
 import { VM_TYPE } from '@utils/constants/votemachine';
 import { getVoteMachine } from 'directed-graph';
-// =============================== METAMASK SECTION ===============================
-import { isExternalProvider } from '../MissionVotingDetail';
-import { Web3Provider } from '@ethersproject/providers';
-import moment from 'moment';
-import { supabase } from 'utils';
-import Client from '@snapshot-labs/snapshot.js/dist/sign';
-// =============================== METAMASK SECTION ===============================
 
 interface Props {
   currentCheckpointData: any;

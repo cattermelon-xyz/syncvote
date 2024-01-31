@@ -3,8 +3,9 @@ const path = require('path');
 const autoprefixer = require('autoprefixer');
 const tailwindcss = require('tailwindcss');
 const Dotenv = require('dotenv-webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-console.log('in webpack.config.js');
+console.log('start building ...');
 console.log('output path: ', path.resolve(__dirname, '..', 'chrome-extension'));
 module.exports = {
   entry: {
@@ -44,7 +45,18 @@ module.exports = {
       },
     ],
   },
-  plugins: [new Dotenv()],
+  plugins: [
+    new Dotenv(),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'src/assets/img',
+          to: 'img',
+          force: true,
+        },
+      ],
+    }),
+  ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {

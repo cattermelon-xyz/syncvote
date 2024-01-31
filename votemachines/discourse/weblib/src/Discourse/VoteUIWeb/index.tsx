@@ -117,7 +117,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '60vh',
+                            '65vh',
                             editor.editing.view.document.getRoot()
                           );
                         });

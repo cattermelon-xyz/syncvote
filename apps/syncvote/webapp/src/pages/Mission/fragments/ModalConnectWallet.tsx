@@ -8,25 +8,12 @@ import { useSDK } from '@metamask/sdk-react';
 interface Props {
   open: boolean;
   onClose: () => void;
-  setAccount?: any;
+  onOpen: () => void;
 }
 
-const ModalConnectWallet: React.FC<Props> = ({ open, onClose, setAccount }) => {
-  const { sdk } = useSDK();
+const ModalConnectWallet: React.FC<Props> = ({ open, onClose, onOpen }) => {
   const handleConnect = async () => {
-    try {
-      console.log(sdk);
-      const accounts = await sdk?.connect();
-
-      if (Array.isArray(accounts) && accounts.length > 0) {
-        setAccount(accounts[0]);
-        console.log(accounts[0]);
-      }
-    } catch (err) {
-      console.warn(`failed to connect..`, err);
-    }
-
-    onClose();
+    onOpen();
   };
 
   return (

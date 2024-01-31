@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import { resetLastProposalId } from '../utils';
 import { queryOrgs } from '@data/org';
 import moment from 'moment';
+import Loading from './Loading';
+import NoProposal from '@components/NoProposal';
 
 interface Props {
   setPage: any;
@@ -39,12 +41,13 @@ const HomePage: React.FC<Props> = ({
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && user !== -1) {
       // TODO: useCallback to solve infinite loop
       // setLoading(true);
       queryOrgs({
         params: { userId: user.id },
         onSuccess: (data) => {
+          setLoading(false);
           const sortedData = data.sort((a: any, b: any) => {
             return (
               moment(a.last_updated).unix() - moment(b.last_updated).unix()
@@ -61,7 +64,6 @@ const HomePage: React.FC<Props> = ({
           );
           setOrgsOption(handleDataOrgs);
           setDataOrgs(data);
-          setLoading(false);
         },
         onError: (error) => {
           console.log('error', error);
@@ -88,7 +90,7 @@ const HomePage: React.FC<Props> = ({
               />
             ))
           ) : (
-            <Empty />
+            <NoProposal className='mt-10' />
           )}
         </div>
       ),
@@ -109,7 +111,7 @@ const HomePage: React.FC<Props> = ({
               />
             ))
           ) : (
-            <Empty />
+            <NoProposal className='mt-10' />
           )}
         </div>
       ),
@@ -134,7 +136,7 @@ const HomePage: React.FC<Props> = ({
   };
   return (
     <>
-      {orgsOption && (
+      {orgsOption ? (
         <>
           <div className='flex flex-row justify-between mb-6 items-center'>
             <Select
@@ -173,6 +175,8 @@ const HomePage: React.FC<Props> = ({
             tabBarStyle={{ color: '#898989' }}
           />
         </>
+      ) : (
+        <Loading />
       )}
     </>
   );
