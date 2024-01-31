@@ -412,6 +412,8 @@ const MissionVotingDetail = () => {
   return (
     <>
       <ConnectModal
+        account={account}
+        setAccount={setAccount}
         open={openConnectModal}
         onCancel={() => setOpenConnectModal(false)}
       />

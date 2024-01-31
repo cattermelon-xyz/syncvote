@@ -39,9 +39,11 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 const anyWindow = window as any;
                 if (anyWindow.ethereum) {
                   setLoading(true);
+
                   const provider = new ethers.BrowserProvider(
                     anyWindow.ethereum
                   );
+
                   const signer = await provider.getSigner();
                   console.log(checkpointData?.data.governor);
 
@@ -61,6 +63,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     ['0x'],
                     title
                   );
+                  
                   const signature = await tx.wait();
 
                   const new_tx = await provider.getTransactionReceipt(

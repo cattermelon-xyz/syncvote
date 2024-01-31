@@ -20,19 +20,20 @@ export const getAccount = () => {
 };
 
 export const disconnect = async () => {
-  async () => {
-    const anyWindow = window as any;
-    const chain = getValue('chain');
-    switch (chain) {
-      case 'ethereum':
-        // TODO: disconnect from ethereum
-        break;
-      case 'solana':
-        anyWindow.phantom.solana?.disconnect();
-        break;
-      default:
-    }
-  };
+  const anyWindow = window as any;
+  const chain = getValue('chain');
+  console.log('Disconnect', chain);
+
+  switch (chain) {
+    case 'ethereum':
+      // TODO: disconnect from ethereum
+      break;
+    case 'solana':
+      console.log('disconnect', anyWindow.phantom.solana);
+      await anyWindow.phantom.solana?.disconnect();
+      break;
+    default:
+  }
 };
 
 export const disconnectWallet = () => {
