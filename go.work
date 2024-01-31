@@ -1,7 +1,7 @@
-go 1.21.0
+go 1.23
 
 use (
-    ./apps/syncvote/service
+    ./apps/syncvote/service/go
 	./votemachines/polling/web2
 	./votemachines/singlevote/web2
 )

@@ -1,5 +1,5 @@
 import { GraphViewMode, IToken } from '../../interface';
-import { Select, Space } from 'antd';
+import { Alert, Select, Space } from 'antd';
 import AllowedByIdentity from './fragment/AllowedByIdentity';
 import AllowedByToken from './fragment/AllowedByToken';
 import { useContext } from 'react';
@@ -7,6 +7,18 @@ import { GraphPanelContext } from '../../context';
 import { FiUserCheck } from 'react-icons/fi';
 import { TbAtom } from 'react-icons/tb';
 import CollapsiblePanel from '../../components/CollapsiblePanel';
+import { HighlightOutlined, WarningOutlined } from '@ant-design/icons';
+
+const isAuthorOnly = (participation: any) => {
+  if (
+    participation?.type === 'identity' &&
+    participation?.data?.length === 1 &&
+    participation?.data[0] === 'proposer'
+  ) {
+    return true;
+  }
+  return false;
+};
 
 const VotingPartipation = () => {
   const {
@@ -15,26 +27,43 @@ const VotingPartipation = () => {
     onChange,
     viewMode,
   } = useContext(GraphPanelContext);
-  const selectedNode = allData.checkpoints?.find(
+  const allCheckPoints = allData.checkpoints ? [...allData.checkpoints] : [];
+  allData.subWorkflows?.map((sw: any) => {
+    sw.checkpoints?.map((chk: any) => {
+      allCheckPoints.push({ ...chk, subWorkflowId: sw.refId });
+    });
+  });
+  const selectedNode = allCheckPoints?.find(
     (chk: any) => chk.id === selectedNodeId
   );
   const participation = selectedNode?.participation || {};
   const type = participation?.type;
   const data = participation?.data;
+
   const identity = type === 'identity' && data ? (data as string[]) : [];
   const tokenData = type === 'token' && data ? (data as IToken) : {};
   return (
     <Space direction='vertical' size='small' className='w-full'>
       <Select
         disabled={!(viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION)}
-        value={type}
+        value={isAuthorOnly(participation) ? 'author' : type}
         style={{ width: '100%' }}
         onChange={(value) => {
-          onChange({
-            participation: {
-              type: value,
-            },
-          });
+          if (value === 'author') {
+            onChange({
+              participation: {
+                type: 'identity',
+                data: ['proposer'],
+              },
+            });
+            return;
+          } else {
+            onChange({
+              participation: {
+                type: value,
+              },
+            });
+          }
         }}
         options={[
           {
@@ -42,26 +71,45 @@ const VotingPartipation = () => {
             label: (
               <div className='flex items-center'>
                 <FiUserCheck className='mr-2' />
-                Custom
+                List of email or public key
               </div>
             ),
             value: 'identity',
           },
-          // choosing this option would engage Votemachine
+          {
+            key: 'author',
+            value: 'author',
+            label: (
+              <div className='flex items-center'>
+                <HighlightOutlined className='mr-2' />
+                Author Only
+              </div>
+            ),
+          }, // choosing this option would engage Votemachine
           {
             key: 'token',
             label: (
-              <div className='flex items-center'>
+              <div className='flex items-center line-through'>
                 <TbAtom className='mr-2' />
-                Token/NFT holder
+                Token/NFT holder (Deprecated Soon)
               </div>
             ),
             value: 'token',
           },
+          {
+            key: 'all',
+            value: 'all',
+            label: (
+              <div className='flex items-center'>
+                <HighlightOutlined className='mr-2' />
+                Everyone can vote
+              </div>
+            ),
+          },
         ]}
       />
       {type ? <div className='py-1'>{/* <hr /> */}</div> : null}
-      {type === 'identity' ? (
+      {type === 'identity' && isAuthorOnly(participation) === false ? (
         <AllowedByIdentity
           editable={viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION || false}
           identity={identity}
@@ -102,6 +150,13 @@ const VotingPartipation = () => {
               },
             });
           }}
+        />
+      ) : null}
+      {isAuthorOnly(participation) ? (
+        <Alert
+          type='warning'
+          message='Only Author of the Proposal can participate in this activity'
+          showIcon
         />
       ) : null}
     </Space>

@@ -3,6 +3,11 @@ const { Veto } = require('./Veto');
 const { UpVote } = require('./Upvote');
 const { SingleVote } = require('./SingleVote');
 const { DocInput } = require('./DocInput');
+const { Discourse } = require('./Discourse');
+const { Snapshot } = require('./Snapshot');
+const { Tally } = require('./Tally');
+const { Realms } = require('./Realms');
+
 
 class VoteMachineController {
   constructor(props) {
@@ -12,14 +17,20 @@ class VoteMachineController {
       UpVote: new UpVote(props),
       SingleChoiceRaceToMax: new SingleVote(props),
       DocInput: new DocInput(props),
+      Discourse: new Discourse(props),
+      Snapshot: new Snapshot(props),
+      Tally: new Tally(props),
+      Realms: new Realms(props),
     };
     this.vote_machine_type = props.vote_machine_type;
+    this.id = props.id;
   }
-  
+
   initDataForCVD() {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].initDataForCVD();
     } else {
+      console.log('Debug initDataForCVD', this.vote_machine_type, this.id);
       throw new Error(`Invalid data`);
     }
   }
@@ -28,11 +39,12 @@ class VoteMachineController {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].fallBack();
     } else {
+      console.log('Debug fallBack', this.vote_machine_type, this.id);
       throw new Error(`Invalid data`);
     }
   }
 
-  recordVote(voteData) {
+  async recordVote(voteData) {
     if (this.votingTypes[this.vote_machine_type]) {
       return this.votingTypes[this.vote_machine_type].recordVote(voteData);
     } else {

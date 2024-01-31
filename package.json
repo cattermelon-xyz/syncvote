@@ -12,6 +12,11 @@
     "votemachines/upvote/weblib",
     "votemachines/veto/weblib",
     "votemachines/docinput/weblib",
-    "utils"
+    "votemachines/snapshot/weblib",
+    "votemachines/discourse/weblib",
+    "votemachines/tally/weblib",
+    "votemachines/realms/weblib",
+    "utils",
+    "apps/extension/react-chrome-app"
   ]
 }

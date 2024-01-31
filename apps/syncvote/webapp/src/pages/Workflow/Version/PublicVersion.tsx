@@ -3,7 +3,7 @@ import {
   FullscreenExitOutlined,
   FullscreenOutlined,
 } from '@ant-design/icons';
-import { GrDocumentText } from 'react-icons/gr';
+import { GrDocumentText, GrOverview } from 'react-icons/gr';
 import parse from 'html-react-parser';
 import { DirectedGraph, emptyStage } from 'directed-graph';
 import {
@@ -45,8 +45,15 @@ import PublicPageRedirect from '@middleware/logic/publicPageRedirect';
 import './public-version.scss';
 import { config } from '@dal/config';
 import LogoSyncVoteShort from '@assets/icons/svg-icons/LogoSyncVoteShort';
+import { CreateProposalModal } from '@fragments/CreateProposalModal';
+import PhaseDrawer from './fragment/PhaseDrawer';
 
 export const PublicVersion = () => {
+  const [searchParams, setSearchParams] = useSearchParams('');
+  const urlSelectedCheckPointId =
+    searchParams.get('cp') !== '' && searchParams.get('cp') !== 'overview'
+      ? searchParams.get('cp')
+      : '';
   const { orgIdString, workflowIdString, versionIdString } = useParams();
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
@@ -60,7 +67,9 @@ export const PublicVersion = () => {
   const [org, setOrg] = useState<any>();
   const [profile, setProfile] = useState<any>();
   const [session, setSession] = useState<Session | null>(null);
-  const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [selectedNodeId, setSelectedNodeId] = useState(
+    urlSelectedCheckPointId || ''
+  );
   const [selectedEdgeId, setSelectedEdgeId] = useState('');
   const [dataHasChanged, setDataHasChanged] = useState(false);
   const [rightSiderStatus, setRSiderStatus] = useState('description');
@@ -76,8 +85,6 @@ export const PublicVersion = () => {
     setSession(_session);
     setShowRegisterInvitation(_session?.user?.user_metadata ? false : true);
   };
-  const [searchParams, setSearchParams] = useSearchParams('');
-  console.log(searchParams);
 
   const diagramFullScreen =
     searchParams.get('view') === 'not-full' ? false : true;
@@ -182,10 +189,30 @@ export const PublicVersion = () => {
   };
 
   const isDesktop = window.innerWidth > 700;
+  const [openCreateProposalModal, setOpenCreateProposalModal] = useState(false);
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
+  const [isPhaseDrawerShown, setIsPhaseDrawerShown] = useState(
+    searchParams.get('cp') === 'overview'
+  );
   return (
     <>
       {contextHolder}
+      <PhaseDrawer
+        workflow={workflow}
+        shown={isPhaseDrawerShown}
+        setShown={setIsPhaseDrawerShown}
+      />
       <Layout>
+        <CreateProposalModal
+          open={openCreateProposalModal}
+          onCancel={() => {
+            setOpenCreateProposalModal(false);
+          }}
+          workflow={workflow}
+          workflowVersion={version}
+        />
         {version?.status === 'PUBLISHED' ||
         version?.status === 'PUBLIC_COMMUNITY' ||
         (version?.status === 'DRAFT' &&
@@ -239,8 +266,17 @@ export const PublicVersion = () => {
                     size='large'
                   />
                   <Space direction='vertical' className='w-full'>
-                    <p className='text-[17px] font-normal items-left w-full text-ellipsis overflow-hidden whitespace-nowrap'>
-                      {worflowInfo?.workflow}
+                    <p className='text-[17px] font-normal items-left w-full text-ellipsis overflow-hidden whitespace-nowrap flex items-center gap-2'>
+                      <div>{worflowInfo?.workflow}</div>
+                      <div>
+                        <Button
+                          type='link'
+                          icon={<GrOverview />}
+                          onClick={() => {
+                            setIsPhaseDrawerShown(true);
+                          }}
+                        />
+                      </div>
                     </p>
                     <Space direction='horizontal'>
                       <div className='flex items-center text-[13px] text-ellipsis overflow-hidden whitespace-nowrap'>
@@ -392,6 +428,16 @@ export const PublicVersion = () => {
                   selectedLayoutId={
                     version?.data?.cosmetic?.defaultLayout?.horizontal
                   }
+                  openCreateProposalModal={() => {
+                    if (user.email) {
+                      setOpenCreateProposalModal(true);
+                    } else {
+                      Modal.error({
+                        title: 'Login required',
+                        content: 'Please login to create proposal',
+                      });
+                    }
+                  }}
                   onConfigEdgePanelClose={() => setSelectedEdgeId('')}
                   setExportImage={setDownloadImageStatus}
                   shouldExportImage={downloadImageStatus}

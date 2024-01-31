@@ -71,9 +71,9 @@ const DocsConfigPanel = ({
         }}
         title={id === '' ? 'New Document' : 'Edit'}
       >
-        <Space direction='vertical' size='middle'>
+        <Space direction='vertical' size='middle' className='w-full'>
           <Input value={title} onChange={(e) => setTitle(e.target.value)} />
-          <Space direction='vertical' size='small'>
+          <Space direction='vertical' size='small' className='w-full'>
             <div className='text-gray-400 font-bold'>
               Guideline & Description
             </div>
@@ -84,7 +84,7 @@ const DocsConfigPanel = ({
               }}
             />
           </Space>
-          <Space direction='vertical' size='small'>
+          <Space direction='vertical' size='small' className='w-full'>
             <div className='text-gray-400 font-bold'>Template</div>
             <TextEditor
               value={template}

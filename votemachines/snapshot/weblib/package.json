@@ -1,5 +1,5 @@
 {
-  "name": "single-vote",
+  "name": "snapshot",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -21,7 +21,8 @@
     "tailwindcss": "3.2.7",
     "postcss": "8.4.21",
     "autoprefixer": "10.4.13",
-    "@snapshot-labs/snapshot.js": "^0.8.1"
+    "@snapshot-labs/snapshot.js": "^0.8.1",
+    "@ethersproject/providers": "^5.7.2"
   },
   "peerDependencies": {
     "react": "^18.2.0",

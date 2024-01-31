@@ -1,0 +1,8 @@
+content.js
+popup.js
+background.js
+547.js
+*.content.js
+*.popup.js
+*.background.js
+*.LICENSE.txt

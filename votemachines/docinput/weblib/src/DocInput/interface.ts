@@ -15,6 +15,7 @@ export namespace DocInput {
     //eslint-disable-line
     options: string[];
     docs: IDoc[];
+    variables: string[];
   }
 
   export interface IOption {

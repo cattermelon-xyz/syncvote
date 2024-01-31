@@ -8,6 +8,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 local.code-workspace
 .vscode/local.code-workspace
+*-lock.json
 # OS 
 .DS_Store
 

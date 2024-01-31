@@ -199,6 +199,7 @@ const Detail = () => {
             data={versionData}
             selectedLayoutId={versionData?.cosmetic?.defaultLayout?.horizontal}
             className={loading ? 'opacity-0' : ''}
+            shouldFitView={true}
           />
           <Skeleton
             active
@@ -218,7 +219,11 @@ const Detail = () => {
               <div className='font-bold text-md'>Tags</div>
               <div className='flex flex-wrap'>
                 {tags.length > 0 ? (
-                  tags.map((tag: any) => <Tag key={tag.id} className='mb-2'>{tag.label}</Tag>)
+                  tags.map((tag: any) => (
+                    <Tag key={tag.id} className='mb-2'>
+                      {tag.label}
+                    </Tag>
+                  ))
                 ) : (
                   <span className='text-neutral-500'>No tags available</span>
                 )}

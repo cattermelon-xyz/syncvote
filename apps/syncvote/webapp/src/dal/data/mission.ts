@@ -37,6 +37,7 @@ export class MissionFunctionClass {
       const { data, error } = await supabase
         .from('mission_view')
         .select('*')
+        .neq('title', '')
         .in('org_id', orgIds);
 
       // TODO: check if data is correct
@@ -114,6 +115,7 @@ export const queryAMissionDetail = async ({
     .from('mission_vote_details')
     .select('*')
     .eq('mission_id', missionId);
+  console.log('from dal/mission.ts: ', data, missionId);
   if (!error) {
     const { data: dataVoteRecords, error: errorVoteRecord } = await supabase
       .from('vote_record')
@@ -139,6 +141,16 @@ export const queryAMissionDetail = async ({
       );
 
       const dataMissionAfterHandle = data[0];
+      dataMissionAfterHandle.author_icon_url =
+        dataMissionAfterHandle.author_icon_url
+          ? dataMissionAfterHandle.author_icon_url
+          : `preset:${dataMissionAfterHandle.author_preset_icon_url}`;
+      dataMissionAfterHandle.workflow_icon_url =
+        dataMissionAfterHandle.workflow_icon_url
+          ? dataMissionAfterHandle.workflow_icon_url
+          : `preset:${dataMissionAfterHandle.workflow_preset_icon_url}`;
+      delete dataMissionAfterHandle.author_preset_icon_url;
+      delete dataMissionAfterHandle.workflow_preset_icon_url;
       dataMissionAfterHandle.vote_record = voteRecords;
       dataMissionAfterHandle.progress = progress;
       onSuccess(dataMissionAfterHandle);
@@ -168,6 +180,7 @@ export const queryMission = async ({
   const { data, error } = await supabase
     .from('mission_view')
     .select('*')
+    .neq('title', '')
     .in('org_id', orgIds);
 
   if (data) {
@@ -182,6 +195,10 @@ export const queryMission = async ({
         ? d.mission_icon_url
         : `preset:${d.mission_preset_icon_url}`;
 
+      newd.author_icon_url = d.author_icon_url
+        ? d.author_icon_url
+        : `preset:${d.author_preset_icon_url}`;
+
       const orgPresetIcon = d?.org_preset_icon_url
         ? `preset:${d?.org_preset_icon_url}`
         : d?.preset_icon_url;
@@ -191,6 +208,7 @@ export const queryMission = async ({
       delete newd.org_preset_icon_url;
       delete newd.mission_preset_icon_url;
       delete newd.preset_banner_url;
+      delete newd.author_preset_icon_url;
       newMissions.push(newd);
     }
 

@@ -30,7 +30,8 @@ export const validateWorkflow = ({
   } else {
     if (
       checkPoint?.participation === undefined ||
-      checkPoint?.participation?.data === undefined
+      (checkPoint?.participation?.data === undefined &&
+        checkPoint?.participation.type !== 'all')
     ) {
       isValid = false;
       message.push('Missing voting participation condition');
@@ -84,7 +85,13 @@ const ContextTab = () => {
     onChangeLayout,
     onDelete,
   } = useContext(GraphPanelContext);
-  const selectedNode = data.checkpoints?.find(
+  const allCheckPoints = data.checkpoints ? [...data.checkpoints] : [];
+  data.subWorkflows?.map((sw: any) => {
+    sw.checkpoints?.map((chk: any) => {
+      allCheckPoints.push({ ...chk, subWorkflowId: sw.refId });
+    });
+  });
+  const selectedNode = allCheckPoints.find(
     (chk: any) => chk.id === selectedNodeId
   );
   const selectedLayout = data.cosmetic?.layouts?.find(

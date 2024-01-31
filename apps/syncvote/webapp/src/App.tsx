@@ -9,7 +9,10 @@ import { Polling } from 'polling';
 import { Veto } from 'veto';
 import { UpVote } from 'upvote';
 import { DocInput } from 'doc-input';
-import { Snapshot } from '../../../../votemachines/snapshot/weblib/index';
+import { Snapshot } from 'snapshot';
+import { Discourse } from 'discourse';
+import { Tally } from 'tally-xyz';
+import { Realms } from 'realms-solana';
 import { AuthContext } from '@layout/context/AuthContext';
 
 function App({ layout }: { layout: any }) {
@@ -25,6 +28,9 @@ function App({ layout }: { layout: any }) {
     registerVoteMachine(UpVote);
     registerVoteMachine(DocInput);
     registerVoteMachine(Snapshot);
+    registerVoteMachine(Discourse);
+    registerVoteMachine(Tally);
+    registerVoteMachine(Realms);
   }, [session]);
 
   const Layout: any = layout;

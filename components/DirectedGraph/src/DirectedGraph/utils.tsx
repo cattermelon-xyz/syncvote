@@ -1,4 +1,5 @@
 import { ClockCircleOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 export const displayDelayDuration = (duration: moment.Duration) => {
   const years =
@@ -69,4 +70,35 @@ export const displayDuration = (duration: moment.Duration) => {
         } `;
   const drt = years + months + days + hours + minutes + seconds;
   return drt ? drt : '0 seconds';
+};
+
+export const shortenString = (str: string, maxLength: number = 30) => {
+  if (!str || str.length <= maxLength) {
+    return str;
+  }
+  return str.substring(0, maxLength) + '...';
+};
+
+export const replaceVariables = async (
+  template: string,
+  variables: any,
+  onSuccess: any
+) => {
+  let result = template;
+  Object.keys(variables).forEach(async (key) => {
+    if (variables[key]) {
+      const v = variables[key];
+      result = result.replace(`{{${key}}}`, v);
+      const regex = new RegExp(`{{${key}.\\w*}}`, 'g');
+      const matches = result.matchAll(regex);
+      for (const match of matches) {
+        const _key = match[0].replace('{{', '').replace('}}', '').split('.')[1];
+        await axios.get(v).then((res) => {
+          result = result.replace(match[0], res.data[_key]);
+        });
+      }
+    }
+    onSuccess(result);
+  });
+  return result;
 };

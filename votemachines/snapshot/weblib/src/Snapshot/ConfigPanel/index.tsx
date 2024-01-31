@@ -1,19 +1,21 @@
 import { Space, Switch, Button, Alert, Input, Popover, Select } from 'antd';
-import { useState } from 'react';
-import { ICheckPoint, IVoteMachineConfigProps } from 'directed-graph';
+import { useContext, useEffect, useState } from 'react';
 import {
-  DelayUnit,
+  GraphContext,
+  ICheckPoint,
+  IVoteMachineConfigProps,
+} from 'directed-graph';
+import {
   NavConfigPanel,
   INavPanelNode,
   CollapsiblePanel,
   SideNote,
-  ResultCalculator,
 } from 'directed-graph';
-import NewOptionDrawer from './NewOptionDrawer';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import '../styles.scss';
-import { Snapshot as Interface } from '../interface';
 import { MdHelpOutline } from 'react-icons/md';
+import moment from 'moment';
+import { TextEditor } from 'rich-text-editor';
 
 /**
  *
@@ -31,75 +33,151 @@ export default (props: IVoteMachineConfigProps) => {
   // optionsDescription: '',
   const {
     currentNodeId = '',
-    votingPowerProvider = '',
-    whitelist = [], //eslint-disable-line
     data = {
-      max: 0,
-      token: '', // spl token
       options: [],
+      snapShotOption: [],
       space: '',
-      type: '',
+      type: 'single-choice',
+      next: '',
+      fallback: '',
+      action: 'create-proposal',
+      proposalId: '',
+      snapshotDuration: 0,
+      template: '',
+      snapshotIdToSync: '',
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
     allNodes = [], //eslint-disable-line
-    includedAbstain,
-    quorum,
     optionsDescription,
-    resultDescription,
   } = props;
 
-  const { max, token, options } = data;
-  const delays = props.delays || Array(options?.length).fill(0);
-  const delayUnits =
-    props.delayUnits || Array(options?.length).fill(DelayUnit.MINUTE);
-  const delayNotes = props.delayNotes || Array(options?.length).fill('');
+  const {
+    fallback,
+    next,
+    action,
+    snapShotOption,
+    snapshotDuration,
+    snapshotIdToSync,
+  } = data;
+  const delays = props.delays || Array(2).fill(0);
+
+  // Duration snapshot
+  const days = snapshotDuration ? Math.floor(snapshotDuration / 86400) : 0;
+  const hours = snapshotDuration
+    ? Math.floor((snapshotDuration - days * 86400) / 3600)
+    : 0;
+  const mins = snapshotDuration
+    ? Math.floor((snapshotDuration - days * 86400 - hours * 3600) / 60)
+    : 0;
+  const delayUnits = props.delayUnits || Array(2).fill(0);
+  const delayNotes = props.delayNotes || Array(2).fill('');
+
   const posibleOptions: ICheckPoint[] = [];
-  const [showAddOptionDrawer, setShowNewOptionDrawer] = useState(false);
+  const actions = [
+    { label: 'Create Proposal', value: 'create-proposal' },
+    { label: 'Sync Proposal Result', value: 'sync-proposal' },
+  ];
+
+  const fallbackNode = allNodes.find((n) => n.id === fallback);
+  const nextNode = allNodes.find((n) => n.id === next);
+  const posibleNodes = [
+    ...allNodes.filter(
+      (n) => [fallback, next, currentNodeId].indexOf(n.id) === -1
+    ),
+  ];
+  const snapshotNodes = allNodes.filter(
+    (n) =>
+      n.vote_machine_type === 'Snapshot' && n?.data.action === 'create-proposal'
+  );
+
+  const snapshotParents: any[] = [];
+
+  for (let i = 0; i < snapshotNodes.length; i++) {
+    const checkpointSnapshot = { ...snapshotNodes[i] };
+    checkpointSnapshot.label = checkpointSnapshot.title;
+    checkpointSnapshot.value = checkpointSnapshot.id;
+    snapshotParents.push(checkpointSnapshot);
+    console.log(snapshotParents);
+  }
+
+  const changeDelayHandler = (val: any, childIdx: number) => {
+    const { delay, delayUnit, delayNote } = val;
+    delays[childIdx] = delay;
+    delayUnits[childIdx] = delayUnit;
+    delayNotes[childIdx] = delayNote;
+    onChange({
+      delays: structuredClone(delays),
+      delayUnits: structuredClone(delayUnits),
+      delayNotes: structuredClone(delayNotes),
+    });
+  };
+
+  const replaceHandler = (val: any, childIdx: number) => {
+    const { id } = val;
+    const newChildren = [...children];
+    if (childIdx === -1) {
+      newChildren.push(id);
+    } else {
+      newChildren[childIdx] = id;
+    }
+    return newChildren;
+  };
+
+  // fallback and next
   allNodes.forEach((child) => {
     if (child.id !== currentNodeId && !children.includes(child.id)) {
       posibleOptions.push(child);
     }
   });
-  const [newOption, setNewOption] = useState<Interface.IOption>({
-    id: '',
-    title: '',
-    delay: 0,
-    delayUnit: DelayUnit.MINUTE,
-    delayNote: '',
-  });
-  const addNewOptionHandler = (newOptionData: any) => {
-    if (newOptionData.id && newOptionData.title) {
-      const opts = options ? [...options] : [];
-      const chds = children ? [...children] : [];
+
+  const selectOptions = [
+    {
+      label: 'Single Choice',
+      value: 'single-choice',
+    },
+    // {
+    //   label: 'Approval',
+    //   value: 'approval',
+    // },
+    // {
+    //   label: 'Quadratic',
+    //   value: 'quadratic',
+    // },
+    // {
+    //   label: 'Ranked Choice',
+    //   value: 'ranked-choice',
+    // },
+    // {
+    //   label: 'Weighted',
+    //   value: 'weighted',
+    // },
+    // {
+    //   label: 'Basic',
+    //   value: 'basic',
+    // },
+  ];
+
+  const addNewOptionHandlerSnapshot = (newOptionData: any) => {
+    if (newOptionData) {
+      const opts = snapShotOption ? [...snapShotOption] : [];
       onChange({
         data: {
-          options: [...opts, newOptionData.title],
+          ...data,
+          snapShotOption: [...opts, newOptionData],
         },
-        children: [...chds, newOptionData.id],
-        delays: [...delays, newOptionData.delay],
-        delayUnits: [...delayUnits, newOptionData.delayUnit],
-        delayNotes: [...delayNotes, newOptionData.delayNote],
       });
+
+      setInputValue('');
     }
   };
-  const deleteOptionHandler = (index: number) => {
-    onChange({
-      data: {
-        options: [...options.slice(0, index), ...options.slice(index + 1)],
-      },
-      children: [...children.slice(0, index), ...children.slice(index + 1)],
-      delays: [...delays.slice(0, index), ...delays.slice(index + 1)],
-      delayUnits: [
-        ...delayUnits.slice(0, index),
-        ...delayUnits.slice(index + 1),
-      ],
-      delayNotes: [
-        ...delayNotes.slice(0, index),
-        ...delayNotes.slice(index + 1),
-      ],
-    });
-  };
+
+  const [inputValue, setInputValue] = useState('');
+  const { data: graphData } = useContext(GraphContext);
+  const variablesMission = graphData?.variables;
+  const [variablesOption, setVariablesOption] =
+    useState<{ label: string; value: string }[]>();
+
   const changeOptionDelay = (value: any, index: number) => {
     const newDelays = [...delays];
     const newDelayUnits = [...delayUnits];
@@ -113,208 +191,424 @@ export default (props: IVoteMachineConfigProps) => {
       delayNotes: structuredClone(newDelayNotes),
     });
   };
-  const changeOptionLabel = (value: string, index: number) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    onChange({ data: { ...data, options: structuredClone(newOptions) } });
-  };
-  const changeAbstainHandler = (value: boolean) => {
-    onChange({
-      includedAbstain: value,
-    });
-  };
-  const replaceOption = (
-    newOptionData: { id: string; title: string },
-    index: number
-  ) => {
-    if (newOptionData.id && newOptionData.title) {
-      const newOptions = options
-        ? [
-            ...options.slice(0, index),
-            newOptionData.title,
-            ...options.slice(index + 1),
-          ]
-        : [];
-      const newChildren = children
-        ? [
-            ...children.slice(0, index),
-            newOptionData.id,
-            ...children.slice(index + 1),
-          ]
-        : [];
-      onChange({
-        data: {
-          options: structuredClone(newOptions),
-        },
-        children: structuredClone(newChildren),
+
+  useEffect(() => {
+    if (variablesMission) {
+      const optionsData = variablesMission?.map((variables: string) => {
+        return {
+          label: variables,
+          value: variables,
+        };
       });
+      setVariablesOption(optionsData);
     }
-  };
-  const selectOptions = [
-    {
-      label: 'Single Choice',
-      value: 'single-choice',
-    },
-    {
-      label: 'Approval',
-      value: 'approval',
-    },
-    {
-      label: 'Quadratic',
-      value: 'quadratic',
-    },
-    {
-      label: 'Ranked Choice',
-      value: 'ranked-choice',
-    },
-    {
-      label: 'Weighted',
-      value: 'weighted',
-    },
-    {
-      label: 'Basic',
-      value: 'basic',
-    },
-  ];
+  }, [variablesMission]);
 
   return (
     <>
       <Space direction='vertical' size='large' className='w-full single-choice'>
-        {/* <Space direction="vertical" size="small" className="w-full">
-      <div className="bg-slate-100 p-2 w-full">
-        <span className="mr-0.5">Everyone choose ONE option until one option reach</span>
-        {getMaxText()}
-      </div>
-    </Space> */}
-        <CollapsiblePanel title='Options & navigation'>
-          <>
-            <Space
-              direction='horizontal'
-              size='small'
-              className='w-full flex items-center justify-between bg-zinc-100 px-4 py-2 rounded-lg'
-            >
-              <span>Enable abstain options</span>
-              <Space direction='horizontal' size='small'>
-                Yes
-                <Switch
-                  checked={includedAbstain}
-                  onChange={changeAbstainHandler}
-                />
-              </Space>
-            </Space>
-            <hr className='my-2' />
-            <Alert
-              type='success'
-              message='Set up logic for your workflow'
-              description='If option X wins then workflow will navigage to Y checkpoint'
-              closable
-            />
-            <Space direction='vertical' size='small' className='w-full'>
-              {options?.map((option: string, index: number) => {
-                const currentNode = allNodes.find(
-                  (node) => node.id === children[index]
-                );
-                return (
-                  <NavConfigPanel
-                    title={`Option ${index + 1}`}
-                    key={option}
-                    index={index}
-                    navLabel={option}
-                    currentNode={currentNode as INavPanelNode}
-                    changeDelayHandler={changeOptionDelay}
-                    changeLabelHandler={changeOptionLabel}
-                    deleteHandler={deleteOptionHandler}
-                    possibleNodes={posibleOptions as INavPanelNode[]}
-                    replaceHandler={replaceOption}
-                    delay={delays[index] || 0}
-                    delayUnit={delayUnits[index] || 0}
-                    delayNote={delayNotes[index] || ''}
-                  />
-                );
-              })}
-              {includedAbstain ? (
-                <Space
-                  direction='vertical'
-                  className='w-full flex justify-between'
-                >
-                  <span className='text-gray-400'>
-                    Option {options?.length + 1}
-                  </span>
-                  <Input className='w-full' value='Abstain' disabled />
-                </Space>
-              ) : null}
-            </Space>
-            <Button
-              type='link'
-              icon={<PlusOutlined />}
-              className='w-full flex items-center justify-start pl-0 my-2'
-              onClick={() => setShowNewOptionDrawer(true)}
-            >
-              Add a new option & navigation
-            </Button>
-            <NewOptionDrawer
-              showAddOptionDrawer={showAddOptionDrawer}
-              setShowNewOptionDrawer={setShowNewOptionDrawer}
-              newOption={newOption}
-              setNewOption={setNewOption}
-              posibleOptions={posibleOptions}
-              addNewOptionHandler={addNewOptionHandler}
-            />
-            <SideNote
-              value={optionsDescription}
-              setValue={(val: string) => {
+        <CollapsiblePanel title='Action Type'>
+          <Space direction='vertical' size='small' className='w-full'>
+            <Select
+              value={action}
+              className='w-full'
+              options={actions}
+              onChange={(value, option) => {
                 onChange({
-                  optionsDescription: val,
+                  data: {
+                    ...data,
+                    action: value,
+                  },
                 });
               }}
             />
-          </>
+          </Space>
         </CollapsiblePanel>
-        <CollapsiblePanel title='Snapshot Info'>
-          <Space direction='vertical' size='small' className='w-full'>
-            <Space direction='vertical' size='small' className='w-full'>
-              <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Space
-                <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
-                  <MdHelpOutline />
-                </Popover>
-              </div>
-              <Input
-                className='w-full'
-                placeholder='hectagon.eth'
-                value={data.space}
-                onChange={(e: any) => {
+
+        <CollapsiblePanel title='Navigation'>
+          {action === 'create-proposal' ? (
+            <>
+              <Alert
+                type='success'
+                message={
+                  <>
+                    <p>
+                      There are only 2 options "Pass" or "Fail" for user to
+                      choose.
+                    </p>
+                    {/* <p>Note that "Abstain" choices are included in "Quorum"</p> */}
+                  </>
+                }
+              />
+              <Space direction='vertical' size='middle' className='w-full mt-4'>
+                <NavConfigPanel
+                  title='Pass'
+                  currentNode={nextNode}
+                  possibleNodes={posibleNodes}
+                  index={children.indexOf(next || '')}
+                  navLabel='Total votes pass Quorum and Vetos fail Threshold'
+                  delay={nextNode ? delays[children.indexOf(next || '')] : 0}
+                  delayUnit={
+                    nextNode ? delayUnits[children.indexOf(next || '')] : 0
+                  }
+                  delayNote={
+                    nextNode ? delayNotes[children.indexOf(next || '')] : 0
+                  }
+                  changeDelayHandler={changeDelayHandler}
+                  replaceHandler={(val: any, idx: number) => {
+                    onChange({
+                      children: replaceHandler(val, idx),
+                      data: { ...data, next: val.id },
+                    });
+                  }}
+                />
+                <NavConfigPanel
+                  title='Fail'
+                  currentNode={fallbackNode}
+                  possibleNodes={posibleNodes}
+                  index={children.indexOf(fallback || '')}
+                  navLabel='Total votes fail Quorum and/or Vetos pass Threshold'
+                  delay={
+                    fallbackNode ? delays[children.indexOf(fallback || '')] : 0
+                  }
+                  delayUnit={
+                    fallbackNode
+                      ? delayUnits[children.indexOf(fallback || '')]
+                      : 0
+                  }
+                  delayNote={
+                    fallbackNode
+                      ? delayNotes[children.indexOf(fallback || '')]
+                      : 0
+                  }
+                  changeDelayHandler={changeDelayHandler}
+                  replaceHandler={(val: any, idx: number) => {
+                    onChange({
+                      children: replaceHandler(val, idx),
+                      data: { ...data, fallback: val.id },
+                    });
+                  }}
+                />
+                <SideNote
+                  value={optionsDescription}
+                  setValue={(val: string) => {
+                    onChange({
+                      optionsDescription: val,
+                    });
+                  }}
+                />
+              </Space>
+            </>
+          ) : (
+            <>
+              <Alert
+                type='success'
+                message={
+                  <>
+                    <p>
+                      There are many options base on Checkpoint Snapshot Parent.
+                    </p>
+                  </>
+                }
+              />
+              {snapShotOption &&
+                snapShotOption.map((option: any, index: any) => {
+                  const currentNode = allNodes.find(
+                    (node) => node.id === children[index]
+                  );
+                  return (
+                    <>
+                      <NavConfigPanel
+                        title={`Option ${index}`}
+                        key={option}
+                        index={index}
+                        navLabel={option}
+                        currentNode={currentNode as INavPanelNode}
+                        changeDelayHandler={changeOptionDelay}
+                        replaceHandler={(val: any, idx: number) => {
+                          onChange({
+                            children: replaceHandler(val, idx),
+                            data: { ...data, next: val.id },
+                          });
+                        }}
+                        possibleNodes={posibleOptions as INavPanelNode[]}
+                        delay={delays[index] || 0}
+                        delayUnit={delayUnits[index] || 0}
+                        delayNote={delayNotes[index] || ''}
+                      />
+                    </>
+                  );
+                })}
+
+              <NavConfigPanel
+                title='Fail'
+                currentNode={fallbackNode}
+                possibleNodes={posibleNodes}
+                index={children.indexOf(fallback || '')}
+                navLabel='Total votes fail Quorum and/or Vetos pass Threshold'
+                delay={
+                  fallbackNode ? delays[children.indexOf(fallback || '')] : 0
+                }
+                delayUnit={
+                  fallbackNode
+                    ? delayUnits[children.indexOf(fallback || '')]
+                    : 0
+                }
+                delayNote={
+                  fallbackNode
+                    ? delayNotes[children.indexOf(fallback || '')]
+                    : 0
+                }
+                changeDelayHandler={changeDelayHandler}
+                replaceHandler={(val: any, idx: number) => {
                   onChange({
-                    data: {
-                      ...data,
-                      space: e.target.value,
-                    },
+                    children: replaceHandler(val, idx),
+                    data: { ...data, fallback: val.id },
                   });
                 }}
               />
+            </>
+          )}
+        </CollapsiblePanel>
+
+        <CollapsiblePanel title='Snapshot Info'>
+          {action === 'create-proposal' ? (
+            <Space direction='vertical' size='small' className='w-full'>
+              <Space direction='vertical' size='small' className='w-full'>
+                <div className='text-sm text-slate-600 flex items-center gap-2'>
+                  Space
+                  <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
+                    <MdHelpOutline />
+                  </Popover>
+                </div>
+                <Input
+                  className='w-full'
+                  placeholder='hectagon.eth'
+                  value={data.space}
+                  onChange={(e: any) => {
+                    onChange({
+                      data: {
+                        ...data,
+                        space: e.target.value,
+                      },
+                    });
+                  }}
+                />
+              </Space>
+              <Space direction='vertical' size='small' className='w-full'>
+                <div className='text-sm text-slate-600 flex items-center gap-2'>
+                  Votemachine type
+                  <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
+                    <MdHelpOutline />
+                  </Popover>
+                </div>
+                <Select
+                  value={data?.type}
+                  className='w-full'
+                  options={selectOptions}
+                  onChange={(value, option) => {
+                    onChange({
+                      data: {
+                        ...data,
+                        type: value,
+                      },
+                    });
+                  }}
+                />
+              </Space>
+              <Space direction='vertical'>
+                <div className='text-sm text-slate-600 flex items-center gap-2'>
+                  Template
+                </div>
+                <TextEditor
+                  value={data?.template || ''}
+                  setValue={(val: any) => {
+                    onChange({
+                      data: {
+                        ...data,
+                        template: val,
+                      },
+                    });
+                  }}
+                />
+              </Space>
+              <Space direction='vertical'>
+                <div>
+                  {snapshotDuration ? (
+                    <>
+                      apprx.{' '}
+                      {moment.duration(snapshotDuration, 'seconds').humanize()}
+                    </>
+                  ) : (
+                    <span className='text-red-500'>Duration is missing</span>
+                  )}
+                </div>
+                <Space
+                  direction='horizontal'
+                  className='w-full flex justify-between'
+                >
+                  <Input
+                    addonAfter='Days'
+                    value={days}
+                    placeholder='Day'
+                    className='text-center'
+                    onChange={(e) => {
+                      onChange({
+                        data: {
+                          ...data,
+                          snapshotDuration:
+                            parseInt(e.target.value || '0', 10) * 86400 +
+                            hours * 3600 +
+                            mins * 60,
+                        },
+                      });
+                    }}
+                    // disabled={locked.duration}
+                  />
+                  <Input
+                    value={hours}
+                    addonAfter='Hour'
+                    placeholder='Hour'
+                    className='text-center'
+                    onChange={(e) => {
+                      onChange({
+                        data: {
+                          ...data,
+                          snapshotDuration:
+                            days * 86400 +
+                            parseInt(e.target.value || '0', 10) * 3600 +
+                            mins * 60,
+                        },
+                      });
+                    }}
+                    // disabled={locked.duration}
+                  />
+                  <Input
+                    value={mins}
+                    addonAfter='Minute'
+                    placeholder='Minute'
+                    className='text-center'
+                    onChange={(e) => {
+                      onChange({
+                        data: {
+                          ...data,
+                          snapshotDuration:
+                            days * 86400 +
+                            hours * 3600 +
+                            parseInt(e.target.value || '0', 10) * 60,
+                        },
+                      });
+                    }}
+                    // disabled={locked.duration}
+                  />
+                </Space>
+              </Space>
+
+              <Space direction='vertical' size='small' className='w-full'>
+                <div className='text-sm text-slate-600 flex items-center gap-2'>
+                  Proposal ID
+                  <Popover content='Choose variable to store proposal Id of Snapshot'>
+                    <MdHelpOutline />
+                  </Popover>
+                </div>
+                <Select
+                  value={data?.proposalId}
+                  className='w-full'
+                  options={variablesOption}
+                  onChange={(value, option) => {
+                    onChange({
+                      data: {
+                        ...data,
+                        proposalId: value,
+                      },
+                    });
+                  }}
+                />
+              </Space>
+              <Space direction='vertical' size='small' className='w-full'>
+                <div className='text-sm text-slate-600 flex items-center gap-2'>
+                  Options
+                  <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
+                    <MdHelpOutline />
+                  </Popover>
+                </div>
+                <Input
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                  }}
+                  suffix={
+                    <Button
+                      type='link'
+                      icon={<PlusOutlined />}
+                      className='w-full flex items-center justify-start pl-0'
+                      onClick={() => {
+                        addNewOptionHandlerSnapshot(inputValue);
+                      }}
+                    >
+                      Add a new option
+                    </Button>
+                  }
+                />
+                <Space direction='vertical' size='small' className='w-full'>
+                  {snapShotOption &&
+                    snapShotOption.map((option: string, index: number) => {
+                      return (
+                        <div
+                          key={index}
+                          className='flex items-center justify-between w-full'
+                        >
+                          <div className=''>{option}</div>
+                          <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={() => {
+                              console.log(index);
+                              const opts = [...snapShotOption];
+                              opts.splice(index, 1);
+                              onChange({
+                                data: {
+                                  ...data,
+                                  snapShotOption: opts,
+                                },
+                              });
+                            }}
+                          ></Button>
+                        </div>
+                      );
+                    })}
+                </Space>
+              </Space>
             </Space>
+          ) : (
             <Space direction='vertical' size='small' className='w-full'>
               <div className='text-sm text-slate-600 flex items-center gap-2'>
-                Votemachine type
+                Checkpoint Snapshot Proposal to Sync
                 <Popover content='Quorum is the minimum number of votes/tokens needed for a proposal to be considered valid.'>
                   <MdHelpOutline />
                 </Popover>
               </div>
               <Select
-                value={data.type}
+                value={snapshotIdToSync}
                 className='w-full'
-                options={selectOptions}
-                onChange={(value) => {
+                options={snapshotParents}
+                onChange={(_value, option) => {
+                  console.log(option);
+
                   onChange({
                     data: {
                       ...data,
-                      type: value,
+                      snapshotIdToSync: option.id,
+                      space: option?.data?.space,
+                      type: option?.data?.type,
+                      proposalId: option?.data?.proposalId,
+                      snapshotOption: option?.data.snapshotOption,
                     },
                   });
                 }}
               />
             </Space>
-          </Space>
+          )}
         </CollapsiblePanel>
       </Space>
     </>

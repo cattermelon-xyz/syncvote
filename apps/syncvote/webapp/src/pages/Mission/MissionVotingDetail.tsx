@@ -1,94 +1,376 @@
 import { useEffect, useState } from 'react';
-import { Card, Button, Progress, Space, Tag, message } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { Icon } from 'icon';
-import { useParams } from 'react-router-dom';
+import { Space, MenuProps, Button, Card, Tag, Tabs } from 'antd';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { queryAMissionDetail } from '@dal/data';
-import { extractIdFromIdString } from 'utils';
+import { extractIdFromIdString, supabase, useGetDataHook } from 'utils';
 import { Modal } from 'antd';
 import { useDispatch } from 'react-redux';
-import {
-  formatDate,
-  getTimeElapsedSinceStart,
-  getTimeRemainingToEnd,
-} from '@utils/helpers';
 import ModalListParticipants from './fragments/ModalListParticipants';
-import ModalVoterInfo from './fragments/ModalVoterInfo';
 import { extractCurrentCheckpointId } from '@utils/helpers';
-import MissionProgress from './fragments/MissionProgress';
-import VoteSection from './fragments/VoteSection';
-import ShowDescription from './fragments/ShowDescription';
-import ProposalDocuments from './fragments/ProposalDocuments';
 import { queryDocInput } from '@dal/data';
+import { config } from '@dal/config';
+import { ExternalProvider } from '@ethersproject/providers';
+import MissionProgressSummary from './fragments/MissionProgressSummary';
+import MissionSummary from './fragments/MissionSummary';
+import { getVoteMachine } from 'directed-graph';
+import { vote } from '@axios/vote';
+import Metamask from '@assets/icons/svg-icons/Metamask';
+import { finishLoading, startLoading } from '@redux/reducers/ui.reducer';
+import { L } from '@utils/locales/L';
+import HistoryOfCheckpoint from './fragments/HistoryOfCheckpoint';
+import { ConnectModal, getAccount, disconnectWallet } from 'syncvote-wallet';
+
+export function isExternalProvider(
+  provider: any
+): provider is ExternalProvider {
+  return provider && typeof provider.request === 'function';
+}
+// =============================== METAMASK SECTION ===============================
+
+const getCheckpointData = (data: any) => {
+  const currentCheckpointId = extractCurrentCheckpointId(data.id);
+  const checkpointData = data?.data?.checkpoints.filter(
+    (checkpoint: any) => checkpoint.id === currentCheckpointId
+  );
+  // FIXME: doc-input data format is not compliant with the current format
+  // TODO: change doc-input to PDA-style data structure
+  // const listVersionDocs = data?.progress.flatMap((progress: any) => {
+  //   return progress?.tallyResult?.submission || [];
+  // });
+  const listVersionDocs: any = [];
+  let checkpointDataAfterHandle = checkpointData[0];
+  if (!checkpointData[0].isEnd) {
+    const startToVote = new Date(data.startToVote);
+    // convert second to millisecond of duration
+    const duration = (checkpointData[0].duration || 0) * 1000;
+    const endTovote = new Date(startToVote.getTime() + duration).toISOString();
+    checkpointDataAfterHandle.endToVote = endTovote;
+    checkpointDataAfterHandle.initData = data.initData || {};
+  }
+
+  return {
+    listVersionDocs,
+    currentCheckpointData: checkpointDataAfterHandle,
+  };
+};
+
+const login = async (dispatch: any) => {
+  dispatch(startLoading({}));
+  const currentURL = window.location.href;
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+      redirectTo: currentURL,
+    },
+  });
+  dispatch(finishLoading({}));
+  if (error) {
+    Modal.error({
+      title: L('error'),
+      content: error.message || '',
+    });
+  }
+};
+
+const renderVoteMachine = (
+  missionData: any,
+  user: any,
+  account: any,
+  dispatch: any,
+  isFullVote: boolean
+) => {
+  const { currentCheckpointData } = getCheckpointData(missionData);
+  const voteMachine = getVoteMachine(currentCheckpointData?.vote_machine_type);
+  // if forkNode or joinNode, what should we do?
+  const isVoteable = !(
+    currentCheckpointData?.isEnd ||
+    currentCheckpointData?.vote_machine_type === 'forkNode' ||
+    currentCheckpointData?.vote_machine_type === 'joinNode'
+  );
+  const isForkNode = currentCheckpointData?.vote_machine_type === 'forkNode';
+  return (
+    <>
+      {isVoteable && voteMachine?.VoteUIWeb && (
+        <voteMachine.VoteUIWeb
+          missionData={missionData}
+          checkpointData={currentCheckpointData}
+          onSubmit={(sumitted: any) => {
+            submit(
+              sumitted,
+              currentCheckpointData,
+              missionData.mission_id,
+              user,
+              account,
+              dispatch,
+              isFullVote
+            );
+          }}
+        />
+      )}
+      {!currentCheckpointData.isEnd &&
+        currentCheckpointData.vote_machine_type !== 'Snapshot' &&
+        currentCheckpointData.vote_machine_type !== 'DocInput' && (
+          <>
+            {voteMachine?.RenderChoices && (
+              <voteMachine.RenderChoices
+                missionData={missionData}
+                currentCheckpointData={currentCheckpointData}
+              />
+            )}
+          </>
+        )}
+    </>
+  );
+};
+
+const renderId = (
+  user: any,
+  dispatch: any,
+  account: any,
+  connect: any,
+  disconnect: any
+) => {
+  return (
+    <Card className='flex flex-col mb-10 gap-6'>
+      <Space direction='vertical'>
+        {user?.email ? (
+          <div>
+            <span>
+              You are logged in with email <Tag>{user.email}</Tag>
+              <Button
+                type='text'
+                onClick={async () => {
+                  dispatch(startLoading({}));
+                  await supabase.auth.signOut();
+                  window.location.reload();
+                  dispatch(finishLoading({}));
+                }}
+              >
+                Sign out
+              </Button>
+            </span>
+          </div>
+        ) : (
+          <div>
+            <Button
+              onClick={async () => {
+                login(dispatch);
+              }}
+            >
+              Login
+            </Button>{' '}
+            with email
+          </div>
+        )}
+        {account ? (
+          <div>
+            <span>
+              You are voting with wallet{' '}
+              <Tag>
+                {account.substr(0, 3) +
+                  '...' +
+                  account.substr(account.length - 3, account.length - 1)}
+              </Tag>
+              <Button type='text' onClick={disconnect}>
+                Disconnect
+              </Button>
+            </span>
+          </div>
+        ) : (
+          <div className='flex gap-2 items-center'>
+            <Button
+              icon={<Metamask />}
+              className='flex items-center'
+              onClick={connect}
+            >
+              Connect a wallet
+            </Button>
+          </div>
+        )}
+      </Space>
+    </Card>
+  );
+};
+
+const submit = (
+  submitted: any,
+  currentCheckpointData: any,
+  missionId: any,
+  user: any,
+  account: any,
+  dispatch: any,
+  isFullVote?: boolean
+) => {
+  const { option, submission } = submitted;
+  const participants = currentCheckpointData?.participation?.data || [];
+  let permittedIdentity = participants.find(
+    (participant: any) =>
+      participant.toLowerCase() === user?.email?.toLowerCase() ||
+      participant.toLowerCase() === account?.toLowerCase()
+  );
+  let permitted =
+    participants.length === 0
+      ? true
+      : permittedIdentity !== undefined
+      ? true
+      : false;
+  if (permitted) {
+    vote({
+      data: {
+        identify: permittedIdentity,
+        option: option,
+        mission_id: missionId,
+        submission: submission,
+      },
+      onSuccess: (res: any) => {
+        if (['FALLBACK', 'ERR'].indexOf(res.data.status) !== -1) {
+          console.log('error: ', res);
+          Modal.error({
+            title: 'Error',
+            content: res.data.message.toString(),
+          });
+        } else {
+          Modal.success({
+            title: 'Success',
+            maskClosable: !isFullVote,
+            content: isFullVote
+              ? 'Please open Extension to continue'
+              : 'Voted successfully',
+            footer: isFullVote ? null : undefined,
+            onOk: () => {
+              window.location.reload();
+            },
+          });
+        }
+      },
+      onError: (err) => {
+        console.log('err: ', err);
+        Modal.error({
+          title: 'Error',
+          content: 'Voting error',
+        });
+      },
+      dispatch,
+    });
+  } else {
+    Modal.error({
+      title: "You don't have permission to vote",
+      content: 'Please sign in with your registered email or wallet address',
+    });
+  }
+};
 
 const MissionVotingDetail = () => {
+  const [searchParams, setSearchParams] = useSearchParams('');
+  const isFullVote = searchParams.get('view') === 'full' ? true : false;
   const { missionIdString } = useParams();
+  const dispatch = useDispatch();
   const missionId = extractIdFromIdString(missionIdString);
   const [missionData, setMissionData] = useState<any>();
-  const [isReachedQuorum, setIsReachedQuorum] = useState<boolean>();
   const [openModalListParticipants, setOpenModalListParticipants] =
     useState<boolean>(false);
-  const [openModalVoterInfo, setOpenModalVoterInfo] = useState<boolean>(false);
-  const [listParticipants, setListParticipants] = useState<any[]>([]);
-  const [selectedOption, onSelectedOption] = useState<number>(-1);
-  const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
-  const [submission, setSubmission] = useState<any>();
-  const [listVersionDocs, setListVersionDocs] = useState<any[]>();
-  const [dataOfAllDocs, setDataOfAllDocs] = useState<any[]>([]);
+  const [historicalCheckpointData, setHistoricalCheckpointData] =
+    useState<any>();
+  const { currentCheckpointData, listVersionDocs } = missionData
+    ? getCheckpointData(missionData)
+    : {
+        currentCheckpointData: undefined,
+        listVersionDocs: [],
+      };
+  const subMissions = missionData?.data?.subMissions || [];
+  const user = useGetDataHook({
+    configInfo: config.queryUserById,
+  }).data;
 
-  const dispatch = useDispatch();
+  // =============================== METAMASK SECTION ===============================
+  const [account, setAccount] = useState<any>(getAccount());
+
+  useEffect(() => {
+    console.log('try to getAccount: ', getAccount());
+    setAccount(getAccount());
+  });
+
+  const connect = () => {
+    setOpenConnectModal(true);
+  };
+
+  const disconnect = async () => {
+    disconnectWallet();
+    console.log('account ', getAccount());
+    setAccount(getAccount());
+    // // TODO: disconnect
+    // // sdk?.terminate();
+    // setAccount('');
+  };
+
+  useEffect(() => {
+    const anyWindow = window as any;
+    anyWindow.ethereum?.on('accountsChanged', (accounts: any) => {
+      console.log('accounts changed: ', accounts);
+      disconnectWallet();
+      setAccount(getAccount());
+    });
+    // handle account change in phantom solana
+    anyWindow.phantom?.solana?.on('disconnect', () => {
+      console.log('disconnect');
+      disconnectWallet();
+      setAccount(getAccount());
+    });
+  });
+
+  // =============================== METAMASK SECTION ===============================
 
   const fetchData = () => {
     queryAMissionDetail({
       missionId,
-      onSuccess: (data: any) => {
-        setMissionData(data);
+      onSuccess: async (data: any) => {
+        // query variables value
+        const variables = data?.data?.variables;
+        const variableValues: any = {};
+        for (var i = 0; i < variables?.length; i++) {
+          const resp: any = await supabase
+            .from('variables')
+            .select('value')
+            .eq('mission_id', missionId)
+            .eq('name', variables[i]);
+          if (resp.data) {
+            variableValues[variables[i]] = resp.data[0]?.value;
+          }
+        }
         const currentCheckpointId = extractCurrentCheckpointId(data.id);
+        let subMissionIds = [];
+        const subMissions: any = [];
         const checkpointData = data?.data?.checkpoints.filter(
           (checkpoint: any) => checkpoint.id === currentCheckpointId
         );
-        const listVersionDocs = data?.progress.flatMap((progress: any) => {
-          return progress?.tallyResult?.submission || [];
-        });
-        setListVersionDocs(listVersionDocs);
-        console.log('missiondata', data);
-        console.log('checkpointData', checkpointData[0]);
-        let checkpointDataAfterHandle = checkpointData[0];
+        if (checkpointData[0].vote_machine_type === 'forkNode') {
+          subMissionIds = data.initData?.start || [];
 
-        if (!checkpointData[0].isEnd) {
-          const startToVote = new Date(data.startToVote);
-          // convert second to millisecond of duration
-          const duration = checkpointData[0].duration * 1000;
-          const endTovote = new Date(
-            startToVote.getTime() + duration
-          ).toISOString();
-          checkpointDataAfterHandle.endToVote = endTovote;
+          for (var i = 0; i < subMissionIds.length; i++) {
+            await queryAMissionDetail({
+              missionId: subMissionIds[i],
+              dispatch,
+              onSuccess: (data: any) => {
+                console.log(
+                  'push submission data in array, set variables: ',
+                  variableValues
+                );
+                subMissions.push({
+                  ...data,
+                  data: { ...data.data, variables: variableValues },
+                });
+              },
+              onError: (error) => {},
+            });
+          }
         }
-
-        switch (checkpointData[0]?.vote_machine_type) {
-          case 'SingleChoiceRaceToMax':
-            if (checkpointData[0]?.includedAbstain === true) {
-              checkpointDataAfterHandle.data.options.push('Abstain');
-            }
-            break;
-          case 'UpVote':
-            checkpointDataAfterHandle.data.options = [];
-            checkpointDataAfterHandle.data.options.push('Upvote');
-            if (checkpointData[0]?.includedAbstain === true) {
-              checkpointDataAfterHandle.data.options.push('Abstain');
-            }
-            break;
-          case 'Veto':
-            checkpointDataAfterHandle.data.options = [];
-            checkpointDataAfterHandle.data.options.push('Upvote');
-            if (checkpointData[0]?.includedAbstain === true) {
-              checkpointDataAfterHandle.data.options.push('Abstain');
-            }
-            break;
-          default:
-            break;
-        }
-        setCurrentCheckpointData(checkpointDataAfterHandle);
+        data.data.variables = variableValues;
+        data.data.subMissions = subMissions;
+        setMissionData(data);
       },
       onError: (error) => {
         Modal.error({
@@ -105,324 +387,108 @@ const MissionVotingDetail = () => {
   }, []);
 
   useEffect(() => {
-    if (listVersionDocs) {
-      listVersionDocs?.map((versionItem: any) => {
-        const idDocInput = versionItem[Object.keys(versionItem)[0]];
-        queryDocInput({
-          idDocInput,
-          onSuccess: (data: any) => {
-            setDataOfAllDocs((prevData) => [...prevData, data]);
-          },
-          onError: (error) => {
-            Modal.error({
-              title: 'Error',
-              content: error,
-            });
-          },
+    console.log('historicalCheckpointData', historicalCheckpointData);
+  }, [historicalCheckpointData]);
+
+  // TODO: change to PDA-style design to query all docs version
+
+  const isForkNode = currentCheckpointData?.vote_machine_type === 'forkNode';
+  const subMissionTabItems = subMissions?.map(
+    (subMission: any, index: number) => {
+      return {
+        label: subMission?.title,
+        key: index.toString(),
+        children: renderVoteMachine(
+          subMission,
+          user,
+          account,
           dispatch,
-        });
-      });
+          isFullVote
+        ),
+      };
     }
-  }, [listVersionDocs]);
-
-  useEffect(() => {
-    console.log('missionData', missionData);
-    console.log('dataOfAllDocs', dataOfAllDocs);
-  }, [missionData, listParticipants, dataOfAllDocs]);
-
-  useEffect(() => {
-    if (missionData && currentCheckpointData) {
-      if (missionData.result) {
-        const totalVotingPower = Object.values(missionData.result).reduce(
-          (acc: number, voteData: any) => acc + voteData.voting_power,
-          0
-        );
-        if (totalVotingPower >= currentCheckpointData.quorum) {
-          setIsReachedQuorum(true);
-        }
-      }
-
-      if (!currentCheckpointData.isEnd) {
-        setListParticipants(currentCheckpointData.participation.data);
-      }
-    }
-  }, [missionData, selectedOption]);
-
+  );
+  const [openConnectModal, setOpenConnectModal] = useState(false);
   return (
     <>
-      {missionData && currentCheckpointData && (
-        <div className='w-[1033px] flex gap-4'>
-          <div className='w-2/3'>
-            <div className='flex flex-col mb-10 gap-6'>
-              <div className='flex gap-4'>
-                {!currentCheckpointData.isEnd &&
-                getTimeRemainingToEnd(currentCheckpointData.endToVote) !=
-                  'expired' ? (
-                  <Tag bordered={false} color='green' className='text-base '>
-                    Active
-                  </Tag>
-                ) : (
-                  <Tag bordered={false} color='default' className='text-base'>
-                    Closed
-                  </Tag>
-                )}
-                <Button
-                  style={{ border: 'None', padding: '0px', boxShadow: 'None' }}
-                  className='text-[#6200EE]'
-                  icon={<UploadOutlined />}
-                  onClick={() => navigator.clipboard.writeText(window.location.href)
-                    .then(() => message.success('URL copied to clipboard!'))
-                    .catch(err => {
-                      console.error('Failed to copy URL: ', err);
-                      message.error('Failed to copy URL');
-                    })}
-                >
-                  Share
-                </Button>
-              </div>
-              <div className='flex items-center'>
-                <Icon presetIcon='' iconUrl='' size='large' />
-                <div className='flex flex-col ml-2'>
-                  <p className='font-semibold text-xl	'>{missionData.m_title}</p>
-                  <p>{missionData.workflow_title}</p>
-                </div>
-              </div>
-            </div>
-            <Space direction='vertical' size={16} className='w-full'>
-              <Card className='w-[271px]'>
-                <Space direction='horizontal' size={'small'}>
-                  <p>Author</p>
-                  <Icon iconUrl='' presetIcon='' size='medium' />
-                  <p className='w-[168px] truncate ...'>{missionData.author}</p>
-                </Space>
-              </Card>
-              <ShowDescription
-                titleDescription={'Proposal content'}
-                description={missionData?.m_desc}
-              />
-              <ShowDescription
-                titleDescription={'Checkpoint description'}
-                description={currentCheckpointData?.description}
-                bgColor='bg-[#F6F6F6]'
-              />
-              {missionData?.progress && (
-                <ProposalDocuments
-                  titleDescription={'Proposal documents'}
-                  missionData={missionData}
-                  listVersionDocs={listVersionDocs}
-                  dataOfAllDocs={dataOfAllDocs}
-                />
-              )}
-              {!currentCheckpointData.isEnd && (
-                <VoteSection
-                  currentCheckpointData={currentCheckpointData}
-                  setOpenModalVoterInfo={setOpenModalVoterInfo}
-                  onSelectedOption={onSelectedOption}
-                  missionData={missionData}
-                  setSubmission={setSubmission}
-                  submission={submission}
-                  dataOfAllDocs={dataOfAllDocs}
-                  listVersionDocs={listVersionDocs}
-                />
-              )}
-              {!currentCheckpointData.isEnd &&
-                currentCheckpointData.vote_machine_type !== 'DocInput' && (
-                  <Card className='p-4'>
-                    <div className='flex flex-col gap-4'>
-                      <p className='text-xl font-medium'>Votes</p>
-                      <div className='flex'>
-                        <p className='w-8/12'>Identity</p>
-                        <p className='w-4/12 text-right'>Vote</p>
-                      </div>
-                      {missionData.vote_record &&
-                        missionData.vote_record.map(
-                          (record: any, recordIndex: number) => {
-                            return (
-                              <div className='flex mb-4' key={recordIndex}>
-                                <div className='w-8/12 flex items-center gap-2'>
-                                  <Icon
-                                    iconUrl=''
-                                    presetIcon=''
-                                    size='medium'
-                                  />
-                                  <p>{record.identify}</p>
-                                </div>
-                                {record.option.map(
-                                  (option: any, optionIndex: number) => {
-                                    const voteOption =
-                                      option === '-1'
-                                        ? 'Abstain'
-                                        : currentCheckpointData.data.options[
-                                            parseInt(option)
-                                          ];
-                                    return (
-                                      <p
-                                        key={optionIndex}
-                                        className='w-4/12 text-right'
-                                      >
-                                        {voteOption}
-                                      </p>
-                                    );
-                                  }
-                                )}
-                              </div>
-                            );
-                          }
-                        )}
-                    </div>
-                    {/* <div className='w-full flex justify-center items-center'>
-                  <Button className='mt-4' icon={<ReloadOutlined />}>
-                    View More
-                  </Button>
-                </div> */}
-                  </Card>
-                )}
-            </Space>
-          </div>
-          <div className='flex-1 flex flex-col gap-4'>
-            {missionData?.progress && (
-              <MissionProgress missionData={missionData} />
+      <ConnectModal
+        account={account}
+        setAccount={setAccount}
+        open={openConnectModal}
+        onCancel={() => setOpenConnectModal(false)}
+      />
+      {isFullVote && missionData && currentCheckpointData && (
+        <div className='max-w-2xl px-4'>
+          <div>{renderId(user, dispatch, account, connect, disconnect)}</div>
+          <Space direction='vertical' size={16} className='w-full'>
+            {isForkNode && (
+              <>
+                <Tabs defaultActiveKey='0' items={subMissionTabItems} />
+              </>
             )}
-            {missionData.result ? (
-              <Card className=''>
-                <p className='mb-6 text-base font-semibold'>Voting results</p>
-                {currentCheckpointData.data.options.map(
-                  (option: any, index: any) => {
-                    // still calculate voting_power of Abstain but not show in result
-                    if (option === 'Abstain') {
-                      return <div key={-1}></div>;
-                    }
-                    const totalVotingPower = Object.values(
-                      missionData.result
-                    ).reduce(
-                      (acc: number, voteData: any) =>
-                        acc + voteData.voting_power,
-                      0
-                    );
-
-                    let percentage;
-                    if (currentCheckpointData.quorum >= totalVotingPower) {
-                      percentage =
-                        (missionData.result[index]?.voting_power /
-                          currentCheckpointData.quorum) *
-                        100;
-                    } else {
-                      percentage =
-                        (missionData.result[index]?.voting_power /
-                          totalVotingPower) *
-                        100;
-                    }
-                    percentage = parseFloat(percentage.toFixed(2));
-                    return (
-                      <div key={index} className='flex flex-col gap-2'>
-                        <p className='text-base font-semibold'>{option}</p>
-                        <p className='text-base'>
-                          {missionData.result[option]} votes
-                        </p>
-                        <Progress percent={percentage} size='small' />
-                      </div>
-                    );
-                  }
-                )}
-                {isReachedQuorum ? (
-                  <div className='w-full flex justify-center items-center mt-2'>
-                    <Button className='w-full bg-[#EAF6EE] text-[#29A259]'>
-                      Reached required quorum
-                    </Button>
-                  </div>
-                ) : (
-                  <div className='w-full flex justify-center items-center mt-2'>
-                    <Button className='w-full'>Not reached quorum</Button>
-                  </div>
-                )}
-              </Card>
+            {historicalCheckpointData ? (
+              <HistoryOfCheckpoint
+                historicalCheckpointData={historicalCheckpointData}
+              />
             ) : (
-              <></>
+              renderVoteMachine(
+                missionData,
+                user,
+                account,
+                dispatch,
+                isFullVote
+              )
             )}
-            {!currentCheckpointData.isEnd && (
-              <Card className=''>
-                <p className='mb-4 text-base font-semibold'>
-                  Rules & conditions
-                </p>
-                <div className='flex flex-col gap-2'>
-                  <div className='flex justify-between'>
-                    <p className='text-base '>Start time</p>
-                    <p className='text-base font-semibold'>
-                      {getTimeElapsedSinceStart(missionData.startToVote)}
-                    </p>
-                  </div>
-                  <p className='text-right'>
-                    {formatDate(missionData.startToVote)}
-                  </p>
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <div className='flex justify-between'>
-                    <p className='text-base '>Remaining duration</p>
-                    <p className='text-base font-semibold'>
-                      {getTimeRemainingToEnd(currentCheckpointData.endToVote)}
-                    </p>
-                  </div>
-                  {currentCheckpointData.isEnd ? (
-                    <></>
-                  ) : (
-                    <p className='text-right'>
-                      {formatDate(currentCheckpointData.endToVote)}
-                    </p>
-                  )}
-                </div>
-                <hr className='w-full my-4' />
-                <div className='flex justify-between'>
-                  <p className='text-base '>Who can vote</p>
-                  <p
-                    className='text-base font-semibold text-[#6200EE] cursor-pointer'
-                    onClick={() => setOpenModalListParticipants(true)}
-                  >
-                    View details
-                  </p>
-                </div>
-                <hr className='w-full my-4' />
-                {currentCheckpointData?.data?.threshold ? (
-                  <div>
-                    <div className='flex justify-between'>
-                      <p className='text-base '>Threshold counted by</p>
-                      <p className='text-base font-semibold'>
-                        Total votes made
-                      </p>
-                    </div>
-                    <div className='flex justify-between'>
-                      <p className='text-base '>Threshold</p>
-                      <p className='text-base font-semibold'>
-                        {currentCheckpointData?.data?.threshold}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <></>
-                )}
-                <div className='flex justify-between'>
-                  <p className='text-base '>Quorum</p>
-                  <p className='text-base font-semibold'>
-                    {currentCheckpointData.quorum} votes
-                  </p>
-                </div>
-              </Card>
-            )}
+          </Space>
+        </div>
+      )}
+      {!isFullVote && missionData && currentCheckpointData && (
+        <div className='lg:w-[1024px] md:w-[640px] sm:w-[400px] flex gap-4'>
+          <Space direction='vertical' className='w-2/3' size='small'>
+            <MissionSummary
+              currentCheckpointData={currentCheckpointData}
+              missionData={missionData}
+              listVersionDocs={listVersionDocs}
+              dataOfAllDocs={[]}
+            />
+            {renderId(user, dispatch, account, connect, disconnect)}
+            <Space direction='vertical' size={16} className='w-full'>
+              {isForkNode && (
+                <>
+                  <Tabs defaultActiveKey='0' items={subMissionTabItems} />
+                </>
+              )}
+              {historicalCheckpointData ? (
+                <HistoryOfCheckpoint
+                  historicalCheckpointData={historicalCheckpointData}
+                />
+              ) : (
+                renderVoteMachine(
+                  missionData,
+                  user,
+                  account,
+                  dispatch,
+                  isFullVote
+                )
+              )}
+            </Space>
+          </Space>
+          <div className='flex-1 flex flex-col gap-4'>
+            <MissionProgressSummary
+              missionData={missionData}
+              currentCheckpointData={currentCheckpointData}
+              setOpenModalListParticipants={setOpenModalListParticipants}
+              setHistoricalCheckpointData={setHistoricalCheckpointData}
+              historicalCheckpointData={historicalCheckpointData}
+            />
           </div>
         </div>
       )}
       <ModalListParticipants
         open={openModalListParticipants}
         onClose={() => setOpenModalListParticipants(false)}
-        listParticipants={listParticipants}
-      />
-      <ModalVoterInfo
-        option={selectedOption === -1 ? [-1] : [selectedOption - 1]}
-        open={openModalVoterInfo}
-        onClose={() => setOpenModalVoterInfo(false)}
-        missionId={missionId}
-        listParticipants={listParticipants}
-        submission={submission}
-        currentCheckpointData={currentCheckpointData}
+        listParticipants={currentCheckpointData?.participation?.data || []}
+        historicalCheckpointData={historicalCheckpointData}
       />
     </>
   );

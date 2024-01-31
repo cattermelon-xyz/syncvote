@@ -9,7 +9,13 @@ import SideNote from '../../components/SideNote';
 const VotingDuration = () => {
   const { data, onChange, viewMode, selectedNodeId } =
     useContext(GraphPanelContext);
-  const selectedNode = data.checkpoints?.find(
+  const allCheckPoints = data.checkpoints ? [...data.checkpoints] : [];
+  data.subWorkflows?.map((sw: any) => {
+    sw.checkpoints?.map((chk: any) => {
+      allCheckPoints.push({ ...chk });
+    });
+  });
+  const selectedNode = allCheckPoints?.find(
     (chk: any) => chk.id === selectedNodeId
   );
   const duration = selectedNode?.duration || 0;
@@ -20,9 +26,13 @@ const VotingDuration = () => {
     : 0;
   const dateChange = (durationChanged: number) => {
     const node = structuredClone(selectedNode);
+    console.log('dateChange in duration ', node);
     if (node) {
-      node.duration = durationChanged;
-      onChange(node);
+      console.log('durationChanged', durationChanged);
+      onChange({
+        ...node,
+        duration: durationChanged,
+      });
     }
   };
   const locked = selectedNode?.locked ? selectedNode?.locked : {};
@@ -47,7 +57,9 @@ const VotingDuration = () => {
             className='text-center'
             onChange={(e) => {
               dateChange(
-                parseInt(e.target.value, 10) * 86400 + hours * 3600 + mins * 60
+                parseInt(e.target.value || '0', 10) * 86400 +
+                  hours * 3600 +
+                  mins * 60
               );
             }}
             disabled={locked.duration}
@@ -59,7 +71,9 @@ const VotingDuration = () => {
             className='text-center'
             onChange={(e) => {
               dateChange(
-                days * 86400 + parseInt(e.target.value, 10) * 3600 + mins * 60
+                days * 86400 +
+                  parseInt(e.target.value || '0', 10) * 3600 +
+                  mins * 60
               );
             }}
             disabled={locked.duration}
@@ -71,7 +85,9 @@ const VotingDuration = () => {
             className='text-center'
             onChange={(e) => {
               dateChange(
-                days * 86400 + hours * 3600 + parseInt(e.target.value, 10) * 60
+                days * 86400 +
+                  hours * 3600 +
+                  parseInt(e.target.value || '0', 10) * 60
               );
             }}
             disabled={locked.duration}

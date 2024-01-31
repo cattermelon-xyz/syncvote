@@ -87,6 +87,9 @@ const Flow = () => {
     shouldExportImage,
     setExportImage,
     shouldFitView,
+    onInit,
+    onDragOver,
+    onDrop,
   } = useContext(GraphContext);
   const [nodes, setNodes] = React.useState([]);
   const [edges, setEdges] = React.useState([]);
@@ -107,9 +110,7 @@ const Flow = () => {
     setEdges(obj.edges);
 
     if (shouldFitView) {
-      console.log('setTimeout ** attempt to fit view');
       setTimeout(() => {
-        console.log('attempt to fit view');
         fitView();
       }, 50);
     }
@@ -229,16 +230,18 @@ const Flow = () => {
         proOptions={proOptions}
         onEdgeClick={onEdgeClick}
         fitView={true}
+        onInit={onInit}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
       >
         {window.innerWidth > 700 ? (
-          <Controls position='bottom-left' showInteractive={false} />
+          <Controls position='top-right' showInteractive={false} />
         ) : null}
         <Background color='#aaa' variant={BackgroundVariant.Dots} />
         {navPanel ? (
           <Panel position='top-left'>
-            <Space direction='vertical'>
-              <Space direction='horizontal'>{navPanel}</Space>
-              {/* <Space
+            {navPanel}
+            {/* <Space
               direction="horizontal"
               size="middle"
               className="p-2 border rounded-md flex items-center bg-white"
@@ -276,42 +279,11 @@ const Flow = () => {
                 );
               })}
             </Space> */}
-            </Space>
           </Panel>
         ) : null}
 
         {viewMode === GraphViewMode.EDIT_WORKFLOW_VERSION ? (
           <>
-            <Panel position='bottom-center'>
-              <Space direction='horizontal'>
-                {env === 'dev' ? (
-                  <div
-                    className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100'
-                    onClick={() => setIsDocsShown(true)}
-                    title='List of document'
-                  >
-                    <PaperClipOutlined />
-                    <Badge count={docs.length ? docs.length : 0} />
-                  </div>
-                ) : null}
-                <div
-                  className='flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100'
-                  onClick={onResetPosition}
-                  title="Reset the graph's position"
-                >
-                  <SyncOutlined />
-                </div>
-                <div
-                  className={`flex items-center justify-center w-[44px] h-[44px] rounded-lg text-violet-500 cursor-pointer hover:bg-violet-500 hover:text-white bg-violet-100`}
-                  onClick={() => {
-                    onAddNewNode ? onAddNewNode() : null;
-                  }}
-                  title='Add a new node'
-                >
-                  <PlusOutlined />
-                </div>
-              </Space>
-            </Panel>
             <Panel position='bottom-right'>
               <>
                 <Modal

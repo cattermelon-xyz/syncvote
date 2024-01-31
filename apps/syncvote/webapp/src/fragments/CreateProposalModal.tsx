@@ -1,4 +1,4 @@
-import { Button, Input, Modal, Select, Space } from 'antd';
+import { Button, Input, Modal, Select, Space, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { IDoc, emptyStage } from 'directed-graph';
 
@@ -148,6 +148,7 @@ export const CreateProposalModal = ({
             });
           },
           dispatch,
+          author: user.email,
         });
       }
 
@@ -209,11 +210,16 @@ export const CreateProposalModal = ({
           <div className='flex'>
             <div style={{ width: 580 }}>
               <Space direction='vertical' className='w-full'>
+                {user.email && (
+                  <div className='flex gap-2'>
+                    <div>Author</div> <Tag>{user.email}</Tag>
+                  </div>
+                )}
                 <div className='text-sm text-[#575655]'>Proposal name </div>
                 <div>
                   <Input
                     className='w-full'
-                    placeholder={'Governance revision'}
+                    placeholder={'E.g: Proposal to invest new project'}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     style={isWarning ? { borderColor: 'red' } : undefined}
@@ -239,7 +245,7 @@ export const CreateProposalModal = ({
                     </div>
                   </>
                 )}
-                <div className='text-sm text-[#575655] mb-2'>
+                {/* <div className='text-sm text-[#575655] mb-2'>
                   Proposal description
                 </div>
                 <div>
@@ -250,7 +256,7 @@ export const CreateProposalModal = ({
                     }}
                     id='text-editor'
                   />
-                </div>
+                </div> */}
               </Space>
             </div>
           </div>

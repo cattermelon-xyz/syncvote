@@ -11,6 +11,7 @@ import { formatDate } from '@utils/helpers';
 import { CreateProposalModal } from '@fragments/CreateProposalModal';
 import { EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
 import ModalDeleteMission from './ModalDeleteMission';
+import moment from 'moment';
 
 interface Props {
   title?: string;
@@ -28,9 +29,7 @@ const ListProposals: React.FC<Props> = ({
   const [modalOfProposalId, setModalOfProposalId] = useState<string | null>(
     null
   );
-  const [missionIdDelete, setMissionIdDelete] = useState<string | null>(
-    null
-  );
+  const [missionIdDelete, setMissionIdDelete] = useState<string | null>(null);
   const [workflowOfProposalId, setWorkflowOfProposalId] = useState<any>();
   const [wfversionOfProposalId, setWfversionOfProposalId] = useState<any>();
   const [filteredProposals, setFilteredProposals] = useState<any[]>([]);
@@ -85,9 +84,7 @@ const ListProposals: React.FC<Props> = ({
       id: dataOfAproposal?.workflow_version_id,
       data: dataOfAproposal?.workflow_version_data,
     });
-
   }, [modalOfProposalId]);
-
 
   const navigate = useNavigate();
 
@@ -104,6 +101,9 @@ const ListProposals: React.FC<Props> = ({
     const filteredData = isExcludeDraftMission
       ? listProposals.filter((proposal) => proposal.status !== 'DRAFT')
       : listProposals;
+    filteredData.sort((a: any, b: any) => {
+      return moment(a.startToVote).isBefore(b.startToVote) ? 1 : -1;
+    });
     setFilteredProposals(filteredData);
   }, [listProposals]);
 

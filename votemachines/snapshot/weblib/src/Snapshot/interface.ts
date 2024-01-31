@@ -11,16 +11,14 @@ export namespace Snapshot {
   export interface IData {
     //eslint-disable-line
     options: string[];
-    max: number;
-    token: string;
-    space?: string;
-    type?: ProposalType;
-    start?: number;
-    end?: number;
-    title?: string;
-    body?: string;
-    discussion?: string;
-    plugins?: string;
+    space: string;
+    type: ProposalType;
+    action: 'create-proposal' | 'sync-proposal';
+    snapShotOption: string[];
+    fallback?: string;
+    next?: string;
+    proposalId: string;
+    template?: string;
   }
 
   export interface IOption {

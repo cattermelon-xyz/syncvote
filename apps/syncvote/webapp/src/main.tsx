@@ -8,7 +8,6 @@ import { ConfigProvider } from 'antd';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
-    {/* <React.StrictMode> */}
     <ConfigProvider
       theme={{
         token: {
@@ -23,6 +22,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     >
       <AppRoutes />
     </ConfigProvider>
-    {/* </React.StrictMode> */}
   </Provider>
 );

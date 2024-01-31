@@ -14,7 +14,6 @@ async function getAllVoteRecord() {
               vr.id,
               vr.who,
               vr.option,
-              vr.voting_power,
               vr.current_vote_data_id
             )
           );

@@ -15,10 +15,12 @@ class UpVote extends VotingMachine {
       isValid = false;
       message.push('Missing options');
     }
+
     if (!checkpoint?.quorum) {
       isValid = false;
       message.push('Missing quorum');
     }
+
     if (!checkpoint?.data.pass || !checkpoint?.data.fallback) {
       isValid = false;
       message.push('Missing pass or fallback option');
@@ -33,11 +35,9 @@ class UpVote extends VotingMachine {
     let result = {
       '-1': {
         count: 0,
-        voting_power: 0,
       },
       0: {
         count: 0,
-        voting_power: 0,
       },
     };
 
@@ -94,7 +94,6 @@ class UpVote extends VotingMachine {
 
     if (this.participation.type === 'identity') {
       this.result[voteData.option[0]].count += 1;
-      this.result[voteData.option[0]].voting_power += 1;
     } else {
       // Dont have vote by token
     }

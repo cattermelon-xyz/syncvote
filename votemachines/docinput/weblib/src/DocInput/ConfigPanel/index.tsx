@@ -1,4 +1,4 @@
-import { Space, Switch, Button, Alert, Input, Select, Modal } from 'antd';
+import { Space, Switch, Button, Alert, Input, Select, Modal, Tag } from 'antd';
 import { useContext, useState } from 'react';
 import {
   GraphContext,
@@ -23,6 +23,8 @@ import { MdDeleteOutline } from 'react-icons/md';
 import NewDocActionDrawer from './NewDocActionDrawer';
 import { FaInfo } from 'react-icons/fa6';
 
+// TODO: DocInput do not require voting quorum
+
 /**
  *
  * @param IVoteMachineConfigProps
@@ -44,6 +46,7 @@ export default (props: IVoteMachineConfigProps) => {
     data = {
       options: [],
       docs: [],
+      variables: [],
     },
     onChange = (data: ICheckPoint) => {},
     children = [],
@@ -53,7 +56,9 @@ export default (props: IVoteMachineConfigProps) => {
     optionsDescription,
     resultDescription,
   } = props;
+  const allVariables = props?.raw?.variables || [];
   const { docs, options } = data;
+  const variables = data.variables || [];
   const { data: graphData } = useContext(GraphContext);
   const predefinedDocs: IDoc[] = graphData.docs || [];
   const delays = props.delays || Array(options?.length).fill(0);
@@ -62,6 +67,7 @@ export default (props: IVoteMachineConfigProps) => {
   const delayNotes = props.delayNotes || Array(options?.length).fill('');
   const posibleOptions: ICheckPoint[] = [];
   const [showAddOptionDrawer, setShowNewOptionDrawer] = useState(false);
+  const [selectedVariable, setSelectedVariable] = useState('');
   allNodes.forEach((child) => {
     if (child.id !== currentNodeId && !children.includes(child.id)) {
       posibleOptions.push(child);
@@ -222,7 +228,58 @@ export default (props: IVoteMachineConfigProps) => {
             />
           </>
         </CollapsiblePanel>
-        <CollapsiblePanel title='Document Action'>
+        <CollapsiblePanel title='Variables'>
+          <div>Data will be stored in following variables</div>
+          <div className='mt-2 flex flex-col gap-1'>
+            {variables.map((v: any, index: number) => {
+              return (
+                <div key={index} className='flex justify-between items-center'>
+                  <Tag className='v'>{v}</Tag>
+                  <Button
+                    icon={<MdDeleteOutline />}
+                    type='link'
+                    danger
+                    onClick={() => {
+                      const newVariables = [...variables];
+                      newVariables.splice(index, 1);
+                      onChange({
+                        data: {
+                          ...data,
+                          variables: newVariables,
+                        },
+                      });
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className='flex w-full items-center justify-between'>
+            <Select
+              options={allVariables
+                .filter((v: any) => variables.indexOf(v) === -1)
+                .map((v: any) => ({ label: v, value: v }))}
+              className='w-1/2'
+              value={selectedVariable}
+              onChange={(v: any) => setSelectedVariable(v)}
+            />
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => {
+                const newVariables = [...variables, selectedVariable];
+                onChange({
+                  data: {
+                    ...data,
+                    variables: newVariables,
+                  },
+                });
+              }}
+            >
+              Add new
+            </Button>
+          </div>
+        </CollapsiblePanel>
+        {/* <CollapsiblePanel title='Document Action'>
           <Space direction='vertical' className='w-full' size='large'>
             {docs?.map((doc: DocInput.IDoc, index: number) => {
               const predefinedDoc: any =
@@ -292,7 +349,7 @@ export default (props: IVoteMachineConfigProps) => {
             data={data}
             onChange={onChange}
           />
-        </CollapsiblePanel>
+        </CollapsiblePanel> */}
       </Space>
     </>
   );

@@ -9,6 +9,7 @@ export interface ICheckPoint {
   vote_machine_type?: string;
   isEnd?: boolean;
   duration?: number; // in seconds
+  minDuration?: number;
   locked?: any;
   triggers?: any[];
   participation?: IParticipant;
@@ -22,13 +23,16 @@ export interface ICheckPoint {
   resultDescription?: string;
   optionsDescription?: string;
   durationDescription?: string;
+  subWorkflowId?: string;
+  inHappyPath?: boolean;
+  phase?: string;
 }
 
 // TODO: add version
 // TODO: separate between data & cosmetic options
 
 export interface IParticipant {
-  type?: 'token' | 'identity';
+  type?: 'token' | 'identity' | 'author' | 'all';
   data?: IToken | string[];
 }
 
@@ -49,6 +53,7 @@ export interface IVoteMachineConfigProps extends ICheckPoint {
   viewMode: GraphViewMode;
   currentNodeId?: string;
   allNodes: any[];
+  raw?: IWorkflowVersionData;
   onChange: (data: any) => void;
   /**
    * Solana Address
@@ -71,14 +76,26 @@ export interface IVoteMachineGetLabelProps {
   target: any;
 }
 
+// if checkPointData is ended -> show result
+// else show options for choices
+export interface IVoteUIWebProps {
+  onSubmit: (data: any) => void; // submit the choice & its data
+  missionData: any; // data of the mission
+  checkpointData: any; // data of current checkpoint
+  isEditorUI?: boolean; // if show UI for editor page when click link in extension
+}
+
 export interface IVoteMachine {
   ConfigPanel: (props: IVoteMachineConfigProps) => JSX.Element;
+  VoteUIWeb?: (props: IVoteUIWebProps) => JSX.Element;
+  RenderChoices?: (props: any) => JSX.Element;
+  RenderTallyResult?: (props: any) => JSX.Element;
   getName: () => string;
   getProgramAddress: () => string;
   getType: () => string;
   deleteChildNode: (data: any, children: string[], childId: string) => void;
   getLabel: (props: IVoteMachineGetLabelProps) => JSX.Element;
-  getIcon: () => JSX.Element;
+  getIcon: (className?: string) => JSX.Element;
   getInitialData: () => any;
   abstract: ({
     checkpoint,
@@ -155,11 +172,20 @@ export interface IDoc {
   template: string;
 }
 
+export interface ISubWorkflow {
+  id: string;
+  start: string;
+  checkpoints: ICheckPoint[];
+}
+
 export interface IWorkflowVersionData {
   start: string;
   checkpoints: ICheckPoint[];
-  docs?: IDoc[];
-  cosmetic?: IWorkflowVersionCosmetic;
+  docs?: IDoc[]; // docs of all workflows
+  cosmetic?: IWorkflowVersionCosmetic; // cosmetic & positions of all checkpoints
+  subWorkflows?: ISubWorkflow[];
+  phases?: any[];
+  variables?: string[];
 }
 
 export interface IGraph {
@@ -193,6 +219,9 @@ export interface IGraph {
   onChangeLayout?: (data: IWorkflowVersionLayout) => void;
   openCreateProposalModal?: () => void;
   shouldFitView?: boolean;
+  onInit?: (reactflowInstance: any) => void;
+  onDrop?: (event: any) => void;
+  onDragOver?: (event: any) => void;
 }
 
 export interface IConfigPanel {

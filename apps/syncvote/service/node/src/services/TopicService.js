@@ -1,15 +1,25 @@
 const { supabase } = require('../configs/supabaseClient');
 const axios = require('axios');
-
+// TODO: wrong place! should place inside votemachine
 const createTopic = async (props) => {
-  const { discourseConfig } = props;
   try {
     if (!props.title || !props.raw || !props.org_id) {
       throw new Error('Title, content, and org_id are all required!');
     }
 
-    console.log('discourseConfig', discourseConfig);
-    console.log(`http://${discourseConfig.id_string}/posts`);
+    const { data, error } = await supabase
+      .from('web2_key')
+      .select('*')
+      .eq('org_id', props.org_id);
+
+    if (error || data.length === 0) {
+      throw new Error(error || 'No Discourse configuration found.');
+    }
+
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === 'discourse'
+    );
+    const discourseConfig = filteredDiscourse[0];
 
     const discourseData = {
       title: props.title,
@@ -19,7 +29,9 @@ const createTopic = async (props) => {
 
     // Make API call to Discourse
     const response = await axios.post(
-      `http://${discourseConfig.id_string}/posts`,
+      discourseConfig.id_string.includes('https')
+        ? `${discourseConfig.id_string}/posts`
+        : `https://${discourseConfig.id_string}/posts`,
       discourseData,
       {
         headers: {
@@ -29,15 +41,25 @@ const createTopic = async (props) => {
       }
     );
 
-    return { data: response.data };
+    const firstPostId = response?.data?.id;
+    const topicId = response?.data?.topic_id;
+    const linkDiscourse = `${discourseConfig.id_string}/t/${topicId}`;
+
+    const dataAfterCreate = {
+      firstPostId,
+      topicId,
+      linkDiscourse,
+    };
+
+    return { data: dataAfterCreate };
   } catch (e) {
-    console.error('Error creating topic:', e);
+    console.error('Error creating topic:', e.data);
     return { error: e };
   }
 };
 
-const getPosts = async (reqBody) => {
-  if (!reqBody.topic_id || !reqBody.org_id) {
+const getPosts = async (props) => {
+  if (!props.topic_id || !props.org_id) {
     throw new Error('Topic_id and org_id are all required!');
   }
 
@@ -45,7 +67,7 @@ const getPosts = async (reqBody) => {
     const { data, error } = await supabase
       .from('web2_key')
       .select('*')
-      .eq('org_id', reqBody.org_id);
+      .eq('org_id', props.org_id);
 
     if (error || data.length === 0) {
       throw new Error(error || 'No Discourse configuration found.');
@@ -58,7 +80,7 @@ const getPosts = async (reqBody) => {
 
     // Make API call to Discourse to get posts
     const response = await axios.get(
-      `http://${discourseConfig.id_string}/t/${reqBody.topic_id}.json`,
+      `http://${discourseConfig.id_string}/t/${props.topic_id}.json`,
       {
         headers: {
           'Api-Key': discourseConfig.access_token,
@@ -74,8 +96,8 @@ const getPosts = async (reqBody) => {
   }
 };
 
-const updateCategory = async (reqBody) => {
-  if (!reqBody.topic_id || !reqBody.org_id || !reqBody.category_id) {
+const moveTopic = async (props) => {
+  if (!props.topic_id || !props.org_id || !props.category_id) {
     throw new Error('Topic_id, category_id and org_id are all required!');
   }
 
@@ -83,7 +105,7 @@ const updateCategory = async (reqBody) => {
     const { data, error } = await supabase
       .from('web2_key')
       .select('*')
-      .eq('org_id', reqBody.org_id);
+      .eq('org_id', props.org_id);
 
     if (error || data.length === 0) {
       throw new Error(error || 'No Discourse configuration found.');
@@ -93,14 +115,15 @@ const updateCategory = async (reqBody) => {
       (integration) => integration.provider === 'discourse'
     );
     const discourseConfig = filteredDiscourse[0];
+    discourseConfig.id_string = discourseConfig.id_string.includes('https')
+      ? discourseConfig.id_string
+      : 'https://' + discourseConfig.id_string;
 
-    const url = `http://${discourseConfig.id_string}/t/-/${reqBody.topic_id}.json`;
+    const url = `${discourseConfig.id_string}/t/-/${props.topic_id}.json`;
 
     const payload = {
-      category_id: reqBody.category_id,
+      category_id: props.category_id,
     };
-
-    console.log('payload', payload);
 
     const response = await axios.put(url, payload, {
       headers: {
@@ -119,5 +142,5 @@ const updateCategory = async (reqBody) => {
 module.exports = {
   createTopic,
   getPosts,
-  updateCategory,
+  moveTopic,
 };
