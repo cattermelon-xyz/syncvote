@@ -1,16 +1,9 @@
 import { useState } from 'react';
-import {
-  DownOutlined,
-  UpOutlined,
-  ClockCircleOutlined,
-  ExportOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons';
+import { ExportOutlined, LoadingOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import parse from 'html-react-parser';
 import VoteButton from './VoteButton';
 import { Divider } from 'antd';
-import { openWorkflowPage, shortenString } from '../utils';
+import { openWorkflowPage, shortenString, stripHTML } from '../utils';
 
 const isInteractable = ({
   checkpointId,
@@ -53,7 +46,6 @@ const VoteUI = ({
   reload: any;
   setLoading: any;
 }) => {
-  console.log('user: ', user);
   const [expanded, setExpanded] = useState(true);
   const { workflow_id, workflow_version_id, org_id } = currentProposalData;
   const { isEnd, vote_machine_type, title, endToVote, phase, description } =
@@ -103,7 +95,7 @@ const VoteUI = ({
 
         {checkpointData?.note ? (
           <>
-            <div>{parse(checkpointData?.note)}</div>
+            <div>{shortenString(stripHTML(checkpointData?.note), 50)}</div>
           </>
         ) : (
           <></>
@@ -118,7 +110,7 @@ const VoteUI = ({
         <div className='flex flex-col w-full gap-4'>
           <div className='flex flex-row justify-between text-base'>
             <div className='flex flex-row items-center'>
-              <div className='rounded-full w-[8px] h-[8px] bg-violet-500'></div>
+              <div className='rounded-full w-[8px] h-[8px] bg-[#6200EE]'></div>
               <div className='ml-[12px] text-md font-bold'>{title}</div>
             </div>
             {/* <div
@@ -138,8 +130,8 @@ const VoteUI = ({
               </div>
             </div>
             <Divider className='my-2' />
-            <div className='flex flex-row justify-between w-full mb-2'>
-              <div>View guidelines</div>
+            <div className='flex flex-row justify-between w-full'>
+              <div className='text-xs text-gray-500 font-medium'>View guidelines</div>
               <div
                 className='cursor-pointer text-[#6200EE]'
                 onClick={() => {
@@ -155,11 +147,11 @@ const VoteUI = ({
               </div>
             </div>
             {description ? (
-              <div className='text-xs mb-2 text-gray-700'>
-                {parse(shortenString(description, 50))}
+              <div className='text-xs px-1 font-medium text-gray-700'>
+                {shortenString(stripHTML(description), 138)}
               </div>
             ) : null}
-            <div className='mt-2'>{renderButton()}</div>
+            <div className='mt-4'>{renderButton()}</div>
           </div>
         </div>
         {/* {expanded} */}
@@ -170,12 +162,12 @@ const VoteUI = ({
         <div className='text-xs font-bold'>{title}</div>
         <Divider className='my-1' />
         <div className='flex flex-row justify-between  text-xs'>
-          <div>Remaining duration</div>
+        <div className='text-xs text-gray-500 font-medium'>Remaining duration</div>
           <div>{moment(endToVote).fromNow()}</div>
         </div>
         <Divider className='my-1' />
-        <div className='flex flex-row justify-between text-xs mb-2'>
-          <div>View guidelines</div>
+        <div className='flex flex-row justify-between text-xs'>
+        <div className='text-xs text-gray-500 font-medium'>View guidelines</div>
           <ExportOutlined
             className='cursor-pointer'
             onClick={() => {
@@ -189,11 +181,11 @@ const VoteUI = ({
           />
         </div>
         {description ? (
-          <div className='text-xs mb-2 text-gray-700'>
-            {parse(shortenString(description, 50))}
+          <div className='text-xs px-1 font-medium text-gray-700'>
+            {shortenString(stripHTML(description), 138)}
           </div>
         ) : null}
-        <div className='mt-2'>{renderButton()}</div>
+        <div className='mt-4'>{renderButton()}</div>
       </div>
     )
   ) : (

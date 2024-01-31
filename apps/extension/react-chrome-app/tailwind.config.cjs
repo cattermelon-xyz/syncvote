@@ -19,7 +19,7 @@ module.exports = {
     extend: {
       colors: {
         violet: {
-          primary: '#5D23BB',
+          primary: '#6200EE',
           'primary-hover': '#521da8',
           light: '#EFE9F8',
           'version-1': '#EFE9F8',
@@ -93,7 +93,7 @@ module.exports = {
         'gray-text': '#575655',
         'gray-title': '#252422',
         tag: {
-          'active-text': '#5D23BB',
+          'active-text': '#6200EE',
           'active-bg': '#EFE9F8',
           'pending-text': 'D89531',
           'pending-bg': '#FBF4EA',

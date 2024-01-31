@@ -46,6 +46,7 @@ export const queryOrgs = async ({
             banner_url,
             preset_icon_url,
             preset_banner_url,
+            desc,
             versions: workflow_version(
               id, 
               data,

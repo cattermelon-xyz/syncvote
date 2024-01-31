@@ -11,7 +11,6 @@ import { shortenString } from '../utils';
 import DoneIcon from '@assets/icons/DoneIcon';
 
 const HistoryItem = ({ item }: { item: any }) => {
-  console.log('item: ', item);
   const [expanded, setExpanded] = useState(false);
   // TODO: this is a hack, should use votemachine function instead
   const {
@@ -77,16 +76,6 @@ const HistoryItem = ({ item }: { item: any }) => {
       </>
     );
   };
-  console.log(
-    'in HistoryItem, endedAt: ',
-    endedAt,
-    '; phase: ',
-    phase,
-    ';  checkpoint: ',
-    checkpoint_title,
-    'item: ',
-    item
-  );
   return (
     endedAt &&
     (!phase ? (
@@ -94,8 +83,8 @@ const HistoryItem = ({ item }: { item: any }) => {
       <>
         <div className='flex flex-col text-gray-600 gap-4'>
           <div className='flex flex-row justify-between text-base'>
-            <div className='flex flex-row items-center'>
-              <div className='rounded-full w-[8px] h-[8px] bg-gray-500'></div>
+            <div className='pl-1 flex flex-row items-center'>
+              <div className='rounded-full w-[8px] h-[8px] bg-gray-400'></div>
               <div className='ml-[12px] text-md font-bold'>
                 {checkpoint_title}
               </div>
@@ -141,7 +130,7 @@ const HistoryItem = ({ item }: { item: any }) => {
         </div>
         <Divider className='my-1' />
         <div className='flex flex-row w-full justify-between'>
-          <div>Completed on</div>
+        <div className='text-xs text-gray-500 font-medium'>Completed on</div>
           <div>{moment(endedAt || 0).format('MMM DD, hh:mm A')}</div>
         </div>
         <Divider className='my-1' />
