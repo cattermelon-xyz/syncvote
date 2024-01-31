@@ -11,6 +11,7 @@ import HistoryItem from '@components/HistoryItem';
 import VoteUI from '@components/VoteUI';
 import moment from 'moment';
 import { MissionStatusTag } from '@components/MissionStatusTag';
+import { Divider } from 'antd';
 
 interface Props {
   setPage: any;
@@ -86,15 +87,24 @@ const Voting: React.FC<Props> = ({
     return (
       <>
         <div className='flex flex-col gap-4'>
-          <div className='flex flex-row justify-between items-center'>
+          <div className='flex flex-row justify-between items-start'>
             <div className='flex flex-row items-center pl-1'>
-              {completed ? (
-                <div className='rounded-full w-[8px] h-[8px] bg-gray-400'></div>
-              ) : (
-                <div className='rounded-full w-[8px] h-[8px] bg-[#6200EE]'></div>
-              )}
-              <div className='ml-[12px] font-bold text-base'>
-                {shortenString(phase || '', 30)}
+              <div className='flex flex-col gap-2'>
+                <div className='flex flex-row items-center'>
+                  {completed ? (
+                    <div className='rounded-full w-[8px] h-[8px] bg-gray-400'></div>
+                  ) : (
+                    <div className='rounded-full w-[8px] h-[8px] bg-[#6200EE]'></div>
+                  )}
+                  <div className='ml-[12px] font-semibold text-base'>
+                    {shortenString(phase, 25)}
+                  </div>
+                </div>
+                {completed ? (
+                  <div className='text-xs text-gray-600 ml-[20px]'>
+                    {moment(endedAt || '').format('MMM DD, hh:mm A')}
+                  </div>
+                ) : null}
               </div>
             </div>
             {completed ? (
@@ -113,20 +123,6 @@ const Voting: React.FC<Props> = ({
               >
                 {expanded ? <UpOutlined /> : <DownOutlined />}
               </div>
-            ) : null}
-          </div>
-          <div className='flex flex-col rounded-md bg-white p-3 gap-1'>
-            <div className='flex flex-row justify-between'>
-            <div className='text-xs text-gray-500 font-medium'>Started at</div>
-              <div>{moment(startAt || '').format('MMM DD, hh:mm A')}</div>
-            </div>
-            {completed ? (
-              <>
-                <div className='flex flex-row justify-between'>
-                <div className='text-xs text-gray-500 font-medium'>Ended at</div>
-                  <div>{moment(endedAt || '').format('MMM DD, hh:mm A')}</div>
-                </div>
-              </>
             ) : null}
           </div>
         </div>
@@ -191,6 +187,9 @@ const Voting: React.FC<Props> = ({
             lastPhase = index !== 0 ? historyItems[index - 1].phase : '';
             return (
               <>
+                {index !== 0 && lastPhase !== item?.phase ? (
+                  <Divider className='my-2' />
+                ) : null}
                 {item?.phase && (index === 0 || lastPhase !== item?.phase)
                   ? renderPhaseHeader(
                       item.phase,
@@ -220,12 +219,14 @@ const Voting: React.FC<Props> = ({
                 currentCheckpointData?.created_at
               )
             : null}
+          {historyItems.length > 1 ? <Divider className='my-2' /> : null}
           <VoteUI
             currentProposalData={currentProposalData}
             checkpointData={currentCheckpointData}
             user={user}
             reload={reload}
             setLoading={setLoading}
+            isFirstCheckPoint={historyItems.length === 0}
           />
         </div>
       </div>

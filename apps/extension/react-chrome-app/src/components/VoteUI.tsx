@@ -57,6 +57,7 @@ const VoteUI = ({
     '-'
   );
   const isExpired = moment(endToVote || 0).isBefore(moment());
+  console.log('isExpired', isExpired);
   const isAuthorOnly = isInteractable({
     checkpointId: checkpointData.id,
     currentProposalData,
@@ -113,7 +114,9 @@ const VoteUI = ({
           <div className='flex flex-row justify-between text-base'>
             <div className='flex flex-row items-center'>
               <div className='rounded-full w-[8px] h-[8px] bg-[#6200EE]'></div>
-              <div className='ml-[12px] text-md font-bold'>{title}</div>
+              <div className='ml-[12px] text-base font-bold'>
+                {shortenString(title, 25)}
+              </div>
             </div>
             {/* <div
               onClick={() => setExpanded(!expanded)}
@@ -122,11 +125,13 @@ const VoteUI = ({
               {expanded ? <DownOutlined /> : <UpOutlined />}
             </div> */}
           </div>
-          <div className='flex flex-col bg-white p-3 w-full text-xs rounded'>
+          <div className='flex flex-col bg-white p-3 w-full text-xs rounded  gap-2'>
             {isFirstCheckPoint && (
               <>
                 <div className='flex flex-row justify-between'>
-                  <div>{isExpired ? 'Expired' : 'Remaining duration'}</div>
+                  <div>
+                    {isExpired === true ? 'Expired' : 'Remaining duration'}
+                  </div>
                   <div>
                     {isExpired
                       ? `${moment(endToVote || 0).fromNow(true)} ago`
@@ -141,7 +146,7 @@ const VoteUI = ({
                 View guidelines
               </div>
               <div
-                className='cursor-pointer text-[#6200EE]'
+                className='cursor-pointer text-gray-600'
                 onClick={() => {
                   openWorkflowPage(
                     org_id,
@@ -159,7 +164,7 @@ const VoteUI = ({
                 {stripHTML(description)}
               </div>
             ) : null}
-            <div className='mt-4'>{renderButton()}</div>
+            <div className='mt-2'>{renderButton()}</div>
           </div>
         </div>
         {/* {expanded} */}
@@ -167,21 +172,29 @@ const VoteUI = ({
     ) : (
       // in a phase
       <div className='w-full bg-white p-3 rounded flex flex-col gap-1'>
-        <div className='text-xs font-bold'>{title}</div>
+        <div className='text-xs font-semibold'>{shortenString(title, 35)}</div>
         <Divider className='my-1' />
-        <div className='flex flex-row justify-between  text-xs'>
-          <div className='text-xs text-gray-500 font-medium'>
-            Remaining duration
-          </div>
-          <div>{moment(endToVote).fromNow()}</div>
-        </div>
-        <Divider className='my-1' />
+        {isFirstCheckPoint && (
+          <>
+            <div className='flex flex-row justify-between text-xs'>
+              <div className='text-xs text-gray-500 font-medium'>
+                {isExpired === true ? 'Expired' : 'Remaining duration'}
+              </div>
+              <div>
+                {isExpired
+                  ? `${moment(endToVote || 0).fromNow(true)} ago`
+                  : `${moment(endToVote || 0).fromNow(true)} left`}
+              </div>
+            </div>
+            <Divider className='my-2' />
+          </>
+        )}
         <div className='flex flex-row justify-between text-xs'>
           <div className='text-xs text-gray-500 font-medium'>
             View guidelines
           </div>
           <ExportOutlined
-            className='cursor-pointer'
+            className='cursor-pointer text-gray-600'
             onClick={() => {
               openWorkflowPage(
                 org_id,
