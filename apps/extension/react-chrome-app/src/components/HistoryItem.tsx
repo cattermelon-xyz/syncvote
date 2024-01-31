@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import moment from 'moment';
 import { Tag, Divider } from 'antd';
-import { shortenString } from '../utils';
+import { openProofOnChain, shortenString } from '../utils';
 import DoneIcon from '@assets/icons/DoneIcon';
 
 const HistoryItem = ({ item }: { item: any }) => {
@@ -31,10 +31,27 @@ const HistoryItem = ({ item }: { item: any }) => {
   const linkDiscourse = tallyResult?.submission?.linkDiscourse || null;
   const linkSnapshot = tallyResult?.linkSnapshot || null;
   const renderResult = () => {
-    return (
+    return selectedOption || linkDiscourse || linkSnapshot ? (
       <>
-        {selectedOption || linkDiscourse || linkSnapshot ? (
-          <div className='text-xs'>
+        <div>
+          <div className='flex flex-row w-full justify-between text-xs'>
+            <div className='text-gray-600'>
+              {selectedOption && 'Selected option'}
+              {linkDiscourse && 'Post link'}
+              {linkSnapshot && 'Snapshot link'}
+            </div>
+            {linkSnapshot || linkDiscourse ? (
+              <a
+                href={linkSnapshot ? linkSnapshot : linkDiscourse}
+                className='text-[#6200EE]'
+              >
+                <ExportOutlined />
+              </a>
+            ) : (
+              <></>
+            )}
+          </div>
+          <div className='text-xs mt-2'>
             {selectedOption ? (
               <div className='flex flex-row gap-1 items-center'>
                 <DoneIcon />
@@ -44,7 +61,7 @@ const HistoryItem = ({ item }: { item: any }) => {
               </div>
             ) : null}{' '}
             {linkDiscourse ? (
-              <div className='flex flex-row gap-1 items-center'>
+              <div className='flex flex-row gap-1 items-center mt-2'>
                 <DoneIcon />
                 <a
                   href={linkDiscourse}
@@ -57,7 +74,7 @@ const HistoryItem = ({ item }: { item: any }) => {
               </div>
             ) : null}
             {linkSnapshot ? (
-              <div className='flex flex-row gap-1 items-center'>
+              <div className='flex flex-row gap-1 items-center mt-2'>
                 <DoneIcon />
                 <a
                   href={linkSnapshot}
@@ -70,10 +87,11 @@ const HistoryItem = ({ item }: { item: any }) => {
               </div>
             ) : null}
           </div>
-        ) : (
-          <></>
-        )}
+        </div>
+        <Divider className='my-1' />
       </>
+    ) : (
+      <></>
     );
   };
   return (
@@ -104,17 +122,23 @@ const HistoryItem = ({ item }: { item: any }) => {
             {expanded && !isEnd && (
               <>
                 <Divider className='my-1' />
+                {renderResult()}
                 <div className='flex flex-row w-full justify-between text-xs'>
-                  <div>Result</div>
+                  <div className='text-gray-600'>Proof on chain</div>
                   {arweave_id ? (
-                    <a href={arweave_id}>
+                    <span
+                      onClick={() =>
+                        openProofOnChain(
+                          arweave_id.replace('https://arweave.net/', '')
+                        )
+                      }
+                    >
                       <ExportOutlined />
-                    </a>
+                    </span>
                   ) : (
                     <></>
                   )}
                 </div>
-                {renderResult()}
               </>
             )}
           </div>
@@ -130,21 +154,25 @@ const HistoryItem = ({ item }: { item: any }) => {
         </div>
         <Divider className='my-1' />
         <div className='flex flex-row w-full justify-between'>
-        <div className='text-xs text-gray-500 font-medium'>Completed on</div>
+          <div className='text-xs text-gray-500 font-medium'>Completed on</div>
           <div>{moment(endedAt || 0).format('MMM DD, hh:mm A')}</div>
         </div>
         <Divider className='my-1' />
+        {renderResult()}
         <div className='w-full flex flex-row justify-between text-xs'>
-          <div>Result</div>
+          <div className='text-gray-600'>Proof on chain</div>
           {arweave_id ? (
-            <a href={arweave_id}>
+            <span
+              onClick={() =>
+                openProofOnChain(arweave_id.replace('https://arweave.net/', ''))
+              }
+            >
               <ExportOutlined className='ml-1' />
-            </a>
+            </span>
           ) : (
             <></>
           )}
         </div>
-        {renderResult()}
       </div>
     ))
   );

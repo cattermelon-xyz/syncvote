@@ -4,6 +4,7 @@ const chromeStorageKeys = {
   lastProposalId: 'lastProposalId',
   lastOrgId: 'lastOrgId',
   lastPage: 'lastPage',
+  lastWorkflowId: 'lastWorkflowId',
 };
 
 export { chromeStorageKeys };

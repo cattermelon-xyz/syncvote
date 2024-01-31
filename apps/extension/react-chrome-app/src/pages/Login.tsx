@@ -24,16 +24,32 @@ const Login = () => {
   });
 
   return (
-    <div className='flex flex-col mt-[84px] gap-7 justify-between items-center'>
-      <LogoSyncVote width='114' height='87' />
-      <Button
-        type='default'
-        className='flex items-center mr-4'
-        onClick={signInWithGoogle}
-      >
-        <Google />
-        <div className='ml-1'>Continue with Google</div>
-      </Button>
+    <div className='flex flex-col mt-[84px] gap-16 justify-between items-center'>
+      <div className='flex flex-col gap-6 items-center'>
+        <LogoSyncVote width='130' height='100' color='#383838' />
+        <div className='flex flex-col gap-4 text-center w-full'>
+          <div className='text-2xl text-color-gray-700 font-bold'>
+            Welcome to SyncVote
+          </div>
+          <div className='text-xs text-color-gray-600'>
+            Create and keep track your proposal
+          </div>
+        </div>
+      </div>
+
+      <div className='w-[320px] flex flex-col gap-4'>
+        <Button
+          type='default'
+          className='flex items-center w-full h-[52px]'
+          onClick={signInWithGoogle}
+        >
+          <Google />
+          <div className='ml-2 text-base'>Continue with Google</div>
+        </Button>
+        <div className='text-base text-gray-600 w-full text-center'>
+          Please reopen the plugin after logged in
+        </div>
+      </div>
     </div>
   );
 };

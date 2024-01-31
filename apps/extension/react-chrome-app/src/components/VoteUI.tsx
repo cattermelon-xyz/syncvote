@@ -39,12 +39,14 @@ const VoteUI = ({
   user,
   reload,
   setLoading,
+  isFirstCheckPoint,
 }: {
   currentProposalData: any;
   checkpointData: any;
   user: any;
   reload: any;
   setLoading: any;
+  isFirstCheckPoint?: any;
 }) => {
   const [expanded, setExpanded] = useState(true);
   const { workflow_id, workflow_version_id, org_id } = currentProposalData;
@@ -121,17 +123,23 @@ const VoteUI = ({
             </div> */}
           </div>
           <div className='flex flex-col bg-white p-3 w-full text-xs rounded'>
-            <div className='flex flex-row justify-between'>
-              <div>{isExpired ? 'Expired' : 'Remaining duration'}</div>
-              <div>
-                {isExpired
-                  ? `${moment(endToVote || 0).fromNow(true)} ago`
-                  : `${moment(endToVote || 0).fromNow(true)} left`}
-              </div>
-            </div>
-            <Divider className='my-2' />
+            {isFirstCheckPoint && (
+              <>
+                <div className='flex flex-row justify-between'>
+                  <div>{isExpired ? 'Expired' : 'Remaining duration'}</div>
+                  <div>
+                    {isExpired
+                      ? `${moment(endToVote || 0).fromNow(true)} ago`
+                      : `${moment(endToVote || 0).fromNow(true)} left`}
+                  </div>
+                </div>
+                <Divider className='my-2' />
+              </>
+            )}
             <div className='flex flex-row justify-between w-full'>
-              <div className='text-xs text-gray-500 font-medium'>View guidelines</div>
+              <div className='text-xs text-gray-500 font-medium'>
+                View guidelines
+              </div>
               <div
                 className='cursor-pointer text-[#6200EE]'
                 onClick={() => {
@@ -147,8 +155,8 @@ const VoteUI = ({
               </div>
             </div>
             {description ? (
-              <div className='text-xs px-1 font-medium text-gray-700'>
-                {shortenString(stripHTML(description), 138)}
+              <div className='text-xs px-1 font-medium text-gray-700 three-line-ellipsis'>
+                {stripHTML(description)}
               </div>
             ) : null}
             <div className='mt-4'>{renderButton()}</div>
@@ -162,12 +170,16 @@ const VoteUI = ({
         <div className='text-xs font-bold'>{title}</div>
         <Divider className='my-1' />
         <div className='flex flex-row justify-between  text-xs'>
-        <div className='text-xs text-gray-500 font-medium'>Remaining duration</div>
+          <div className='text-xs text-gray-500 font-medium'>
+            Remaining duration
+          </div>
           <div>{moment(endToVote).fromNow()}</div>
         </div>
         <Divider className='my-1' />
         <div className='flex flex-row justify-between text-xs'>
-        <div className='text-xs text-gray-500 font-medium'>View guidelines</div>
+          <div className='text-xs text-gray-500 font-medium'>
+            View guidelines
+          </div>
           <ExportOutlined
             className='cursor-pointer'
             onClick={() => {
@@ -181,8 +193,8 @@ const VoteUI = ({
           />
         </div>
         {description ? (
-          <div className='text-xs px-1 font-medium text-gray-700'>
-            {shortenString(stripHTML(description), 138)}
+          <div className='text-xs px-1 font-medium text-gray-700 three-line-ellipsis'>
+            {stripHTML(description)}
           </div>
         ) : null}
         <div className='mt-4'>{renderButton()}</div>
