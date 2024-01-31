@@ -462,6 +462,7 @@ export const EditVersion = () => {
                         {showLeftPanel && (
                           <div className='px-3 py-4 gap-2 flex flex-col w-[250px] h-full'>
                             <VoteMachineList />
+                            <Divider className='my-0' />
                             <ColorLegend
                               showColorLegend={showColorLegend}
                               setShowColorLegend={setShowColorLegend}
@@ -472,19 +473,20 @@ export const EditVersion = () => {
                               setVersion={setVersion}
                               setDataHasChanged={setDataHasChanged}
                             />
-                            <Divider className='my-1' />
+                            <Divider className='my-0' />
                             <WorkflowList
                               version={version}
                               setVersion={setVersion}
                               allCheckPoints={allCheckPoints}
                             />
-                            <Divider className='my-1' />
+                            <Divider className='my-0' />
                             <VariableList
                               version={version}
                               setVersion={setVersion}
                             />
-                            <Divider className='my-1' />
+                            <Divider className='my-0' />
                             <Phases version={version} setVersion={setVersion} />
+                            <Divider className='my-0' />
                           </div>
                         )}
                         <div

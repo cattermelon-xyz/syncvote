@@ -38,11 +38,12 @@ const CreateProposal: React.FC<Props> = ({
       start: currentWorkflowData?.versions[0]?.data?.start,
       workflow_version_id: currentWorkflowData?.versions[0]?.id,
     };
-
-    createMission({
+    console.log('create mission: ', missionData);
+    await createMission({
       missionData,
       onSuccess: (response) => {
         setLoading(false);
+        console.log('create mission success');
         // TODO: fix loading
         setCurrentProposalId(response.data[0]?.id);
         setPage(PAGE_ROUTER.DONE_CREATE_PROPOSAL);
@@ -177,11 +178,11 @@ const CreateProposal: React.FC<Props> = ({
         disabled={isButtonDisabled}
         onClick={async () => {
           setLoading(true);
+          await handleCreateProposal();
           await chrome.runtime.sendMessage({
             action: 'saveLastWorkflowId',
             payload: '',
           });
-          await handleCreateProposal();
         }}
       >
         Confirm

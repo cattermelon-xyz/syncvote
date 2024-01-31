@@ -19,7 +19,8 @@ export const MissionStatusTag = ({
   let text = 'Draft';
   switch (mission.status) {
     case 'STOPPED':
-      if (mission.checkpoint_inHappyPath) {
+      // TODO: change database to fix this ugly code
+      if (mission.checkpoint_inhappypath || mission.checkpoint_inHappyPath) {
         color = 'success';
         text = 'Success';
       } else {

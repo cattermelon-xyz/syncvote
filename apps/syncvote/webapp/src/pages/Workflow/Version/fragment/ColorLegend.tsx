@@ -30,7 +30,7 @@ const ColorLegend = ({
     <>
       <CollapsiblePanel
         title={
-          <div className='text-sm flex flex-row'>
+          <div className='text-sm flex flex-row' title='Show labeled color'>
             <BgColorsOutlined className='mr-1' />
             <div>Color Legend</div>
           </div>

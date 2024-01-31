@@ -32,7 +32,7 @@ const VoteButton = ({
       }
       // TODO: user check must resides on server
       jsxObject = (
-        <div className='flex flex-col gap-1'>
+        <div className='flex flex-col gap-2'>
           {options.map((option: any, index: number) => {
             const selectedOption = option === 'Abstain' ? -1 : index;
             const data = {

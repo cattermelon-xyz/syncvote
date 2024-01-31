@@ -4,6 +4,7 @@ import {
   UpOutlined,
   AuditOutlined,
   ExportOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import { Tag, Divider } from 'antd';
@@ -43,7 +44,7 @@ const HistoryItem = ({ item }: { item: any }) => {
             {linkSnapshot || linkDiscourse ? (
               <a
                 href={linkSnapshot ? linkSnapshot : linkDiscourse}
-                className='text-[#6200EE]'
+                className='text-gray-600'
               >
                 <ExportOutlined />
               </a>
@@ -104,7 +105,7 @@ const HistoryItem = ({ item }: { item: any }) => {
             <div className='pl-1 flex flex-row items-center'>
               <div className='rounded-full w-[8px] h-[8px] bg-gray-400'></div>
               <div className='ml-[12px] text-md font-bold'>
-                {checkpoint_title}
+                {shortenString(checkpoint_title, 40)}
               </div>
             </div>
             <div
@@ -126,15 +127,20 @@ const HistoryItem = ({ item }: { item: any }) => {
                 <div className='flex flex-row w-full justify-between text-xs'>
                   <div className='text-gray-600'>Proof on chain</div>
                   {arweave_id ? (
-                    <span
-                      onClick={() =>
-                        openProofOnChain(
-                          arweave_id.replace('https://arweave.net/', '')
-                        )
-                      }
-                    >
-                      <ExportOutlined />
-                    </span>
+                    <div className='flex flex-row gap-2 ml-1'>
+                      <a className='text-gray-600' href={arweave_id}>
+                        <DownloadOutlined />
+                      </a>
+                      <span
+                        onClick={() =>
+                          openProofOnChain(
+                            arweave_id.replace('https://arweave.net/', '')
+                          )
+                        }
+                      >
+                        <ExportOutlined />
+                      </span>
+                    </div>
                   ) : (
                     <></>
                   )}
@@ -149,7 +155,7 @@ const HistoryItem = ({ item }: { item: any }) => {
       <div className='flex flex-col bg-white rounded p-3 gap-1'>
         <div className='flex flex-row w-full justify-between'>
           <div className='text-md font-bold'>
-            <div>{checkpoint_title}</div>
+            <div>{shortenString(checkpoint_title, 40)}</div>
           </div>
         </div>
         <Divider className='my-1' />
@@ -162,13 +168,20 @@ const HistoryItem = ({ item }: { item: any }) => {
         <div className='w-full flex flex-row justify-between text-xs'>
           <div className='text-gray-600'>Proof on chain</div>
           {arweave_id ? (
-            <span
-              onClick={() =>
-                openProofOnChain(arweave_id.replace('https://arweave.net/', ''))
-              }
-            >
-              <ExportOutlined className='ml-1' />
-            </span>
+            <div className='flex flex-row gap-2 ml-1'>
+              <a className='text-gray-600' href={arweave_id}>
+                <DownloadOutlined />
+              </a>
+              <span
+                onClick={() =>
+                  openProofOnChain(
+                    arweave_id.replace('https://arweave.net/', '')
+                  )
+                }
+              >
+                <ExportOutlined />
+              </span>
+            </div>
           ) : (
             <></>
           )}

@@ -23,6 +23,7 @@ export const queryMission = async ({
 
     for (let d of mList) {
       const newd = { ...d };
+      console.log('mission in mission_view: ', d);
 
       newd.mission_icon_url = d.mission_icon_url
         ? d.mission_icon_url
