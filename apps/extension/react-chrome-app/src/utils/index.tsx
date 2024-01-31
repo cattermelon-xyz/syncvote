@@ -78,3 +78,12 @@ export const openWorkflowPage = (
     },
   });
 };
+
+export const openProofOnChain = (hash: string) => {
+  chrome.runtime.sendMessage({
+    action: 'openUrl',
+    payload: {
+      url: `https://viewblock.io/arweave/tx/${hash}`,
+    },
+  });
+};
