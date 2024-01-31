@@ -75,7 +75,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </div>
         }
       >
-        <p className='text-base text-gray-400'>Please double-check the information you've input. Once you click Confirm, this action will be submitted.</p>
+        <p className='text-base text-gray-400'>Please double-check the information you have input. Once you click 'Confirm', this action cannot be reversed.</p>
       </Modal>
       <div className='w-full h-full flex flex-col items-center justify-between'>
         {action === 'create-topic' && (
@@ -117,7 +117,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '65vh',
+                            '60vh',
                             editor.editing.view.document.getRoot()
                           );
                         });

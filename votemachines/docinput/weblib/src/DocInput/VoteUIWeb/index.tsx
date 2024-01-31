@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Card, Button, Radio, Input, Tag } from 'antd';
+import { Card, Button, Radio, Input, Tag, Divider } from 'antd';
 import { IDoc } from 'directed-graph';
 import { getTimeRemainingToEnd } from '../funcs';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -91,154 +91,54 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   }>({});
 
   return (
-    <>
-      <p className='text-base font-semibold mb-2'>Plase input these values</p>
-      <div className='flex flex-col gap-2 w-full mb-2'>
-        {variables?.map((v: any) => {
-          return (
-            <div className='w-full flex items-center justify-between' key={v}>
-              <Tag>{v}</Tag>
-              <Input
-                value={variableValues[v] || ''}
-                className='w-1/2'
-                onChange={(e) => {
-                  variableValues[v] = e.target.value;
-                  setVariableValues({ ...variableValues });
-                }}
-              />
-            </div>
-          );
-        })}
-        {/* {optionDocs &&
-          optionDocs.map((optionDoc: any, index: any) => {
-            return (
-              <div
-                key={index}
-                className={`flex gap-3 ${
-                  expandedDocIds.includes(optionDoc.id)
-                    ? 'items-start'
-                    : 'items-center'
-                }`}
-              >
-                <div className='w-12 h-12 rounded-full bg-[#F6F6F6] flex items-center justify-center'>
-                  {index + 1}
-                </div>
-                <div className='w-full'>
-                  <div
-                    className={` flex justify-between ${
-                      expandedDocIds.includes(optionDoc.id) ? 'mb-7' : ''
-                    }`}
-                  >
-                    <div className='flex flex-col gap-2 mt-1'>
-                      <p>{optionDoc?.action}</p>
-                      <p>{optionDoc?.title}</p>
-                    </div>
-                    {expandedDocIds.includes(optionDoc.id) ? (
-                      <DownOutlined
-                        onClick={() =>
-                          setExpandedDocIds((prevIds) =>
-                            prevIds.filter((id) => id !== optionDoc.id)
-                          )
-                        }
-                      />
-                    ) : (
-                      <UpOutlined
-                        onClick={() =>
-                          setExpandedDocIds((prevIds) => [
-                            ...prevIds,
-                            optionDoc.id,
-                          ])
-                        }
-                      />
-                    )}
-                  </div>
-                  {expandedDocIds.includes(optionDoc.id) &&
-                    (optionDoc?.action === 'Append ' ? (
-                      <>
-                        <ShowDescription
-                          titleDescription={''}
-                          description={optionDoc.template}
-                          isAppendDocInput={true}
-                          bgColor='bg-[#F6F6F6]'
-                        />
-                        <div className='mt-4'>
-                          <TextEditor
-                            value={editorValues[optionDoc.id]}
-                            id={`text-editor-${optionDoc.id}`}
-                            setValue={(newValue: any) => {
-                              setEditorValues((prevValues) => ({
-                                ...prevValues,
-                                [optionDoc.id]: newValue,
-                              }));
-                            }}
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <TextEditor
-                        value={editorValues[optionDoc.id] || optionDoc.template}
-                        id={`text-editor-${optionDoc.id}`}
-                        setValue={(newValue: any) => {
-                          setEditorValues((prevValues) => ({
-                            ...prevValues,
-                            [optionDoc.id]: newValue,
-                          }));
-                        }}
-                      />
-                    ))}
-                </div>
+    <div className='flex flex-col h-full'>
+      <div className='flex-1 flex justify-center overflow-auto'>
+        <div className='w-full flex flex-col' style={{ maxWidth: '700px' }}>
+          <p className='text-base text-gray-500 mb-1'>
+            Input value
+          </p>
+          <div className='flex flex-col gap-2 w-full mb-2'>
+            {variables?.map((v: any) => (
+              <div className='w-full flex-col items-center justify-between' key={v}>
+                <h1 className='mb-6'>{v}</h1>
+                <Input
+                  value={variableValues[v] || ''}
+                  className='w-full h-12'
+                  onChange={(e) => {
+                    variableValues[v] = e.target.value;
+                    setVariableValues({ ...variableValues });
+                  }}
+                />
               </div>
-            );
-          })} */}
-      </div>
-      <div
-        className={`flex gap-3 ${
-          expandVoteForDocInput ? 'items-start' : 'items-start'
-        }`}
-      >
-        <div className='flex flex-col gap-6 w-full'>
-          <div className={` flex justify-between`}>
-            <div className='flex flex-col gap-2 mt-1'>
-              <p className='text-base font-semibold'>Choose option</p>
-            </div>
-            {expandVoteForDocInput ? (
-              <DownOutlined onClick={() => setExpandVoteForDocInput(false)} />
-            ) : (
-              <UpOutlined onClick={() => setExpandVoteForDocInput(true)} />
-            )}
-          </div>
-          {expandVoteForDocInput &&
-            checkpointData.data.options.map((option: any, index: any) => (
-              <Card className='w-full' key={index}>
-                {/* selectedOption === index + 1 because 0 === false can't not check radio button */}
-                <Radio
-                  checked={
-                    selectedOption === (option === 'Abstain' ? -1 : index)
-                  }
-                  onChange={() =>
-                    setSelectedOption(option === 'Abstain' ? -1 : index)
-                  }
-                >
-                  {`${index + 1}. ${option}`}
-                </Radio>
-              </Card>
             ))}
-          <Button
-            type='primary'
-            className='w-full'
-            onClick={handleConfirm}
-            disabled={
-              selectedOption !== null &&
-              getTimeRemainingToEnd(checkpointData.endToVote) != 'expired'
-                ? false
-                : true
-            }
-          >
-            Confirm
-          </Button>
+          </div>
         </div>
       </div>
-    </>
+      <div className='w-full'>
+        <Divider className='my-1' />
+        <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
+          {expandVoteForDocInput &&
+            checkpointData.data.options.map((option: any, index: any) => (
+              <Button
+                key={index}
+                type={index === 1 ? 'primary' : 'default'}
+                className={`mx-2 ${
+                  selectedOption === (option === 'Abstain' ? -1 : index)
+                    ? 'selected-button-class'
+                    : 'normal-button-class'
+                }`}
+                style={{ order: index === 1 ? -1 : 0 }} // This line ensures primary button is on the right
+                onClick={() => {
+                  setSelectedOption(option === 'Abstain' ? -1 : index);
+                  handleConfirm();
+                }}
+              >
+                {option}
+              </Button>
+            ))}
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -35,8 +35,9 @@ const ModalConnectWallet: React.FC<Props> = ({ open, onClose, setAccount }) => {
         open={open}
         cancelButtonProps={{ style: { display: 'none' } }}
         onCancel={() => {
-          onClose();
         }}
+        maskClosable={false}
+        closable={false}
         width={720}
         footer={null}
       >

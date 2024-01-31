@@ -175,7 +175,7 @@ const Voting: React.FC<Props> = ({
               // onClick={() => {
               //   openMissionPage(org_id, mission_id);
               // }}
-              className='w-full pl-1 mb-3 text-xl cursor-pointer text-gray-700 font-bold'
+              className='w-full pl-1 mb-3 text-xl text-gray-700 font-bold'
             >
               {shortenString(currentProposalData?.m_title)}
               {/* <ExportOutlined className='ml-1' /> */}
