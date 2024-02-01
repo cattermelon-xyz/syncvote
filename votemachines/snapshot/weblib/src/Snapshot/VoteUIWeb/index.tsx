@@ -1,6 +1,4 @@
-import React from 'react';
 import { useEffect, useState } from 'react';
-import { useSDK } from '@metamask/sdk-react';
 import { Card, Button, Radio, Input, Tag, Divider, Modal } from 'antd';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
@@ -129,17 +127,18 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
       <Modal
         className='rounded-xl'
         open={showTemplate}
-        title='Template'
+        title={<span style={{ fontSize: '32px' }}>Template</span>}
         onCancel={() => setShowTemplate(false)}
         footer={null}
-        width={'580vw'}
+        width={'58vw'}
       >
-        <div className='border rounded-md'>
+        <div className='border rounded-md text-base'>
           {parse(checkpointData?.data?.template || '')}
         </div>
       </Modal>
 
       <Modal
+        centered
         open={showConfirm}
         title='Confirm Submission'
         onCancel={() => setShowConfirm(false)}
@@ -156,11 +155,8 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
         }
       >
         <div className='flex flex-col gap-4'>
-          <div className='rounded border border-gray-300 border-solid p-2'>
-            <div className='text-md font-bold'>{title}</div>
-            {parse(shortenString(description, 200) || '')}
-          </div>
-          <div className='rounded border border-gray-300 border-solid p-2 flex flex-col gap-3'>
+          <p className='text-base text-gray-400'>Please double-check the information you have input. Once you click 'Confirm', this action cannot be reversed.</p>
+          <div className='rounded-xl border border-gray-300 border-solid p-4 flex flex-col gap-3'>
             <div className='flex flex-row justify-between'>
               <div>Snapshot Space</div>
               <div>
@@ -215,7 +211,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                       writer.setStyle(
                         //use max-height(for scroll) or min-height(static)
                         'min-height',
-                        '450px',
+                        '60vh',
                         editor.editing.view.document.getRoot()
                       );
                     });
@@ -228,7 +224,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             <Divider className='my-1' />
             <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
               {/* TODO: double click bug & if wallet is not connected, there is not try to connect it */}
-              <Button type='primary' loading={loading} onClick={submitSnapshot}>
+              <Button type='primary' loading={loading} onClick={() => setShowConfirm(true)}>
                 Submit
               </Button>
             </div>

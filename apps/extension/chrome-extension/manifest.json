@@ -5,6 +5,12 @@
   "icons": {
     "16": "./icons/logo32.png"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["/img/*"],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ],
   "action": {
     "default_title": "Click Me",
     "default_popup": "popup.html",

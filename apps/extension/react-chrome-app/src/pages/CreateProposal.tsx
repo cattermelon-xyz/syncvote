@@ -3,13 +3,9 @@ import { ExportOutlined, LeftOutlined } from '@ant-design/icons';
 import Input from 'antd/es/input/Input';
 import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
-import {
-  openWorkflowPage,
-  resetLastProposalId,
-  shortenString,
-  stripHTML,
-} from '../utils';
+import { openWorkflowPage, resetLastProposalId, stripHTML } from '../utils';
 import { createMission } from '@axios/createMission';
+import { getLastWorkflowId } from '@configs/getLastValue';
 
 interface Props {
   setPage: any;
@@ -27,6 +23,7 @@ const CreateProposal: React.FC<Props> = ({
   setLoading,
 }) => {
   const [inputValue, setInputValue] = useState('');
+  const [currentWorkflowId, setCurrentWorkflowId] = useState<any>();
   const [currentWorkflowData, setCurrentWorkflowData] = useState<any>();
   const isButtonDisabled = !inputValue || !currentWorkflowData;
   const [workflowsOption, setWorkflowsOption] = useState<any>();
@@ -41,11 +38,12 @@ const CreateProposal: React.FC<Props> = ({
       start: currentWorkflowData?.versions[0]?.data?.start,
       workflow_version_id: currentWorkflowData?.versions[0]?.id,
     };
-
-    createMission({
+    console.log('create mission: ', missionData);
+    await createMission({
       missionData,
       onSuccess: (response) => {
         setLoading(false);
+        console.log('create mission success');
         // TODO: fix loading
         setCurrentProposalId(response.data[0]?.id);
         setPage(PAGE_ROUTER.DONE_CREATE_PROPOSAL);
@@ -59,6 +57,15 @@ const CreateProposal: React.FC<Props> = ({
 
   useEffect(() => {
     resetLastProposalId();
+    getLastWorkflowId().then((val) => {
+      setCurrentWorkflowId(val);
+      if (val) {
+        const selectedDataWorkflow = currentOrgData?.workflows?.filter(
+          (dataOrg: any) => dataOrg?.id === val
+        );
+        setCurrentWorkflowData(selectedDataWorkflow[0]);
+      }
+    });
   });
 
   useEffect(() => {
@@ -86,10 +93,15 @@ const CreateProposal: React.FC<Props> = ({
     }
   }, [currentOrgData]);
 
-  const handleChangeWorkflow = (value: string) => {
+  const handleChangeWorkflow = async (value: string) => {
     const selectedDataWorkflow = currentOrgData?.workflows?.filter(
       (dataOrg: any) => dataOrg?.id === value
     );
+    setCurrentWorkflowId(value);
+    await chrome.runtime.sendMessage({
+      action: 'saveLastWorkflowId',
+      payload: value,
+    });
     setCurrentWorkflowData(selectedDataWorkflow[0]);
   };
 
@@ -128,6 +140,7 @@ const CreateProposal: React.FC<Props> = ({
               onChange={(e) => setInputValue(e.target.value)}
             />
             <Select
+              value={currentWorkflowId}
               className='h-[49px] w-full'
               placeholder='Select proposal process'
               onChange={handleChangeWorkflow}
@@ -149,8 +162,8 @@ const CreateProposal: React.FC<Props> = ({
                     }}
                   />
                 </div>
-                <div className='text-sm mt-3 text-gray-700'>
-                  {shortenString(stripHTML(currentWorkflowData?.desc), 245)}
+                <div className='text-sm mt-3 text-gray-700 six-line-ellipsis'>
+                  {stripHTML(currentWorkflowData?.desc)}
                 </div>
               </div>
             )}
@@ -166,6 +179,10 @@ const CreateProposal: React.FC<Props> = ({
         onClick={async () => {
           setLoading(true);
           await handleCreateProposal();
+          await chrome.runtime.sendMessage({
+            action: 'saveLastWorkflowId',
+            payload: '',
+          });
         }}
       >
         Confirm

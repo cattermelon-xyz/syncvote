@@ -3,7 +3,7 @@ import {
   getLastOrgId,
   getLastPage,
   getLastProposalId,
-} from '@configs/getLastProposalId';
+} from '@configs/getLastValue';
 import { useEffect, useState } from 'react';
 import { PAGE_ROUTER } from '@constants/common';
 import {
@@ -16,18 +16,10 @@ import {
 import { queryAMissionDetail } from '@data/mission';
 import { queryMission } from '@data/mission';
 import { extractCurrentCheckpointId } from './utils';
-import { Spin } from 'antd';
-
-const Loading = () => {
-  return (
-    <div className='w-full h-full flex justify-center items-center'>
-      <Spin />
-    </div>
-  );
-};
+import Loading from '@pages/Loading';
 
 function App() {
-  const [user, setUser] = useState<any>();
+  const [user, setUser] = useState<any>(-1);
   const [page, _setPage] = useState<string>(PAGE_ROUTER.HOME_PAGE);
   const setPage = async (val: string) => {
     _setPage(val);
@@ -52,34 +44,34 @@ function App() {
   const [followingMissions, setFollowingMissions] = useState<any[]>([]);
   const [currentCheckpointData, setCurrentCheckpointData] = useState<any>();
   const [lastRequest, setLastRequest] = useState<any>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setLoading(true);
     getCurrentUser().then((resp) => {
+      setLoading(false);
       if (resp) {
         setUser(resp.user);
-        setLoading(false);
       } else {
+        setUser(null);
       }
     });
     getLastProposalId().then((resp) => {
+      setLoading(false);
       if (resp) {
         setCurrentProposalId(resp.id);
-        setLoading(false);
       }
     });
     getLastPage().then((resp) => {
+      setLoading(false);
       if (resp) {
         _setPage(resp);
-        setLoading(false);
       }
     });
     getLastOrgId().then((resp) => {
-      console.log('load last org id: ', resp);
+      setLoading(false);
       if (resp) {
         _setCurrentOrgId(resp);
-        setLoading(false);
       }
     });
   }, []);
@@ -91,6 +83,7 @@ function App() {
       queryAMissionDetail({
         missionId: currentProposalId,
         onSuccess: (data: any) => {
+          setLoading(false);
           setCurrentProposalData({
             ...data,
             checkpoint_participation: data.participation,
@@ -111,10 +104,9 @@ function App() {
             checkpointDataAfterHandle.endToVote = endTovote;
           }
           setCurrentCheckpointData(checkpointDataAfterHandle);
-          setLoading(false);
         },
         onError: (error) => {
-          console.log('error', error);
+          console.log('error queryAMissionDetail:', error);
           setLoading(false);
         },
       });
@@ -126,6 +118,7 @@ function App() {
       queryMission({
         orgId: currentOrgData?.id,
         onSuccess: (data) => {
+          setLoading(false);
           const tmpMyMissions = data.filter(
             (missionData: any) =>
               missionData?.creator_id === user?.id && missionData.title
@@ -143,10 +136,9 @@ function App() {
           // console.log('tmpFollowingMissions', tmpFollowingMissions);
           setMyMissions(tmpMyMissions);
           setFollowingMissions(tmpFollowingMissions);
-          setLoading(false);
         },
         onError: (error) => {
-          console.log('error', error);
+          console.log('error currentOrgData: ', error);
           setLoading(false);
         },
       });
@@ -154,7 +146,7 @@ function App() {
   }, [currentOrgData, user]);
 
   return (
-    <div className='w-[357px] h-[600px] pt-[13px] pb-1 px-3 rounded-xl bg-[#F4F4F4] overflow-y-auto no-scrollbar'>
+    <div className='w-[357px] h-[600px] pt-[20px] pb-1 px-5 rounded-xl bg-[#F4F4F4] overflow-y-auto no-scrollbar'>
       {loading === true ? (
         <Loading />
       ) : user === null || user === undefined ? (

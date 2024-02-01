@@ -60,7 +60,7 @@ export const vote = async (data: any) => {
 export const openMissionPage = (orgId: string, proposalId: string) => {
   chrome.runtime.sendMessage({
     action: 'openUrl',
-    payload: { url: `${frontEndUrl}/${orgId}/${proposalId}/vote` },
+    payload: { url: `${frontEndUrl}/${orgId}/${proposalId}/submit` },
   });
 };
 
@@ -75,6 +75,15 @@ export const openWorkflowPage = (
     action: 'openUrl',
     payload: {
       url: `${frontEndUrl}/public/${orgId}/${workflowId}/${wvId}${cpUrl}`,
+    },
+  });
+};
+
+export const openProofOnChain = (hash: string) => {
+  chrome.runtime.sendMessage({
+    action: 'openUrl',
+    payload: {
+      url: `https://viewblock.io/arweave/tx/${hash}`,
     },
   });
 };

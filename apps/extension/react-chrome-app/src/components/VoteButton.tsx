@@ -32,7 +32,7 @@ const VoteButton = ({
       }
       // TODO: user check must resides on server
       jsxObject = (
-        <div className='flex flex-col gap-1'>
+        <div className='flex flex-col gap-2'>
           {options.map((option: any, index: number) => {
             const selectedOption = option === 'Abstain' ? -1 : index;
             const data = {
@@ -76,9 +76,8 @@ const VoteButton = ({
       }
       jsxObject = (
         <Button
-          icon={<Discourse />}
           type='primary'
-          className='flex items-center gap-1'
+          className='text-center h-11 bg-gray-900 text-white'
           onClick={async () => {
             if (action === 'move-topic') {
               const data = {
@@ -111,7 +110,7 @@ const VoteButton = ({
         <Button
           type='primary'
           block
-          className='flex items-center gap-1'
+          className='text-center h-11 bg-gray-900 text-white'
           onClick={() => openMissionPage(orgId, proposalId)}
         >
           {label}
@@ -124,6 +123,7 @@ const VoteButton = ({
           <Button
             type='primary'
             block
+            className='text-center h-11 bg-gray-900 text-white'
             onClick={() => openMissionPage(orgId, proposalId)}
           >
             Go to Mission Page

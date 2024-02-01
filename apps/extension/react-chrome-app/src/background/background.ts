@@ -100,6 +100,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     }
 
+    case 'saveLastWorkflowId': {
+      chrome.storage.sync.set({
+        [chromeStorageKeys.lastWorkflowId]: request.payload,
+      });
+      break;
+    }
+
     default:
       break;
   }

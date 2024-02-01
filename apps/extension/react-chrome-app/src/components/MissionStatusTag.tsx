@@ -19,7 +19,8 @@ export const MissionStatusTag = ({
   let text = 'Draft';
   switch (mission.status) {
     case 'STOPPED':
-      if (mission.checkpoint_inHappyPath) {
+      // TODO: change database to fix this ugly code
+      if (mission.checkpoint_inhappypath || mission.checkpoint_inHappyPath) {
         color = 'success';
         text = 'Success';
       } else {
@@ -61,19 +62,19 @@ export const MissionStatusTag = ({
   }
   switch (color) {
     case 'default':
-      tagClass = 'border-0 ';
+      tagClass = 'border-1 ';
       break;
     case 'success':
-      tagClass = 'text-[#1D713E] bg-[#EAF6EE] border-0 ';
+      tagClass = 'text-[#1D713E] bg-[#EAF6EE] border-[#1D713E] border-1 ';
       break;
     case 'success-border':
       tagClass = 'text-[#1D713E] bg-[#EAF6EE] border-[#1D713E] border-1 ';
       break;
     case 'failed':
-      tagClass = 'text-[#A22C29] bg-[#F6EAEA] border-0 ';
+      tagClass = 'text-[#A22C29] bg-[#F6EAEA] border-[#A22C29] border-1 ';
       break;
     case 'inprogress':
-      tagClass = 'text-[#D89531] bg-[#FBF4EA] border-0 ';
+      tagClass = 'text-[#D89531] bg-[#FBF4EA] border-[#D89531] border-1 ';
       break;
   }
   tagClass += ' rounded-xl ' + className ? className : '';

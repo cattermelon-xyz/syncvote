@@ -4,10 +4,11 @@ import {
   UpOutlined,
   AuditOutlined,
   ExportOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import { Tag, Divider } from 'antd';
-import { shortenString } from '../utils';
+import { openProofOnChain, shortenString } from '../utils';
 import DoneIcon from '@assets/icons/DoneIcon';
 
 const HistoryItem = ({ item }: { item: any }) => {
@@ -31,10 +32,27 @@ const HistoryItem = ({ item }: { item: any }) => {
   const linkDiscourse = tallyResult?.submission?.linkDiscourse || null;
   const linkSnapshot = tallyResult?.linkSnapshot || null;
   const renderResult = () => {
-    return (
+    return selectedOption || linkDiscourse || linkSnapshot ? (
       <>
-        {selectedOption || linkDiscourse || linkSnapshot ? (
-          <div className='text-xs'>
+        <div>
+          <div className='flex flex-row w-full justify-between text-xs'>
+            <div className='text-gray-600'>
+              {selectedOption && 'Selected option'}
+              {linkDiscourse && 'Post link'}
+              {linkSnapshot && 'Snapshot link'}
+            </div>
+            {linkSnapshot || linkDiscourse ? (
+              <a
+                href={linkSnapshot ? linkSnapshot : linkDiscourse}
+                className='text-gray-600'
+              >
+                <ExportOutlined />
+              </a>
+            ) : (
+              <></>
+            )}
+          </div>
+          <div className='text-xs mt-2'>
             {selectedOption ? (
               <div className='flex flex-row gap-1 items-center'>
                 <DoneIcon />
@@ -44,7 +62,7 @@ const HistoryItem = ({ item }: { item: any }) => {
               </div>
             ) : null}{' '}
             {linkDiscourse ? (
-              <div className='flex flex-row gap-1 items-center'>
+              <div className='flex flex-row gap-1 items-center mt-2'>
                 <DoneIcon />
                 <a
                   href={linkDiscourse}
@@ -57,7 +75,7 @@ const HistoryItem = ({ item }: { item: any }) => {
               </div>
             ) : null}
             {linkSnapshot ? (
-              <div className='flex flex-row gap-1 items-center'>
+              <div className='flex flex-row gap-1 items-center mt-2'>
                 <DoneIcon />
                 <a
                   href={linkSnapshot}
@@ -70,10 +88,11 @@ const HistoryItem = ({ item }: { item: any }) => {
               </div>
             ) : null}
           </div>
-        ) : (
-          <></>
-        )}
+        </div>
+        <Divider className='my-1' />
       </>
+    ) : (
+      <></>
     );
   };
   return (
@@ -83,10 +102,10 @@ const HistoryItem = ({ item }: { item: any }) => {
       <>
         <div className='flex flex-col text-gray-600 gap-4'>
           <div className='flex flex-row justify-between text-base'>
-            <div className='flex flex-row items-center'>
-              <div className='rounded-full w-[8px] h-[8px] bg-gray-500'></div>
+            <div className='pl-1 flex flex-row items-center'>
+              <div className='rounded-full w-[8px] h-[8px] bg-gray-400'></div>
               <div className='ml-[12px] text-md font-bold'>
-                {checkpoint_title}
+                {shortenString(checkpoint_title, 40)}
               </div>
             </div>
             <div
@@ -104,17 +123,28 @@ const HistoryItem = ({ item }: { item: any }) => {
             {expanded && !isEnd && (
               <>
                 <Divider className='my-1' />
+                {renderResult()}
                 <div className='flex flex-row w-full justify-between text-xs'>
-                  <div>Result</div>
+                  <div className='text-gray-600'>Proof on chain</div>
                   {arweave_id ? (
-                    <a href={arweave_id}>
-                      <ExportOutlined />
-                    </a>
+                    <div className='flex flex-row gap-2 ml-1'>
+                      <a className='text-gray-600' href={arweave_id}>
+                        <DownloadOutlined />
+                      </a>
+                      <span
+                        onClick={() =>
+                          openProofOnChain(
+                            arweave_id.replace('https://arweave.net/', '')
+                          )
+                        }
+                      >
+                        <ExportOutlined />
+                      </span>
+                    </div>
                   ) : (
                     <></>
                   )}
                 </div>
-                {renderResult()}
               </>
             )}
           </div>
@@ -125,26 +155,37 @@ const HistoryItem = ({ item }: { item: any }) => {
       <div className='flex flex-col bg-white rounded p-3 gap-1'>
         <div className='flex flex-row w-full justify-between'>
           <div className='text-md font-bold'>
-            <div>{checkpoint_title}</div>
+            <div>{shortenString(checkpoint_title, 40)}</div>
           </div>
         </div>
         <Divider className='my-1' />
         <div className='flex flex-row w-full justify-between'>
-          <div>Completed on</div>
+          <div className='text-xs text-gray-500 font-medium'>Completed on</div>
           <div>{moment(endedAt || 0).format('MMM DD, hh:mm A')}</div>
         </div>
         <Divider className='my-1' />
+        {renderResult()}
         <div className='w-full flex flex-row justify-between text-xs'>
-          <div>Result</div>
+          <div className='text-gray-600'>Proof on chain</div>
           {arweave_id ? (
-            <a href={arweave_id}>
-              <ExportOutlined className='ml-1' />
-            </a>
+            <div className='flex flex-row gap-2 ml-1'>
+              <a className='text-gray-600' href={arweave_id}>
+                <DownloadOutlined />
+              </a>
+              <span
+                onClick={() =>
+                  openProofOnChain(
+                    arweave_id.replace('https://arweave.net/', '')
+                  )
+                }
+              >
+                <ExportOutlined />
+              </span>
+            </div>
           ) : (
             <></>
           )}
         </div>
-        {renderResult()}
       </div>
     ))
   );

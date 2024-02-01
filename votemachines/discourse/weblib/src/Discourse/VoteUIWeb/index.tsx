@@ -37,16 +37,19 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   return (
     <>
       <Modal
+        className='rounded-xl'
         open={showTemplate}
-        title='Template'
+        title={<span style={{ fontSize: '32px' }}>Template</span>}
         onCancel={() => setShowTemplate(false)}
         footer={null}
+        width={'58vw'}
       >
         <div className='border rounded-md'>
           {parse(checkpointData?.data?.template || '')}
         </div>
       </Modal>
       <Modal
+        centered  
         open={showConfirm}
         title='Confirm submission'
         onCancel={() => setShowConfirm(false)}
@@ -72,7 +75,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </div>
         }
       >
-        {parse(shortenString(missionDesc, 200) || '')}
+        <p className='text-base text-gray-400'>Please double-check the information you have input. Once you click 'Confirm', this action cannot be reversed.</p>
       </Modal>
       <div className='w-full h-full flex flex-col items-center justify-between'>
         {action === 'create-topic' && (
@@ -83,7 +86,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 style={{ maxWidth: '700px' }}
               >
                 <div className='mb-8'>
-                  <div className='mb-2 text-gray-500'>
+                  <div className='mb-2 text-gray-400'>
                     Create a new Topic on Discourse
                   </div>
                   <input
@@ -100,7 +103,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     shape='circle'
                     size='large'
                     className='absolute '
-                    style={{ left: '-60px' }}
+                    style={{ left: '-72px' }}
                     onClick={() => setShowTemplate(true)}
                     disabled={!checkpointData?.data?.template}
                     title='Show Template'
@@ -114,7 +117,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '450px',
+                            '65vh',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -126,7 +129,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             </div>
             <div className='w-full'>
               <Divider className='my-1' />
-              <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
+              <div className='w-full flex flex-row-reverse py-3 pr-5 items-center'>
                 <Button
                   type='primary'
                   onClick={() => {
@@ -260,8 +263,8 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               </div>
             </div>
             <div className='w-full'>
-              <Divider className='my-1' />
-              <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
+              <Divider className='mb-3' />
+              <div className='w-full flex flex-row-reverse py-3 pr-5 items-center'>
                 <Button
                   type='primary'
                   onClick={() => {

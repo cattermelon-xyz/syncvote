@@ -16,7 +16,7 @@ export default (
     </Route>
     <Route path='/' element={<App layout={NoHeaderAppLayout} />}>
       <Route
-        path=':orgIdString/:missionIdString/vote'
+        path=':orgIdString/:missionIdString/submit'
         element={<MissionVoting />}
       />
     </Route>

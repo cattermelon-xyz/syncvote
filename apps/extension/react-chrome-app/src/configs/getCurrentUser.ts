@@ -19,15 +19,13 @@ export async function getCurrentUser(): Promise<null | {
         access_token: gauthAccessToken,
         refresh_token: gauthRefreshToken,
       });
-
       const user = resp.data?.user;
       const supabaseAccessToken = resp.data.session?.access_token;
-
       if (user && supabaseAccessToken) {
         return { user, accessToken: supabaseAccessToken };
       }
     } catch (e: any) {
-      console.error('Error: ', e);
+      console.error('Error in fetching user: ', e);
     }
   }
 
