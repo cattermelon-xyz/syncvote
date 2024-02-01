@@ -132,6 +132,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
         title='Template'
         onCancel={() => setShowTemplate(false)}
         footer={null}
+        width={'580vw'}
       >
         <div className='border rounded-md'>
           {parse(checkpointData?.data?.template || '')}
