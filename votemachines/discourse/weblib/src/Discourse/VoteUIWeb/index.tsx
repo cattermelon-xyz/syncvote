@@ -44,7 +44,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
         footer={null}
         width={'58vw'}
       >
-        <div className='border rounded-md'>
+        <div className='border rounded-md overscroll-y-auto' style={{maxHeight: '60vh', overscrollBehaviorY: 'contain'}}>
           {parse(checkpointData?.data?.template || '')}
         </div>
       </Modal>
@@ -264,7 +264,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             </div>
             <div className='w-full'>
               <Divider className='mb-3' />
-              <div className='w-full flex flex-row-reverse py-3 pr-5 items-center'>
+              <div className='w-full flex py-3 pr-5 items-center' style={{flexDirection: 'row-reverse'}}>
                 <Button
                   type='primary'
                   onClick={() => {
