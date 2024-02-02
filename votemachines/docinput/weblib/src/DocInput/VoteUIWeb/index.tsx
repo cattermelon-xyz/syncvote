@@ -116,7 +116,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
       </div>
       <div className='w-full'>
         <Divider className='my-1' />
-        <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
+        <div className='w-full flex pt-2 pb-3 pr-5 items-center' style={{flexDirection: 'row-reverse'}}>
           {expandVoteForDocInput &&
             checkpointData.data.options.map((option: any, index: any) => (
               <Button

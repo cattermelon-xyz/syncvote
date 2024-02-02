@@ -1,4 +1,4 @@
-import { Button, Divider, Input, Modal, Select, Space } from 'antd';
+import { Button, Divider, Drawer, Input, Modal, Select, Space } from 'antd';
 import {
   IVoteUIWebProps,
   replaceVariables,
@@ -36,20 +36,27 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   return (
     <>
-      <Modal
-        className='rounded-xl'
-        open={showTemplate}
+      <Drawer
         title={<span style={{ fontSize: '32px' }}>Template</span>}
-        onCancel={() => setShowTemplate(false)}
-        footer={null}
-        width={'58vw'}
+        placement='right' // or 'left', 'top', 'bottom' as per your requirement
+        closable={true}
+        onClose={() => setShowTemplate(false)}
+        visible={showTemplate}
+        getContainer={false}
+        style={{ position: 'absolute' }}
+        width={'40vw'} // or height in case of 'top' or 'bottom' placement
+        className='pl-5'
       >
-        <div className='border rounded-md'>
+        <div
+          className='border rounded-md overscroll-y-auto'
+          style={{ maxHeight: '70%', overscrollBehaviorY: 'contain' }}
+        >
           {parse(checkpointData?.data?.template || '')}
         </div>
-      </Modal>
+      </Drawer>
+
       <Modal
-        centered  
+        centered
         open={showConfirm}
         title='Confirm submission'
         onCancel={() => setShowConfirm(false)}
@@ -75,9 +82,12 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
           </div>
         }
       >
-        <p className='text-base text-gray-400'>Please double-check the information you have input. Once you click 'Confirm', this action cannot be reversed.</p>
+        <p className='text-base text-gray-400'>
+          Please double-check the information you have input. Once you click
+          'Confirm', this action cannot be reversed.
+        </p>
       </Modal>
-      <div className='w-full h-full flex flex-col items-center justify-between'>
+      <div className='h-full flex flex-col items-center'>
         {action === 'create-topic' && (
           <>
             <div className='w-full flex flex-col items-center'>
@@ -97,7 +107,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </div>
-                <div className='flex flex-row relative'>
+                <div className='flex flex-row relative mb-3'>
                   <Button
                     icon={<FileOutlined />}
                     shape='circle'
@@ -117,7 +127,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '65vh',
+                            '63vh',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -128,8 +138,11 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               </div>
             </div>
             <div className='w-full'>
-              <Divider className='my-1' />
-              <div className='w-full flex flex-row-reverse py-3 pr-5 items-center'>
+              <Divider className='m-0' />
+              <div
+                className='w-full flex py-3 pr-5 items-center'
+                style={{ flexDirection: 'row-reverse' }}
+              >
                 <Button
                   type='primary'
                   onClick={() => {
@@ -175,7 +188,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                 <div className='mb-8'>
                   <div className='mb-2 text-gray-500'>Update Topic</div>
                 </div>
-                <div className='flex flex-row relative'>
+                <div className='flex flex-row relative mb-3'>
                   <Button
                     icon={<FileOutlined />}
                     shape='circle'
@@ -195,7 +208,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '450px',
+                            '63vh',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -206,7 +219,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               </div>
             </div>
             <div className='w-full'>
-              <Divider className='my-1' />
+              <Divider className='m-0' />
               <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
                 <Button
                   type='primary'
@@ -232,7 +245,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     Create a new Post on Discourse
                   </div>
                 </div>
-                <div className='flex flex-row relative'>
+                <div className='flex flex-row relative mb-3'>
                   <Button
                     icon={<FileOutlined />}
                     shape='circle'
@@ -252,7 +265,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                           writer.setStyle(
                             //use max-height(for scroll) or min-height(static)
                             'min-height',
-                            '450px',
+                            '63vh',
                             editor.editing.view.document.getRoot()
                           );
                         });
@@ -263,8 +276,11 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               </div>
             </div>
             <div className='w-full'>
-              <Divider className='mb-3' />
-              <div className='w-full flex flex-row-reverse py-3 pr-5 items-center'>
+              <Divider className='m-0' />
+              <div
+                className='w-full flex py-3 pr-5 items-center'
+                style={{ flexDirection: 'row-reverse' }}
+              >
                 <Button
                   type='primary'
                   onClick={() => {
