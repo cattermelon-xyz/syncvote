@@ -8,6 +8,7 @@ import ReactFlow, {
   useReactFlow,
   getRectOfNodes,
   getTransformForBounds,
+  applyNodeChanges,
 } from 'reactflow';
 import { toPng } from 'html-to-image';
 import React, {
@@ -70,7 +71,6 @@ const Flow = () => {
     onEdgeClick,
     onLayoutClick,
     onPaneClick,
-    onNodeChanged,
     onResetPosition,
     onAddNewNode,
     onViewPortChange,
@@ -90,9 +90,24 @@ const Flow = () => {
     onInit,
     onDragOver,
     onDrop,
+    onNodesPositionChange,
   } = useContext(GraphContext);
-  const [nodes, setNodes] = React.useState([]);
-  const [edges, setEdges] = React.useState([]);
+  const obj: any = buildATree({
+    data,
+    selectedNodeId,
+    selectedLayoutId,
+    selectedEdgeId,
+  });
+  const [nodes, setNodes] = React.useState(obj.nodes);
+  const [edges, setEdges] = React.useState(obj.edges);
+
+  const onNodesChange = useCallback(
+    (changes: any) => {
+      setNodes((nds: any) => applyNodeChanges(changes, nds));
+      onNodesPositionChange ? onNodesPositionChange(changes) : null;
+    },
+    [setNodes]
+  );
   const [isDocsShown, setIsDocsShown] = useState(false);
   useOnViewportChange({
     onChange: useCallback((viewport: any) => {
@@ -100,12 +115,6 @@ const Flow = () => {
     }, []),
   });
   useEffect(() => {
-    const obj: any = buildATree({
-      data,
-      selectedNodeId,
-      selectedLayoutId,
-      selectedEdgeId,
-    });
     setNodes(obj.nodes);
     setEdges(obj.edges);
 
@@ -222,9 +231,10 @@ const Flow = () => {
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodeDragThreshold={1}
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
-        onNodesChange={onNodeChanged}
+        onNodesChange={onNodesChange}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         proOptions={proOptions}

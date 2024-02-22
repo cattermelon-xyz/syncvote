@@ -139,12 +139,11 @@ export const deleteNode = (
   }
 };
 
-export const changeNode = (
+export const saveNodePosition = (
   version: any,
   changedNodes: any,
   selectedLayoutId: any,
-  setVersion: any,
-  setDataHasChanged: any
+  setVersion: any
 ) => {
   const newData = structuredClone(version?.data);
   if (newData.subWorkflows) {
@@ -204,7 +203,7 @@ export const changeNode = (
     ...version,
     data: newData,
   });
-  setDataHasChanged(true);
+  return newData;
 };
 
 export const save = async (

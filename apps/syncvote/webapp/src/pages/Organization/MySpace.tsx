@@ -15,6 +15,7 @@ import { config } from '@dal/config';
 import ListProposals from '@pages/Mission/fragments/ListProposals';
 import { queryMission } from '@dal/data';
 import { useDispatch } from 'react-redux';
+import NewFeatureDialog from '@components/NewFeatureDialog/NewFeatureDialog';
 
 const env = import.meta.env.VITE_ENV;
 
@@ -255,6 +256,7 @@ const MySpace: React.FC = () => {
 
   return (
     <>
+      <NewFeatureDialog />
       <CreateSpaceModal
         open={openModalCreateWorkspace}
         onClose={() => setOpenModalCreateWorkspace(false)}

@@ -21,7 +21,6 @@ export const GraphContext = React.createContext<IGraph>({
   onNodeClick: () => {},
   onLayoutClick: () => {},
   onPaneClick: () => {},
-  onNodeChanged: () => {},
   onResetPosition: () => {},
   onViewPortChange: () => {},
   onCosmeticChanged: (changed: IWorkflowVersionCosmetic) => {},
@@ -37,6 +36,7 @@ export const GraphContext = React.createContext<IGraph>({
   onInit: (reactflowInstance: any) => {},
   onDrop: (event: any) => {},
   onDragOver: (event: any) => {},
+  onNodesPositionChange: (data: any) => {},
 });
 
 export const GraphPanelContext = React.createContext<IConfigPanel>({
