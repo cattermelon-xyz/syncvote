@@ -23,11 +23,11 @@ const MachineConfigPanel = ({
       label: 'Rules and conditions',
       children: <RulesTab vmConfigPanel={vmConfigPanel} />,
     },
-    // {
-    //   key: '3',
-    //   label: 'Automated actions',
-    //   children: <TriggerTab />,
-    // },
+    {
+      key: '3',
+      label: 'Automated actions',
+      children: <TriggerTab />,
+    },
   ];
   const { viewMode } = useContext(GraphPanelContext);
   const editable =

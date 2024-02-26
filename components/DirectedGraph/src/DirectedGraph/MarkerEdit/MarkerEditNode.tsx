@@ -34,7 +34,7 @@ const MarkerEditNode = () => {
               {Markers.map((marker: any) => {
                 return (
                   <div
-                    key={marker.title.backgroundColor}
+                    key={Math.random()}
                     className='w-[16px] h-[16px] border-2 cursor-pointer'
                     style={{
                       backgroundColor: marker.title.backgroundColor,

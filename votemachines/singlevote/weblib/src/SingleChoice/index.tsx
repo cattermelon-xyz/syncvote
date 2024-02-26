@@ -22,7 +22,7 @@ import { SingleChoice as Funcs } from './funcs';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
 import VoteUIWeb from './VoteUIWeb';
-import { Card } from 'antd';
+import { Card, Popover } from 'antd';
 import { Icon } from 'icon';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
@@ -40,7 +40,19 @@ const getLabel = (props: IVoteMachineGetLabelProps) => {
       <div>
         {filteredTriggers?.map((trg: any) =>
           trg.provider === 'twitter' ? (
-            <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
+            <Popover
+              key={Math.random()}
+              content={
+                <div>
+                  <div className='mb-2 text-blue-500'>
+                    @{trg.params.username}
+                  </div>
+                  <div>{trg.params.tweet}</div>
+                </div>
+              }
+            >
+              <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
+            </Popover>
           ) : (
             <span key={trg.id || Math.random()}>{trg.provider}</span>
           )

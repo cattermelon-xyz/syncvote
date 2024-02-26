@@ -66,7 +66,7 @@ export const TemplateViewData = () => {
       if (!error) {
         setVersion(versionData);
         console.log(data);
-        
+
         setTemplate({
           title: data.title,
           id: data.id,
@@ -229,22 +229,6 @@ export const TemplateViewData = () => {
                 onChange={(newData) => {}}
                 onChangeLayout={(newData) => {}}
                 onDeleteNode={(nodeId) => {}}
-                onNodeChanged={(changedNodes) => {
-                  const newData = structuredClone(version?.data);
-                  newData?.checkpoints?.forEach((v: any, index: number) => {
-                    const changedNode = changedNodes.find(
-                      (cN: any) => cN.id === v.id
-                    );
-                    if (changedNode && changedNode.position) {
-                      newData.checkpoints[index].position =
-                        changedNode.position;
-                    }
-                  });
-                  setVersion({
-                    ...version,
-                    data: newData,
-                  });
-                }}
                 onNodeClick={(_event, node) => {
                   setSelectedNodeId(node.id);
                 }}

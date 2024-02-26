@@ -1,38 +1,53 @@
 import { Drawer, Space, Select, Segmented, Divider } from 'antd';
 import { useState } from 'react';
+import { IWeb2Integration } from '../../../..';
 
 const NewTriggerDrawer = ({
   selectedNode,
   triggers,
   onChange,
-  options,
-  AddElement,
-  selectedIntegrationId,
-  setSelectedIntegrationId,
+  getEnforcer,
   showAddTriggerDrawer,
   setShowAddTriggerDrawer,
-  selectedIntegration,
-  setSelectedTriggerAt,
   selectedTriggerAt,
-  triggerAtOptions,
+  allData,
+  integrations,
 }: {
   selectedNode: any;
   triggers: any[];
   onChange: (data: any) => void;
-  options: any[];
-  AddElement: any;
-  selectedIntegrationId: string | undefined;
-  setSelectedIntegrationId: (value: string) => void;
+  getEnforcer: any;
   showAddTriggerDrawer: boolean;
   setShowAddTriggerDrawer: (value: boolean) => void;
-  selectedIntegration: any;
-  setSelectedTriggerAt: (value: string) => void;
   selectedTriggerAt: string | undefined;
-  triggerAtOptions: any[];
+  allData: any;
+  integrations: any;
 }) => {
-  const [selectedSegmented, setSelectedSegmented] = useState(
-    selectedTriggerAt === 'this' ? 'this' : 'end'
+  const childrenOptions =
+    selectedNode?.children?.map((cId: any) => {
+      const c = allData.checkpoints.find((chk: any) => chk.id === cId);
+      return {
+        value: cId,
+        label: <>{c?.title}</>,
+      };
+    }) || [];
+  const [selectedChild, setSelectedChild] = useState('');
+  const [selectedIntegrationId, setSelectedIntegrationId] = useState<string>();
+  const selectedIntegration = integrations?.find(
+    (integration: any) => integration.id === selectedIntegrationId
   );
+  const AddElement = getEnforcer(selectedIntegration?.provider || '').Add;
+  const options =
+    integrations?.map((integration: IWeb2Integration) => {
+      return {
+        id: integration.id,
+        label:
+          integration.username !== ' '
+            ? `${integration.provider} (${integration.username})`
+            : integration.provider,
+        value: integration.id,
+      };
+    }) || [];
   return (
     <Drawer
       open={showAddTriggerDrawer}
@@ -42,50 +57,19 @@ const NewTriggerDrawer = ({
       }}
     >
       <Space direction='vertical' className='w-full' size='small'>
-        <Space direction='vertical' className='w-full' size='small'>
-          <div>Trigger this action</div>
-          <Segmented
-            block
-            options={[
-              {
-                label: 'At the start',
-                value: 'this',
-              },
-              {
-                label: 'At the end',
-                value: 'end',
-              },
-            ]}
-            value={selectedSegmented === 'this' ? 'this' : 'end'}
-            onChange={(value) => {
-              setSelectedSegmented(value === 'this' ? 'this' : 'end');
-              setSelectedTriggerAt(value === 'this' ? 'this' : '');
-            }}
-          />
-          {selectedSegmented === 'this' ? (
-            <span className='text-xs'>
-              Action triggers when this checkpoint is active
-            </span>
-          ) : (
-            <>
-              <span className='text-xs'>
-                Action triggers when voting ends with specific results
-              </span>
-              <div>Trigger by results</div>
-              <Select
-                options={triggerAtOptions}
-                className='w-full'
-                value={selectedTriggerAt}
-                onChange={(value) => {
-                  setSelectedTriggerAt(value);
-                }}
-              />
-            </>
-          )}
-        </Space>
-        <Divider />
         <Space direction='vertical' size='small' className='w-full'>
-          <span>Action</span>
+          <span>With</span>
+          <Select
+            options={childrenOptions}
+            value={selectedChild}
+            onChange={(v: any) => {
+              setSelectedChild(v);
+            }}
+            defaultValue='Select an action'
+            className='w-full'
+          />
+          <Divider className='my-2' />
+          <span>Trigger</span>
           <Select
             options={options}
             value={selectedIntegrationId}
@@ -101,27 +85,15 @@ const NewTriggerDrawer = ({
             <AddElement
               data={selectedIntegration}
               onChange={(data: any) => {
-                const tmpData = structuredClone(data);
+                const tmpData = structuredClone({
+                  ...data,
+                  triggerAt: selectedChild,
+                  name: data.provider + '-' + triggers.length,
+                });
                 const tmpSelectedNode = structuredClone(selectedNode);
-                tmpData.integrationId = selectedIntegrationId;
-                delete tmpData.id;
-                delete tmpData.access_token;
-                delete tmpData.refresh_token;
-                delete tmpData.refresh_token_expires_at;
-                delete tmpData.created_at;
-                delete tmpData.scope;
-                delete tmpData.updated_at;
                 onChange({
                   ...tmpSelectedNode,
-                  triggers: [
-                    ...triggers,
-                    {
-                      provider: selectedIntegration?.provider,
-                      name: `Trigger#${triggers.length + 1}`,
-                      triggerAt: selectedTriggerAt,
-                      ...tmpData,
-                    },
-                  ],
+                  triggers: [...triggers, { ...tmpData }],
                 });
                 setShowAddTriggerDrawer(false);
               }}

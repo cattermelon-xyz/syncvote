@@ -135,7 +135,7 @@ const ContextTab = () => {
       rs = (
         <>
           {params.message.map((msg: string) => {
-            return <Alert key={msg} message={msg} type='error' />;
+            return <Alert key={Math.random()} message={msg} type='error' />;
           })}
         </>
       );

@@ -76,6 +76,8 @@ export const deleteNode = (
   setDataHasChanged: any,
   setSelectedNodeId: any
 ) => {
+  // TODO: move this function into DirectedGraph
+  // TODO: delete triggers
   if (id === version?.data.start) {
     // TODO: how about start node of a sub workflow?
     Modal.error({
@@ -98,6 +100,11 @@ export const deleteNode = (
           if (_node.children) {
             _node.children.splice(_node.children.indexOf(id));
           }
+        }
+        if (_node.triggers) {
+          _node.triggers = _node.triggers.filter(
+            (t: any) => t.triggerAt !== id
+          );
         }
       });
       newData.checkpoints.splice(index, 1);
@@ -139,12 +146,11 @@ export const deleteNode = (
   }
 };
 
-export const changeNode = (
+export const saveNodePosition = (
   version: any,
   changedNodes: any,
   selectedLayoutId: any,
-  setVersion: any,
-  setDataHasChanged: any
+  setVersion: any
 ) => {
   const newData = structuredClone(version?.data);
   if (newData.subWorkflows) {
@@ -204,7 +210,7 @@ export const changeNode = (
     ...version,
     data: newData,
   });
-  setDataHasChanged(true);
+  return newData;
 };
 
 export const save = async (

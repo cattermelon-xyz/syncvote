@@ -21,9 +21,11 @@ const CollapsiblePanel = ({
   const [isOpen, setIsOpen] = useState(open);
   return (
     <div
-      className={`${className ? className : 'p-4 bg-white rounded-lg w-full'}`}
+      className={`${
+        className ? className : 'p-4 bg-white rounded-lg w-full select-none'
+      }`}
     >
-      <div className='w-full flex items-center justify-between mb-2'>
+      <div className='w-full flex items-center justify-between'>
         {typeof title === 'string' ? (
           <div className='font-bold text-lg select-none'>{title}</div>
         ) : (
@@ -41,7 +43,9 @@ const CollapsiblePanel = ({
       </div>
       <div
         style={bodyStyle}
-        className={`w-full ${!collapsable ? null : !isOpen ? 'hidden' : null}`}
+        className={`w-full mt-2 ${
+          !collapsable ? null : !isOpen ? 'hidden' : null
+        }`}
       >
         {children}
       </div>

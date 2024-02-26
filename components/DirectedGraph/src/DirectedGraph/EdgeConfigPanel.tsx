@@ -46,7 +46,7 @@ const EdgeConfigPanel = ({
         className='w-full bg-white rounded-lg p-4'
       >
         <Space direction='vertical' size='small' className='w-full'>
-          <div className='text-zinc-400'>Result</div>
+          <div className='text-zinc-400'>Selected Option</div>
           <div className='flex items-center'>
             <div className='text-md' style={{ ...selectedEdge?.labelStyle }}>
               {label}

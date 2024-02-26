@@ -204,7 +204,6 @@ export interface IGraph {
   onEdgeClick?: (event: any, data: any) => void;
   onLayoutClick?: (data: any) => void;
   onPaneClick?: (event: any) => void;
-  onNodeChanged?: (data: any) => void; // new name: onReactFlowNodeChanged
   onCosmeticChanged?: (changed: IWorkflowVersionCosmetic) => void;
   onResetPosition?: () => void;
   onViewPortChange?: (viewport: any) => void;
@@ -222,6 +221,7 @@ export interface IGraph {
   onInit?: (reactflowInstance: any) => void;
   onDrop?: (event: any) => void;
   onDragOver?: (event: any) => void;
+  onNodesPositionChange?: (data: any) => void;
 }
 
 export interface IConfigPanel {

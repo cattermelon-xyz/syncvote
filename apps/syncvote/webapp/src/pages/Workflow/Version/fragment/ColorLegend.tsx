@@ -38,9 +38,9 @@ const ColorLegend = ({
         className='p-0 w-full'
         open={false}
       >
-        {markers.map((marker: any) => {
+        {markers.map((marker: any, index: any) => {
           return (
-            <div className='flex gap-2 items-center' key={marker.color}>
+            <div className='flex gap-2 items-center' key={index}>
               <div
                 className='w-[16px] h-[16px]'
                 style={{ backgroundColor: marker.color }}

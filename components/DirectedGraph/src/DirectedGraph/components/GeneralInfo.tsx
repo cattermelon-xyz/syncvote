@@ -21,9 +21,9 @@ const renderParticipation = (participation: IParticipant | undefined) => {
             <div>
               <div className='text-zinc-500'>List of identity:</div>
               <ol className='ml-2'>
-                {identities.map((str, index) => {
+                {identities.map((str) => {
                   return (
-                    <li key={index} className='ml-1'>
+                    <li key={Math.random()} className='ml-1'>
                       {str}
                     </li>
                   );
@@ -88,26 +88,32 @@ const GeneralInfo = ({ checkpoint }: { checkpoint: ICheckPoint }) => {
               ) : null}
             </span>
           </li>
-        ) : <li>Who can pariticapte:</li>}
+        ) : (
+          <li>Who can pariticapte:</li>
+        )}
         {isRTE(votingLocation) ? (
           <li>
             Location:
             <SideNote value={votingLocation} />
           </li>
-        ) : <li>Location:</li>}
-          <li>
-            Duration:{' '}
-            <span>
+        ) : (
+          <li>Location:</li>
+        )}
+        <li>
+          Duration:{' '}
+          <span>
             <span className='text-violet-500'>
-              {checkpoint?.duration ? displayDuration(
-                moment.duration((checkpoint?.duration || 0) * 1000)
-              ):''}
-              </span>
-              {checkpoint?.durationDescription ? (
-                <SideNote value={checkpoint?.durationDescription} />
-              ) : null}
+              {checkpoint?.duration
+                ? displayDuration(
+                    moment.duration((checkpoint?.duration || 0) * 1000)
+                  )
+                : ''}
             </span>
-          </li>
+            {checkpoint?.durationDescription ? (
+              <SideNote value={checkpoint?.durationDescription} />
+            ) : null}
+          </span>
+        </li>
       </ul>
     </>
   );
