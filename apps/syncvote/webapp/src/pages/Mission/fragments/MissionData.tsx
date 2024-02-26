@@ -177,18 +177,6 @@ const Data = ({
           viewMode={GraphViewMode.EDIT_MISSION}
           data={versionData}
           selectedNodeId={selectedNodeId}
-          onNodeChanged={(changedNodes) => {
-            const newData = structuredClone(versionData);
-            newData.checkpoints?.forEach((v: any, index: number) => {
-              const changedNode = changedNodes.find(
-                (cN: any) => cN.id === v.id
-              );
-              if (changedNode && changedNode.position) {
-                newData.checkpoints[index].position = changedNode.position;
-              }
-            });
-            setVersionData(newData);
-          }}
           onNodeClick={(event, node) => {
             setSelectedNodeId(node.id);
           }}
@@ -202,18 +190,7 @@ const Data = ({
             });
             setVersionData(newData);
           }}
-          onAddNewNode={() => {
-            // TODO: should I delete this function? you cannot create new node in Mission mode
-            const newData = structuredClone(versionData);
-            const newId = `node-${new Date().getTime()}`;
-            newData.checkpoints.push({
-              id: newId,
-              position: centerPos,
-              isEnd: true,
-            });
-            setVersionData(newData);
-            setSelectedNodeId(newId);
-          }}
+          onAddNewNode={() => {}}
           onViewPortChange={(viewport) => {
             setCenterPos({
               x: (-viewport.x + 600) / viewport.zoom,

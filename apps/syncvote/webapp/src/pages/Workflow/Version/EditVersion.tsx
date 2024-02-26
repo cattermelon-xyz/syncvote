@@ -197,12 +197,7 @@ export const EditVersion = () => {
     const arr = Object.keys(nodePositionsToSave).map(
       (k: any) => nodePositionsToSave[k]
     );
-    const v = saveNodePosition(
-      version,
-      arr,
-      selectedLayoutId,
-      setDataHasChanged
-    );
+    const v = saveNodePosition(version, arr, selectedLayoutId, setVersion);
     await save(
       changedData,
       { ...version, data: v },
@@ -512,15 +507,32 @@ export const EditVersion = () => {
                     onDeleteNode={onDeleteNode}
                     onConfigPanelClose={() => setSelectedNodeId('')}
                     onChangeLayout={onChangeLayout}
-                    onEdgeClick={onEdgeClick}
+                    onEdgeClick={(e, edge) => {
+                      saveNodePosition(
+                        version,
+                        Object.keys(nodePositionsToSave).map(
+                          (k: any) => nodePositionsToSave[k]
+                        ),
+                        selectedLayoutId,
+                        setVersion
+                      );
+                      onEdgeClick(e, edge);
+                    }}
                     onConfigEdgePanelClose={() => setSelectedEdgeId('')}
                     onCosmeticChanged={onCosmeticChanged}
                     onLayoutClick={(selectedLayoutId) => {
                       setSelectedLayoutId(selectedLayoutId);
                     }}
                     onNodeClick={(event, node) => {
-                      console.log('node click: ', node.id);
                       setSelectedNodeId(node.id);
+                      saveNodePosition(
+                        version,
+                        Object.keys(nodePositionsToSave).map(
+                          (k: any) => nodePositionsToSave[k]
+                        ),
+                        selectedLayoutId,
+                        setVersion
+                      );
                     }}
                     onNodesPositionChange={(changedNodes: any) => {
                       if (changedNodes?.length === 1) {
@@ -529,18 +541,15 @@ export const EditVersion = () => {
                         });
                         const n = changedNodes[0];
                         if (n.type === 'position' && n.dragging) {
-                          console.log('save id: ', n.id);
                           toSave[n.id] = structuredClone(n);
                         }
                         if (Object.keys(toSave).length > 0) {
-                          console.log('toSave: ', toSave);
                           setNodePostionsToSave(toSave);
                         }
                         setDataHasChanged(true);
                       }
                     }}
                     onPaneClick={() => {
-                      console.log('panel click');
                       setSelectedNodeId('');
                     }}
                     onResetPosition={onResetPosition}

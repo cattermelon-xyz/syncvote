@@ -32,24 +32,6 @@ function App() {
             onDeleteNode={(nodeId) => {}}
             onConfigEdgePanelClose={() => {}}
             onConfigPanelClose={() => setSelectedNodeId('')}
-            onNodeChanged={(changedNodes) => {
-              const newData = structuredClone(version?.data);
-              newData?.checkpoints?.forEach((v: any, index: number) => {
-                const changedNode = changedNodes.find(
-                  (cN: any) => cN.id === v.id
-                );
-                if (changedNode && changedNode.position) {
-                  newData.checkpoints[index].position = changedNode.position;
-                }
-              });
-              setVersion({
-                ...version,
-                data: newData,
-              });
-              if (selectedNodeId) {
-                setDataHasChanged(true);
-              }
-            }}
             onNodeClick={(_event, node) => {
               setSelectedNodeId(node.id);
             }}

@@ -11,22 +11,9 @@ import ReactFlow, {
   applyNodeChanges,
 } from 'reactflow';
 import { toPng } from 'html-to-image';
-import React, {
-  useEffect,
-  useCallback,
-  useState,
-  useContext,
-  version,
-} from 'react';
-import { Badge, Button, Drawer, Modal, Space } from 'antd';
-import {
-  BulbOutlined,
-  CloseCircleOutlined,
-  CloseOutlined,
-  PlusOutlined,
-  SyncOutlined,
-  PaperClipOutlined,
-} from '@ant-design/icons';
+import React, { useEffect, useCallback, useState, useContext } from 'react';
+import { Button, Drawer, Modal } from 'antd';
+import { BulbOutlined, CloseOutlined } from '@ant-design/icons';
 import 'reactflow/dist/style.css';
 import { buildATree } from './buildATree';
 import MultipleDirectNode from './CustomNodes/MultipleDiretionNode';
