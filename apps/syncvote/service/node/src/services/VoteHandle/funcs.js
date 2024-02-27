@@ -30,6 +30,25 @@ const handleMovingToNextCheckpoint = async (
       .update({ arweave_id: arweave_id })
       .eq('id', details.cvd_id);
 
+    // Insert new triggers
+    let { data: triggersData, error: er } = await supabase
+      .from('checkpoint')
+      .select('triggers')
+      .eq('id', current_vote_data[0].checkpoint_id);
+    if (triggersData) {
+      triggersData = triggersData[0].triggers || [];
+    }
+    const triggers = triggersData.map((trigger) => {
+      console.log('trigger: ', trigger);
+      return {
+        mission_id: current_vote_data[0].mission_id,
+        data: trigger,
+      };
+    });
+    const { error: triggers_err } = await supabase
+      .from('mission_triggers')
+      .insert(triggers);
+
     // Init startToVote for next checkpoint
     let startToVote = timeDefault;
 

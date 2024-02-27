@@ -67,7 +67,7 @@ const Display = ({
 }) => {
   const { params, allNodes, triggerAt } = data;
   const { username, tweet } = params;
-  const nodeTitle = allNodes.find((node: any) => node.id === triggerAt).title;
+  const nodeTitle = allNodes?.find((node: any) => node.id === triggerAt)?.title;
   return (
     <Space direction='vertical' size='middle' className='w-full p-2 rounded-md'>
       <Space
@@ -93,8 +93,10 @@ const Display = ({
             style={{ marginBottom: '0px' }}
             editable={{
               onChange: (val: string) => {
+                const newData = structuredClone(data);
+                delete newData.allNodes;
                 onChange({
-                  ...data,
+                  ...newData,
                   params: {
                     ...data.params,
                     tweet: val,

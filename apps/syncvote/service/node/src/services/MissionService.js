@@ -94,6 +94,7 @@ async function insertMission(props) {
               desc: checkpoint?.description,
               props: checkpoint?.data,
               inHappyPath: checkpoint?.inHappyPath,
+              triggers: checkpoint?.triggers,
             };
 
             const error = await insertCheckpoint(checkpointData);

@@ -21,18 +21,45 @@ import { Discourse as Funcs } from './funcs';
 import { LuMapPin } from 'react-icons/lu';
 import parse from 'html-react-parser';
 import VoteUIWeb from './VoteUIWeb';
-import { Tag } from 'antd';
+import { Popover, Tag } from 'antd';
 const SelectOptions = Interface.SelectOptions;
 import icon from '../assets/icon.svg';
 
 const getLabel = (props: IVoteMachineGetLabelProps) => {
   const { source, target } = props;
-  return source?.data.next === target?.id ? (
-    <span>Pass</span>
-  ) : (
-    <span>Fail</span>
+  const { triggers } = source;
+  const title = source?.data.next === target?.id ? 'Pass' : 'Fail';
+  const filteredTriggers = triggers?.filter(
+    (trg: any) => trg.triggerAt === target.id
+  );
+  return (
+    <div>
+      <div>{title}</div>
+      <div>
+        {filteredTriggers?.map((trg: any) =>
+          trg.provider === 'twitter' ? (
+            <Popover
+              key={Math.random()}
+              content={
+                <div>
+                  <div className='mb-2 text-blue-500'>
+                    @{trg.params.username}
+                  </div>
+                  <div>{trg.params.tweet}</div>
+                </div>
+              }
+            >
+              <TwitterOutlined key={trg.id || Math.random()} className='pr-2' />
+            </Popover>
+          ) : (
+            <span key={trg.id || Math.random()}>{trg.provider}</span>
+          )
+        )}
+      </div>
+    </div>
   );
 };
+
 // label: label.length > 20 ? `${label.substring(0, 20)}...` : label,
 
 const getIcon = (className?: string) => {
