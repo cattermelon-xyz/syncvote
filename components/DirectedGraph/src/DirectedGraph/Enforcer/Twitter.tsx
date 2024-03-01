@@ -40,7 +40,14 @@ const Add = ({
           className='flex items-center'
           icon={<PlusOutlined />}
           onClick={() => {
-            onChange({ ...data, tweet: tmpTweet });
+            onChange({
+              provider: data.provider,
+              idString: data.id_string,
+              params: {
+                tweet: tmpTweet,
+                username: data.username,
+              },
+            });
             setTmpTweet('');
           }}
         >
@@ -58,22 +65,15 @@ const Display = ({
   data: any;
   onChange: (data: any) => void;
 }) => {
-  const { username, tweet, allNodes, triggerAt } = data;
-  const title =
-    triggerAt === 'this'
-      ? 'the start'
-      : allNodes.find((node: any) => node.id === triggerAt).title;
+  const { params, allNodes, triggerAt } = data;
+  const { username, tweet } = params;
+  const nodeTitle = allNodes.find((node: any) => node.id === triggerAt).title;
   return (
-    <Space direction='vertical' size='middle' className='w-full'>
-      <div className='flex items-center'>
-        <FlagOutlined className='mr-2' />
-        Trigger action at
-        <Tag className='mx-2'>{title}</Tag>
-      </div>
+    <Space direction='vertical' size='middle' className='w-full p-2 rounded-md'>
       <Space
         direction='horizontal'
         size='small'
-        className='w-full flex items-center p-2 border-2 rounded-md justify-between'
+        className='w-full flex items-center border-2 rounded-md justify-between'
       >
         <Space direction='horizontal' size='small'>
           <TwitterOutlined className='mr-1 text-blue-500' />
@@ -93,7 +93,13 @@ const Display = ({
             style={{ marginBottom: '0px' }}
             editable={{
               onChange: (val: string) => {
-                onChange({ ...data, tweet: val });
+                onChange({
+                  ...data,
+                  params: {
+                    ...data.params,
+                    tweet: val,
+                  },
+                });
               },
             }}
           >
@@ -101,6 +107,12 @@ const Display = ({
           </Paragraph>
         </div>
       ) : null}
+      <div className='flex items-center'>
+        <FlagOutlined className='mr-2' />
+        When
+        <Tag className='mx-2'>{nodeTitle}</Tag>
+        is choosen
+      </div>
     </Space>
   );
 };

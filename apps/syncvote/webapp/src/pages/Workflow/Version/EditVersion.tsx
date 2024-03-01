@@ -40,7 +40,7 @@ const autoSaveWorker = new Worker(workerURL, { type: 'classic' });
 const env = import.meta.env.VITE_ENV;
 
 import {
-  changeNode,
+  saveNodePosition,
   deleteNode,
   extractVersion,
   extractWorkflowFromList,
@@ -50,7 +50,10 @@ import {
 import VariableList from './fragment/VariableList';
 import Phases from './fragment/Phases';
 import VoteMachineList from './fragment/VoteMachinesList';
+import { set } from 'immer/dist/internal';
 
+// FIXME: this component is very important but it was poorly made
+// let's refactor it
 export const EditVersion = () => {
   const [searchParams, setSearchParams] = useSearchParams('');
   const urlSelectedCheckPointId =
@@ -58,17 +61,17 @@ export const EditVersion = () => {
       ? searchParams.get('cp')
       : '';
   const { orgIdString, workflowIdString, versionIdString } = useParams();
-  const [isLoadingData, setIsLoadingData] = useState(true);
-  const [isDataFetchedFromServer, setIsDataFetchedFromServer] = useState(false);
   const orgId = extractIdFromIdString(orgIdString);
   const workflowId = extractIdFromIdString(workflowIdString);
   const versionId = extractIdFromIdString(versionIdString);
   const dispatch = useDispatch();
-  const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
-  const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
   const [openCreateProposalModal, setOpenCreateProposalModal] = useState(false);
+  const { workflows, lastFetch } = useSelector((state: any) => state.workflow);
   const { web2Integrations } = useSelector((state: any) => state.integration);
+  const [centerPos, setCenterPos] = useState({ x: 0, y: 0 });
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isDataFetchedFromServer, setIsDataFetchedFromServer] = useState(false);
   const [version, setVersion] = useState<any>(
     extractVersion({
       workflows,
@@ -94,7 +97,7 @@ export const EditVersion = () => {
   const [shouldDownloadImage, setShouldDownloadImage] = useState(false);
   const [viewMode, setViewMode] = useState(GraphViewMode.EDIT_WORKFLOW_VERSION);
   const [fitScreen, setFitScreen] = useState(0); // 0: never fit, 1: should fit, 2: fitted
-
+  const [nodePositionsToSave, setNodePostionsToSave] = useState<any>({});
   if (env === 'production') {
     autoSaveWorker.onmessage = (e) => {
       if (dataHasChanged) {
@@ -191,9 +194,13 @@ export const EditVersion = () => {
     changedData?: any | undefined,
     hideLoading?: boolean
   ) => {
+    const arr = Object.keys(nodePositionsToSave).map(
+      (k: any) => nodePositionsToSave[k]
+    );
+    const v = saveNodePosition(version, arr, selectedLayoutId, setVersion);
     await save(
       changedData,
-      version,
+      { ...version, data: v },
       upsertWorkflowVersion,
       dispatch,
       versionId,
@@ -257,15 +264,7 @@ export const EditVersion = () => {
     // TODO: move this to IGraph interface to drill selectedEdge into children components
     setSelectedEdgeId(edge.id);
   };
-  const onNodeChanged = (changedNodes: any) => {
-    changeNode(
-      version,
-      changedNodes,
-      selectedLayoutId,
-      setVersion,
-      setDataHasChanged
-    );
-  };
+
   const onCosmeticChanged = (changed: IWorkflowVersionCosmetic) => {
     const cosmetic = changeCosmetic(version?.data.cosmetic, changed);
     setVersion({
@@ -374,7 +373,6 @@ export const EditVersion = () => {
   }, []);
   const onDrop = useCallback(
     (event: any) => {
-      console.log('onDrop ', event);
       event.preventDefault();
 
       const type = event.dataTransfer.getData('application/nodeType');
@@ -392,6 +390,7 @@ export const EditVersion = () => {
         y: event.clientY,
       });
       onAddNewNode(position.x - 30, position.y - 20, type, initialData, name);
+      setDataHasChanged(true);
     },
     [reactflowInstance, onAddNewNode]
   );
@@ -508,15 +507,47 @@ export const EditVersion = () => {
                     onDeleteNode={onDeleteNode}
                     onConfigPanelClose={() => setSelectedNodeId('')}
                     onChangeLayout={onChangeLayout}
-                    onEdgeClick={onEdgeClick}
+                    onEdgeClick={(e, edge) => {
+                      saveNodePosition(
+                        version,
+                        Object.keys(nodePositionsToSave).map(
+                          (k: any) => nodePositionsToSave[k]
+                        ),
+                        selectedLayoutId,
+                        setVersion
+                      );
+                      onEdgeClick(e, edge);
+                    }}
                     onConfigEdgePanelClose={() => setSelectedEdgeId('')}
-                    onNodeChanged={onNodeChanged}
                     onCosmeticChanged={onCosmeticChanged}
                     onLayoutClick={(selectedLayoutId) => {
                       setSelectedLayoutId(selectedLayoutId);
                     }}
                     onNodeClick={(event, node) => {
                       setSelectedNodeId(node.id);
+                      saveNodePosition(
+                        version,
+                        Object.keys(nodePositionsToSave).map(
+                          (k: any) => nodePositionsToSave[k]
+                        ),
+                        selectedLayoutId,
+                        setVersion
+                      );
+                    }}
+                    onNodesPositionChange={(changedNodes: any) => {
+                      if (changedNodes?.length === 1) {
+                        const toSave = structuredClone({
+                          ...nodePositionsToSave,
+                        });
+                        const n = changedNodes[0];
+                        if (n.type === 'position' && n.dragging) {
+                          toSave[n.id] = structuredClone(n);
+                        }
+                        if (Object.keys(toSave).length > 0) {
+                          setNodePostionsToSave(toSave);
+                        }
+                        setDataHasChanged(true);
+                      }
                     }}
                     onPaneClick={() => {
                       setSelectedNodeId('');

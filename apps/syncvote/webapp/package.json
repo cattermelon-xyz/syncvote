@@ -54,7 +54,7 @@
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.1",
     "react-zoom-pan-pinch": "^3.0.4",
-    "reactflow": "^11.7.2",
+    "reactflow": "^11.10.4",
     "realms-solana": "1.0.0",
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
