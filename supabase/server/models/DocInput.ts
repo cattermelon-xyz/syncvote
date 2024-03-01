@@ -1,5 +1,5 @@
 import { VotingMachine } from './index.ts';
-import { upsertVariable } from './integration/database/variables.ts';
+import { upsertVariable } from '../integration/database/variables.ts';
 
 export class DocInput extends VotingMachine {
   options: any;

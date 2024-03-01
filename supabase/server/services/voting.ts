@@ -1,13 +1,12 @@
 import moment from 'npm:moment@^2.29.4';
 
-import { getMissionVoteDetailsDatabase } from './integration/database/missionVoteDetails.ts';
+import { getMissionVoteDetailsDatabase } from '../integration/database/missionVoteDetails.ts';
 import {
   checkMinDurationTally,
   handleMovingToNextCheckpoint,
-} from './integration/start.ts';
-import { supabase } from './configs/supabaseClient.ts';
-import { VoteMachineController } from './VotingController.ts';
-import { error } from 'console';
+} from '../integration/start.ts';
+import { supabase } from '../configs/supabaseClient.ts';
+import { VoteMachineController } from '../models/VotingController.ts';
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -183,7 +182,7 @@ export const vote = async (req: any) => {
   } catch (error) {
     return new Response(
       JSON.stringify({
-        message: error,
+        error: error,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

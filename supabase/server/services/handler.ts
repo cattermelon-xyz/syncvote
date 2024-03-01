@@ -1,22 +1,22 @@
-import { SingleVote } from './SingleVote.ts';
-import { DocInput } from './DocInput.ts';
-import { Veto } from './Veto.ts';
-import { UpVote } from './UpVote.ts';
-import { Snapshot } from './Snapshot.ts';
-import { Discourse } from './Discourse.ts';
-import { Tally } from './Tally.ts';
-import { Realms } from './Realms.ts';
+import { SingleVote } from '../models/SingleVote.ts';
+import { DocInput } from '../models/DocInput.ts';
+import { Veto } from '../models/Veto.ts';
+import { UpVote } from '../models/UpVote.ts';
+import { Snapshot } from '../models/Snapshot.ts';
+import { Discourse } from '../models/Discourse.ts';
+import { Tally } from '../models/Tally.ts';
+import { Realms } from '../models/Realms.ts';
 import moment from 'npm:moment@^2.29.4';
 
 import {
   insertMissionDatabase,
   updateMissionDatabase,
-} from './integration/database/mission.ts';
-import { insertCheckpointDatabase } from './integration/database/checkpoint.ts';
-import { insertCvdDatabase } from './integration/database/currentVoteData.ts';
-import { getMissionVoteDetailsDatabase } from './integration/database/missionVoteDetails.ts';
-import { start } from './integration/start.ts';
-import { createArweave } from './functions/index.ts';
+} from '../integration/database/mission.ts';
+import { insertCheckpointDatabase } from '../integration/database/checkpoint.ts';
+import { insertCvdDatabase } from '../integration/database/currentVoteData.ts';
+import { getMissionVoteDetailsDatabase } from '../integration/database/missionVoteDetails.ts';
+import { start } from '../integration/start.ts';
+import { createArweave } from '../functions/index.ts';
 
 const VoteMachineValidate = {
   SingleChoiceRaceToMax: new SingleVote({}),
@@ -30,46 +30,49 @@ const VoteMachineValidate = {
 };
 
 export const corsHeaders = {
+  'Allow-Access-Control-Origin': '*',
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': '*',
+  'Content-Type': 'application/json',
 };
 
-export const handler = async (req: any) => {
+export const handler = async (req: Request): Promise<Response> => {
   try {
     const props = await req.json();
+
     if (props.refId && props.parent) {
       console.log('Create Mission: ', props.refId);
     } else {
       console.log('Create Mission');
     }
 
-    // const { arweave_id, error: arweave_err } = await createArweave(props);
-    // if (arweave_err) {
-    //   throw new Error('CreateArweaveError: ' + arweave_err);
-    // }
+    const { arweave_id, error: arweave_err } = await createArweave(props);
+
+    if (arweave_err) {
+      throw new Error('CreateArweaveError: ' + arweave_err);
+    }
 
     const { data: newMission, error } = await insertMissionDatabase({
       ...props,
-      // arweave_id: arweave_id,
+      arweave_id: arweave_id,
     });
 
     if (error) {
       throw new Error(`CreateMissionError: ${error}`);
     } else {
-      if (newMission.status === 'PUBLIC') {
-        console.log('Loop to create all checkpoint');
-        for (const checkpoint of newMission.data.checkpoints) {
+      if (newMission?.status === 'PUBLIC') {
+        console.log('Loop to create all checkpoints');
+
+        for (const checkpoint of newMission.data?.checkpoints || []) {
           if (
             !checkpoint.isEnd &&
             checkpoint?.vote_machine_type !== 'forkNode' &&
             checkpoint?.vote_machine_type !== 'joinNode'
           ) {
             const { duration, participation, title } = checkpoint;
-            const { isValid, message } =
-              VoteMachineValidate[checkpoint.vote_machine_type].validate(
-                checkpoint
-              );
+            const { isValid, message } = VoteMachineValidate[
+              checkpoint.vote_machine_type
+            ]?.validate(checkpoint) || { isValid: false, message: '' };
 
             if (!duration || !participation || !title || !isValid) {
               throw new Error(
@@ -99,6 +102,7 @@ export const handler = async (req: any) => {
           };
 
           console.log('CreateCheckpoint: ', checkpointData.id);
+
           const { error } = await insertCheckpointDatabase(checkpointData);
 
           if (error) {
@@ -107,6 +111,7 @@ export const handler = async (req: any) => {
         }
 
         console.log('Start mission');
+
         const { data: current_vote_data } = await insertCvdDatabase({
           checkpoint_id: `${newMission.id}-${newMission.start}`,
           startToVote: moment().format(),
@@ -134,19 +139,17 @@ export const handler = async (req: any) => {
         message: 'CreateMissionSuccessfully',
       }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders },
         status: 200,
       }
     );
-  } catch (error: any) {
-    return new Response(
-      JSON.stringify({
-        message: error,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      }
-    );
+  } catch (error) {
+    return new Response(error, {
+      status: 401,
+      statusText: 'Unauthorized',
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    });
   }
 };

@@ -1,7 +1,7 @@
 import axios from 'npm:axios@^1.5.0';
 import moment from 'npm:moment@^2.29.4';
 import { supabase } from '../configs/supabaseClient.ts';
-import { VoteMachineController } from '../VotingController.ts';
+import { VoteMachineController } from '../models/VotingController.ts';
 // import { createArweave } from '../functions/index.ts';
 
 export const handleMovingToNextCheckpoint = async ({
@@ -79,28 +79,28 @@ export const handleMovingToNextCheckpoint = async ({
 
     const startNextCheckpoint = async (details) => {
       if (!details?.vote_machine_type && details?.isEnd) {
-        await startEndNode(details);
+        await startEndNode({ details: details });
       } else if (details?.vote_machine_type && !details?.isEnd) {
         if (details?.vote_machine_type === 'forkNode') {
-          await startForkNode(details);
+          await startForkNode({ details: details });
         } else {
-          await start(details);
+          await start({ details: details });
         }
       } else {
         console.log('Debug', details);
       }
     };
 
-    //   if (startToVote.unix() === timeDefault.unix()) {
-    //     await startNextCheckpoint(next_details[0]);
-    //   } else {
-    //     const cronSyntax = convertToCron(moment(startToVote));
-    //     const job = new CronJob(cronSyntax, async function () {
-    //       await startNextCheckpoint(next_details[0]);
-    //     });
-    //     job.start();
-    //     console.log(`Start a job to start for ${next_checkpoint_id} `);
-    //   }
+    if (startToVote.unix() === timeDefault.unix()) {
+      await startNextCheckpoint(next_details[0]);
+    } else {
+      // const cronSyntax = convertToCron(moment(startToVote));
+      // const job = new CronJob(cronSyntax, async function () {
+      //   await startNextCheckpoint(next_details[0]);
+      // });
+      // job.start();
+      // console.log(`Start a job to start for ${next_checkpoint_id} `);
+    }
 
     if (error) {
       console.log(error);
@@ -220,8 +220,8 @@ export const startForkNode = async ({ details }) => {
     const subWorkflows = details?.data?.subWorkflows;
     const end = details?.props?.end;
     const start = details?.props?.start;
-    const startMissionId = [];
-    const endMissionId = [];
+    const startMissionId: any[] = [];
+    const endMissionId: any[] = [];
 
     for (let subWorkflowData of subWorkflows) {
       if (start.includes(subWorkflowData.refId)) {
@@ -237,12 +237,12 @@ export const startForkNode = async ({ details }) => {
             workflow_version_id: details.workflow_version_id,
           })
           .then(async (response: any) => {
-            // if (response.data.status !== 'ERR') {
-            //   startMissionId.push(response.data.data[0].id);
-            //   if (end.includes(subWorkflowData.refId)) {
-            //     endMissionId.push(response.data.data[0].id);
-            //   }
-            // }
+            if (response.data.status !== 'ERR') {
+              startMissionId.push(response.data.data[0].id);
+              if (end.includes(subWorkflowData.refId)) {
+                endMissionId.push(response.data.data[0].id);
+              }
+            }
           });
       }
     }
@@ -314,7 +314,7 @@ function arraysEqual(arr1: any, arr2: any) {
   return arr1.every((element) => arr2.includes(element));
 }
 
-export function checkMinDurationTally(details) {
+export function checkMinDurationTally(details: any) {
   if (details.minDuration) {
     const now = moment().unix();
     const startToVoteMoment = moment(details.startToVote).unix();

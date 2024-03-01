@@ -14,12 +14,15 @@ export async function createArweave(metadata: any) {
       logging: false,
     });
     const wallet = JSON.parse(Deno.env.get('ARWEAVE_KEY') ?? '{}');
+    console.log(wallet);
+
     const metadataRequest = JSON.stringify(metadata);
     const metadataTransaction = await arweave.createTransaction({
       data: metadataRequest,
     });
+    console.log(1);
     await arweave.transactions.sign(metadataTransaction, wallet);
-
+    console.log(2);
     await fetch('https://arweave.net/tx', {
       method: 'POST',
       headers: {
@@ -27,7 +30,7 @@ export async function createArweave(metadata: any) {
       },
       body: JSON.stringify(metadataTransaction),
     });
-
+    console.log(3);
     return { arweave_id: 'https://arweave.net/' + metadataTransaction.id };
   } catch (error) {
     console.log(error);

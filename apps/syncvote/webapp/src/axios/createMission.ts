@@ -10,6 +10,7 @@ import { Discourse } from 'discourse/src/Discourse/funcs';
 import { Snapshot } from 'snapshot/src/Snapshot/funcs';
 import { Tally } from 'tally-xyz/src/Tally/funcs';
 import { Realms } from 'realms-solana/src/Realms/funcs';
+import { supabase } from 'utils';
 
 // TODO: fix this, syncvote should not depend on any votemachine
 const VoteMachineValidate = {
@@ -56,6 +57,7 @@ export const createMission = async ({
       allCheckPoints.push({ ...chk, subWorkflowId: sw.refId });
     });
   });
+
   allCheckPoints.forEach((checkpoint: ICheckPoint, index: number) => {
     if (
       !checkpoint?.isEnd &&
@@ -84,22 +86,24 @@ export const createMission = async ({
     }
   });
   if (isValidate) {
-    axios
-      .post(`${import.meta.env.VITE_SERVER_URL}/mission/create`, newMissionData)
-      .then((response) => {
-        console.log('Respone', response.data);
-        if (response.data.status === 'ERR') {
-          onError(response.data.message);
-        } else {
-          onSuccess(response.data);
-        }
-        dispatch(finishLoading({}));
-      })
-      .catch((error) => {
-        console.log('Error', error);
-        onError(error);
-        dispatch(finishLoading({}));
-      });
+    const res = await supabase.functions.invoke('create-mission', {
+      body: newMissionData,
+    });
+
+    console.log('Respone', res);
+    dispatch(finishLoading({}));
+    //   if (!res.error) {
+    //     onSuccess(res.data);
+    //     if (res.data.error) {
+    //       onError(res.data.message);
+    //     } else {
+    //       onSuccess(res.data);
+    //     }
+    //   } else {
+    //     console.log(res.data);
+    //     onError(res.error);
+    //   }
+    //   dispatch(finishLoading({}));
   } else {
     console.log('Here');
     onError('Checkpoint of this proposal is missing attributes');

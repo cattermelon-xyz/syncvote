@@ -1,4 +1,4 @@
-import { supabase } from './configs/supabaseClient.ts';
+import { supabase } from '../configs/supabaseClient.ts';
 import { VotingMachine } from './index.ts';
 // import { ApolloClient, InMemoryCache, gql } from 'npm:@apollo/client@^3.8.7';
 
@@ -206,7 +206,7 @@ const SNAPSHOT_ACTION = {
   SYNC_PROPOSAL: 'sync-proposal',
 };
 
-const getSnapshotData = async (props) => {
+const getSnapshotData = async (props: any): Promise<any> => {
   // try {
   //   const { proposalId } = props;
   //   const clientApollo = new ApolloClient({

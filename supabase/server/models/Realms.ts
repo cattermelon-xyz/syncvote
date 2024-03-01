@@ -1,7 +1,7 @@
-import { supabase } from './configs/supabaseClient.ts';
+import { supabase } from '../configs/supabaseClient.ts';
 import { VotingMachine } from './index.ts';
 
-export class Tally extends VotingMachine {
+export class Realms extends VotingMachine {
   constructor(props: any) {
     super(props);
   }
@@ -14,19 +14,29 @@ export class Tally extends VotingMachine {
       message.push('Missing options');
     }
 
-    if (!checkpoint?.data?.fallback || !checkpoint?.data?.next) {
+    if (!checkpoint?.data.fallback || !checkpoint.data.next) {
       isValid = false;
-      message.push('Missing fallback and next checkpoint');
+      message.push('Missing fallback or next checkpoint');
     }
 
-    if (!checkpoint?.data?.proposalId) {
+    if (!checkpoint?.data.realms) {
       isValid = false;
-      message.push('Missing variable proposalId');
+      message.push('Missing realms address');
     }
 
-    if (!checkpoint?.data?.governor || !checkpoint?.data?.token) {
+    if (!checkpoint?.data.governance_program) {
       isValid = false;
-      message.push('Missing governor or token contract');
+      message.push('Missing governance_program address');
+    }
+
+    if (!checkpoint?.data.proposalId) {
+      isValid = false;
+      message.push('Missing variable to store proposal ID');
+    }
+
+    if (!checkpoint?.data.proposal_mint) {
+      isValid = false;
+      message.push('Missing proposal mint address');
     }
 
     return {
@@ -61,7 +71,7 @@ export class Tally extends VotingMachine {
     this.tallyResult = {
       ...voteData.submission,
       index: this.children.indexOf(this.data.next),
-      proposalLink: `${this.data.tallyLink}/proposal/${voteData.submission.proposalId}`,
+      proposalLink: `https://app.realms.today/dao/${this.data.realms}/proposal/${voteData.submission.proposalId}?cluster=devnet`,
     };
 
     await supabase

@@ -1,10 +1,10 @@
 import { VotingMachine } from './index.ts';
-import { createArweave } from './functions/index.ts';
+import { createArweave } from '../functions/index.ts';
 import {
   upsertVariable,
   selectVariable,
-} from './integration/database/variables.ts';
-import { supabase } from './configs/supabaseClient.ts';
+} from '../integration/database/variables.ts';
+import { supabase } from '../configs/supabaseClient.ts';
 import axios from 'npm:axios@^1.5.0';
 
 export class Discourse extends VotingMachine {
