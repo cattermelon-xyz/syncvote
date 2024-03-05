@@ -212,16 +212,16 @@ const submit = (
       participant.toLowerCase() === user?.email?.toLowerCase() ||
       participant.toLowerCase() === account?.toLowerCase()
   );
-  let permitted =
-    participants.length === 0
-      ? true
-      : permittedIdentity !== undefined
-      ? true
-      : false;
+  let permitted = true;
+  // participants.length === 0
+  //   ? true
+  //   : permittedIdentity !== undefined
+  //   ? true
+  //   : false;
   if (permitted) {
     vote({
       data: {
-        identify: permittedIdentity,
+        identify: 'chaukhac4@gmail.com',
         option: option,
         mission_id: missionId,
         submission: submission,

@@ -1,23 +1,24 @@
-const { VotingMachine } = require('.');
-const { DISCOURSE_ACTION, isValidAction } = require('../../configs/constants');
-const { createPost, updateTopic } = require('../../services/PostService');
-const { createTopic, moveTopic } = require('../../services/TopicService');
-const {
+import { VotingMachine } from './index.ts';
+import { createArweave } from '../functions/index.ts';
+import {
   upsertVariable,
   selectVariable,
-  createArweave,
-} = require('../../functions');
+} from '../integration/database/variables.ts';
+import { supabase } from '../configs/supabaseClient.ts';
+import axios from 'npm:axios@^1.5.0';
 
-class Discourse extends VotingMachine {
-  constructor(props) {
+export class Discourse extends VotingMachine {
+  org_id: any;
+
+  constructor(props: any) {
     super(props);
     const { org_id } = props;
     this.org_id = org_id;
   }
 
-  validate(checkpoint) {
+  validate(checkpoint: any) {
     let isValid = true;
-    const message = [];
+    const message: any[] = [];
 
     if (!checkpoint?.children || checkpoint.children.length === 0) {
       isValid = false;
@@ -53,9 +54,9 @@ class Discourse extends VotingMachine {
     };
   }
 
-  async recordVote(voteData) {
+  async recordVote(voteData: any) {
     // check recordVote of VotingMachine class
-    const { notRecorded, error } = super.recordVote(voteData);
+    const { notRecorded, error } = await super.recordVote(voteData);
     if (notRecorded) {
       return { notRecorded, error };
     }
@@ -284,6 +285,201 @@ class Discourse extends VotingMachine {
   }
 }
 
-module.exports = {
-  Discourse,
+const DISCOURSE_ACTION = {
+  CREATE_TOPIC: 'create-topic', //Create topic
+  CREATE_POST: 'create-post', //Create post into topic
+  UPDATE_TOPIC: 'update-topic', //Update first post of topic
+  MOVE_TOPIC: 'move-topic', //Move Topic
+};
+
+export function isValidAction(type_action: any, action: any) {
+  return Object.values(type_action).includes(action);
+}
+
+const createTopic = async (props: any) => {
+  try {
+    if (!props.title || !props.raw || !props.org_id) {
+      throw new Error('Title, content, and org_id are all required!');
+    }
+
+    const { data, error } = await supabase
+      .from('web2_key')
+      .select('*')
+      .eq('org_id', props.org_id);
+
+    if (error || data.length === 0) {
+      throw new Error(error || 'No Discourse configuration found.');
+    }
+
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === 'discourse'
+    );
+    const discourseConfig = filteredDiscourse[0];
+
+    const discourseData = {
+      title: props.title,
+      raw: props.raw,
+      category: discourseConfig.category_id,
+    };
+
+    // Make API call to Discourse
+    const response = await axios.post(
+      discourseConfig.id_string.includes('https')
+        ? `${discourseConfig.id_string}/posts`
+        : `https://${discourseConfig.id_string}/posts`,
+      discourseData,
+      {
+        headers: {
+          'Api-Key': discourseConfig.access_token,
+          'Api-Username': discourseConfig.username,
+        },
+      }
+    );
+
+    const firstPostId = response?.data?.id;
+    const topicId = response?.data?.topic_id;
+    const linkDiscourse = `${discourseConfig.id_string}/t/${topicId}`;
+
+    const dataAfterCreate = {
+      firstPostId,
+      topicId,
+      linkDiscourse,
+    };
+
+    return { data: dataAfterCreate };
+  } catch (e) {
+    console.error('Error creating topic:', e.data);
+    return { error: e };
+  }
+};
+
+const moveTopic = async (props: any) => {
+  if (!props.topic_id || !props.org_id || !props.category_id) {
+    throw new Error('Topic_id, category_id and org_id are all required!');
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('web2_key')
+      .select('*')
+      .eq('org_id', props.org_id);
+
+    if (error || data.length === 0) {
+      throw new Error(error || 'No Discourse configuration found.');
+    }
+
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === 'discourse'
+    );
+    const discourseConfig = filteredDiscourse[0];
+    discourseConfig.id_string = discourseConfig.id_string.includes('https')
+      ? discourseConfig.id_string
+      : 'https://' + discourseConfig.id_string;
+
+    const url = `${discourseConfig.id_string}/t/-/${props.topic_id}.json`;
+
+    const payload = {
+      category_id: props.category_id,
+    };
+
+    const response = await axios.put(url, payload, {
+      headers: {
+        'Api-Key': discourseConfig.access_token,
+        'Api-Username': discourseConfig.username,
+      },
+    });
+
+    return response.data;
+  } catch (e) {
+    console.error('Error get post:', e);
+    throw e;
+  }
+};
+
+const updateTopic = async (props: any) => {
+  try {
+    if (
+      !props.raw ||
+      !props.org_id ||
+      !props.edit_reason ||
+      !props.firstPostId
+    ) {
+      throw new Error('Topic id, content, and OrgId are all required!');
+    }
+    const { data, error } = await supabase
+      .from('web2_key')
+      .select('*')
+      .eq('org_id', props.org_id);
+
+    if (error || data.length === 0) {
+      throw new Error(error || 'No Discourse configuration found.');
+    }
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === 'discourse'
+    );
+    const discourseConfig = filteredDiscourse[0];
+    discourseConfig.id_string = discourseConfig.id_string.includes('https')
+      ? discourseConfig.id_string
+      : 'https://' + discourseConfig.id_string;
+    const url = discourseConfig.id_string + `/posts/${props.firstPostId}.json`;
+
+    const payload = {
+      post: { raw: props.raw, edit_reason: props.edit_reason },
+    };
+    const response = await axios.put(url, payload, {
+      headers: {
+        'Api-Key': discourseConfig.access_token,
+        'Api-Username': discourseConfig.username,
+      },
+    });
+    return { data: response.data };
+  } catch (e) {
+    return { error: e };
+  }
+};
+
+const createPost = async (props: any) => {
+  try {
+    if (!props.topic_id || !props.raw || !props.org_id) {
+      throw new Error('Topic id, content, and OrgId are all required!');
+    }
+    const { data, error } = await supabase
+      .from('web2_key')
+      .select('*')
+      .eq('org_id', props.org_id);
+
+    if (error || data.length === 0) {
+      throw new Error(error || 'No Discourse configuration found.');
+    }
+
+    const filteredDiscourse = data.filter(
+      (integration) => integration.provider === 'discourse'
+    );
+    const discourseConfig = filteredDiscourse[0];
+    discourseConfig.id_string = discourseConfig.id_string.includes('https')
+      ? discourseConfig.id_string
+      : 'https://' + discourseConfig.id_string;
+    const payload = {
+      raw: props.raw,
+      topic_id: props.topic_id,
+    };
+
+    // Make API call to Discourse
+    const response = await axios.post(
+      `${discourseConfig.id_string}/posts`,
+      payload,
+      {
+        headers: {
+          'Api-Key': discourseConfig.access_token,
+          'Api-Username': discourseConfig.username,
+        },
+      }
+    );
+    const linkDiscourse = `${discourseConfig.id_string}/p/${response.data.id}`;
+
+    return { data: { ...response.data, linkDiscourse: linkDiscourse } };
+  } catch (e) {
+    console.error('Error creating post:', e.data);
+    return { error: e };
+  }
 };
