@@ -187,13 +187,6 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
               >
                 <div className='mb-8'>
                   <div className='mb-2 text-gray-500'>Update Topic</div>
-                  <input
-                    type='text'
-                    className='w-full border-none text-4xl focus:outline-none focus:border-none'
-                    placeholder='Proposal Title'
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
                 </div>
                 <div className='flex flex-row relative mb-3'>
                   <Button
@@ -206,7 +199,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
                     disabled={!checkpointData?.data?.template}
                     title='Show Template'
                   />
-                  <div className='flex flex-col'style={{ maxWidth: '700px' }}>
+                  <div className='flex flex-col'>
                     <TextEditor
                       value={missionDesc}
                       setValue={setMissionDesc}
@@ -227,10 +220,7 @@ const VoteUIWeb = (props: IVoteUIWebProps): JSX.Element => {
             </div>
             <div className='w-full'>
               <Divider className='m-0' />
-              <div
-                className='w-full flex py-3 pr-5 items-center'
-                style={{ flexDirection: 'row-reverse' }}
-              >
+              <div className='w-full flex flex-row-reverse pt-2 pb-3 pr-5 items-center'>
                 <Button
                   type='primary'
                   onClick={() => {
