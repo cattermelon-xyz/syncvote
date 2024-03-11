@@ -290,7 +290,7 @@ const MissionVotingDetail = () => {
   const [account, setAccount] = useState<any>(getAccount());
 
   useEffect(() => {
-    console.log('try to getAccount: ', getAccount());
+    // console.log('try to getAccount: ', getAccount());
     setAccount(getAccount());
   });
 

@@ -37,6 +37,9 @@ export const corsHeaders = {
 };
 
 export const handler = async (req: Request): Promise<Response> => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
   try {
     const props = await req.json();
 
