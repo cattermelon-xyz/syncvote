@@ -7,8 +7,8 @@ export const getAccount = () => {
   // console.log('chain: ', chain);
   // const ethAddress = anyWindow.ethereum?.selectedAddress;
   // const solAddress = anyWindow.solana?.publicKey?.toBase58();
-  console.log('anyWindow.ethereum: ', anyWindow.ethereum);
-  console.log('anyWindow.solana: ', anyWindow.solana);
+  // console.log('anyWindow.ethereum: ', anyWindow.ethereum);
+  // console.log('anyWindow.solana: ', anyWindow.solana);
   if (chain === 'ethereum') {
     return getValue('account');
   } else if (chain === 'solana') {
